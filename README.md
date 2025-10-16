@@ -64,7 +64,7 @@ Download from [here](https://astah.net/downloads/) and install.
 
 ### Install the astah-pro-mcp Plugin
 
-Download [the plugin JAR file (astah-pro-mcp-x.x.x.jar)](https://github.com/takaakit/astah-pro-mcp/releases), drop it into Astah, then restart Astah (see [this page](https://astahblog.com/2014/12/15/astah_plugins/)). After restarting, if you see an **'mcp'** tab in Astah's extensions view, the installation was successful.
+Download [the plugin JAR file (astah-pro-mcp-x.x.x.jar)](https://github.com/takaakit/astah-pro-mcp/releases), drop it into Astah, then restart Astah (see [here](https://astahblog.com/2014/12/15/astah_plugins/)). After restarting, if you see an **'mcp'** tab in Astah's extensions view, the installation was successful.
 
 ![mcp tab](img/mcp-tab.png)
 
@@ -117,6 +117,7 @@ Or run this command:
 ```bash
 claude mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8888/mcp
 ```
+See [here](https://docs.claude.com/en/docs/claude-code/mcp#managing-your-servers) for information on the `--scope` flag.
 
 #### Codex CLI
 
@@ -151,7 +152,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 
 <br>
 
-> **Important:** Use `127.0.0.1` instead of `localhost`. Connections to `localhost` will fail.
+> *Note:* Use `127.0.0.1` instead of `localhost`. Connections to `localhost` will fail.
 
 <br>
 
@@ -168,7 +169,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 
 <br>
 
-> **Troubleshooting:** If *Claude Desktop* cannot connect to the MCP server, completely quit *Claude Desktop* (e.g., end the 'Claude' process in Task Manager), then restart it.
+> *Troubleshooting:* If *Claude Desktop* cannot connect to the MCP server, completely quit *Claude Desktop* (e.g., end the 'Claude' process in Task Manager), then restart it.
 
 <br>
 
@@ -176,7 +177,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 
 If you want to build and test locally:
 
-1. Set up your Astah plugin development environment (see [this page](https://astah.net/support/plugin-dev-tutorial/plugin-development-setup-for-astah-professional/)).
+1. Set up your Astah plugin development environment (see [here](https://astah.net/support/plugin-dev-tutorial/plugin-development-setup-for-astah-professional/)).
 
 2. Build:
    ```bash
