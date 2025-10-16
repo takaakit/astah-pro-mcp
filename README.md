@@ -64,7 +64,7 @@ Download from [here](https://astah.net/downloads/) and install.
 
 ### Install the astah-pro-mcp Plugin
 
-Download [the plugin JAR file](https://github.com/takaakit/astah-pro-mcp/releases), drop it into Astah, then restart Astah (see [this page](https://astahblog.com/2014/12/15/astah_plugins/)). After restarting, if you see an **'mcp'** tab in Astah's extensions view, the installation was successful.
+Download [the plugin JAR file (astah-pro-mcp-x.x.x.jar)](https://github.com/takaakit/astah-pro-mcp/releases), drop it into Astah, then restart Astah (see [this page](https://astahblog.com/2014/12/15/astah_plugins/)). After restarting, if you see an **'mcp'** tab in Astah's extensions view, the installation was successful.
 
 ![mcp tab](img/mcp-tab.png)
 
