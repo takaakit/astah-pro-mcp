@@ -1,0 +1,8 @@
+https://plantuml.com/class-diagram.html
+https://plantuml.com/object-diagram.html
+https://plantuml.com/sequence-diagram.html
+https://plantuml.com/use-case-diagram.html
+https://plantuml.com/activity-diagram-beta.html
+https://plantuml.com/state-diagram.html
+https://plantuml.com/component-diagram.html
+https://plantuml.com/deployment-diagram.html
