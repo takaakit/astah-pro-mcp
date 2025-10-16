@@ -7,7 +7,7 @@ A **local MCP server** that runs as a plugin for **Astah Professional**, a UML m
 - Generate source code from UML models and diagrams in your Astah project, and vice versa.
 - Create UML diagrams in Astah from hand-drawn sketch images.
 
----
+<br>
 
 The videos below show *Claude Code* designing a simple library management system and drawing a class diagram, a sequence diagram, and an activity diagram. These videos are sped up 5×.
 
@@ -24,7 +24,7 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
 > *Note:* As of October 10, 2025, AI assistants/agents are reasonably good at viewing and editing model information, but their ability to view and edit visual diagram information is still developing.
 
----
+<br>
 
 ## System Requirements
 
@@ -44,7 +44,7 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
   > *Tip:* This is just the personal impression, but we recommend *Claude Code* or *Claude Desktop* because they use tool functions more appropriately. Additionally, if processing speed is your priority, go with *Claude Code*.
 
----
+<br>
 
 ## Supported Diagram Types
 
@@ -54,7 +54,7 @@ This MCP server can view and edit the following diagrams (with more to come):
 - **Sequence Diagram**  
 - **Activity Diagram**
 
----
+<br>
 
 ## Installation
 
@@ -153,7 +153,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 
 > **Important:** Use `127.0.0.1` instead of `localhost`. Connections to `localhost` will fail.
 
----
+<br>
 
 ## How to Use
 
@@ -170,7 +170,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 
 > **Troubleshooting:** If *Claude Desktop* cannot connect to the MCP server, completely quit *Claude Desktop* (e.g., end the 'Claude' process in Task Manager), then restart it.
 
----
+<br>
 
 ## Build & Test
 
@@ -195,7 +195,7 @@ If you want to build and test locally:
    astah-mvn test -DastahPath="C:\Program Files\astah-professional" -Dtest="**/editor/*Test"
    ```
 
----
+<br>
 
 ## Considerations
 
@@ -217,7 +217,7 @@ This MCP server prioritizes providing the information AI assistants/agents need 
 ### AI Limitations
 As with source code, AI assistants/agents can make mistakes or misinterpret UML models and diagrams.
 
----
+<br>
 
 ## License
 
@@ -226,13 +226,13 @@ Some tool functions provided by this MCP server return excerpts from the [OMG UM
 All other source code is copyrighted by **Takaaki Teshima** and released under the **MIT-0** license.  
 [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue.svg)](https://opensource.org/licenses/MIT-0)
 
----
+<br>
 
 ## Got a feature request or found a bug?
 
 Please open an [issue](https://github.com/takaakit/astah-pro-mcp/issues). Because this project is experimental and may undergo breaking changes, we're not currently accepting pull requests. Thank you for your understanding.
 
----
+<br>
 
 ## Need support?
 
