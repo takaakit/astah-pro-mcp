@@ -231,7 +231,7 @@ All other source code is copyrighted by **Takaaki Teshima** and released under t
 
 ## Got a feature request or found a bug?
 
-Please open an [issue](https://github.com/takaakit/astah-pro-mcp/issues). Because this project is experimental and may undergo breaking changes, we're not currently accepting pull requests. Thank you for your understanding.
+Please open an [issue](https://github.com/takaakit/astah-pro-mcp/issues). Because this project is experimental phase and may introduce breaking changes, we aren't accepting pull requests until the design and implementation stabilize. Thank you for your understanding.
 
 <br>
 
