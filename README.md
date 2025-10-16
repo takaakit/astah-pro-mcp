@@ -113,8 +113,6 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 ```
 </details>
 
-<br>
-
 Or run this command:
 ```bash
 claude mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8888/mcp
