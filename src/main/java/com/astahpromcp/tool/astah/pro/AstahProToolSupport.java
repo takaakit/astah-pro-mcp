@@ -258,4 +258,8 @@ public class AstahProToolSupport {
     public IUseCaseDiagram getUseCaseDiagram(String id) {
         return getEntity(id, IUseCaseDiagram.class, "usecase diagram");
     }
+
+    public ICommunicationDiagram getCommunicationDiagram(String id) {
+        return getEntity(id, ICommunicationDiagram.class, "communication diagram");
+    }
 }

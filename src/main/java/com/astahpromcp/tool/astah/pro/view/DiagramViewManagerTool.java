@@ -111,7 +111,7 @@ public class DiagramViewManagerTool implements ToolProvider {
                             
                     ToolSupport.definition(
                             "auto_layout",
-                            "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information.",
+                            "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
                             this::autoLayout,
                             NoInputDTO.class,
                             DiagramDTO.class),

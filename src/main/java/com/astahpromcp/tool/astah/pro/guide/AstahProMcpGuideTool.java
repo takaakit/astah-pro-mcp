@@ -47,6 +47,11 @@ IMPORTANT POINTS to Keep in Mind:
 * Object diagrams and package diagrams are substituted with class diagrams. This means that, for example, instance specifications and instance specification links are drawn on class diagrams.  
 
 
+Procedure for Editing Models and Diagrams:
+* When editing models and diagrams, execute the loop below. End the loop when editing is complete, when no further edits are possible, or when the loop has been repeated five or more times.
+  Draft an edit plan → Apply the edits → Retrieve and evaluate information about the post-edit model and diagram → If any deficiencies are found, return to drafting an edit plan.
+
+
 Inheritance Structure of Element Types:
 The following PlantUML code illustrates the inheritance structure of element types in Astah. Child types inherit all the characteristics of their parent types. Every element in an Astah project belongs to one of these element types. The definitions of element types in Astah generally follow those defined in the UML Specification, although some of them are slightly customized.
 

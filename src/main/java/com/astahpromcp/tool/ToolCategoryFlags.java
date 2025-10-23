@@ -9,6 +9,7 @@ public class ToolCategoryFlags {
     private final boolean stateMachineDiagramEnabled;
     private final boolean useCaseDiagramEnabled;
     private final boolean requirementDiagramEnabled;
+    private final boolean communicationDiagramEnabled;
     
     public ToolCategoryFlags(
             boolean classDiagramEnabled,
@@ -16,7 +17,8 @@ public class ToolCategoryFlags {
             boolean activityDiagramEnabled,
             boolean stateMachineDiagramEnabled,
             boolean useCaseDiagramEnabled,
-            boolean requirementDiagramEnabled) {
+            boolean requirementDiagramEnabled,
+            boolean communicationDiagramEnabled) {
 
         this.classDiagramEnabled = classDiagramEnabled;
         this.sequenceDiagramEnabled = sequenceDiagramEnabled;
@@ -24,6 +26,7 @@ public class ToolCategoryFlags {
         this.stateMachineDiagramEnabled = stateMachineDiagramEnabled;
         this.useCaseDiagramEnabled = useCaseDiagramEnabled;
         this.requirementDiagramEnabled = requirementDiagramEnabled;
+        this.communicationDiagramEnabled = communicationDiagramEnabled;
     }
     
     public boolean isClassDiagramEnabled() {
@@ -48,5 +51,9 @@ public class ToolCategoryFlags {
     
     public boolean isRequirementDiagramEnabled() {
         return requirementDiagramEnabled;
+    }
+
+    public boolean isCommunicationDiagramEnabled() {
+        return communicationDiagramEnabled;
     }
 }

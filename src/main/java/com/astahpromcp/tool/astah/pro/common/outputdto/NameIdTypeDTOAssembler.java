@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.common.outputdto;
 
-import com.change_vision.jude.api.inf.model.INamedElement;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 

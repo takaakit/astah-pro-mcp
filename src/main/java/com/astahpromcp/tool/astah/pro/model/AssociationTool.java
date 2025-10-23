@@ -117,14 +117,14 @@ public class AssociationTool implements ToolProvider {
 
                     ToolSupport.definition(
                             "set_navi_of_asso_end_a",
-                            "Set the navigability of the specified association end A (specified by ID), and return the association end information after it is set.",
+                            "Set the navigability of the specified association end A (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end A to 'navigable', the arrowhead appears on the association end B side.",
                             this::setNavigabilityOfAssociationEndA,
                             AssociationEndWithNavigabilityDTO.class,
                             AttributeDTO.class),
 
                     ToolSupport.definition(
                             "set_navi_of_asso_end_b",
-                            "Set the navigability of the specified association end B (specified by ID), and return the association end information after it is set.",
+                            "Set the navigability of the specified association end B (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end B to 'navigable', the arrowhead appears on the association end A side.",
                             this::setNavigabilityOfAssociationEndB,
                             AssociationEndWithNavigabilityDTO.class,
                             AttributeDTO.class)

@@ -8,17 +8,19 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllLabelIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllNameIdTypeInfoDTO;
+import com.astahpromcp.tool.astah.pro.project.outputdto.SourceTargetNameIdTypeListDTO;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import com.change_vision.jude.api.inf.model.IDiagram;
-import com.change_vision.jude.api.inf.model.INamedElement;
+import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class ProjectInfoTool implements ToolProvider {
@@ -76,7 +78,14 @@ public class ProjectInfoTool implements ToolProvider {
                             "Return all presentation data on the specified diagram (specified by ID). The presentation data is a simplified information: label, identifier, and type.",
                             this::getAllPresentationsOnDiagram,
                             IdDTO.class,
-                            LabelIdTypeListDTO.class)
+                            LabelIdTypeListDTO.class),
+
+                    ToolSupport.definition(
+                            "get_clses_that_ref_or_be_refed_by",
+                            "Return all classifiers (classes, interfaces, and enumerations) that the specified classifier (specified by ID) references or that reference it. The returned data is a simplified information: name, identifier, and type. For example, when you need to understand the scope of impact of changes to a specific element, use this tool. If you want to traverse references recursively, you'll need to use this tool repeatedly. Note that using a classifier as a type is considered a reference to that classifier.",
+                            this::getClassifiersThatReferenceOrBeReferencedBy,
+                            IdDTO.class,
+                            SourceTargetNameIdTypeListDTO.class)
             );
         } catch (Exception e) {
             log.error("Failed to create project info tools", e);
@@ -94,7 +103,7 @@ public class ProjectInfoTool implements ToolProvider {
             try {
                 namedIdTypeDTOs.add(NameIdTypeDTOAssembler.toDTO(astahNamedElement));
             } catch (Exception e) {
-                log.info("Due to an issue on the Astah side, failed to convert INamedElement to NameIdTypeDTO: " + e.getMessage());
+                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to NameIdTypeDTO: " + e.getMessage());
             }
         }
 
@@ -145,7 +154,7 @@ public class ProjectInfoTool implements ToolProvider {
                 if (astahPresentation.getLabel() == null
                         || astahPresentation.getID() == null
                         || astahPresentation.getID().isEmpty()) {
-                    log.info("Label or ID is invalid: Label={}, ID={}", astahPresentation.getLabel(), astahPresentation.getID());
+                    log.debug("Label or ID is invalid: Label={}, ID={}", astahPresentation.getLabel(), astahPresentation.getID());
                     continue;
                 }
                 labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
@@ -197,7 +206,7 @@ public class ProjectInfoTool implements ToolProvider {
             if (astahPresentation.getLabel() == null
                     || astahPresentation.getID() == null
                     || astahPresentation.getID().isEmpty()) {
-                log.info("Label or ID is invalid: Label={}, ID={}", astahPresentation.getLabel(), astahPresentation.getID());
+                log.debug("Label or ID is invalid: Label={}, ID={}", astahPresentation.getLabel(), astahPresentation.getID());
                 continue;
             }
             labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
@@ -205,5 +214,242 @@ public class ProjectInfoTool implements ToolProvider {
 
         return new LabelIdTypeListDTO(labelIdTypeDTOs);
     }
-}
 
+    private SourceTargetNameIdTypeListDTO getClassifiersThatReferenceOrBeReferencedBy(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Get classifiers that reference or are referenced by: {}", param);
+
+        IClass astahTargetClass = astahProToolSupport.getClass(param.id());
+
+        Set<NameIdTypeDTO> inheritanceSourceClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> inheritanceTargetClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> realizationSourceClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> realizationTargetClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> associationSourceClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> associationTargetClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> dependencySourceClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> dependencyTargetClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> typeUsageSourceClassifier = new LinkedHashSet<>();
+        Set<NameIdTypeDTO> typeUsageTargetClassifier = new LinkedHashSet<>();
+
+        for (INamedElement astahNamedElement : projectAccessor.findElements(IClass.class)) {
+            IClass astahClass = (IClass)astahNamedElement;
+            
+            if (astahClass.equals(astahTargetClass)) {
+                // Processing for the target class itself
+                for (IAttribute astahAttribute : astahClass.getAttributes()) {
+                    // Association
+                    if (astahAttribute.getAssociation() != null) {
+                        // Both navigabilities are unspecified
+                        if (astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Unspecified")
+                            && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Unspecified")) {
+                            
+                            if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass) {
+                                associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[1].getOwner()));
+                            }
+
+                            if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahTargetClass) {
+                                associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[0].getOwner()));
+                            }
+
+                        // One of the navigabilities is specified
+                        } else {
+                            
+                            if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass
+                                && astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Navigable")) {
+                                associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[1].getOwner()));
+                            }
+                            
+                            if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahTargetClass
+                                && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Navigable")) {
+                                associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[0].getOwner()));
+                            }
+                        }
+                    // Attribute
+                    } else {
+                        if (astahAttribute.getType() != null) {
+                            typeUsageTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahAttribute.getType()));
+                        }
+                    }
+                }
+
+                // Operation
+                for (IOperation astahOperation : astahClass.getOperations()) {
+                    if (astahOperation.getReturnType() != null) {
+                        typeUsageTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahOperation.getReturnType()));
+                    }
+
+                    for (IParameter astahParameter : astahOperation.getParameters()) {
+                        if (astahParameter.getType() != null) {
+                            typeUsageTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahParameter.getType()));
+                        }
+                    }
+                }
+
+                // Realization
+                for (IRealization astahRealization : astahClass.getClientRealizations()) {
+                    if (astahRealization.getSupplier() != null) {
+                        realizationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahRealization.getSupplier()));
+                    }
+                }
+
+                // Generalization
+                for (IGeneralization astahGeneralization : astahClass.getGeneralizations()) {
+                    if (astahGeneralization.getSuperType() != null) {
+                        inheritanceTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahGeneralization.getSuperType()));
+                    }
+                }
+
+                // Template parameter
+                for (IClassifierTemplateParameter astahTemplateParameter : astahClass.getTemplateParameters()) {
+                    if (astahTemplateParameter.getType() != null) {
+                        typeUsageTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahTemplateParameter.getType()));
+                    }
+                }
+
+                // Dependency
+                for (IDependency astahDependency : astahClass.getClientDependencies()) {
+                    if (astahDependency.getSupplier() != null) {
+                        dependencyTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahDependency.getSupplier()));
+                    }
+                }
+
+                // Usage
+                for (IUsage astahUsage : astahClass.getClientUsages()) {
+                    if (astahUsage.getSupplier() != null) {
+                        dependencyTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahUsage.getSupplier()));
+                    }
+                }
+
+                // Port
+                for (IPort astahPort : astahClass.getPorts()) {
+                    if (astahPort.getType() != null) {
+                        typeUsageTargetClassifier.add(NameIdTypeDTOAssembler.toDTO(astahPort.getType()));
+                    }
+                }
+
+            } else {
+                // Processing for other classes
+                for (IAttribute astahAttribute : astahClass.getAttributes()) {
+                    // Association
+                    if (astahAttribute.getAssociation() != null) {
+                        // Both navigabilities are unspecified
+                        if (astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Unspecified")
+                            && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Unspecified")) {
+                            
+                            if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass) {
+                                associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                            }
+
+                            if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahTargetClass) {
+                                associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                            }
+
+                        // One of the navigabilities is specified
+                        } else {
+
+                            if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass
+                                && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Navigable")) {
+                                associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                            }
+                            
+                            if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahTargetClass
+                                && astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Navigable")) {
+                                associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                            }
+                        }
+                    // Attribute
+                    } else {
+                        if (astahAttribute.getType() != null) {
+                            if (astahAttribute.getType().equals(astahTargetClass)) {
+                                typeUsageSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                            }
+                        }
+                    }
+                }
+
+                // Operation
+                for (IOperation astahOperation : astahClass.getOperations()) {
+                    if (astahOperation.getReturnType() != null) {
+                        if (astahOperation.getReturnType().equals(astahTargetClass)) {
+                            typeUsageSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+
+                    for (IParameter astahParameter : astahOperation.getParameters()) {
+                        if (astahParameter.getType() != null) {
+                            if (astahParameter.getType().equals(astahTargetClass)) {
+                                typeUsageSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                            }
+                        }
+                    }
+                }
+
+                // Realization
+                for (IRealization astahRealization : astahClass.getClientRealizations()) {
+                    if (astahRealization.getSupplier() != null) {
+                        if (astahRealization.getSupplier().equals(astahTargetClass)) {
+                            realizationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+                }
+
+                // Generalization
+                for (IGeneralization astahGeneralization : astahClass.getGeneralizations()) {
+                    if (astahGeneralization.getSuperType() != null) {
+                        if (astahGeneralization.getSuperType().equals(astahTargetClass)) {
+                            inheritanceSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+                }
+
+                // Template parameter
+                for (IClassifierTemplateParameter astahTemplateParameter : astahClass.getTemplateParameters()) {
+                    if (astahTemplateParameter.getType() != null) {
+                        if (astahTemplateParameter.getType().equals(astahTargetClass)) {
+                            typeUsageSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+                }
+
+                // Dependency
+                for (IDependency astahDependency : astahClass.getClientDependencies()) {
+                    if (astahDependency.getSupplier() != null) {
+                        if (astahDependency.getSupplier().equals(astahTargetClass)) {
+                            dependencySourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+                }
+
+                // Usage
+                for (IUsage astahUsage : astahClass.getClientUsages()) {
+                    if (astahUsage.getSupplier() != null) {
+                        if (astahUsage.getSupplier().equals(astahTargetClass)) {
+                            dependencySourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+                }
+
+                // Port
+                for (IPort astahPort : astahClass.getPorts()) {
+                    if (astahPort.getType() != null) {
+                        if (astahPort.getType().equals(astahTargetClass)) {
+                            typeUsageSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
+                        }
+                    }
+                }
+            }
+        }
+
+        return new SourceTargetNameIdTypeListDTO(
+                new ArrayList<>(inheritanceSourceClassifier),
+                new ArrayList<>(inheritanceTargetClassifier),
+                new ArrayList<>(realizationSourceClassifier),
+                new ArrayList<>(realizationTargetClassifier),
+                new ArrayList<>(associationSourceClassifier),
+                new ArrayList<>(associationTargetClassifier),
+                new ArrayList<>(dependencySourceClassifier),
+                new ArrayList<>(dependencyTargetClassifier),
+                new ArrayList<>(typeUsageSourceClassifier),
+                new ArrayList<>(typeUsageTargetClassifier));
+    }
+}

@@ -1,20 +1,20 @@
 package com.astahpromcp.tool.astah.pro.model;
 
-import java.util.List;
-
-import com.change_vision.jude.api.inf.model.ICombinedFragment;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTOAssembler;
+import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ICombinedFragment.html

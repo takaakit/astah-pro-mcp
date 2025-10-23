@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.knowledge;
 
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
+import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;

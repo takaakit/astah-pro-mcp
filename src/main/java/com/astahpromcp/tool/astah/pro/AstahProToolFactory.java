@@ -119,7 +119,6 @@ public class AstahProToolFactory {
                 providers.add(new InteractionOperandTool(projectAccessor, transactionManager, astahProToolSupport));
                 providers.add(new InteractionTool(projectAccessor, transactionManager, astahProToolSupport));
                 providers.add(new InteractionUseTool(projectAccessor, transactionManager, astahProToolSupport));
-                providers.add(new LifelineLinkTool(projectAccessor, transactionManager, astahProToolSupport));
                 providers.add(new LifelineTool(projectAccessor, transactionManager, astahProToolSupport));
                 providers.add(new LinkEndTool(projectAccessor, transactionManager, astahProToolSupport));
                 providers.add(new LinkTool(projectAccessor, transactionManager, astahProToolSupport));
@@ -151,6 +150,13 @@ public class AstahProToolFactory {
                 providers.add(new RequirementDiagramEditorTool(projectAccessor, transactionManager, requirementDiagramEditor, astahProToolSupport));
                 providers.add(new RequirementTool(projectAccessor, transactionManager, astahProToolSupport));
                 providers.add(new TestCaseTool(projectAccessor, transactionManager, astahProToolSupport));
+            }
+
+            // Communication diagram tools
+            if (categoryFlags.isCommunicationDiagramEnabled()) {
+                providers.add(new CommunicationDiagramGuideTool());
+                providers.add(new CommunicationDiagramTool(projectAccessor, transactionManager, astahProToolSupport));
+                providers.add(new LifelineLinkTool(projectAccessor, transactionManager, astahProToolSupport));
             }
 
             return providers;

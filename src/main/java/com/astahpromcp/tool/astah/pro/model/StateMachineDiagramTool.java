@@ -1,8 +1,5 @@
 package com.astahpromcp.tool.astah.pro.model;
 
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
-import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
@@ -10,6 +7,9 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateMachineDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateMachineDiagramDTOAssembler;
+import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
+import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 

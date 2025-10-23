@@ -2,15 +2,15 @@ package com.astahpromcp.tool.astah.pro.project;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeDTO;
-import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeListDTO;
-import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
-import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeListDTO;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllLabelIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllNameIdTypeInfoDTO;
+import com.astahpromcp.tool.astah.pro.project.outputdto.SourceTargetNameIdTypeListDTO;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProjectInfoToolTest {
 
@@ -31,7 +31,7 @@ public class ProjectInfoToolTest {
     private Method getNamedElementsChunk;
     private Method getAllPresentations;
     private Method getPresentationsChunk;
-    private Method retrieveDiagramContent;
+    private Method getClassifiersThatReferenceOrBeReferencedBy;
     private Field nameIdTypeDTOChunksCacheField;
     private Field labelIdTypeDTOChunksCacheField;
 
@@ -74,6 +74,13 @@ public class ProjectInfoToolTest {
             "getPresentationsChunk",
             McpSyncServerExchange.class,
             ChunkDTO.class);
+        
+        // getClassifiersThatReferenceOrBeReferencedBy() method
+        getClassifiersThatReferenceOrBeReferencedBy = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "getClassifiersThatReferenceOrBeReferencedBy",
+            McpSyncServerExchange.class,
+            IdDTO.class);
 
         // nameIdTypeDTOChunksCache field
         nameIdTypeDTOChunksCacheField = TestSupport.getAccessibleField(
@@ -179,5 +186,206 @@ public class ProjectInfoToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void getClassifiersThatReferenceOrBeReferencedBy_ok() throws Exception {
+        // Get classifier
+        IClass classifier = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Baz");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(classifier.getId());
+        
+        // ----------------------------------------
+        // Call getClassifiersThatReferenceOrBeReferencedBy()
+        // ----------------------------------------
+        SourceTargetNameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getClassifiersThatReferenceOrBeReferencedBy,
+            tool,
+            inputDTO,
+            SourceTargetNameIdTypeListDTO.class);
+        
+        // Get classifier
+        IClass quux01 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux01");
+        IClass quux02 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux02");
+        IClass quux03 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux03");
+        IClass quux04 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux04");
+        IClass quux05 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux05");
+        IClass quux06 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux06");
+        IClass quux07 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux07");
+        IClass quux08 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux08");
+        IClass quux09 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux09");
+        IClass quux10 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux10");
+        IClass quux11 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux11");
+        IClass quux12 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux12");
+        IClass quux13 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux13");
+        IClass quux14 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux14");
+        IClass quux15 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quux15");
+        
+        IClass quuy01 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy01");
+        IClass quuy02 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy02");
+        IClass quuy03 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy03");
+        IClass quuy04 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy04");
+        IClass quuy05 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy05");
+        IClass quuy06 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy06");
+        IClass quuy07 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy07");
+        IClass quuy08 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy08");
+        IClass quuy09 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy09");
+        IClass quuy10 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy10");
+        IClass quuy11 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy11");
+        IClass quuy12 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy12");
+        IClass quuy13 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy13");
+        IClass quuy14 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy14");
+        IClass quuy15 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy15");
+        IClass quuy16 = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Quuy16");
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        NameIdTypeDTO quux01DTO = NameIdTypeDTOAssembler.toDTO(quux01);
+        NameIdTypeDTO quux02DTO = NameIdTypeDTOAssembler.toDTO(quux02);
+        NameIdTypeDTO quux03DTO = NameIdTypeDTOAssembler.toDTO(quux03);
+        NameIdTypeDTO quux04DTO = NameIdTypeDTOAssembler.toDTO(quux04);
+        NameIdTypeDTO quux05DTO = NameIdTypeDTOAssembler.toDTO(quux05);
+        NameIdTypeDTO quux06DTO = NameIdTypeDTOAssembler.toDTO(quux06);
+        NameIdTypeDTO quux07DTO = NameIdTypeDTOAssembler.toDTO(quux07);
+        NameIdTypeDTO quux08DTO = NameIdTypeDTOAssembler.toDTO(quux08);
+        NameIdTypeDTO quux09DTO = NameIdTypeDTOAssembler.toDTO(quux09);
+        NameIdTypeDTO quux10DTO = NameIdTypeDTOAssembler.toDTO(quux10);
+        NameIdTypeDTO quux11DTO = NameIdTypeDTOAssembler.toDTO(quux11);
+        NameIdTypeDTO quux12DTO = NameIdTypeDTOAssembler.toDTO(quux12);
+        NameIdTypeDTO quux13DTO = NameIdTypeDTOAssembler.toDTO(quux13);
+        NameIdTypeDTO quux14DTO = NameIdTypeDTOAssembler.toDTO(quux14);
+        NameIdTypeDTO quux15DTO = NameIdTypeDTOAssembler.toDTO(quux15);
+
+        List<NameIdTypeDTO> associationSourceClassifier = outputDTO.associationSourceClassifier();
+        assertTrue(associationSourceClassifier.contains(quux01DTO));
+        assertTrue(associationSourceClassifier.contains(quux02DTO));
+        assertTrue(associationSourceClassifier.contains(quux03DTO));
+        assertTrue(associationSourceClassifier.contains(quux04DTO));
+        assertTrue(associationSourceClassifier.contains(quux05DTO));
+        assertTrue(associationSourceClassifier.contains(quux06DTO));
+        assertTrue(associationSourceClassifier.contains(quux07DTO));
+        assertTrue(associationSourceClassifier.contains(quux08DTO));
+
+        List<NameIdTypeDTO> inheritanceSourceClassifier = outputDTO.inheritanceSourceClassifier();
+        assertTrue(inheritanceSourceClassifier.contains(quux09DTO));
+
+        List<NameIdTypeDTO> dependencySourceClassifier = outputDTO.dependencySourceClassifier();
+        assertTrue(dependencySourceClassifier.contains(quux10DTO));
+        assertTrue(dependencySourceClassifier.contains(quux11DTO));
+
+        List<NameIdTypeDTO> typeUsageSourceClassifier = outputDTO.typeUsageSourceClassifier();
+        assertTrue(typeUsageSourceClassifier.contains(quux12DTO));
+        assertTrue(typeUsageSourceClassifier.contains(quux13DTO));
+        assertTrue(typeUsageSourceClassifier.contains(quux14DTO));
+        assertTrue(typeUsageSourceClassifier.contains(quux15DTO));
+
+        NameIdTypeDTO quuy01DTO = NameIdTypeDTOAssembler.toDTO(quuy01);
+        NameIdTypeDTO quuy02DTO = NameIdTypeDTOAssembler.toDTO(quuy02);
+        NameIdTypeDTO quuy03DTO = NameIdTypeDTOAssembler.toDTO(quuy03);
+        NameIdTypeDTO quuy04DTO = NameIdTypeDTOAssembler.toDTO(quuy04);
+        NameIdTypeDTO quuy05DTO = NameIdTypeDTOAssembler.toDTO(quuy05);
+        NameIdTypeDTO quuy06DTO = NameIdTypeDTOAssembler.toDTO(quuy06);
+        NameIdTypeDTO quuy07DTO = NameIdTypeDTOAssembler.toDTO(quuy07);
+        NameIdTypeDTO quuy08DTO = NameIdTypeDTOAssembler.toDTO(quuy08);
+        NameIdTypeDTO quuy09DTO = NameIdTypeDTOAssembler.toDTO(quuy09);
+        NameIdTypeDTO quuy10DTO = NameIdTypeDTOAssembler.toDTO(quuy10);
+        NameIdTypeDTO quuy11DTO = NameIdTypeDTOAssembler.toDTO(quuy11);
+        NameIdTypeDTO quuy12DTO = NameIdTypeDTOAssembler.toDTO(quuy12);
+        NameIdTypeDTO quuy13DTO = NameIdTypeDTOAssembler.toDTO(quuy13);
+        NameIdTypeDTO quuy14DTO = NameIdTypeDTOAssembler.toDTO(quuy14);
+        NameIdTypeDTO quuy15DTO = NameIdTypeDTOAssembler.toDTO(quuy15);
+        NameIdTypeDTO quuy16DTO = NameIdTypeDTOAssembler.toDTO(quuy16);
+        
+        List<NameIdTypeDTO> associationTargetClassifier = outputDTO.associationTargetClassifier();
+        assertTrue(associationTargetClassifier.contains(quuy01DTO));
+        assertTrue(associationTargetClassifier.contains(quuy02DTO));
+        assertTrue(associationTargetClassifier.contains(quuy03DTO));
+        assertTrue(associationTargetClassifier.contains(quuy04DTO));
+        assertTrue(associationTargetClassifier.contains(quuy05DTO));
+        assertTrue(associationTargetClassifier.contains(quuy06DTO));
+        assertTrue(associationTargetClassifier.contains(quuy07DTO));
+        assertTrue(associationTargetClassifier.contains(quuy08DTO));
+
+        List<NameIdTypeDTO> inheritanceTargetClassifier = outputDTO.inheritanceTargetClassifier();
+        assertTrue(inheritanceTargetClassifier.contains(quuy09DTO));
+
+        List<NameIdTypeDTO> dependencyTargetClassifier = outputDTO.dependencyTargetClassifier();
+        assertTrue(dependencyTargetClassifier.contains(quuy10DTO));
+        assertTrue(dependencyTargetClassifier.contains(quuy11DTO));
+
+        List<NameIdTypeDTO> typeUsageTargetClassifier = outputDTO.typeUsageTargetClassifier();
+        assertTrue(typeUsageTargetClassifier.contains(quuy12DTO));
+        assertTrue(typeUsageTargetClassifier.contains(quuy13DTO));
+        assertTrue(typeUsageTargetClassifier.contains(quuy14DTO));
+        assertTrue(typeUsageTargetClassifier.contains(quuy15DTO));
+
+        List<NameIdTypeDTO> realizationTargetClassifier = outputDTO.realizationTargetClassifier();
+        assertTrue(realizationTargetClassifier.contains(quuy16DTO));
     }
 }

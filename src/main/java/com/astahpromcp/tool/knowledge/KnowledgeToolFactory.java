@@ -37,6 +37,7 @@ public class KnowledgeToolFactory {
             ProjectAccessor projectAccessor = astahApi.getProjectAccessor();
 
             return List.of(
+                    new DDDReferenceTool(workspaceDir, projectAccessor),
                     new AstahManualTool(workspaceDir, projectAccessor),
                     new PlantumlGuideTool(workspaceDir, httpClient),
                     new ColorPaletteGuideTool(workspaceDir, httpClient)

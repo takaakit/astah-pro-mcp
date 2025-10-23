@@ -1,20 +1,21 @@
 package com.astahpromcp.tool.astah.pro.model;
 
+import com.astahpromcp.tool.ToolDefinition;
+import com.astahpromcp.tool.ToolProvider;
+import com.astahpromcp.tool.ToolSupport;
+import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.InstanceSpecificationWithClassifierDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IInstanceSpecification;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
-import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTOAssembler;
-import com.astahpromcp.tool.astah.pro.model.inputdto.InstanceSpecificationWithClassifierDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInstanceSpecification.html

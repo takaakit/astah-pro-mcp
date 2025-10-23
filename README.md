@@ -40,7 +40,9 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
   > *Note 1:* This MCP server exposes **200+** tool functions. Other AI assistants/agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
 
-  > *Note 2:* This MCP server only connects to AI assistants/agents **running on the same machine** as Astah Professional. Under Astah's terms of use, using Astah via an AI assistant/agent running on a different machine is not permitted. For questions about these terms, please contact Change Vision (the developer of Astah) directly.
+  > *Note 2*: This MCP server only connects to AI assistants/agents running on the same machine as Astah Professional.
+  According to Astah's terms of use, using Astah via an AI assistant/agent is permitted only if you hold a valid license and access it exclusively for your own use with your licensed Astah. Allowing a non-licensed third party to operate Astah via such an assistant/agent is strictly prohibited.  
+  For details, please refer to the FAQ ([English](https://astah.net/support/cv-members-guide/#ai-external-access) / [Japanese](https://astah.change-vision.com/ja/faq/faq-license/ai-external-access.html)) or [contact Change Vision (the developer of Astah)](https://astah.net/about/contact/) directly.
 
   > *Tip:* This is just the personal impression, but we recommend *Claude Code* or *Claude Desktop* because they use tool functions more appropriately. Additionally, if processing speed is your priority, go with *Claude Code*.
 
@@ -166,6 +168,8 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
   ![Connection Request](img/mcp-connection-request.png)
 
 3. Send prompts to the AI assistant/agent.
+
+If you want to disable this plugin, click [Plugin] > [Installed Plugin], select the *Astah Pro MCP* entry in the plugin list dialog, click Disable, and then restart Astah.
 
 <br>
 

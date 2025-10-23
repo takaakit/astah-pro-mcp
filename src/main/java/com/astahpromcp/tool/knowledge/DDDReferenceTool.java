@@ -14,9 +14,9 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
-public class AstahManualTool implements ToolProvider {
+public class DDDReferenceTool implements ToolProvider {
 
     private static final int CHUNK_SIZE = 51200; // characters 50KB (50 * 1024)
     private final List<String> contentCache;
@@ -33,62 +33,59 @@ public class AstahManualTool implements ToolProvider {
     private final Path outputDirectory;
     private final ProjectAccessor projectAccessor;
 
-    private final String pdfFilePath;
+    private final String dddReferenceUrl = "https://www.domainlanguage.com/wp-content/uploads/2016/05/DDD_Reference_2015-03.pdf";
 
-    public AstahManualTool(Path outputDirectory, ProjectAccessor projectAccessor) {
+    public DDDReferenceTool(Path outputDirectory, ProjectAccessor projectAccessor) {
         this.outputDirectory = outputDirectory;
         this.projectAccessor = projectAccessor;
         this.contentCache = new CopyOnWriteArrayList<>();
-        this.pdfFilePath = projectAccessor.getAstahInstallPath() + "ReferenceManual-astah-UML_professional.pdf";
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            // Normalize the path via File to stay cross-platform friendly
-            Path pdfPath = new File(pdfFilePath).toPath();
-            
-            if (!Files.exists(pdfPath)) {
-                log.error("Astah Professional Reference Manual PDF file not found: " + pdfPath);
+            // Check if the DDD Reference URL is accessible
+            try {
+                URI.create(dddReferenceUrl).toURL().openConnection().connect();
+            } catch (Exception e) {
+                log.error("DDD Reference URL is not accessible: " + dddReferenceUrl, e);
                 return List.of();
             }
     
             return List.of(
                     ToolSupport.definition(
-                            "get_info_of_astah_man",
-                            "Return the total number of chunks and the data of the first chunk of Astah Professional Reference Manual. If you want to learn how to use Astah, use this tool.",
-                            this::getAstahManual,
+                            "get_info_of_ddd_ref",
+                            "Return the total number of chunks and the data of the first chunk of Domain-Driven Design Reference. If you want to learn the theory of Domain-Driven Design (DDD), use this tool.",
+                            this::getDDDReference,
                             NoInputDTO.class,
                             DocumentDTO.class),
 
                     ToolSupport.definition(
-                            "get_chunk_of_astah_man",
-                            "Return the chunk data of Astah Professional Reference Manual. If no chunk data exists, an empty string is set.",
-                            this::getAstahManualChunk,
+                            "get_chunk_of_ddd_ref",
+                            "Return the chunk data of Domain-Driven Design Reference. If no chunk data exists, an empty string is set.",
+                            this::getDDDReferenceChunk,
                             ChunkDTO.class,
                             DocumentChunkDTO.class)
             );
         } catch (Exception e) {
-            log.error("Failed to create astah manual tools", e);
+            log.error("Failed to create DDD reference tools", e);
             return List.of();
         }
     }
 
-    private DocumentDTO getAstahManual(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
-        log.debug("Get astah manual: {}", param);
+    private DocumentDTO getDDDReference(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+        log.debug("Get DDD reference: {}", param);
 
         if (!contentCache.isEmpty()) {
-            log.info("Astah Professional Reference Manual already loaded, returning from cache.");
+            log.info("Domain-Driven Design Reference already loaded, returning from cache.");
             return new DocumentDTO(contentCache.size(), contentCache.get(0));
         }
 
-        log.info("Loading Astah Professional Reference Manual from PDF resource.");
-        // Normalize the path via File to stay cross-platform friendly
-        Path pdfPath = new File(pdfFilePath).toPath();
+        log.info("Loading Domain-Driven Design Reference from PDF URL.");
         
-        try (InputStream is = Files.newInputStream(pdfPath)) {
+        try (InputStream is = URI.create(dddReferenceUrl).toURL().openStream()) {
             if (is == null) {
-                throw new IOException("Astah Professional Reference Manual PDF resource not found.");
+                throw new IOException("Domain-Driven Design Reference PDF resource not found.");
             }
 
             String text;
@@ -97,11 +94,15 @@ public class AstahManualTool implements ToolProvider {
                 text = new PDFTextStripper().getText(document);
             }
 
+            // Replace multiple spaces with a single space
+            text = text.replaceAll("\t\r", " ");
+            text = text.replaceAll(" {2,}", " ");
+
             // Write the extracted text to a file
-            String textFileName = "astah_professional_reference_manual.txt";
+            String textFileName = "ddd_reference_2015_03.txt";
             Path outputPath = outputDirectory.resolve(textFileName);
             Files.write(outputPath, text.getBytes(StandardCharsets.UTF_8));
-            log.info("Astah Professional Reference Manual text saved to file: {}", outputPath.toAbsolutePath());
+            log.info("Domain-Driven Design Reference text saved to file: {}", outputPath.toAbsolutePath());
 
             List<String> chunks = splitText(text, CHUNK_SIZE);
             if (chunks.isEmpty()) {
@@ -115,8 +116,8 @@ public class AstahManualTool implements ToolProvider {
         }
     }
 
-    private DocumentChunkDTO getAstahManualChunk(McpSyncServerExchange exchange, ChunkDTO param) {
-        log.debug("Get astah manual chunk: {}", param);
+    private DocumentChunkDTO getDDDReferenceChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+        log.debug("Get DDD reference chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();
         if (chunkIndex < 0 || chunkIndex >= contentCache.size()) {
