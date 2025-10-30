@@ -3,12 +3,10 @@ package com.astahpromcp.tool.astah.pro.model.outputdto;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class DiagramDTOAssembler {
     public static DiagramDTO toDTO(@NonNull IDiagram astahDiagram) throws Exception {
 

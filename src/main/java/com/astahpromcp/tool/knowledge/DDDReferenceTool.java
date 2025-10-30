@@ -104,7 +104,7 @@ public class DDDReferenceTool implements ToolProvider {
             Files.write(outputPath, text.getBytes(StandardCharsets.UTF_8));
             log.info("Domain-Driven Design Reference text saved to file: {}", outputPath.toAbsolutePath());
 
-            List<String> chunks = splitText(text, CHUNK_SIZE);
+            List<String> chunks = KnowledgeToolSupport.splitText(text, CHUNK_SIZE);
             if (chunks.isEmpty()) {
                 chunks.add(""); // Ensure there is at least one empty chunk
             }
@@ -125,18 +125,5 @@ public class DDDReferenceTool implements ToolProvider {
         }
 
         return new DocumentChunkDTO(contentCache.get(chunkIndex));
-    }
-
-    private List<String> splitText(String text, int chunkSize) {
-        if (text == null || text.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<String> chunks = new ArrayList<>();
-        for (int i = 0; i < text.length(); i += chunkSize) {
-            chunks.add(text.substring(i, Math.min(text.length(), i + chunkSize)));
-        }
-        
-        return chunks;
     }
 }

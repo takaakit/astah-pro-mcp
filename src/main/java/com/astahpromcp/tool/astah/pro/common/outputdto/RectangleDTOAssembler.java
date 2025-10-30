@@ -1,11 +1,8 @@
 package com.astahpromcp.tool.astah.pro.common.outputdto;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
 import java.awt.geom.Rectangle2D;
 
-@Slf4j
 public class RectangleDTOAssembler {
     public static RectangleDTO toDTO(@NonNull Rectangle2D astahRectangle) throws Exception {
 

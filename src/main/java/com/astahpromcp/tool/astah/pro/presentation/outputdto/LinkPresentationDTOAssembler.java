@@ -3,13 +3,11 @@ package com.astahpromcp.tool.astah.pro.presentation.outputdto;
 import com.astahpromcp.tool.astah.pro.common.outputdto.PointDoubleDTO;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class LinkPresentationDTOAssembler {
     public static LinkPresentationDTO toDTO(@NonNull ILinkPresentation astahLinkPresentation) throws Exception {
 

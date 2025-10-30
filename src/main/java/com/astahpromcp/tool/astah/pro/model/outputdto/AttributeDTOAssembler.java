@@ -4,9 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IMultiplicityRange;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class AttributeDTOAssembler {
     public static AttributeDTO toDTO(@NonNull IAttribute astahAttribute) throws Exception {
 

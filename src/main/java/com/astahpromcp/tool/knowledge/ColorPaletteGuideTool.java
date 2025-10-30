@@ -111,7 +111,7 @@ public class ColorPaletteGuideTool implements ToolProvider {
         Files.writeString(outputPath, allTextContentString, StandardCharsets.UTF_8);
         log.info("Color Palette guide saved to file: {}", outputPath.toAbsolutePath());
 
-        List<String> chunks = splitText(allTextContentString, CHUNK_SIZE);
+        List<String> chunks = KnowledgeToolSupport.splitText(allTextContentString, CHUNK_SIZE);
         if (chunks.isEmpty()) {
             chunks.add("");
         }
@@ -167,18 +167,5 @@ public class ColorPaletteGuideTool implements ToolProvider {
                 return "[Error fetching content from " + urlString + "]";
             }
         });
-    }
-
-    private List<String> splitText(String text, int chunkSize) {
-        if (text == null || text.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<String> chunks = new ArrayList<>();
-        for (int i = 0; i < text.length(); i += chunkSize) {
-            chunks.add(text.substring(i, Math.min(text.length(), i + chunkSize)));
-        }
-
-        return chunks;
     }
 }

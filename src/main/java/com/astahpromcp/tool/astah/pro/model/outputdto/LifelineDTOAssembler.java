@@ -6,12 +6,10 @@ import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.model.ILifelineLink;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class LifelineDTOAssembler {
     public static LifelineDTO toDTO(@NonNull ILifeline astahLifeline) throws Exception {
 

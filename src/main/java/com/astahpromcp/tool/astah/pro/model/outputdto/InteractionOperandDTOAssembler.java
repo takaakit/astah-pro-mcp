@@ -6,12 +6,10 @@ import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.model.IMessage;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class InteractionOperandDTOAssembler {
     public static InteractionOperandDTO toDTO(@NonNull IInteractionOperand astahInteractionOperand) throws Exception {
 

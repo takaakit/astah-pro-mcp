@@ -3,14 +3,18 @@ package com.astahpromcp.tool.astah.pro.project;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.common.inputdto.SearchDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllLabelIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllNameIdTypeInfoDTO;
+import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeDefinitionListDTO;
+import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeNamespaceListDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.SourceTargetNameIdTypeListDTO;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -32,6 +36,9 @@ public class ProjectInfoToolTest {
     private Method getAllPresentations;
     private Method getPresentationsChunk;
     private Method getClassifiersThatReferenceOrBeReferencedBy;
+    private Method searchWithinNamedElements;
+    private Method searchWithinPresentations;
+    private Method getClassifiersWithinPackage;
     private Field nameIdTypeDTOChunksCacheField;
     private Field labelIdTypeDTOChunksCacheField;
 
@@ -79,6 +86,27 @@ public class ProjectInfoToolTest {
         getClassifiersThatReferenceOrBeReferencedBy = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getClassifiersThatReferenceOrBeReferencedBy",
+            McpSyncServerExchange.class,
+            IdDTO.class);
+
+        // searchWithinNamedElements() method
+        searchWithinNamedElements = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "searchWithinNamedElements",
+            McpSyncServerExchange.class,
+            SearchDTO.class);
+
+        // searchWithinPresentations() method
+        searchWithinPresentations = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "searchWithinPresentations",
+            McpSyncServerExchange.class,
+            SearchDTO.class);
+
+        // getClassifiersWithinPackage() method
+        getClassifiersWithinPackage = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "getClassifiersWithinPackage",
             McpSyncServerExchange.class,
             IdDTO.class);
 
@@ -387,5 +415,144 @@ public class ProjectInfoToolTest {
 
         List<NameIdTypeDTO> realizationTargetClassifier = outputDTO.realizationTargetClassifier();
         assertTrue(realizationTargetClassifier.contains(quuy16DTO));
+    }
+
+    @Test
+    void searchWithinNamedElements_ok_1() throws Exception {
+        // Create input DTO
+        SearchDTO inputDTO = new SearchDTO("test");
+
+        // ----------------------------------------
+        // Call searchWithinNamedElements()
+        // ----------------------------------------
+        NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            searchWithinNamedElements,
+            tool,
+            inputDTO,
+            NameIdTypeDefinitionListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.value());
+        assertEquals(6, outputDTO.value().size());
+    }
+
+    @Test
+    void searchWithinNamedElements_ok_2() throws Exception {
+        // Create input DTO
+        SearchDTO inputDTO = new SearchDTO("テスト");
+
+        // ----------------------------------------
+        // Call searchWithinNamedElements()
+        // ----------------------------------------
+        NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+                searchWithinNamedElements,
+                tool,
+                inputDTO,
+                NameIdTypeDefinitionListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.value());
+        assertEquals(5, outputDTO.value().size());
+    }
+
+    @Test
+    void searchWithinNamedElements_ng() throws Exception {
+        // Create input DTO with empty string
+        SearchDTO inputDTO = new SearchDTO("");
+
+        // ----------------------------------------
+        // Call searchWithinNamedElements() and expect exception
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethod(
+                searchWithinNamedElements,
+                tool,
+                inputDTO,
+                NameIdTypeDefinitionListDTO.class);
+        });
+    }
+
+    @Test
+    void searchWithinPresentations_ok_1() throws Exception {
+        // Create input DTO
+        SearchDTO inputDTO = new SearchDTO("note");
+
+        // ----------------------------------------
+        // Call searchWithinPresentations()
+        // ----------------------------------------
+        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            searchWithinPresentations,
+            tool,
+            inputDTO,
+            LabelIdTypeListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.value());
+        assertEquals(3, outputDTO.value().size());
+    }
+
+    @Test
+    void searchWithinPresentations_ok_2() throws Exception {
+        // Create input DTO
+        SearchDTO inputDTO = new SearchDTO("ノート");
+
+        // ----------------------------------------
+        // Call searchWithinPresentations()
+        // ----------------------------------------
+        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+                searchWithinPresentations,
+                tool,
+                inputDTO,
+                LabelIdTypeListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.value());
+        assertEquals(2, outputDTO.value().size());
+    }
+
+    @Test
+    void searchWithinPresentations_ng() throws Exception {
+        // Create input DTO with empty string
+        SearchDTO inputDTO = new SearchDTO("");
+
+        // ----------------------------------------
+        // Call searchWithinPresentations() and expect exception
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethod(
+                searchWithinPresentations,
+                tool,
+                inputDTO,
+                LabelIdTypeListDTO.class);
+        });
+    }
+
+    @Test
+    void getClassifiersWithinPackage_ok() throws Exception {
+        // Get package
+        IPackage package_ = (IPackage) TestSupport.instance().getNamedElement(
+            IPackage.class,
+            "package0");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(package_.getId());
+        
+        // ----------------------------------------
+        // Call getClassifiersWithinPackage()
+        // ----------------------------------------
+        NameIdTypeNamespaceListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getClassifiersWithinPackage,
+            tool,
+            inputDTO,
+            NameIdTypeNamespaceListDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.value());
+        assertEquals(6, outputDTO.value().size());
     }
 }

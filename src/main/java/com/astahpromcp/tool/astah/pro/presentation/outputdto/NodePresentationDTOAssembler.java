@@ -4,12 +4,10 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTOAssembler;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class NodePresentationDTOAssembler {
     public static NodePresentationDTO toDTO(@NonNull INodePresentation astahNodePresentation) throws Exception {
 

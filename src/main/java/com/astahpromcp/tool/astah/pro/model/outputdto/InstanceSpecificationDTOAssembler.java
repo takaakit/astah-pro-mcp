@@ -6,12 +6,10 @@ import com.change_vision.jude.api.inf.model.IInstanceSpecification;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
 import com.change_vision.jude.api.inf.model.ISlot;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class InstanceSpecificationDTOAssembler {
     public static InstanceSpecificationDTO toDTO(@NonNull IInstanceSpecification astahInstanceSpecification) throws Exception {
 

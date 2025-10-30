@@ -5,12 +5,10 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IActivityNode;
 import com.change_vision.jude.api.inf.model.IPartition;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class PartitionDTOAssembler {
     public static PartitionDTO toDTO(@NonNull IPartition astahPartition) throws Exception {
 

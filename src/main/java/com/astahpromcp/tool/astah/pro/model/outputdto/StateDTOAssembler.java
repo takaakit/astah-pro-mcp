@@ -8,12 +8,10 @@ import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.model.IVertex;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class StateDTOAssembler {
     public static StateDTO toDTO(@NonNull IState astahState) throws Exception {
         

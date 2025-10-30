@@ -1,9 +1,7 @@
 package com.astahpromcp.tool.astah.pro.model.inputdto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public record InteractionOperandWithGuardDTO(
     @JsonPropertyDescription("Target interaction operand identifier")
     String targetInteractionOperandId,

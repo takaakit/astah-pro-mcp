@@ -7,12 +7,10 @@ import com.change_vision.jude.api.inf.model.IInteraction;
 import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.model.IMessage;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class InteractionDTOAssembler {
     public static InteractionDTO toDTO(@NonNull IInteraction astahInteraction) throws Exception {
 

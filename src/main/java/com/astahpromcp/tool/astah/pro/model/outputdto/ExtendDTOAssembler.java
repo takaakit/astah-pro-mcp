@@ -4,9 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IExtend;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class ExtendDTOAssembler {
     public static ExtendDTO toDTO(@NonNull IExtend astahExtend) throws Exception {
         // Named element information

@@ -2,6 +2,8 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeListDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithStereotypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithTaggedValueDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithTypeModifierDTO;
@@ -29,6 +31,7 @@ public class ElementToolTest {
     private Method removeStereotype;
     private Method setTypeModifier;
     private Method changeTaggedValue;
+    private Method getDiagramsOfElement;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -71,6 +74,13 @@ public class ElementToolTest {
             "changeTaggedValue",
             McpSyncServerExchange.class,
             ElementWithTaggedValueDTO.class);
+
+        // getDiagramsOfElement() method
+        getDiagramsOfElement = TestSupport.getAccessibleMethod(
+            ElementTool.class,
+            "getDiagramsOfElement",
+            McpSyncServerExchange.class,
+            IdDTO.class);
     }
 
     @AfterEach
@@ -202,5 +212,30 @@ public class ElementToolTest {
         assertNotNull(outputDTO);
 
         assertEquals("John Doe", clazz.getTaggedValue("author"));
+    }
+
+    @Test
+    void getDiagramsOfElement_ok() throws Exception {
+        // Get class
+        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+            IClass.class,
+            "Foo");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(clazz.getId());
+
+        // ----------------------------------------
+        // Call getDiagramsOfElement()
+        // ----------------------------------------
+        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getDiagramsOfElement,
+            tool,
+            inputDTO,
+            NameIdTypeListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.value());
+        assertEquals(22, outputDTO.value().size());
     }
 }

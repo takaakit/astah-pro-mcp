@@ -4,19 +4,26 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeListDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithStereotypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithTaggedValueDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithTypeModifierDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
-import com.change_vision.jude.api.inf.model.IElement;
-import com.change_vision.jude.api.inf.model.ITaggedValue;
+import com.change_vision.jude.api.inf.model.*;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IElement.html
@@ -63,7 +70,14 @@ public class ElementTool implements ToolProvider {
                             "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element information after it is changed.",
                             this::changeTaggedValue,
                             ElementWithTaggedValueDTO.class,
-                            ElementDTO.class)
+                            ElementDTO.class),
+
+                    ToolSupport.definition(
+                            "get_dgms_of_elem",
+                            "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
+                            this::getDiagramsOfElement,
+                            IdDTO.class,
+                            NameIdTypeListDTO.class)
             );
         } catch (Exception e) {
             log.error("Failed to create element tools", e);
@@ -146,5 +160,65 @@ public class ElementTool implements ToolProvider {
             transactionManager.abortTransaction();
             throw e;
         }
+    }
+
+    private NameIdTypeListDTO getDiagramsOfElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Get diagrams of element: {}", param);
+
+        IElement astahElement = astahProToolSupport.getElement(param.id());
+
+        Set<NameIdTypeDTO> diagrams = new LinkedHashSet<>();
+        INamedElement[] astahNamedElements = projectAccessor.findElements(IDiagram.class);
+        for (INamedElement astahNamedElement : astahNamedElements) {
+            IDiagram astahDiagram = (IDiagram) astahNamedElement;
+
+            for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+                // Check if the model is the same as the specified element
+                IElement astahModel = astahPresentation.getModel();
+                if (astahModel != null
+                    && astahModel.equals(astahElement)) {
+                    diagrams.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
+                }
+
+                // Check if the model is an instance specification and the classifier is the same as the specified element
+                if (astahModel instanceof IInstanceSpecification) {
+                    IInstanceSpecification astahInstanceSpecification = (IInstanceSpecification) astahModel;
+                    if (astahInstanceSpecification.getClassifier() != null
+                        && astahInstanceSpecification.getClassifier().equals(astahElement)) {
+                        diagrams.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
+                    }
+                }
+
+                // Check if the model is a lifeline and the base is the same as the specified element
+                if (astahModel instanceof ILifeline) {
+                    ILifeline astahLifeline = (ILifeline) astahModel;
+                    if (astahLifeline.getBase() != null
+                        && astahLifeline.getBase().equals(astahElement)) {
+                        diagrams.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
+                    }
+                }
+
+                // Check if the model is a object node and the base is the same as the specified element
+                if (astahModel instanceof IObjectNode) {
+                    IObjectNode astahObjectNode = (IObjectNode) astahModel;
+                    if (astahObjectNode.getBase() != null
+                        && astahObjectNode.getBase().equals(astahElement)) {
+                        diagrams.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
+                    }
+                }
+            }
+
+            // Check if the diagram is owned by the specified element
+            IElement owner = astahDiagram.getOwner();
+            while (owner != null) {
+                if (owner.equals(astahElement)) {
+                    diagrams.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
+                    break;
+                }
+                owner = owner.getOwner();
+            }
+        }
+
+        return new NameIdTypeListDTO(new ArrayList<>(diagrams));
     }
 }

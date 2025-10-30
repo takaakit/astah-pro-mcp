@@ -5,16 +5,16 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.common.inputdto.SearchDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
-import com.astahpromcp.tool.astah.pro.project.outputdto.AllLabelIdTypeInfoDTO;
-import com.astahpromcp.tool.astah.pro.project.outputdto.AllNameIdTypeInfoDTO;
-import com.astahpromcp.tool.astah.pro.project.outputdto.SourceTargetNameIdTypeListDTO;
+import com.astahpromcp.tool.astah.pro.project.outputdto.*;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import org.apache.commons.lang3.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -85,7 +85,28 @@ public class ProjectInfoTool implements ToolProvider {
                             "Return all classifiers (classes, interfaces, and enumerations) that the specified classifier (specified by ID) references or that reference it. The returned data is a simplified information: name, identifier, and type. For example, when you need to understand the scope of impact of changes to a specific element, use this tool. If you want to traverse references recursively, you'll need to use this tool repeatedly. Note that using a classifier as a type is considered a reference to that classifier.",
                             this::getClassifiersThatReferenceOrBeReferencedBy,
                             IdDTO.class,
-                            SourceTargetNameIdTypeListDTO.class)
+                            SourceTargetNameIdTypeListDTO.class),
+
+                    ToolSupport.definition(
+                            "search_within_named_elems",
+                            "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope.",
+                            this::searchWithinNamedElements,
+                            SearchDTO.class,
+                            NameIdTypeDefinitionListDTO.class),
+
+                    ToolSupport.definition(
+                            "search_within_prsts",
+                            "Search for the specified string within the label of presentations using partial matching. The search is case-insensitive. Note that named elements are excluded from the search scope. For example, if you want to search for the specified string within note contents, use this tool.",
+                            this::searchWithinPresentations,
+                            SearchDTO.class,
+                            LabelIdTypeListDTO.class),
+
+                    ToolSupport.definition(
+                            "get_clses_within_pkg",
+                            "Return all classifiers (classes, interfaces, and enumerations) within the specified package (specified by ID), including those in its subpackages. The returned data is a simplified information: name, identifier, type, and namespace.",
+                            this::getClassifiersWithinPackage,
+                            IdDTO.class,
+                            NameIdTypeNamespaceListDTO.class)
             );
         } catch (Exception e) {
             log.error("Failed to create project info tools", e);
@@ -451,5 +472,67 @@ public class ProjectInfoTool implements ToolProvider {
                 new ArrayList<>(dependencyTargetClassifier),
                 new ArrayList<>(typeUsageSourceClassifier),
                 new ArrayList<>(typeUsageTargetClassifier));
+    }
+
+    private NameIdTypeDefinitionListDTO searchWithinNamedElements(McpSyncServerExchange exchange, SearchDTO param) throws Exception {
+        log.debug("Search within named elements: {}", param);
+
+        if (param.searchString() == null || param.searchString().isEmpty()) {
+            throw new RuntimeException("Search string is empty");
+        }
+
+        INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
+        List<NameIdTypeDefinitionDTO> nameIdTypeDefinitionDTOs = new ArrayList<>();
+        for (INamedElement astahNamedElement : astahNamedElements) {
+            if (Strings.CI.containsAny(astahNamedElement.getName(), param.searchString())
+                || Strings.CI.containsAny(astahNamedElement.getDefinition(), param.searchString())) {
+                nameIdTypeDefinitionDTOs.add(NameIdTypeDefinitionDTOAssembler.toDTO(astahNamedElement));
+            }
+        }
+
+        return new NameIdTypeDefinitionListDTO(nameIdTypeDefinitionDTOs);
+    }
+
+    private LabelIdTypeListDTO searchWithinPresentations(McpSyncServerExchange exchange, SearchDTO param) throws Exception {
+        log.debug("Search within presentations: {}", param);
+
+        if (param.searchString() == null || param.searchString().isEmpty()) {
+            throw new RuntimeException("Search string is empty");
+        }
+
+        INamedElement[] astahNamedElements = projectAccessor.findElements(IDiagram.class);
+        List<LabelIdTypeDTO> labelIdTypeDTOs = new ArrayList<>();
+        for (INamedElement astahNamedElement : astahNamedElements) {
+            IDiagram astahDiagram = (IDiagram) astahNamedElement;
+            for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+                if (Strings.CI.containsAny(astahPresentation.getLabel(), param.searchString())) {
+                    labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
+                }
+            }
+        }
+
+        return new LabelIdTypeListDTO(labelIdTypeDTOs);
+    }
+
+    private NameIdTypeNamespaceListDTO getClassifiersWithinPackage(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Get classifiers within package: {}", param);
+
+        IPackage astahPackage = astahProToolSupport.getPackage(param.id());
+
+        List<NameIdTypeNamespaceDTO> nameIdTypeNamespaceDTOs = new ArrayList<>();
+        for (INamedElement astahNamedElement : projectAccessor.findElements(IClass.class)) {
+            IClass astahClass = (IClass)astahNamedElement;
+            
+            IElement owner = astahClass.getOwner();
+            while (owner != null) {
+                if (owner.equals(astahPackage)) {
+                    nameIdTypeNamespaceDTOs.add(NameIdTypeNamespaceDTOAssembler.toDTO(astahClass));
+                    break;
+                }
+                owner = owner.getOwner();
+            }
+        }
+
+        return new NameIdTypeNamespaceListDTO(nameIdTypeNamespaceDTOs);
     }
 }

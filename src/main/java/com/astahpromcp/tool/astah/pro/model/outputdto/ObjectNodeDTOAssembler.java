@@ -4,9 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IObjectNode;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class ObjectNodeDTOAssembler {
     public static ObjectNodeDTO toDTO(@NonNull IObjectNode astahObjectNode) throws Exception {
 

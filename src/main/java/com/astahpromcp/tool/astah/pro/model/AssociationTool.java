@@ -103,14 +103,14 @@ public class AssociationTool implements ToolProvider {
 
                     ToolSupport.definition(
                             "set_aggr_kind_of_asso_end_a",
-                            "Set the aggregation kind of the specified association end A (specified by ID), and return the association end information after it is set.",
+                            "Set the aggregation kind of the specified association end A (specified by ID), and return the association end information after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end A. When 'composite' is specified, a filled (black) diamond is placed on association end A.",
                             this::setAggregationKindOfAssociationEndA,
                             AssociationEndWithAggregationKindDTO.class,
                             AttributeDTO.class),
 
                     ToolSupport.definition(
                             "set_aggr_kind_of_asso_end_b",
-                            "Set the aggregation kind of the specified association end B (specified by ID), and return the association end information after it is set.",
+                            "Set the aggregation kind of the specified association end B (specified by ID), and return the association end information after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end B. When 'composite' is specified, a filled (black) diamond is placed on association end B.",
                             this::setAggregationKindOfAssociationEndB,
                             AssociationEndWithAggregationKindDTO.class,
                             AttributeDTO.class),

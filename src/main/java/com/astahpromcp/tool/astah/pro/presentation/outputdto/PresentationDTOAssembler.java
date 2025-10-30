@@ -3,9 +3,7 @@ package com.astahpromcp.tool.astah.pro.presentation.outputdto;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class PresentationDTOAssembler {
     public static PresentationDTO toDTO(@NonNull IPresentation astahPresentation) throws Exception {
 
