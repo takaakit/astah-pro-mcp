@@ -37,18 +37,38 @@ public class ClassDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final ClassDiagramEditor classDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ClassDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ClassDiagramEditor classDiagramEditor, AstahProToolSupport astahProToolSupport) {
+    public ClassDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ClassDiagramEditor classDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.classDiagramEditor = classDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create class diagram editor tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
                 ToolSupport.definition(
                         "create_cls_dgm",
                         "Create a new class diagram (which also serves as an object diagram and package diagram) under the specified package (specified by ID), and return the newly created class diagram information.",
@@ -62,25 +82,21 @@ public class ClassDiagramEditorTool implements ToolProvider {
                         this::createAssociationClassPresentation,
                         NewAssociationClassPresentationDTO.class,
                         PresentationListDTO.class),
-                        
+
                 ToolSupport.definition(
                         "create_inst",
                         "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created instance specification information (node presentation information).",
                         this::createInstanceSpecification,
                         NewInstanceWithPointDTO.class,
                         NodePresentationDTO.class),
-                        
+
                 ToolSupport.definition(
                         "create_inst_link",
                         "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation information.",
                         this::createInstanceSpecificationLink,
                         NewLinkSourceAndTargetDTO.class,
                         LinkPresentationDTO.class)
-            );
-        } catch (Exception e) {
-            log.error("Failed to create class diagram editor tools", e);
-            return List.of();
-        }
+        );
     }
 
     private DiagramDTO createClassDiagram(McpSyncServerExchange exchange, NewDiagramInPackageDTO param) throws Exception {
@@ -125,13 +141,13 @@ public class ClassDiagramEditorTool implements ToolProvider {
             }
 
             return new PresentationListDTO(presentationDTOs);
-            
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;
         }
     }
-    
+
     private NodePresentationDTO createInstanceSpecification(McpSyncServerExchange exchange, NewInstanceWithPointDTO param) throws Exception {
         log.debug("Create instance specification: {}", param);
 
@@ -160,11 +176,11 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
     private LinkPresentationDTO createInstanceSpecificationLink(McpSyncServerExchange exchange, NewLinkSourceAndTargetDTO param) throws Exception {
         log.debug("Create instance specification link: {}", param);
-        
+
         INodePresentation astahSourceNode = astahProToolSupport.getNodePresentation(param.sourceNodePresentationId());
         INodePresentation astahTargetNode = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
         IClassDiagram astahClassDiagram = astahProToolSupport.getClassDiagram(param.targetDiagramId());
-        
+
         classDiagramEditor.setDiagram(astahClassDiagram);
 
         try {

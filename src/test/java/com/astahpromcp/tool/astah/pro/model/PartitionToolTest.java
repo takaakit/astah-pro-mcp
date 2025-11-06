@@ -35,7 +35,8 @@ public class PartitionToolTest {
         tool = new PartitionTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

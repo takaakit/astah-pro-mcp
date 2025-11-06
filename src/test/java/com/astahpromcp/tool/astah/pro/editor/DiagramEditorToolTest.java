@@ -2,8 +2,11 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageWithPointDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTextWithPointDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
@@ -21,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -30,6 +35,8 @@ public class DiagramEditorToolTest {
     private ProjectAccessor projectAccessor;
     private DiagramEditorTool tool;
     private Method insertSvgImage;
+    private Method insertPngImage;
+    private Method insertJpgImage;
     private Method insertText;
     private Method deleteDiagram;
     private Method deletePresentation;
@@ -48,7 +55,8 @@ public class DiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             astahProToolSupport,
-            diagramEditorSupport);
+            diagramEditorSupport,
+            true);
 
         // insertSvgImage() method
         insertSvgImage = TestSupport.getAccessibleMethod(
@@ -56,6 +64,20 @@ public class DiagramEditorToolTest {
             "insertSvgImage",
             McpSyncServerExchange.class,
             NewSvgImageWithPointDTO.class);
+
+        // insertPngImage() method
+        insertPngImage = TestSupport.getAccessibleMethod(
+            DiagramEditorTool.class,
+            "insertPngImage",
+            McpSyncServerExchange.class,
+            NewPngImageWithPointDTO.class);
+
+        // insertJpgImage() method
+        insertJpgImage = TestSupport.getAccessibleMethod(
+            DiagramEditorTool.class,
+            "insertJpgImage",
+            McpSyncServerExchange.class,
+            NewJpgImageWithPointDTO.class);
 
         // insertText() method
         insertText = TestSupport.getAccessibleMethod(
@@ -114,6 +136,70 @@ public class DiagramEditorToolTest {
             tool,
             inputDTO,
             NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+    }
+
+    @Disabled("Astah internal view system components not initialized in test environment, causing NullPointerException in insertPngImage()")
+    @Test
+    void insertPngImage_ok() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+            IClassDiagram.class,
+            "Class Diagram0");
+        
+        // Use a small test PNG image file from test resources
+        Path imagePath = Paths.get("src/test/resources/images/test.png").toAbsolutePath();
+        String imageUrl = imagePath.toUri().toASCIIString();
+        
+        // Create input DTO
+        NewPngImageWithPointDTO inputDTO = new NewPngImageWithPointDTO(
+            classDiagram.getId(),
+            imageUrl,
+            100,
+            120);
+
+        // ----------------------------------------
+        // Call insertPngImage()
+        // ----------------------------------------
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            insertPngImage,
+            tool,
+            inputDTO,
+            RectangleDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+    }
+
+    @Disabled("Astah internal view system components not initialized in test environment, causing NullPointerException in insertJpgImage()")
+    @Test
+    void insertJpgImage_ok() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+            IClassDiagram.class,
+            "Class Diagram0");
+        
+        // Use a small test JPG image file from test resources
+        Path imagePath = Paths.get("src/test/resources/images/test.jpg").toAbsolutePath();
+        String imageUrl = imagePath.toUri().toASCIIString();
+        
+        // Create input DTO
+        NewJpgImageWithPointDTO inputDTO = new NewJpgImageWithPointDTO(
+            classDiagram.getId(),
+            imageUrl,
+            150,
+            170);
+
+        // ----------------------------------------
+        // Call insertJpgImage()
+        // ----------------------------------------
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            insertJpgImage,
+            tool,
+            inputDTO,
+            RectangleDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);

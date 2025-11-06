@@ -14,6 +14,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -24,29 +25,50 @@ public class SlotTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public SlotTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public SlotTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
-        return List.of(
-            ToolSupport.definition(
-                "get_slot_info",
-                "Return detailed information about the specified slot (specified by ID).",
-                this::getInfo,
-                IdDTO.class,
-                SlotDTO.class),
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-            ToolSupport.definition(
-                "set_val_of_slot",
-                "Set the value of the specified slot (specified by ID), and return the slot information after it is set.",
-                this::setValue,
-                SlotWithValueDTO.class,
-                SlotDTO.class)
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create slot tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_slot_info",
+                        "Return detailed information about the specified slot (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        SlotDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_val_of_slot",
+                        "Set the value of the specified slot (specified by ID), and return the slot information after it is set.",
+                        this::setValue,
+                        SlotWithValueDTO.class,
+                        SlotDTO.class)
         );
     }
 

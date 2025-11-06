@@ -17,6 +17,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -27,57 +28,79 @@ public class StateTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public StateTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public StateTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create state tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
-                "get_state_info",
-                "Return detailed information about the specified state (specified by ID).",
-                this::getInfo,
-                IdDTO.class,
-                StateDTO.class),
+                ToolSupport.definition(
+                        "get_state_info",
+                        "Return detailed information about the specified state (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        StateDTO.class)
+        );
+    }
 
-            ToolSupport.definition(
-                "add_inter_trans_of_state",
-                "Add an internal transition to the specified state (specified by ID), and return the state information after it is edited.",
-                this::addInternalTransition,
-                StateWithInternalTransitionDTO.class,
-                StateDTO.class),
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "add_inter_trans_of_state",
+                        "Add an internal transition to the specified state (specified by ID), and return the state information after it is edited.",
+                        this::addInternalTransition,
+                        StateWithInternalTransitionDTO.class,
+                        StateDTO.class),
 
-            ToolSupport.definition(
-                "delete_all_inter_trans_of_state",
-                "Delete all internal transitions from the specified state (specified by ID), and return the state information after it is edited.",
-                this::deleteAllInternalTransitions,
-                IdDTO.class,
-                StateDTO.class),
+                ToolSupport.definition(
+                        "delete_all_inter_trans_of_state",
+                        "Delete all internal transitions from the specified state (specified by ID), and return the state information after it is edited.",
+                        this::deleteAllInternalTransitions,
+                        IdDTO.class,
+                        StateDTO.class),
 
-            ToolSupport.definition(
-                "set_entry_of_state",
-                "Set the entry of the specified state (specified by ID), and return the state information after it is edited.",
-                this::setEntry,
-                StateWithEntryDTO.class,
-                StateDTO.class),
+                ToolSupport.definition(
+                        "set_entry_of_state",
+                        "Set the entry of the specified state (specified by ID), and return the state information after it is edited.",
+                        this::setEntry,
+                        StateWithEntryDTO.class,
+                        StateDTO.class),
 
-            ToolSupport.definition(
-                "set_do_act_of_state",
-                "Set the doActivity of the specified state (specified by ID), and return the state information after it is edited.",
-                this::setDoActivity,
-                StateWithDoActivityDTO.class,
-                StateDTO.class),
+                ToolSupport.definition(
+                        "set_do_act_of_state",
+                        "Set the doActivity of the specified state (specified by ID), and return the state information after it is edited.",
+                        this::setDoActivity,
+                        StateWithDoActivityDTO.class,
+                        StateDTO.class),
 
-            ToolSupport.definition(
-                "set_exit_of_state",
-                "Set the exit of the specified state (specified by ID), and return the state information after it is edited.",
-                this::setExit,
-                StateWithExitDTO.class,
-                StateDTO.class)
+                ToolSupport.definition(
+                        "set_exit_of_state",
+                        "Set the exit of the specified state (specified by ID), and return the state information after it is edited.",
+                        this::setExit,
+                        StateWithExitDTO.class,
+                        StateDTO.class)
         );
     }
 
@@ -91,7 +114,7 @@ public class StateTool implements ToolProvider {
 
     private StateDTO addInternalTransition(McpSyncServerExchange exchange, StateWithInternalTransitionDTO param) throws Exception {
         log.debug("Add internal transition to state: {}", param);
-        
+
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         try {
@@ -130,7 +153,7 @@ public class StateTool implements ToolProvider {
 
     private StateDTO setEntry(McpSyncServerExchange exchange, StateWithEntryDTO param) throws Exception {
         log.debug("Set entry of state: {}", param);
-        
+
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         try {
@@ -148,7 +171,7 @@ public class StateTool implements ToolProvider {
 
     private StateDTO setDoActivity(McpSyncServerExchange exchange, StateWithDoActivityDTO param) throws Exception {
         log.debug("Set doActivity of state: {}", param);
-        
+
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         try {
@@ -166,7 +189,7 @@ public class StateTool implements ToolProvider {
 
     private StateDTO setExit(McpSyncServerExchange exchange, StateWithExitDTO param) throws Exception {
         log.debug("Set exit of state: {}", param);
-        
+
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         try {

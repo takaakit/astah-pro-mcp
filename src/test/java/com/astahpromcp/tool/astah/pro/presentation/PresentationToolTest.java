@@ -43,7 +43,8 @@ public class PresentationToolTest {
         tool = new PresentationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getElement() method
         getElement = TestSupport.getAccessibleMethod(

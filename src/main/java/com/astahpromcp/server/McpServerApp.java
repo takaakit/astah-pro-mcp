@@ -6,6 +6,7 @@ import com.astahpromcp.tool.ToolCategoryFlags;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolRegistrar;
 import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
+import com.astahpromcp.tool.config.ConfigToolFactory;
 import com.astahpromcp.tool.knowledge.KnowledgeToolFactory;
 import com.astahpromcp.tool.log.LogToolFactory;
 import com.astahpromcp.tool.visualization.VisualizationToolFactory;
@@ -109,12 +110,16 @@ public final class McpServerApp {
             false,      // is RequirementDiagramEnabled
             false       // is CommunicationDiagramEnabled
         );
-        
+
+        // Include editor tools
+        boolean includeEditorTools = true;
+
         log.info("Adding tool providers...");
-        toolProviders.addAll(new AstahProToolFactory().createToolProviders(categoryFlags));
+        toolProviders.addAll(new AstahProToolFactory().createToolProviders(categoryFlags, includeEditorTools));
         toolProviders.addAll(new LogToolFactory().createToolProviders(categoryFlags));
         toolProviders.addAll(new KnowledgeToolFactory(McpServerConfig.DEFAULT_WORKSPACE_DIR).createToolProviders(categoryFlags));
         toolProviders.addAll(new VisualizationToolFactory().createToolProviders(categoryFlags));
+        toolProviders.addAll(new ConfigToolFactory().createToolProviders(categoryFlags));
         
         log.info("Total tool providers registered: {}", toolProviders.size());
 

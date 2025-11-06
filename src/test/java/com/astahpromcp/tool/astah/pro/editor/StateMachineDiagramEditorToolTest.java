@@ -56,7 +56,8 @@ public class StateMachineDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             stateMachineDiagramEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // Methods
         addRegion = TestSupport.getAccessibleMethod(

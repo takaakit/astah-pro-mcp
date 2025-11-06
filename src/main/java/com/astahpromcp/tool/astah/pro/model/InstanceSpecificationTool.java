@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -25,35 +26,52 @@ public class InstanceSpecificationTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public InstanceSpecificationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public InstanceSpecificationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create instance specification tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
                 ToolSupport.definition(
                         "get_inst_spec_info",
                         "Return detailed information about the specified instance specification (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
-                        InstanceSpecificationDTO.class),
+                        InstanceSpecificationDTO.class)
+        );
+    }
 
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
                 ToolSupport.definition(
                         "set_cls_to_inst_spec",
                         "Set the classifier (specified by ID) to the instance specification (specified by ID), and return the instance specification information after it is edited.",
                         this::setClassifier,
                         InstanceSpecificationWithClassifierDTO.class,
                         InstanceSpecificationDTO.class)
-            );
-        } catch (Exception e) {
-            log.error("Failed to create instance specification tools", e);
-            return List.of();
-        }
+        );
     }
 
     private InstanceSpecificationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -66,7 +84,7 @@ public class InstanceSpecificationTool implements ToolProvider {
 
     private InstanceSpecificationDTO setClassifier(McpSyncServerExchange exchange, InstanceSpecificationWithClassifierDTO param) throws Exception {
         log.debug("Set classifier to instance specification: {}", param);
-        
+
         IClass astahClass = astahProToolSupport.getClass(param.targetClassifierId());
         IInstanceSpecification astahInstanceSpecification = astahProToolSupport.getInstanceSpecification(param.targetInstanceSpecificationId());
 

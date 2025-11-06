@@ -35,7 +35,8 @@ public class StateMachineToolTest {
         tool = new StateMachineTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // Methods
         getInfo = TestSupport.getAccessibleMethod(

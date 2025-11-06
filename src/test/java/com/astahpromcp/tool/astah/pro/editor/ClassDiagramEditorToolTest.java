@@ -51,7 +51,8 @@ public class ClassDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             classDiagramEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createClassDiagram() method
         createClassDiagram = TestSupport.getAccessibleMethod(

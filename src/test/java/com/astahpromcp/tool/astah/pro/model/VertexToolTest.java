@@ -35,7 +35,8 @@ public class VertexToolTest {
         tool = new VertexTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

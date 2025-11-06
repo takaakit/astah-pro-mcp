@@ -13,41 +13,58 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 public class EnumerationLiteralTool implements ToolProvider {
-    
+
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public EnumerationLiteralTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public EnumerationLiteralTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "set_val_of_enum_lit",
-                            "Set the value of the specified enumeration literal (specified by ID), and return the enumeration literal information after it is set.",
-                            this::setValue,
-                            EnumerationLiteralWithValueDTO.class,
-                            EnumerationLiteralDTO.class)
-            );
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create enumeration literal tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_val_of_enum_lit",
+                        "Set the value of the specified enumeration literal (specified by ID), and return the enumeration literal information after it is set.",
+                        this::setValue,
+                        EnumerationLiteralWithValueDTO.class,
+                        EnumerationLiteralDTO.class)
+        );
+    }
+
     private EnumerationLiteralDTO setValue(McpSyncServerExchange exchange, EnumerationLiteralWithValueDTO param) throws Exception {
         log.debug("Set value of enumeration literal: {}", param);
-        
+
         IEnumerationLiteral astahEnumerationLiteral = astahProToolSupport.getEnumerationLiteral(param.targetEnumerationLiteralId());
 
         try {

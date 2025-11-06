@@ -44,7 +44,8 @@ public class ProjectAccessorToolTest {
         // Tool
         tool = new ProjectAccessorTool(
             projectAccessor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createProject() method
         createProject = TestSupport.getAccessibleMethod(

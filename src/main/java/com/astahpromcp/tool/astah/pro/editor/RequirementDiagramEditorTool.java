@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -26,29 +27,45 @@ public class RequirementDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final RequirementDiagramEditor requirementDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public RequirementDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, RequirementDiagramEditor requirementDiagramEditor, AstahProToolSupport astahProToolSupport) {
+    public RequirementDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, RequirementDiagramEditor requirementDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.requirementDiagramEditor = requirementDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                ToolSupport.definition(
-                    "create_req_dgm",
-                    "Create a new requirement diagram under the specified package (specified by ID), and return the newly created requirement diagram information.",
-                    this::createRequirementDiagram,
-                    NewDiagramInPackageDTO.class,
-                    DiagramDTO.class)
-            );
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create requirement diagram editor tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "create_req_dgm",
+                        "Create a new requirement diagram under the specified package (specified by ID), and return the newly created requirement diagram information.",
+                        this::createRequirementDiagram,
+                        NewDiagramInPackageDTO.class,
+                        DiagramDTO.class)
+        );
     }
 
     private DiagramDTO createRequirementDiagram(McpSyncServerExchange exchange, NewDiagramInPackageDTO param) throws Exception {

@@ -13,43 +13,60 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDependency.html
 @Slf4j
 public class DependencyTool implements ToolProvider {
-    
+
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public DependencyTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public DependencyTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_dep_info",
-                            "Return detailed information about the specified dependency (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            DependencyDTO.class)
-            );
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create dependency tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_dep_info",
+                        "Return detailed information about the specified dependency (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        DependencyDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
+    }
+
     private DependencyDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get dependency information: {}", param);
-        
+
         IDependency astahDependency = astahProToolSupport.getDependency(param.id());
 
         return DependencyDTOAssembler.toDTO(astahDependency);

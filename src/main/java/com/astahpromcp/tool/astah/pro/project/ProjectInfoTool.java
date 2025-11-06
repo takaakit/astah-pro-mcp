@@ -10,6 +10,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.*;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.visualization.outputdto.PlantumlDTO;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,87 +35,109 @@ public class ProjectInfoTool implements ToolProvider {
     private final List<List<LabelIdTypeDTO>> labelIdTypeDTOChunksCache;
     private final Object nameCacheLock = new Object();
     private final Object labelCacheLock = new Object();
+    private final boolean includeEditTools;
 
-    public ProjectInfoTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport) {
+    public ProjectInfoTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.astahProToolSupport = astahProToolSupport;
         this.nameIdTypeDTOChunksCache = new ArrayList<>();
         this.labelIdTypeDTOChunksCache = new ArrayList<>();
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_info_of_all_named_elems",
-                            "Return the total number of chunks and the data of the first chunk of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
-                            this::getAllNamedElements,
-                            NoInputDTO.class,
-                            AllNameIdTypeInfoDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "get_chunk_of_all_named_elems",
-                            "Return the chunk data of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
-                            this::getNamedElementsChunk,
-                            ChunkDTO.class,
-                            NameIdTypeListDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "get_info_of_all_prsts",
-                            "Return the total number of chunks and the data of the first chunk of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
-                            this::getAllPresentations,
-                            NoInputDTO.class,
-                            AllLabelIdTypeInfoDTO.class),
-                            
-                    ToolSupport.definition(
-                            "get_chunk_of_all_prsts",
-                            "Return the chunk data of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
-                            this::getPresentationsChunk,
-                            ChunkDTO.class,
-                            LabelIdTypeListDTO.class),
-
-                    ToolSupport.definition(
-                            "get_info_of_dgm_prsts",
-                            "Return all presentation data on the specified diagram (specified by ID). The presentation data is a simplified information: label, identifier, and type.",
-                            this::getAllPresentationsOnDiagram,
-                            IdDTO.class,
-                            LabelIdTypeListDTO.class),
-
-                    ToolSupport.definition(
-                            "get_clses_that_ref_or_be_refed_by",
-                            "Return all classifiers (classes, interfaces, and enumerations) that the specified classifier (specified by ID) references or that reference it. The returned data is a simplified information: name, identifier, and type. For example, when you need to understand the scope of impact of changes to a specific element, use this tool. If you want to traverse references recursively, you'll need to use this tool repeatedly. Note that using a classifier as a type is considered a reference to that classifier.",
-                            this::getClassifiersThatReferenceOrBeReferencedBy,
-                            IdDTO.class,
-                            SourceTargetNameIdTypeListDTO.class),
-
-                    ToolSupport.definition(
-                            "search_within_named_elems",
-                            "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope.",
-                            this::searchWithinNamedElements,
-                            SearchDTO.class,
-                            NameIdTypeDefinitionListDTO.class),
-
-                    ToolSupport.definition(
-                            "search_within_prsts",
-                            "Search for the specified string within the label of presentations using partial matching. The search is case-insensitive. Note that named elements are excluded from the search scope. For example, if you want to search for the specified string within note contents, use this tool.",
-                            this::searchWithinPresentations,
-                            SearchDTO.class,
-                            LabelIdTypeListDTO.class),
-
-                    ToolSupport.definition(
-                            "get_clses_within_pkg",
-                            "Return all classifiers (classes, interfaces, and enumerations) within the specified package (specified by ID), including those in its subpackages. The returned data is a simplified information: name, identifier, type, and namespace.",
-                            this::getClassifiersWithinPackage,
-                            IdDTO.class,
-                            NameIdTypeNamespaceListDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create project info tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_info_of_all_named_elems",
+                        "Return the total number of chunks and the data of the first chunk of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
+                        this::getAllNamedElements,
+                        NoInputDTO.class,
+                        AllNameIdTypeInfoDTO.class),
+
+                ToolSupport.definition(
+                        "get_chunk_of_all_named_elems",
+                        "Return the chunk data of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
+                        this::getNamedElementsChunk,
+                        ChunkDTO.class,
+                        NameIdTypeListDTO.class),
+
+                ToolSupport.definition(
+                        "get_info_of_all_prsts",
+                        "Return the total number of chunks and the data of the first chunk of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
+                        this::getAllPresentations,
+                        NoInputDTO.class,
+                        AllLabelIdTypeInfoDTO.class),
+
+                ToolSupport.definition(
+                        "get_chunk_of_all_prsts",
+                        "Return the chunk data of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
+                        this::getPresentationsChunk,
+                        ChunkDTO.class,
+                        LabelIdTypeListDTO.class),
+
+                ToolSupport.definition(
+                        "get_info_of_dgm_prsts",
+                        "Return all presentation data on the specified diagram (specified by ID). The presentation data is a simplified information: label, identifier, and type.",
+                        this::getAllPresentationsOnDiagram,
+                        IdDTO.class,
+                        LabelIdTypeListDTO.class),
+
+                ToolSupport.definition(
+                        "retrieve_clses_that_ref_or_be_refed_by",
+                        "Return all classifiers (classes, interfaces, and enumerations) that the specified classifier (specified by ID) references or that reference it. The returned data is a simplified information: name, identifier, and type. For example, when you need to understand the scope of impact of changes to a specific element, use this tool. If you want to traverse references recursively, you'll need to use this tool repeatedly. Note that using a classifier as a type is considered a reference to that classifier.",
+                        this::retrieveClassifiersThatReferenceOrBeReferencedBy,
+                        IdDTO.class,
+                        SourceTargetNameIdTypeListDTO.class),
+
+                ToolSupport.definition(
+                        "search_within_named_elems",
+                        "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope.",
+                        this::searchWithinNamedElements,
+                        SearchDTO.class,
+                        NameIdTypeDefinitionListDTO.class),
+
+                ToolSupport.definition(
+                        "search_within_prsts",
+                        "Search for the specified string within the label of presentations using partial matching. The search is case-insensitive. Note that named elements are excluded from the search scope. For example, if you want to search for the specified string within note contents, use this tool.",
+                        this::searchWithinPresentations,
+                        SearchDTO.class,
+                        LabelIdTypeListDTO.class),
+
+                ToolSupport.definition(
+                        "retrieve_clses_within_pkg",
+                        "Return all classifiers (classes, interfaces, and enumerations) within the specified package (specified by ID), including those in its subpackages. The returned data is a simplified information: name, identifier, type, and namespace.",
+                        this::retrieveClassifiersWithinPackage,
+                        IdDTO.class,
+                        NameIdTypeNamespaceListDTO.class),
+
+                ToolSupport.definition(
+                        "retrieve_pkg_strct_as_puml",
+                        "Return the PlantUML code that represents the package structure of the classifiers within the project. When you need to know the package structure of classifiers across the entire project, use this tool.",
+                        this::retrievePackageStructureAsPlantuml,
+                        NoInputDTO.class,
+                        PlantumlDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
+    }
 
     private AllNameIdTypeInfoDTO getAllNamedElements(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get information of all named elements: {}", param);
@@ -205,7 +229,7 @@ public class ProjectInfoTool implements ToolProvider {
 
     private LabelIdTypeListDTO getPresentationsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
         log.debug("Get presentations chunk: {}", param);
-        
+
         int chunkIndex = param.chunkIndex();
         List<LabelIdTypeDTO> chunk;
         synchronized (labelCacheLock) {
@@ -236,8 +260,8 @@ public class ProjectInfoTool implements ToolProvider {
         return new LabelIdTypeListDTO(labelIdTypeDTOs);
     }
 
-    private SourceTargetNameIdTypeListDTO getClassifiersThatReferenceOrBeReferencedBy(McpSyncServerExchange exchange, IdDTO param) throws Exception {
-        log.debug("Get classifiers that reference or are referenced by: {}", param);
+    private SourceTargetNameIdTypeListDTO retrieveClassifiersThatReferenceOrBeReferencedBy(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Retrieve classifiers that reference or are referenced by: {}", param);
 
         IClass astahTargetClass = astahProToolSupport.getClass(param.id());
 
@@ -254,7 +278,7 @@ public class ProjectInfoTool implements ToolProvider {
 
         for (INamedElement astahNamedElement : projectAccessor.findElements(IClass.class)) {
             IClass astahClass = (IClass)astahNamedElement;
-            
+
             if (astahClass.equals(astahTargetClass)) {
                 // Processing for the target class itself
                 for (IAttribute astahAttribute : astahClass.getAttributes()) {
@@ -263,7 +287,7 @@ public class ProjectInfoTool implements ToolProvider {
                         // Both navigabilities are unspecified
                         if (astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Unspecified")
                             && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Unspecified")) {
-                            
+
                             if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass) {
                                 associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[1].getOwner()));
                             }
@@ -274,12 +298,12 @@ public class ProjectInfoTool implements ToolProvider {
 
                         // One of the navigabilities is specified
                         } else {
-                            
+
                             if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass
                                 && astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Navigable")) {
                                 associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[1].getOwner()));
                             }
-                            
+
                             if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahTargetClass
                                 && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Navigable")) {
                                 associationTargetClassifier.add(NameIdTypeDTOAssembler.toDTO((INamedElement) astahAttribute.getAssociation().getMemberEnds()[0].getOwner()));
@@ -356,7 +380,7 @@ public class ProjectInfoTool implements ToolProvider {
                         // Both navigabilities are unspecified
                         if (astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Unspecified")
                             && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Unspecified")) {
-                            
+
                             if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahTargetClass) {
                                 associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
                             }
@@ -372,7 +396,7 @@ public class ProjectInfoTool implements ToolProvider {
                                 && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Navigable")) {
                                 associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
                             }
-                            
+
                             if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahTargetClass
                                 && astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Navigable")) {
                                 associationSourceClassifier.add(NameIdTypeDTOAssembler.toDTO(astahClass));
@@ -514,15 +538,15 @@ public class ProjectInfoTool implements ToolProvider {
         return new LabelIdTypeListDTO(labelIdTypeDTOs);
     }
 
-    private NameIdTypeNamespaceListDTO getClassifiersWithinPackage(McpSyncServerExchange exchange, IdDTO param) throws Exception {
-        log.debug("Get classifiers within package: {}", param);
+    private NameIdTypeNamespaceListDTO retrieveClassifiersWithinPackage(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Retrieve classifiers within package: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.id());
 
         List<NameIdTypeNamespaceDTO> nameIdTypeNamespaceDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : projectAccessor.findElements(IClass.class)) {
             IClass astahClass = (IClass)astahNamedElement;
-            
+
             IElement owner = astahClass.getOwner();
             while (owner != null) {
                 if (owner.equals(astahPackage)) {
@@ -534,5 +558,68 @@ public class ProjectInfoTool implements ToolProvider {
         }
 
         return new NameIdTypeNamespaceListDTO(nameIdTypeNamespaceDTOs);
+    }
+
+    private PlantumlDTO retrievePackageStructureAsPlantuml(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Retrieve package structure as PlantUML: {}", param);
+
+        IModel astahProject;
+        try {
+            astahProject = projectAccessor.getProject();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the current project.");
+        }
+
+        StringBuilder plantumlCode = new StringBuilder();
+        plantumlCode.append("@startuml").append("\n");
+        String indent = "";
+
+        for (INamedElement astahNamedElement : astahProject.getOwnedElements()) {
+            plantumlCode.append(getNamedElementPlantumlCode(astahNamedElement, indent));
+        }
+
+        plantumlCode.append("@enduml").append("\n");
+        log.debug("Package structure as PlantUML: {}", plantumlCode.toString());
+
+        return new PlantumlDTO(plantumlCode.toString());
+    }
+
+    private String getNamedElementPlantumlCode(INamedElement astahNamedElement, String indent) {
+        StringBuilder plantumlCode = new StringBuilder();
+        if (astahNamedElement instanceof IEnumeration) {
+            IEnumeration astahEnumeration = (IEnumeration) astahNamedElement;
+            plantumlCode.append(indent).append("enum ").append("\"" + astahEnumeration.getName() + "\"").append("\n");
+
+        } else if (astahNamedElement instanceof IClass) {
+            IClass astahClass = (IClass) astahNamedElement;
+            if (Arrays.asList(astahClass.getStereotypes()).contains("interface")) {
+                plantumlCode.append(indent).append("interface ").append("\"" + astahClass.getName() + "\"").append("\n");
+            } else {
+                plantumlCode.append(indent).append("class ").append("\"" + astahClass.getName() + "\"").append("\n");
+            }
+
+            if (astahClass.getNestedClasses().length > 0) {
+                plantumlCode.append(indent).append("{").append("\n");
+                for (IClass nestedClass : astahClass.getNestedClasses()) {
+                    plantumlCode.append(getNamedElementPlantumlCode(nestedClass, indent + "  "));
+                }
+                plantumlCode.append(indent).append("}").append("\n");
+            }
+        }
+
+        if (astahNamedElement instanceof IPackage) {
+            IPackage astahPackage = (IPackage) astahNamedElement;
+            plantumlCode.append(indent).append("package ").append("\"" + astahPackage.getName() + "\"").append("\n");
+
+            if (astahPackage.getOwnedElements().length > 0) {
+                plantumlCode.append(indent).append("{").append("\n");
+                for (INamedElement nestedElement : astahPackage.getOwnedElements()) {
+                    plantumlCode.append(getNamedElementPlantumlCode(nestedElement, indent + "  "));
+                }
+                plantumlCode.append(indent).append("}").append("\n");
+            }
+        }
+
+        return plantumlCode.toString();
     }
 }

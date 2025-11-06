@@ -16,6 +16,7 @@ import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -26,48 +27,64 @@ public class LinkPresentationTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public LinkPresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public LinkPresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_link_prst_info",
-                            "Return detailed information about the specified link presentation (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            LinkPresentationDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_points_of_link_prst",
-                            "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation).",
-                            this::setAllPoints,
-                            LinkPresentationWithPointsDTO.class,
-                            LinkPresentationDTO.class)
-            );
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create link presentation tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_link_prst_info",
+                        "Return detailed information about the specified link presentation (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        LinkPresentationDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_points_of_link_prst",
+                        "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation).",
+                        this::setAllPoints,
+                        LinkPresentationWithPointsDTO.class,
+                        LinkPresentationDTO.class)
+        );
+    }
+
     private LinkPresentationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get link presentation information: {}", param);
-        
+
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.id());
-        
+
         return LinkPresentationDTOAssembler.toDTO(linkPresentation);
     }
 
     private LinkPresentationDTO setAllPoints(McpSyncServerExchange exchange, LinkPresentationWithPointsDTO param) throws Exception {
         log.debug("Set points of link presentation: {}", param);
-        
+
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());
 
 		Point2D.Double[] pointArray = new Point2D.Double[param.drawPoints().size()];

@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -25,42 +26,58 @@ public class RequirementTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public RequirementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public RequirementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                ToolSupport.definition(
-                    "get_req_info",
-                    "Return detailed information about the specified requirement (specified by ID).",
-                    this::getInfo,
-                    IdDTO.class,
-                    RequirementDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                ToolSupport.definition(
-                    "set_req_id",
-                    "Set the requirement identifier (specified by string) of the specified requirement (specified by ID), and return the requirement information after it is set.",
-                    this::setRequirementId,
-                    RequirementWithIdDTO.class,
-                    RequirementDTO.class),
+            return List.copyOf(tools);
 
-                ToolSupport.definition(
-                    "set_req_text",
-                    "Set the requirement text (specified by string) of the specified requirement (specified by ID), and return the requirement information after it is set.",
-                    this::setRequirementText,
-                    RequirementWithTextDTO.class,
-                    RequirementDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create requirement tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_req_info",
+                        "Return detailed information about the specified requirement (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        RequirementDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_req_id",
+                        "Set the requirement identifier (specified by string) of the specified requirement (specified by ID), and return the requirement information after it is set.",
+                        this::setRequirementId,
+                        RequirementWithIdDTO.class,
+                        RequirementDTO.class),
+
+                ToolSupport.definition(
+                        "set_req_text",
+                        "Set the requirement text (specified by string) of the specified requirement (specified by ID), and return the requirement information after it is set.",
+                        this::setRequirementText,
+                        RequirementWithTextDTO.class,
+                        RequirementDTO.class)
+        );
     }
 
     private RequirementDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -100,7 +117,7 @@ public class RequirementTool implements ToolProvider {
             transactionManager.endTransaction();
 
             return RequirementDTOAssembler.toDTO(astahRequirement);
-            
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;

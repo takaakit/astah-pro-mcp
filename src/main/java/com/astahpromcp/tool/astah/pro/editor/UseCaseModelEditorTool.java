@@ -13,6 +13,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -24,51 +25,73 @@ public class UseCaseModelEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final UseCaseModelEditor useCaseModelEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public UseCaseModelEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, UseCaseModelEditor useCaseModelEditor, AstahProToolSupport astahProToolSupport) {
+    public UseCaseModelEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, UseCaseModelEditor useCaseModelEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.useCaseModelEditor = useCaseModelEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create usecase model editor tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
-                "create_actr",
-                "Create a new actor in the specified package (specified by ID), and return the newly created actor information.",
-                this::createActor,
-                NewActorDTO.class,
-                ClassDTO.class),
+                ToolSupport.definition(
+                        "create_actr",
+                        "Create a new actor in the specified package (specified by ID), and return the newly created actor information.",
+                        this::createActor,
+                        NewActorDTO.class,
+                        ClassDTO.class),
 
-            ToolSupport.definition(
-                "create_incld",
-                "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created include information.",
-                this::createInclude,
-                NewIncludeDTO.class,
-                IncludeDTO.class),
+                ToolSupport.definition(
+                        "create_incld",
+                        "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created include information.",
+                        this::createInclude,
+                        NewIncludeDTO.class,
+                        IncludeDTO.class),
 
-            ToolSupport.definition(
-                "create_extnd",
-                "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extend information.",
-                this::createExtend,
-                NewExtendDTO.class,
-                ExtendDTO.class),
+                ToolSupport.definition(
+                        "create_extnd",
+                        "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extend information.",
+                        this::createExtend,
+                        NewExtendDTO.class,
+                        ExtendDTO.class),
 
-            ToolSupport.definition(
-                "create_ext_point",
-                "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extension point information.",
-                this::createExtensionPoint,
-                NewExtensionPointDTO.class,
-                NamedElementDTO.class),
+                ToolSupport.definition(
+                        "create_ext_point",
+                        "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extension point information.",
+                        this::createExtensionPoint,
+                        NewExtensionPointDTO.class,
+                        NamedElementDTO.class),
 
-            ToolSupport.definition(
-                "create_use",
-                "Create a new usecase in the specified package (specified by ID), and return the newly created usecase information.",
-                this::createUseCase,
-                NewUseCaseDTO.class,
-                UseCaseDTO.class)
+                ToolSupport.definition(
+                        "create_use",
+                        "Create a new usecase in the specified package (specified by ID), and return the newly created usecase information.",
+                        this::createUseCase,
+                        NewUseCaseDTO.class,
+                        UseCaseDTO.class)
         );
     }
 

@@ -19,6 +19,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -29,58 +30,75 @@ public class PresentationTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public PresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public PresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_elem_of_prst",
-                            "Return the element information that corresponds to the specified presentation (specified by ID).",
-                            this::getElement,
-                            IdDTO.class,
-                            ElementDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_label",
-                            "Set the label of the specified presentation (specified by ID), and return the presentation information after it is set. Note that newline characters (\\n) cannot be used in labels.",
-                            this::setLabel,
-                            PresentationWithLabelDTO.class,
-                            PresentationDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "change_fill_color",
-                            "Change the fill color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
-                            this::changeFillColor,
-                            PresentationWithColorDTO.class,
-                            PresentationDTO.class),
-
-                    ToolSupport.definition(
-                            "change_line_color",
-                            "Change the line color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
-                            this::changeLineColor,
-                            PresentationWithColorDTO.class,
-                            PresentationDTO.class),
-
-                    ToolSupport.definition(
-                            "change_font_color",
-                            "Change the font color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
-                            this::changeFontColor,
-                            PresentationWithColorDTO.class,
-                            PresentationDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create presentation tools", e);
             return List.of();
         }
     }
-    
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_elem_of_prst",
+                        "Return the element information that corresponds to the specified presentation (specified by ID).",
+                        this::getElement,
+                        IdDTO.class,
+                        ElementDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_label",
+                        "Set the label of the specified presentation (specified by ID), and return the presentation information after it is set. Note that newline characters (\\n) cannot be used in labels.",
+                        this::setLabel,
+                        PresentationWithLabelDTO.class,
+                        PresentationDTO.class),
+
+                ToolSupport.definition(
+                        "change_fill_color",
+                        "Change the fill color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
+                        this::changeFillColor,
+                        PresentationWithColorDTO.class,
+                        PresentationDTO.class),
+
+                ToolSupport.definition(
+                        "change_line_color",
+                        "Change the line color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
+                        this::changeLineColor,
+                        PresentationWithColorDTO.class,
+                        PresentationDTO.class),
+
+                ToolSupport.definition(
+                        "change_font_color",
+                        "Change the font color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
+                        this::changeFontColor,
+                        PresentationWithColorDTO.class,
+                        PresentationDTO.class)
+        );
+    }
+
+
     private ElementDTO getElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get element corresponding to presentation: {}", param);
 

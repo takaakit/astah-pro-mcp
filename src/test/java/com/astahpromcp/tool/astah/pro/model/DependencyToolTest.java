@@ -35,7 +35,8 @@ public class DependencyToolTest {
         tool = new DependencyTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

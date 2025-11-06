@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -23,35 +24,51 @@ public class ObjectNodeTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ObjectNodeTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public ObjectNodeTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_obj_node_info",
-                            "Return detailed information about the specified object node (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            ObjectNodeDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_base_cls_of_obj_node",
-                            "Set the base class (specified by ID) of the specified object node (specified by ID), and return the object node information after it is set.",
-                            this::setBase,
-                            ObjectNodeWithBaseDTO.class,
-                            ObjectNodeDTO.class)
-            );
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create object node tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_obj_node_info",
+                        "Return detailed information about the specified object node (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        ObjectNodeDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_base_cls_of_obj_node",
+                        "Set the base class (specified by ID) of the specified object node (specified by ID), and return the object node information after it is set.",
+                        this::setBase,
+                        ObjectNodeWithBaseDTO.class,
+                        ObjectNodeDTO.class)
+        );
     }
 
     private ObjectNodeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {

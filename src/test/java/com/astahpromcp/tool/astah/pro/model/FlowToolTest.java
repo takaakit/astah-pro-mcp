@@ -39,7 +39,8 @@ public class FlowToolTest {
         tool = new FlowTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

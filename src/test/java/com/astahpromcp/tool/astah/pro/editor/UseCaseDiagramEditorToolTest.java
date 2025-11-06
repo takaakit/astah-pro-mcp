@@ -38,7 +38,8 @@ public class UseCaseDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             useCaseDiagramEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createUseCaseDiagram() method
         createUseCaseDiagram = TestSupport.getAccessibleMethod(

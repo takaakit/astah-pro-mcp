@@ -35,7 +35,8 @@ public class CommentToolTest {
         tool = new CommentTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

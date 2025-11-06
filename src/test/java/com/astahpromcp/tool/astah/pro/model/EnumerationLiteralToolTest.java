@@ -35,7 +35,8 @@ public class EnumerationLiteralToolTest {
         tool = new EnumerationLiteralTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // setValue() method
         setValue = TestSupport.getAccessibleMethod(

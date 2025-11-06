@@ -35,7 +35,8 @@ public class EnumerationToolTest {
         tool = new EnumerationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

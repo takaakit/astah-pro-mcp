@@ -42,7 +42,8 @@ public class OperationToolTest {
         tool = new OperationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

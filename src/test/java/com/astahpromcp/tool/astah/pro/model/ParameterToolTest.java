@@ -38,7 +38,8 @@ public class ParameterToolTest {
         tool = new ParameterTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // setType() method
         setType = TestSupport.getAccessibleMethod(

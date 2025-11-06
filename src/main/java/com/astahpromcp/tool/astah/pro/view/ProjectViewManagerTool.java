@@ -24,48 +24,64 @@ import java.util.List;
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IProjectViewManager.html
 @Slf4j
 public class ProjectViewManagerTool implements ToolProvider {
-    
+
     private final ProjectAccessor projectAccessor;
     private final IProjectViewManager projectViewManager;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ProjectViewManagerTool(ProjectAccessor projectAccessor, IProjectViewManager projectViewManager, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public ProjectViewManagerTool(ProjectAccessor projectAccessor, IProjectViewManager projectViewManager, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.projectViewManager = projectViewManager;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_slct_elms",
-                            "Get the information of the selected elements in the project view.",
-                            this::getSelectedElements,
-                            NoInputDTO.class,
-                            ElementListDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "show_in_prop_view",
-                            "Show the property view of the element (specified by ID), and return the shown element information.",
-                            this::showInPropertyView,
-                            IdDTO.class,
-                            ElementDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "show_in_strct_tree",
-                            "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
-                            this::showInStructureTree,
-                            IdDTO.class,
-                            ElementDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create project view manager tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_slct_elms",
+                        "Get the information of the selected elements in the project view.",
+                        this::getSelectedElements,
+                        NoInputDTO.class,
+                        ElementListDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "show_in_prop_view",
+                        "Show the property view of the element (specified by ID), and return the shown element information.",
+                        this::showInPropertyView,
+                        IdDTO.class,
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "show_in_strct_tree",
+                        "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
+                        this::showInStructureTree,
+                        IdDTO.class,
+                        ElementDTO.class)
+        );
     }
 
     private ElementListDTO getSelectedElements(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {

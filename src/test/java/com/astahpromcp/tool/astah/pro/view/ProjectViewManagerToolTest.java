@@ -45,7 +45,8 @@ public class ProjectViewManagerToolTest {
             projectAccessor,
             projectViewManager,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
         
         // getSelectedElements() method
         getSelectedElements = TestSupport.getAccessibleMethod(

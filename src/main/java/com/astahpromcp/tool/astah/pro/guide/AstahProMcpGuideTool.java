@@ -13,19 +13,23 @@ import java.util.List;
 @Slf4j
 public class AstahProMcpGuideTool implements ToolProvider {
 
+    public AstahProMcpGuideTool() {
+    }
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "astah_pro_mcp_guide",
-                            "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server.",
-                            this::getGuide,
-                            NoInputDTO.class,
-                            GuideDTO.class)
-            );
+	        return List.of(
+	                ToolSupport.definition(
+	                        "astah_pro_mcp_guide",
+	                        "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server.",
+	                        this::getGuide,
+	                        NoInputDTO.class,
+	                        GuideDTO.class)
+	        );
+
         } catch (Exception e) {
-            log.error("Failed to create guide tools", e);
+            log.error("Failed to create astah pro mcp guide tools", e);
             return List.of();
         }
     }

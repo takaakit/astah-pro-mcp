@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -25,35 +26,52 @@ public class ActivityDiagramTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ActivityDiagramTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public ActivityDiagramTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                ToolSupport.definition(
-                    "get_actv_dgm_info",
-                    "Return detailed information about the specified activity diagram (specified by ID).",
-                    this::getInfo,
-                    IdDTO.class,
-                    ActivityDiagramDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                ToolSupport.definition(
-                    "get_actv_of_actv_dgm",
-                    "Return the activity of the specified activity diagram (specified by ID).",
-                    this::getActivity,
-                    IdDTO.class,
-                    ActivityDTO.class)
-            );
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create activity diagram tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_actv_dgm_info",
+                        "Return detailed information about the specified activity diagram (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        ActivityDiagramDTO.class),
+
+                ToolSupport.definition(
+                        "get_actv_of_actv_dgm",
+                        "Return the activity of the specified activity diagram (specified by ID).",
+                        this::getActivity,
+                        IdDTO.class,
+                        ActivityDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
     }
 
     private ActivityDiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {

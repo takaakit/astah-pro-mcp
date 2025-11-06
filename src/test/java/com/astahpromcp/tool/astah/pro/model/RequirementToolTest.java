@@ -39,7 +39,8 @@ public class RequirementToolTest {
         tool = new RequirementTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

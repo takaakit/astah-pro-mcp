@@ -35,7 +35,8 @@ public class ControlNodeToolTest {
         tool = new ControlNodeTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

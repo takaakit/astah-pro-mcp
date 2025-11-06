@@ -13,43 +13,60 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IUsage.html
 @Slf4j
 public class UsageTool implements ToolProvider {
-    
+
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public UsageTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public UsageTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_use_info",
-                            "Return detailed information about the specified usage (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            UsageDTO.class)
-            );
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create usage tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_use_info",
+                        "Return detailed information about the specified usage (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        UsageDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
+    }
+
     private UsageDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get usage information: {}", param);
-        
+
         IUsage astahUsage = astahProToolSupport.getUsage(param.id());
 
         return UsageDTOAssembler.toDTO(astahUsage);

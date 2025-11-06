@@ -49,7 +49,8 @@ public class AssociationToolTest {
         tool = new AssociationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getAssociationInfo() method
         getAssociationInfo = TestSupport.getAccessibleMethod(

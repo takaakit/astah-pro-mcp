@@ -14,6 +14,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -23,244 +24,260 @@ public class BasicModelEditorTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.basicModelEditor = basicModelEditor;
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "change_par",
-                            "Change the parent named element (specified by ID) on the specified named element (specified by ID), and return the newly created package information. For example, this tool is used when you want to change the package structure.",
-                            this::changeParent,
-                            NamedElementWithParentDTO.class,
-                            NamedElementDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "create_pkg_in_prt_pkg",
-                            "Create a new package under the specified parent package (specified by ID), and return the newly created package information. Note that this tool cannot create a root package (i.e., a project).",
-                            this::createPackageInParentPackage,
-                            NewPackageInPackageDTO.class,
-                            PackageDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "create_cls_in_prt_pkg",
-                            "Create a new class under the specified parent package (specified by ID), and return the newly created class information.",
-                            this::createClassInParentPackage,
-                            NewClassInPackageDTO.class,
-                            ClassDTO.class),
-
-                    ToolSupport.definition(
-                            "create_cls_in_prt_cls",
-                            "Create a new class under the specified parent class (specified by ID), and return the newly created class information.",
-                            this::createClassInParentClass,
-                            NewClassInClassDTO.class,
-                            ClassDTO.class),
-
-                    ToolSupport.definition(
-                            "create_enum_in_prt_pkg",
-                            "Create a new enumeration under the specified parent package (specified by ID), and return the newly created enumeration information.",
-                            this::createEnumerationInParentPackage,
-                            NewEnumerationInPackageDTO.class,
-                            EnumerationDTO.class),
-
-                    ToolSupport.definition(
-                            "create_intf_in_prt_pkg",
-                            "Create a new interface under the specified parent package (specified by ID), and return the newly created interface information.",
-                            this::createInterfaceInParentPackage,
-                            NewInterfaceInPackageDTO.class,
-                            ClassDTO.class),
-
-                    ToolSupport.definition(
-                            "create_intf_in_prt_cls",
-                            "Create a new interface under the specified parent class (specified by ID), and return the newly created interface information.",
-                            this::createInterfaceInParentClass,
-                            NewInterfaceInClassDTO.class,
-                            ClassDTO.class),
-
-                    ToolSupport.definition(
-                            "create_attr",
-                            "Create a new attribute under the specified class (specified by ID), and return the newly created attribute information. Since the attribute type is set as 'int', if the attribute type is not 'int', use other tool function to set the attribute type.",
-                            this::createAttribute,
-                            NewAttributeInClassDTO.class,
-                            AttributeDTO.class),
-
-                    ToolSupport.definition(
-                            "create_enum_lite",
-                            "Create a new enumeration literal under the specified enumeration (specified by ID), and return the newly created enumeration literal information.",
-                            this::createEnumerationLiteral,
-                            NewEnumerationLiteralInEnumerationDTO.class,
-                            EnumerationLiteralDTO.class),
-                            
-                    ToolSupport.definition(
-                            "create_ope",
-                            "Create a new operation under the specified class (specified by ID), and return the newly created operation information. Since the operation return type is set to 'void', if the operation return type is not 'void', use other tool function to set the operation return type.",
-                            this::createOperation,
-                            NewOperationInClassDTO.class,
-                            OperationDTO.class),
-                            
-                    ToolSupport.definition(
-                            "create_param",
-                            "Create a new parameter to the specified operation (specified by ID), and return the newly created parameter information. Since the parameter type is set as 'int', if the parameter type is not 'int', use other tool function to set the parameter type.",
-                            this::createParameter,
-                            NewParameterToOperationDTO.class,
-                            ParameterDTO.class),
-
-                    ToolSupport.definition(
-                            "create_asso",
-                            "Create a new association between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association name and the association end A and B role names are set to empty strings.",
-                            this::createAssociation,
-                            NewAssociationDTO.class,
-                            AssociationDTO.class),
-
-                    ToolSupport.definition(
-                            "create_asso_cls",
-                            "Create a new association and association class between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association end A and B role names are set to empty strings.",
-                            this::createAssociationClass,
-                            NewAssociationClassDTO.class,
-                            AssociationClassDTO.class),
-
-                    ToolSupport.definition(
-                            "create_dep",
-                            "Create a new dependency between the specified source named element (specified by ID) and the specified target named element (specified by ID), and return the newly created dependency information.",
-                            this::createDependency,
-                            NewDependencyDTO.class,
-                            DependencyDTO.class),
-
-                    ToolSupport.definition(
-                            "create_gen",
-                            "Create a new generalization between the specified sub class (specified by ID) and the specified super class (specified by ID), and return the newly created generalization information.",
-                            this::createGeneralization,
-                            NewGeneralizationDTO.class,
-                            GeneralizationDTO.class),
-
-                    ToolSupport.definition(
-                            "create_real",
-                            "Create a new realization between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created realization information.",
-                            this::createRealization,
-                            NewRealizationDTO.class,
-                            RealizationDTO.class),
-
-                    ToolSupport.definition(
-                            "create_use",
-                            "Create a new usage between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created usage information.",
-                            this::createUsage,
-                            NewUsageDTO.class,
-                            UsageDTO.class),
-
-                    ToolSupport.definition(
-                            "create_qual",
-                            "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created qualifier information. Limitation: Because an ID of the qualifier type is required, a qualifier of a primitive type cannot be created.",
-                            this::createQualifier,
-                            NewQualifierToAssociationEndDTO.class,
-                            AttributeDTO.class),
-
-                    ToolSupport.definition(
-                            "create_tag_val",
-                            "Create a new tagged value (name and value) to the specified element (specified by ID), and return the element information after it is edited.",
-                            this::createTaggedValue,
-                            NewTaggedValueToElementDTO.class,
-                            ElementDTO.class),
-
-                    ToolSupport.definition(
-                            "create_temp_param",
-                            "Create a template parameter of the specified type (specified by ID) to the specified class (specified by ID), and return the class information after it is edited.",
-                            this::createTemplateParameter,
-                            NewTemplateParameterToClassDTO.class,
-                            ClassDTO.class),
-
-                    ToolSupport.definition(
-                            "delete_elem",
-                            "Delete the specified element (specified by ID), and return the deleted element information.",
-                            this::deleteElement,
-                            IdDTO.class,
-                            ElementDTO.class),
-
-                    ToolSupport.definition(
-                            "create_req_in_prt_pkg",
-                            "Create a new requirement under the specified parent package (specified by ID), and return the newly created requirement information.",
-                            this::createRequirementInParentPackage,
-                            NewRequirementInPackageDTO.class,
-                            RequirementDTO.class),
-
-                    ToolSupport.definition(
-                            "create_req_in_prt_req",
-                            "Create a new requirement under the specified parent requirement (specified by ID), and return the newly created requirement information.",
-                            this::createRequirementInParentRequirement,
-                            NewRequirementInRequirementDTO.class,
-                            RequirementDTO.class),
-
-                    ToolSupport.definition(
-                            "create_test_in_prt_pkg",
-                            "Create a new test case under the specified parent package (specified by ID), and return the newly created test case information.",
-                            this::createTestCaseInParentPackage,
-                            NewTestCaseInPackageDTO.class,
-                            TestCaseDTO.class),
-
-                    ToolSupport.definition(
-                            "create_test_in_prt_test",
-                            "Create a new test case under the specified parent test case (specified by ID), and return the newly created test case information.",
-                            this::createTestCaseInParentTestCase,
-                            NewTestCaseInTestCaseDTO.class,
-                            TestCaseDTO.class),
-
-                    ToolSupport.definition(
-                            "create_copy_dep",
-                            "Create a copy dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                            this::createCopyDependency,
-                            NewCopyDependencyDTO.class,
-                            DependencyDTO.class),
-
-                    ToolSupport.definition(
-                            "create_derv_reqt_dep",
-                            "Create a DeriveReqt dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                            this::createDeriveReqtDependency,
-                            NewDeriveReqtDependencyDTO.class,
-                            DependencyDTO.class),
-
-                    ToolSupport.definition(
-                            "create_refn_dep",
-                            "Create a refine dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                            this::createRefineDependency,
-                            NewRefineDependencyDTO.class,
-                            DependencyDTO.class),
-
-                    ToolSupport.definition(
-                            "create_satfy_dep",
-                            "Create a satisfy dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                            this::createSatisfyDependency,
-                            NewSatisfyDependencyDTO.class,
-                            DependencyDTO.class),
-
-                    ToolSupport.definition(
-                            "create_trace_dep",
-                            "Create a trace dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                            this::createTraceDependency,
-                            NewTraceDependencyDTO.class,
-                            DependencyDTO.class),
-
-                    ToolSupport.definition(
-                            "create_ver_dep",
-                            "Create a verify dependency from the specified source test case (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                            this::createVerifyDependency,
-                            NewVerifyDependencyDTO.class,
-                            DependencyDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create basic model editor tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "change_par",
+                        "Change the parent named element (specified by ID) on the specified named element (specified by ID), and return the newly created package information. For example, this tool is used when you want to change the package structure.",
+                        this::changeParent,
+                        NamedElementWithParentDTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "create_pkg_in_prt_pkg",
+                        "Create a new package under the specified parent package (specified by ID), and return the newly created package information. Note that this tool cannot create a root package (i.e., a project).",
+                        this::createPackageInParentPackage,
+                        NewPackageInPackageDTO.class,
+                        PackageDTO.class),
+
+                ToolSupport.definition(
+                        "create_cls_in_prt_pkg",
+                        "Create a new class under the specified parent package (specified by ID), and return the newly created class information.",
+                        this::createClassInParentPackage,
+                        NewClassInPackageDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "create_cls_in_prt_cls",
+                        "Create a new class under the specified parent class (specified by ID), and return the newly created class information.",
+                        this::createClassInParentClass,
+                        NewClassInClassDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "create_enum_in_prt_pkg",
+                        "Create a new enumeration under the specified parent package (specified by ID), and return the newly created enumeration information.",
+                        this::createEnumerationInParentPackage,
+                        NewEnumerationInPackageDTO.class,
+                        EnumerationDTO.class),
+
+                ToolSupport.definition(
+                        "create_intf_in_prt_pkg",
+                        "Create a new interface under the specified parent package (specified by ID), and return the newly created interface information.",
+                        this::createInterfaceInParentPackage,
+                        NewInterfaceInPackageDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "create_intf_in_prt_cls",
+                        "Create a new interface under the specified parent class (specified by ID), and return the newly created interface information.",
+                        this::createInterfaceInParentClass,
+                        NewInterfaceInClassDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "create_attr",
+                        "Create a new attribute under the specified class (specified by ID), and return the newly created attribute information. Since the attribute type is set as 'int', if the attribute type is not 'int', use other tool function to set the attribute type.",
+                        this::createAttribute,
+                        NewAttributeInClassDTO.class,
+                        AttributeDTO.class),
+
+                ToolSupport.definition(
+                        "create_enum_lite",
+                        "Create a new enumeration literal under the specified enumeration (specified by ID), and return the newly created enumeration literal information.",
+                        this::createEnumerationLiteral,
+                        NewEnumerationLiteralInEnumerationDTO.class,
+                        EnumerationLiteralDTO.class),
+
+                ToolSupport.definition(
+                        "create_ope",
+                        "Create a new operation under the specified class (specified by ID), and return the newly created operation information. Since the operation return type is set to 'void', if the operation return type is not 'void', use other tool function to set the operation return type.",
+                        this::createOperation,
+                        NewOperationInClassDTO.class,
+                        OperationDTO.class),
+
+                ToolSupport.definition(
+                        "create_param",
+                        "Create a new parameter to the specified operation (specified by ID), and return the newly created parameter information. Since the parameter type is set as 'int', if the parameter type is not 'int', use other tool function to set the parameter type.",
+                        this::createParameter,
+                        NewParameterToOperationDTO.class,
+                        ParameterDTO.class),
+
+                ToolSupport.definition(
+                        "create_asso",
+                        "Create a new association between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association name and the association end A and B role names are set to empty strings.",
+                        this::createAssociation,
+                        NewAssociationDTO.class,
+                        AssociationDTO.class),
+
+                ToolSupport.definition(
+                        "create_asso_cls",
+                        "Create a new association and association class between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association end A and B role names are set to empty strings.",
+                        this::createAssociationClass,
+                        NewAssociationClassDTO.class,
+                        AssociationClassDTO.class),
+
+                ToolSupport.definition(
+                        "create_dep",
+                        "Create a new dependency between the specified source named element (specified by ID) and the specified target named element (specified by ID), and return the newly created dependency information.",
+                        this::createDependency,
+                        NewDependencyDTO.class,
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_gen",
+                        "Create a new generalization between the specified sub class (specified by ID) and the specified super class (specified by ID), and return the newly created generalization information.",
+                        this::createGeneralization,
+                        NewGeneralizationDTO.class,
+                        GeneralizationDTO.class),
+
+                ToolSupport.definition(
+                        "create_real",
+                        "Create a new realization between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created realization information.",
+                        this::createRealization,
+                        NewRealizationDTO.class,
+                        RealizationDTO.class),
+
+                ToolSupport.definition(
+                        "create_use",
+                        "Create a new usage between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created usage information.",
+                        this::createUsage,
+                        NewUsageDTO.class,
+                        UsageDTO.class),
+
+                ToolSupport.definition(
+                        "create_qual",
+                        "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created qualifier information. Limitation: Because an ID of the qualifier type is required, a qualifier of a primitive type cannot be created.",
+                        this::createQualifier,
+                        NewQualifierToAssociationEndDTO.class,
+                        AttributeDTO.class),
+
+                ToolSupport.definition(
+                        "create_tag_val",
+                        "Create a new tagged value (name and value) to the specified element (specified by ID), and return the element information after it is edited.",
+                        this::createTaggedValue,
+                        NewTaggedValueToElementDTO.class,
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "create_temp_param",
+                        "Create a template parameter of the specified type (specified by ID) to the specified class (specified by ID), and return the class information after it is edited.",
+                        this::createTemplateParameter,
+                        NewTemplateParameterToClassDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "delete_elem",
+                        "Delete the specified element (specified by ID), and return the deleted element information.",
+                        this::deleteElement,
+                        IdDTO.class,
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "create_req_in_prt_pkg",
+                        "Create a new requirement under the specified parent package (specified by ID), and return the newly created requirement information.",
+                        this::createRequirementInParentPackage,
+                        NewRequirementInPackageDTO.class,
+                        RequirementDTO.class),
+
+                ToolSupport.definition(
+                        "create_req_in_prt_req",
+                        "Create a new requirement under the specified parent requirement (specified by ID), and return the newly created requirement information.",
+                        this::createRequirementInParentRequirement,
+                        NewRequirementInRequirementDTO.class,
+                        RequirementDTO.class),
+
+                ToolSupport.definition(
+                        "create_test_in_prt_pkg",
+                        "Create a new test case under the specified parent package (specified by ID), and return the newly created test case information.",
+                        this::createTestCaseInParentPackage,
+                        NewTestCaseInPackageDTO.class,
+                        TestCaseDTO.class),
+
+                ToolSupport.definition(
+                        "create_test_in_prt_test",
+                        "Create a new test case under the specified parent test case (specified by ID), and return the newly created test case information.",
+                        this::createTestCaseInParentTestCase,
+                        NewTestCaseInTestCaseDTO.class,
+                        TestCaseDTO.class),
+
+                ToolSupport.definition(
+                        "create_copy_dep",
+                        "Create a copy dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        this::createCopyDependency,
+                        NewCopyDependencyDTO.class,
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_derv_reqt_dep",
+                        "Create a DeriveReqt dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        this::createDeriveReqtDependency,
+                        NewDeriveReqtDependencyDTO.class,
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_refn_dep",
+                        "Create a refine dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        this::createRefineDependency,
+                        NewRefineDependencyDTO.class,
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_satfy_dep",
+                        "Create a satisfy dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        this::createSatisfyDependency,
+                        NewSatisfyDependencyDTO.class,
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_trace_dep",
+                        "Create a trace dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        this::createTraceDependency,
+                        NewTraceDependencyDTO.class,
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_ver_dep",
+                        "Create a verify dependency from the specified source test case (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        this::createVerifyDependency,
+                        NewVerifyDependencyDTO.class,
+                        DependencyDTO.class)
+        );
+    }
+
     private NamedElementDTO changeParent(McpSyncServerExchange exchange, NamedElementWithParentDTO param) throws Exception {
         log.debug("Change parent: {}", param);
-        
+
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementid());
         INamedElement newParentAstahNamedElement = astahProToolSupport.getNamedElement(param.newParentNamedElementId());
 
@@ -441,7 +458,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private ParameterDTO createParameter(McpSyncServerExchange exchange, NewParameterToOperationDTO param) throws Exception {
         log.debug("Create parameter: {}", param);
-        
+
         IOperation astahTargetOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         try {
@@ -462,7 +479,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private AssociationDTO createAssociation(McpSyncServerExchange exchange, NewAssociationDTO param) throws Exception {
         log.debug("Create association: {}", param);
-        
+
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
 
@@ -474,7 +491,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 "",
                 "",
                 "");
-            
+
             createdAstahAssociation.getMemberEnds()[0].setNavigability(param.sourceNavigability().toAstahValue());
             createdAstahAssociation.getMemberEnds()[1].setNavigability(param.targetNavigability().toAstahValue());
             createdAstahAssociation.getMemberEnds()[0].setAggregationKind(param.sourceAggregationKind().toAstahValue());
@@ -491,10 +508,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private AssociationClassDTO createAssociationClass(McpSyncServerExchange exchange, NewAssociationClassDTO param) throws Exception {
         log.debug("Create association class: {}", param);
-        
+
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
-        
+
         try {
             transactionManager.beginTransaction();
             IAssociationClass createdAstahAssociationClass = basicModelEditor.createAssociationClass(
@@ -515,7 +532,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private DependencyDTO createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
         log.debug("Create dependency: {}", param);
-        
+
         INamedElement astahSourceNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
@@ -537,10 +554,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private GeneralizationDTO createGeneralization(McpSyncServerExchange exchange, NewGeneralizationDTO param) throws Exception {
         log.debug("Create generalization: {}", param);
-        
+
         IClass astahSubClass = astahProToolSupport.getClass(param.subClassId());
         IClass astahSuperClass = astahProToolSupport.getClass(param.superClassId());
-        
+
         try {
             transactionManager.beginTransaction();
             IGeneralization createdAstahGeneralization = basicModelEditor.createGeneralization(
@@ -559,10 +576,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private RealizationDTO createRealization(McpSyncServerExchange exchange, NewRealizationDTO param) throws Exception {
         log.debug("Create realization: {}", param);
-        
+
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
         IClass astahSupplierClass = astahProToolSupport.getClass(param.supplierClassId());
-        
+
         try {
             transactionManager.beginTransaction();
             IRealization createdAstahRealization = basicModelEditor.createRealization(
@@ -581,10 +598,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private UsageDTO createUsage(McpSyncServerExchange exchange, NewUsageDTO param) throws Exception {
         log.debug("Create usage: {}", param);
-        
+
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
         IClass astahSupplierClass = astahProToolSupport.getClass(param.supplierClassId());
-        
+
         try {
             transactionManager.beginTransaction();
             IUsage createdAstahUsage = basicModelEditor.createUsage(
@@ -603,10 +620,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private AttributeDTO createQualifier(McpSyncServerExchange exchange, NewQualifierToAssociationEndDTO param) throws Exception {
         log.debug("Create qualifier: {}", param);
-        
+
         IAttribute astahAssociationEnd = astahProToolSupport.getAttribute(param.targetAssociationEndId());
         IClass astahType = astahProToolSupport.getClass(param.qualifierTypeId());
-        
+
         try {
             transactionManager.beginTransaction();
             // Create an attribute on the owner class to serve as the qualifier
@@ -626,9 +643,9 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private ElementDTO createTaggedValue(McpSyncServerExchange exchange, NewTaggedValueToElementDTO param) throws Exception {
         log.debug("Create tagged value: {}", param);
-        
+
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
-        
+
         try {
             transactionManager.beginTransaction();
             basicModelEditor.createTaggedValue(
@@ -647,10 +664,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private ClassDTO createTemplateParameter(McpSyncServerExchange exchange, NewTemplateParameterToClassDTO param) throws Exception {
         log.debug("Create template parameter: {}", param);
-        
+
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
         IClass astahType = astahProToolSupport.getClass(param.templateParameterTypeId());
-        
+
         try {
             transactionManager.beginTransaction();
             basicModelEditor.createTemplateParameter(
@@ -670,7 +687,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private ElementDTO deleteElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Delete element: {}", param);
-        
+
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         ElementDTO deletedElementDTO = ElementDTOAssembler.toDTO(astahElement);
@@ -739,7 +756,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 parentAstahPackage,
                 param.newTestCaseName());
             transactionManager.endTransaction();
-            
+
 
             return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
 
@@ -760,7 +777,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 parentAstahTestCase,
                 param.newTestCaseName());
             transactionManager.endTransaction();
-            
+
             return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
 
         } catch (Exception e) {
@@ -768,13 +785,13 @@ public class BasicModelEditorTool implements ToolProvider {
             throw e;
         }
     }
-    
+
     private DependencyDTO createCopyDependency(McpSyncServerExchange exchange, NewCopyDependencyDTO param) throws Exception {
         log.debug("Create copy dependency: {}", param);
-        
+
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
-        
+
         try {
             transactionManager.beginTransaction();
             IDependency createdAstahDependency = basicModelEditor.createCopyDependency(
@@ -782,7 +799,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 targetAstahRequirement,
                 param.newCopyDependencyName());
             transactionManager.endTransaction();
-            
+
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
 
         } catch (Exception e) {
@@ -793,10 +810,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private DependencyDTO createDeriveReqtDependency(McpSyncServerExchange exchange, NewDeriveReqtDependencyDTO param) throws Exception {
         log.debug("Create derive reqt dependency: {}", param);
-        
+
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
-        
+
         try {
             transactionManager.beginTransaction();
             IDependency createdAstahDependency = basicModelEditor.createDeriveReqtDependency(
@@ -804,7 +821,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 targetAstahRequirement,
                 param.newDeriveReqtDependencyName());
             transactionManager.endTransaction();
-            
+
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
 
         } catch (Exception e) {
@@ -815,10 +832,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private DependencyDTO createRefineDependency(McpSyncServerExchange exchange, NewRefineDependencyDTO param) throws Exception {
         log.debug("Create refine dependency: {}", param);
-        
+
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
-        
+
         try {
             transactionManager.beginTransaction();
             IDependency createdAstahDependency = basicModelEditor.createRefineDependency(
@@ -826,7 +843,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 targetAstahRequirement,
                 param.newRefineDependencyName());
             transactionManager.endTransaction();
-            
+
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
 
         } catch (Exception e) {
@@ -837,10 +854,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private DependencyDTO createSatisfyDependency(McpSyncServerExchange exchange, NewSatisfyDependencyDTO param) throws Exception {
         log.debug("Create satisfy dependency: {}", param);
-        
+
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
-        
+
         try {
             transactionManager.beginTransaction();
             IDependency createdAstahDependency = basicModelEditor.createSatisfyDependency(
@@ -848,7 +865,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 targetAstahRequirement,
                 param.newSatisfyDependencyName());
             transactionManager.endTransaction();
-            
+
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
 
         } catch (Exception e) {
@@ -859,10 +876,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private DependencyDTO createTraceDependency(McpSyncServerExchange exchange, NewTraceDependencyDTO param) throws Exception {
         log.debug("Create trace dependency: {}", param);
-        
+
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
-        
+
         try {
             transactionManager.beginTransaction();
             IDependency createdAstahDependency = basicModelEditor.createTraceDependency(
@@ -870,7 +887,7 @@ public class BasicModelEditorTool implements ToolProvider {
                 targetAstahRequirement,
                 param.newTraceDependencyName());
             transactionManager.endTransaction();
-            
+
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
 
         } catch (Exception e) {
@@ -881,10 +898,10 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private DependencyDTO createVerifyDependency(McpSyncServerExchange exchange, NewVerifyDependencyDTO param) throws Exception {
         log.debug("Create verify dependency: {}", param);
-        
+
         ITestCase sourceAstahTestCase = astahProToolSupport.getTestCase(param.sourceTestCaseId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
-        
+
         try {
             transactionManager.beginTransaction();
             IDependency createdAstahDependency = basicModelEditor.createVerifyDependency(
@@ -892,13 +909,12 @@ public class BasicModelEditorTool implements ToolProvider {
                 targetAstahRequirement,
                 param.newVerifyDependencyName());
             transactionManager.endTransaction();
-            
+
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
-            
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;
         }
     }
 }
-

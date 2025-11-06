@@ -54,7 +54,8 @@ public class SequenceDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             sequenceDiagramEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createSequenceDiagram() method
         createSequenceDiagram = TestSupport.getAccessibleMethod(

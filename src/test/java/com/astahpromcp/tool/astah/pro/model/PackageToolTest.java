@@ -35,7 +35,8 @@ public class PackageToolTest {
         tool = new PackageTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

@@ -35,7 +35,8 @@ public class GeneralizationToolTest {
         tool = new GeneralizationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

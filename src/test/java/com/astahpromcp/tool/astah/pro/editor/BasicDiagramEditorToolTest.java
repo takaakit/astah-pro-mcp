@@ -41,7 +41,8 @@ public class BasicDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             astahProToolSupport,
-            diagramEditorSupport);
+            diagramEditorSupport,
+            true);
 
         // createNote() method
         createNote = TestSupport.getAccessibleMethod(

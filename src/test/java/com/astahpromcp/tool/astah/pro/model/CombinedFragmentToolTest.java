@@ -38,7 +38,8 @@ public class CombinedFragmentToolTest {
         tool = new CombinedFragmentTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // addInteractionOperand() method
         addInteractionOperand = TestSupport.getAccessibleMethod(

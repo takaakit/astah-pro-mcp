@@ -43,7 +43,8 @@ public class UseCaseModelEditorToolTest {
             projectAccessor,
             transactionManager,
             useCaseModelEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createActor() method
         createActor = TestSupport.getAccessibleMethod(

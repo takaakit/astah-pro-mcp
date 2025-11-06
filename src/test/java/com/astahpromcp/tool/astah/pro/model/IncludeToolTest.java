@@ -35,7 +35,8 @@ public class IncludeToolTest {
         tool = new IncludeTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

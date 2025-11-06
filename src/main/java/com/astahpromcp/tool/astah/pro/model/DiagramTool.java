@@ -33,43 +33,59 @@ public class DiagramTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
     private final Path imageOutputDir;
+    private final boolean includeEditTools;
 
-    public DiagramTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, Path imageOutputDir) {
+    public DiagramTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, Path imageOutputDir, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
         this.imageOutputDir = imageOutputDir;
+        this.includeEditTools = includeEditTools;
    }
 
    @Override
    public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_dgm_info",
-                            "Return detailed information about the specified diagram (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            DiagramDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "get_dgm_rect",
-                            "Return a rectangle (x, y, width, height) representing the boundary of the specified diagram (specified by ID).",
-                            this::getDiagramBoundRect,
-                            IdDTO.class,
-                            RectangleDTO.class),
-                            
-                    ToolSupport.definition(
-                            "get_prst_on_dgm",
-                            "Return the list of presentations on the specified diagram (specified by ID).",
-                            this::getPresentationsOnDiagram,
-                            IdDTO.class,
-                            PresentationListDTO.class)
-            );
+            return List.copyOf(tools);
+
         } catch (Exception e) {
             log.error("Failed to create diagram tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_dgm_info",
+                        "Return detailed information about the specified diagram (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "get_dgm_rect",
+                        "Return a rectangle (x, y, width, height) representing the boundary of the specified diagram (specified by ID).",
+                        this::getDiagramBoundRect,
+                        IdDTO.class,
+                        RectangleDTO.class),
+
+                ToolSupport.definition(
+                        "get_prst_on_dgm",
+                        "Return the list of presentations on the specified diagram (specified by ID).",
+                        this::getPresentationsOnDiagram,
+                        IdDTO.class,
+                        PresentationListDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
     }
 
     private DiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {

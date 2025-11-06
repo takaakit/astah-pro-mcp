@@ -45,7 +45,8 @@ public class ElementToolTest {
         tool = new ElementTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // addStereotype() method
         addStereotype = TestSupport.getAccessibleMethod(

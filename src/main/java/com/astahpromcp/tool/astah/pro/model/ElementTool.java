@@ -33,61 +33,77 @@ public class ElementTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ElementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public ElementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "add_stereotype",
-                            "Add a stereotype (specified by string) to the specified element (specified by ID), and return the element information after it is edited.",
-                            this::addStereotype,
-                            ElementWithStereotypeDTO.class,
-                            ElementDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "remove_stereotype",
-                            "Remove the specified stereotype (specified by string) from the specified element (specified by ID), and return the element information after it is edited.",
-                            this::removeStereotype,
-                            ElementWithStereotypeDTO.class,
-                            ElementDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "set_type_modifier",
-                            "Set a type modifier of the specified element (specified by ID), and return the element information after it is edited. The type modifier is a symbol appended to the type name, such as * (C++ pointer) and & (C++ reference).",
-                            this::setTypeModifier,
-                            ElementWithTypeModifierDTO.class,
-                            ElementDTO.class),
-
-                    ToolSupport.definition(
-                            "change_tagged_value",
-                            "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element information after it is changed.",
-                            this::changeTaggedValue,
-                            ElementWithTaggedValueDTO.class,
-                            ElementDTO.class),
-
-                    ToolSupport.definition(
-                            "get_dgms_of_elem",
-                            "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
-                            this::getDiagramsOfElement,
-                            IdDTO.class,
-                            NameIdTypeListDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create element tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_dgms_of_elem",
+                        "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
+                        this::getDiagramsOfElement,
+                        IdDTO.class,
+                        NameIdTypeListDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "add_stereotype",
+                        "Add a stereotype (specified by string) to the specified element (specified by ID), and return the element information after it is edited.",
+                        this::addStereotype,
+                        ElementWithStereotypeDTO.class,
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "remove_stereotype",
+                        "Remove the specified stereotype (specified by string) from the specified element (specified by ID), and return the element information after it is edited.",
+                        this::removeStereotype,
+                        ElementWithStereotypeDTO.class,
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "set_type_modifier",
+                        "Set a type modifier of the specified element (specified by ID), and return the element information after it is edited. The type modifier is a symbol appended to the type name, such as * (C++ pointer) and & (C++ reference).",
+                        this::setTypeModifier,
+                        ElementWithTypeModifierDTO.class,
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "change_tagged_value",
+                        "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element information after it is changed.",
+                        this::changeTaggedValue,
+                        ElementWithTaggedValueDTO.class,
+                        ElementDTO.class)
+        );
+    }
+
     private ElementDTO addStereotype(McpSyncServerExchange exchange, ElementWithStereotypeDTO param) throws Exception {
         log.debug("Add stereotype to element: {}", param);
-        
+
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         try {
@@ -105,7 +121,7 @@ public class ElementTool implements ToolProvider {
 
     private ElementDTO removeStereotype(McpSyncServerExchange exchange, ElementWithStereotypeDTO param) throws Exception {
         log.debug("Remove stereotype from element: {}", param);
-        
+
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         try {
@@ -123,7 +139,7 @@ public class ElementTool implements ToolProvider {
 
     private ElementDTO setTypeModifier(McpSyncServerExchange exchange, ElementWithTypeModifierDTO param) throws Exception {
         log.debug("Set type modifier of element: {}", param);
-        
+
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         try {
@@ -141,7 +157,7 @@ public class ElementTool implements ToolProvider {
 
     private ElementDTO changeTaggedValue(McpSyncServerExchange exchange, ElementWithTaggedValueDTO param) throws Exception {
         log.debug("Change value of tagged value: {}", param);
-        
+
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
 
         try {
@@ -153,9 +169,9 @@ public class ElementTool implements ToolProvider {
                     break;
                 }
             }
-            
+
             return ElementDTOAssembler.toDTO(astahElement);
-            
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;

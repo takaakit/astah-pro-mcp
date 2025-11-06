@@ -41,106 +41,122 @@ public class DiagramViewManagerTool implements ToolProvider {
     private final IDiagramViewManager diagramViewManager;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public DiagramViewManagerTool(ProjectAccessor projectAccessor, IDiagramViewManager diagramViewManager, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public DiagramViewManagerTool(ProjectAccessor projectAccessor, IDiagramViewManager diagramViewManager, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.diagramViewManager = diagramViewManager;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "open_dgm",
-                            "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the opened diagram information.",
-                            this::openDiagram,
-                            IdDTO.class,
-                            DiagramDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "close_dgm",
-                            "Close the specified diagram (specified by ID) in Diagram Editor. And return the closed diagram information.",
-                            this::closeDiagram,
-                            IdDTO.class,
-                            DiagramDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "get_cur_dgm",
-                            "Return the information of the currently selected diagram in Diagram Editor.",
-                            this::getCurrentDiagram,
-                            NoInputDTO.class,
-                            DiagramDTO.class),
-
-                    ToolSupport.definition(
-                            "get_slct_prst",
-                            "Return the information of the currently selected presentations in Diagram Editor.",
-                            this::getSelectedPresentations,
-                            NoInputDTO.class,
-                            PresentationListDTO.class),
-
-                    ToolSupport.definition(
-                            "select_prst",
-                            "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations information.",
-                            this::selectPresentations,
-                            IdListDTO.class,
-                            PresentationListDTO.class),
-
-                    ToolSupport.definition(
-                            "select_all_prst",
-                            "Select all presentations in current diagram, and return the selected presentations information.",
-                            this::selectAllPresentations,
-                            NoInputDTO.class,
-                            PresentationListDTO.class),
-
-                    ToolSupport.definition(
-                            "unselect_all",
-                            "Unselect all presentations in current diagram, and return the current diagram information.",
-                            this::unselectAllPresentations,
-                            NoInputDTO.class,
-                            DiagramDTO.class),
-
-                    ToolSupport.definition(
-                            "center_prst_in_dgm",
-                            "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
-                            this::centerPresentationInDiagram,
-                            IdDTO.class,
-                            PresentationDTO.class),
-                            
-                    ToolSupport.definition(
-                            "auto_layout",
-                            "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
-                            this::autoLayout,
-                            NoInputDTO.class,
-                            DiagramDTO.class),
-
-                    ToolSupport.definition(
-                            "get_zoom_fac",
-                            "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
-                            this::getZoomFactor,
-                            NoInputDTO.class,
-                            com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class),
-
-                    ToolSupport.definition(
-                            "zoom",
-                            "Zoom in current diagram, and return the zoomed diagram information.",
-                            this::zoom,
-                            com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO.class,
-                            DiagramDTO.class),
-
-                    ToolSupport.definition(
-                            "zoom_fit",
-                            "Zoom fit in current diagram, and return the zoomed diagram information.",
-                            this::zoomFit,
-                            NoInputDTO.class,
-                            DiagramDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create diagram view manager tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_cur_dgm",
+                        "Return the information of the currently selected diagram in Diagram Editor.",
+                        this::getCurrentDiagram,
+                        NoInputDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "get_slct_prst",
+                        "Return the information of the currently selected presentations in Diagram Editor.",
+                        this::getSelectedPresentations,
+                        NoInputDTO.class,
+                        PresentationListDTO.class),
+
+                ToolSupport.definition(
+                        "get_zoom_fac",
+                        "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
+                        this::getZoomFactor,
+                        NoInputDTO.class,
+                        com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "open_dgm",
+                        "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the opened diagram information.",
+                        this::openDiagram,
+                        IdDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "close_dgm",
+                        "Close the specified diagram (specified by ID) in Diagram Editor. And return the closed diagram information.",
+                        this::closeDiagram,
+                        IdDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "select_prst",
+                        "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations information.",
+                        this::selectPresentations,
+                        IdListDTO.class,
+                        PresentationListDTO.class),
+
+                ToolSupport.definition(
+                        "select_all_prst",
+                        "Select all presentations in current diagram, and return the selected presentations information.",
+                        this::selectAllPresentations,
+                        NoInputDTO.class,
+                        PresentationListDTO.class),
+
+                ToolSupport.definition(
+                        "unselect_all",
+                        "Unselect all presentations in current diagram, and return the current diagram information.",
+                        this::unselectAllPresentations,
+                        NoInputDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "center_prst_in_dgm",
+                        "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
+                        this::centerPresentationInDiagram,
+                        IdDTO.class,
+                        PresentationDTO.class),
+
+                ToolSupport.definition(
+                        "auto_layout",
+                        "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
+                        this::autoLayout,
+                        NoInputDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "zoom",
+                        "Zoom in current diagram, and return the zoomed diagram information.",
+                        this::zoom,
+                        com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "zoom_fit",
+                        "Zoom fit in current diagram, and return the zoomed diagram information.",
+                        this::zoomFit,
+                        NoInputDTO.class,
+                        DiagramDTO.class)
+        );
     }
 
     private DiagramDTO openDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -170,7 +186,7 @@ public class DiagramViewManagerTool implements ToolProvider {
 
         return DiagramDTOAssembler.toDTO(diagram);
     }
-    
+
     private DiagramDTO getCurrentDiagram(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get current diagram: {}", param);
 
@@ -197,7 +213,7 @@ public class DiagramViewManagerTool implements ToolProvider {
 
     private PresentationListDTO selectPresentations(McpSyncServerExchange exchange, IdListDTO param) throws Exception {
         log.debug("Select presentations: {}", param);
-        
+
         List<IPresentation> presentations = new ArrayList<>();
         for (String id : param.value().stream().map(IdDTO::id).toList()) {
             IPresentation presentation = astahProToolSupport.getPresentation(id);
@@ -249,7 +265,7 @@ public class DiagramViewManagerTool implements ToolProvider {
 
     private PresentationDTO centerPresentationInDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Center presentation in diagram: {}", param);
-        
+
         IPresentation presentation = astahProToolSupport.getPresentation(param.id());
 
         try {
@@ -382,7 +398,7 @@ public class DiagramViewManagerTool implements ToolProvider {
                 if (points == null || points.length == 0) {
                     continue;
                 }
-                
+
                 for (Point2D point : points) {
                     if (point == null) {
                         continue;

@@ -16,6 +16,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -26,54 +27,70 @@ public class ClassTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ClassTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public ClassTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_cls_info",
-                            "Return detailed information about the specified class or interface (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            ClassDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_abs_of_class",
-                            "Set the Abstract property of the specified class (specified by ID), and return the class information after it is set.",
-                            this::setAbstract,
-                            ClassWithAbstractDTO.class,
-                            ClassDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "set_act_of_class",
-                            "Set the Active property of the specified class (specified by ID), and return the class information after it is set.",
-                            this::setActive,
-                            ClassWithActiveDTO.class,
-                            ClassDTO.class),
-
-                    ToolSupport.definition(
-                            "set_leaf_of_class",
-                            "Set the Leaf property of the specified class (specified by ID), and return the class information after it is set.",
-                            this::setLeaf,
-                            ClassWithLeafDTO.class,
-                            ClassDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create class tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_cls_info",
+                        "Return detailed information about the specified class or interface (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        ClassDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_abs_of_class",
+                        "Set the Abstract property of the specified class (specified by ID), and return the class information after it is set.",
+                        this::setAbstract,
+                        ClassWithAbstractDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "set_act_of_class",
+                        "Set the Active property of the specified class (specified by ID), and return the class information after it is set.",
+                        this::setActive,
+                        ClassWithActiveDTO.class,
+                        ClassDTO.class),
+
+                ToolSupport.definition(
+                        "set_leaf_of_class",
+                        "Set the Leaf property of the specified class (specified by ID), and return the class information after it is set.",
+                        this::setLeaf,
+                        ClassWithLeafDTO.class,
+                        ClassDTO.class)
+        );
+    }
+
     private ClassDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get class or interface information: {}", param);
-        
+
         IClass astahClass = astahProToolSupport.getClass(param.id());
 
         return ClassDTOAssembler.toDTO(astahClass);
@@ -81,7 +98,7 @@ public class ClassTool implements ToolProvider {
 
     private ClassDTO setAbstract(McpSyncServerExchange exchange, ClassWithAbstractDTO param) throws Exception {
         log.debug("Set abstract of class: {}", param);
-        
+
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
         try {
@@ -99,7 +116,7 @@ public class ClassTool implements ToolProvider {
 
     private ClassDTO setActive(McpSyncServerExchange exchange, ClassWithActiveDTO param) throws Exception {
         log.debug("Set active of class: {}", param);
-        
+
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
         try {
@@ -117,7 +134,7 @@ public class ClassTool implements ToolProvider {
 
     private ClassDTO setLeaf(McpSyncServerExchange exchange, ClassWithLeafDTO param) throws Exception {
         log.debug("Set leaf of class: {}", param);
-        
+
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
         try {

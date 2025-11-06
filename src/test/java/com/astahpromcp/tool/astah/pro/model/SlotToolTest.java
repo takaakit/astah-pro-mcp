@@ -37,7 +37,8 @@ public class SlotToolTest {
         tool = new SlotTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

@@ -35,7 +35,8 @@ public class ActivityNodeToolTest {
         tool = new ActivityNodeTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

@@ -14,6 +14,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -24,23 +25,44 @@ public class InteractionOperandTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public InteractionOperandTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public InteractionOperandTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
                         "get_intr_oprd_info",
                         "Return detailed information about the specified interaction operand (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
-                        InteractionOperandDTO.class),
+                        InteractionOperandDTO.class)
+        );
+    }
 
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
                 ToolSupport.definition(
                         "set_guard_of_intr_oprd",
                         "Set the guard of the specified interaction operand (specified by ID), and return the interaction operand information after it is set.",
@@ -60,16 +82,16 @@ public class InteractionOperandTool implements ToolProvider {
 
     private InteractionOperandDTO setGuard(McpSyncServerExchange exchange, InteractionOperandWithGuardDTO param) throws Exception {
         log.debug("Set guard of interaction operand: {}", param);
-        
+
         IInteractionOperand astahInteractionOperand = astahProToolSupport.getInteractionOperand(param.targetInteractionOperandId());
-        
+
         try {
             transactionManager.beginTransaction();
             astahInteractionOperand.setGuard(param.guard());
             transactionManager.endTransaction();
 
             return InteractionOperandDTOAssembler.toDTO(astahInteractionOperand);
-            
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;

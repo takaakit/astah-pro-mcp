@@ -23,29 +23,50 @@ import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
 @Slf4j
 public class ActivityDiagramEditorTool implements ToolProvider {
-    
+
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final ActivityDiagramEditor activityDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport) {
+    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.activityDiagramEditor = activityDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create activity diagram editor tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
                 ToolSupport.definition(
                         "create_acpt_evt_actn",
                         "Create a new accept event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept event action information. An empty string is not allowed as an action name.",
@@ -185,11 +206,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                         this::createSendSignalAction,
                         NewSendSignalActionDTO.class,
                         NodePresentationDTO.class)
-            );
-        } catch (Exception e) {
-            log.error("Failed to create activity diagram editor tools", e);
-            return List.of();
-        }
+        );
     }
 
     private NodePresentationDTO createAcceptEventAction(McpSyncServerExchange exchange, NewAcceptEventActionDTO param) throws Exception {
@@ -255,7 +272,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationX(),
                     param.locationY()));
             transactionManager.endTransaction();
-            
+
             return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
         } catch (Exception e) {
@@ -309,7 +326,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
             throw e;
         }
     }
-    
+
     private NodePresentationDTO createCallBehaviorAction(McpSyncServerExchange exchange, NewCallBehaviorActionDTO param) throws Exception {
         log.debug("Create call behavior action: {}", param);
 
@@ -507,7 +524,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
     private NodePresentationDTO createInitialNode(McpSyncServerExchange exchange, NewInitialNodeDTO param) throws Exception {
         log.debug("Create initial node: {}", param);
-        
+
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);

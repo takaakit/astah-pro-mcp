@@ -39,7 +39,8 @@ public class LinkEndToolTest {
         tool = new LinkEndTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // setAggregation() method
         setAggregation = TestSupport.getAccessibleMethod(

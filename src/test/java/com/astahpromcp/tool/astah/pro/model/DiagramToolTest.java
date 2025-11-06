@@ -50,7 +50,8 @@ public class DiagramToolTest {
             projectAccessor,
             transactionManager,
             astahProToolSupport,
-            imageOutputDir);
+            imageOutputDir,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

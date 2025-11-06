@@ -37,7 +37,8 @@ public class ActivityDiagramToolTest {
         tool = new ActivityDiagramTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

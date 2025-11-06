@@ -14,6 +14,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -24,65 +25,81 @@ public class NamedElementTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public NamedElementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public NamedElementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_named_elem_info",
-                            "Return the named element information of the specified named element (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            NamedElementDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_name",
-                            "Set the name of the specified named element (specified by ID), and return the named element information after it is edited.",
-                            this::setName,
-                            NamedElementWithNameDTO.class,
-                            NamedElementDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "set_alias1",
-                            "Set the alias1 of the specified named element (specified by ID), and return the named element information after it is edited.",
-                            this::setAlias1,
-                            NamedElementWithAlias1DTO.class,
-                            NamedElementDTO.class),
-
-                    ToolSupport.definition(
-                            "set_alias2",
-                            "Set the alias2 of the specified named element (specified by ID), and return the named element information after it is edited.",
-                            this::setAlias2,
-                            NamedElementWithAlias2DTO.class,
-                            NamedElementDTO.class),
-
-                    ToolSupport.definition(
-                            "set_def",
-                            "Set the definition of the specified named element (specified by ID), and return the named element information after it is edited.",
-                            this::setDefinition,
-                            NamedElementWithDefinitionDTO.class,
-                            NamedElementDTO.class),
-
-                    ToolSupport.definition(
-                            "set_visi",
-                            "Set the visibility of the specified named element (specified by ID), and return the named element information after it is edited.",
-                            this::setVisibility,
-                            NamedElementWithVisibilityDTO.class,
-                            NamedElementDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create named element tools", e);
             return List.of();
         }
     }
-    
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_named_elem_info",
+                        "Return the named element information of the specified named element (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        NamedElementDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_name",
+                        "Set the name of the specified named element (specified by ID), and return the named element information after it is edited.",
+                        this::setName,
+                        NamedElementWithNameDTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "set_alias1",
+                        "Set the alias1 of the specified named element (specified by ID), and return the named element information after it is edited.",
+                        this::setAlias1,
+                        NamedElementWithAlias1DTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "set_alias2",
+                        "Set the alias2 of the specified named element (specified by ID), and return the named element information after it is edited.",
+                        this::setAlias2,
+                        NamedElementWithAlias2DTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "set_def",
+                        "Set the definition of the specified named element (specified by ID), and return the named element information after it is edited.",
+                        this::setDefinition,
+                        NamedElementWithDefinitionDTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "set_visi",
+                        "Set the visibility of the specified named element (specified by ID), and return the named element information after it is edited.",
+                        this::setVisibility,
+                        NamedElementWithVisibilityDTO.class,
+                        NamedElementDTO.class)
+        );
+    }
+
     private NamedElementDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get named element information: {}", param);
 
@@ -100,7 +117,7 @@ public class NamedElementTool implements ToolProvider {
             transactionManager.beginTransaction();
             astahNamedElement.setName(param.name());
             transactionManager.endTransaction();
-            
+
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
 
         } catch (Exception e) {
@@ -111,14 +128,14 @@ public class NamedElementTool implements ToolProvider {
 
     private NamedElementDTO setAlias1(McpSyncServerExchange exchange, NamedElementWithAlias1DTO param) throws Exception {
         log.debug("Set alias1 of named element: {}", param);
-        
+
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         try {
             transactionManager.beginTransaction();
             astahNamedElement.setAlias1(param.alias1());
             transactionManager.endTransaction();
-            
+
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
 
         } catch (Exception e) {
@@ -126,17 +143,17 @@ public class NamedElementTool implements ToolProvider {
             throw e;
         }
     }
-    
+
     private NamedElementDTO setAlias2(McpSyncServerExchange exchange, NamedElementWithAlias2DTO param) throws Exception {
         log.debug("Set alias2 of named element: {}", param);
-        
+
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         try {
             transactionManager.beginTransaction();
             astahNamedElement.setAlias2(param.alias2());
             transactionManager.endTransaction();
-            
+
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
 
         } catch (Exception e) {
@@ -147,14 +164,14 @@ public class NamedElementTool implements ToolProvider {
 
     private NamedElementDTO setDefinition(McpSyncServerExchange exchange, NamedElementWithDefinitionDTO param) throws Exception {
         log.debug("Set definition of named element: {}", param);
-        
+
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         try {
             transactionManager.beginTransaction();
             astahNamedElement.setDefinition(param.definition());
             transactionManager.endTransaction();
-            
+
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
 
         } catch (Exception e) {
@@ -165,20 +182,19 @@ public class NamedElementTool implements ToolProvider {
 
     private NamedElementDTO setVisibility(McpSyncServerExchange exchange, NamedElementWithVisibilityDTO param) throws Exception {
         log.debug("Set visibility of named element: {}", param);
-        
+
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         try {
             transactionManager.beginTransaction();
             astahNamedElement.setVisibility(param.visibility().toAstahValue());
             transactionManager.endTransaction();
-            
+
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
-            
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;
         }
     }
 }
-

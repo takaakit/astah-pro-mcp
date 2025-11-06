@@ -41,7 +41,8 @@ public class StructureDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             astahProToolSupport,
-            diagramEditorSupport);
+            diagramEditorSupport,
+            true);
 
         // createNodePresentation() method
         createNodePresentation = TestSupport.getAccessibleMethod(

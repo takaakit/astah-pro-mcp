@@ -43,7 +43,8 @@ public class NodePresentationToolTest {
         tool = new NodePresentationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

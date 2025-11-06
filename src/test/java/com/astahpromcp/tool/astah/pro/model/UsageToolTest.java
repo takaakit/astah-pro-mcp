@@ -35,7 +35,8 @@ public class UsageToolTest {
         tool = new UsageTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

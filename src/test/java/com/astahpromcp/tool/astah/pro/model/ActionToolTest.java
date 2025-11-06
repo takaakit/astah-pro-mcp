@@ -38,7 +38,8 @@ public class ActionToolTest {
         tool = new ActionTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

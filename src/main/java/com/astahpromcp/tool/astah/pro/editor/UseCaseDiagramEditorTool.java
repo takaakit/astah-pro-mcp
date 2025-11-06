@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -26,23 +27,45 @@ public class UseCaseDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final UseCaseDiagramEditor useCaseDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public UseCaseDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, UseCaseDiagramEditor useCaseDiagramEditor, AstahProToolSupport astahProToolSupport) {
+    public UseCaseDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, UseCaseDiagramEditor useCaseDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.useCaseDiagramEditor = useCaseDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create usecase diagram editor tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
-                "create_use_dgm",
-                "Create a new usecase diagram on the specified package (specified by ID), and return the newly created usecase diagram information.",
-                this::createUseCaseDiagram,
-                NewUseCaseDiagramDTO.class,
-                DiagramDTO.class)
+                ToolSupport.definition(
+                        "create_use_dgm",
+                        "Create a new usecase diagram on the specified package (specified by ID), and return the newly created usecase diagram information.",
+                        this::createUseCaseDiagram,
+                        NewUseCaseDiagramDTO.class,
+                        DiagramDTO.class)
         );
     }
 

@@ -38,7 +38,8 @@ public class InstanceSpecificationToolTest {
         tool = new InstanceSpecificationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

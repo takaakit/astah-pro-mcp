@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -30,69 +31,85 @@ public class NodePresentationTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public NodePresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public NodePresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_node_info",
-                            "Return detailed information about the specified node presentation (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            NodePresentationDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "get_node_prst_rect",
-                            "Return the rectangle of the specified node presentation (specified by ID).",
-                            this::getNodePresentationRectangle,
-                            IdDTO.class,
-                            RectangleDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "set_node_prst_loc",
-                            "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting.",
-                            this::setNodePresentationLocation,
-                            NodePresentationWithLocationDTO.class,
-                            RectangleDTO.class),
-
-                    ToolSupport.definition(
-                            "set_node_prst_width",
-                            "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting.",
-                            this::setNodePresentationWidth,
-                            NodePresentationWithWidthDTO.class,
-                            RectangleDTO.class),
-                            
-                    ToolSupport.definition(
-                            "set_node_prst_height",
-                            "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting.",
-                            this::setNodePresentationHeight,
-                            NodePresentationWithHeightDTO.class,
-                            RectangleDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create node presentation tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_node_info",
+                        "Return detailed information about the specified node presentation (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        NodePresentationDTO.class),
+
+                ToolSupport.definition(
+                        "get_node_prst_rect",
+                        "Return the rectangle of the specified node presentation (specified by ID).",
+                        this::getNodePresentationRectangle,
+                        IdDTO.class,
+                        RectangleDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_node_prst_loc",
+                        "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                        this::setNodePresentationLocation,
+                        NodePresentationWithLocationDTO.class,
+                        RectangleDTO.class),
+
+                ToolSupport.definition(
+                        "set_node_prst_width",
+                        "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                        this::setNodePresentationWidth,
+                        NodePresentationWithWidthDTO.class,
+                        RectangleDTO.class),
+
+                ToolSupport.definition(
+                        "set_node_prst_height",
+                        "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                        this::setNodePresentationHeight,
+                        NodePresentationWithHeightDTO.class,
+                        RectangleDTO.class)
+        );
+    }
+
     private NodePresentationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get node presentation information: {}", param);
-        
+
         INodePresentation nodePresentation = astahProToolSupport.getNodePresentation(param.id());
-        
+
         return NodePresentationDTOAssembler.toDTO(nodePresentation);
     }
-    
+
     private RectangleDTO getNodePresentationRectangle(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get node presentation rectangle: {}", param);
-        
+
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
 
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
@@ -101,7 +118,7 @@ public class NodePresentationTool implements ToolProvider {
 
     private RectangleDTO setNodePresentationLocation(McpSyncServerExchange exchange, NodePresentationWithLocationDTO param) throws Exception {
         log.debug("Set node presentation location: {}", param);
-        
+
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
         try {
@@ -120,7 +137,7 @@ public class NodePresentationTool implements ToolProvider {
 
     private RectangleDTO setNodePresentationWidth(McpSyncServerExchange exchange, NodePresentationWithWidthDTO param) throws Exception {
         log.debug("Set node presentation width: {}", param);
-        
+
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
         try {
@@ -130,7 +147,7 @@ public class NodePresentationTool implements ToolProvider {
 
             Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
             return RectangleDTOAssembler.toDTO(rectangle2D);
-    
+
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;
@@ -139,7 +156,7 @@ public class NodePresentationTool implements ToolProvider {
 
     private RectangleDTO setNodePresentationHeight(McpSyncServerExchange exchange, NodePresentationWithHeightDTO param) throws Exception {
         log.debug("Set node presentation height: {}", param);
-        
+
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
         try {

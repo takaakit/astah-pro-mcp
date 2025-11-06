@@ -12,6 +12,7 @@ import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeNamespaceListD
 import com.astahpromcp.tool.astah.pro.project.outputdto.SourceTargetNameIdTypeListDTO;
 import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.visualization.outputdto.PlantumlDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IPackage;
@@ -35,10 +36,11 @@ public class ProjectInfoToolTest {
     private Method getNamedElementsChunk;
     private Method getAllPresentations;
     private Method getPresentationsChunk;
-    private Method getClassifiersThatReferenceOrBeReferencedBy;
+    private Method retrieveClassifiersThatReferenceOrBeReferencedBy;
     private Method searchWithinNamedElements;
     private Method searchWithinPresentations;
-    private Method getClassifiersWithinPackage;
+    private Method retrieveClassifiersWithinPackage;
+    private Method retrievePackageStructureAsPlantuml;
     private Field nameIdTypeDTOChunksCacheField;
     private Field labelIdTypeDTOChunksCacheField;
 
@@ -52,7 +54,8 @@ public class ProjectInfoToolTest {
         // Tool
         tool = new ProjectInfoTool(
             projectAccessor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getAllNamedElements() method
         getAllNamedElements = TestSupport.getAccessibleMethod(
@@ -82,10 +85,10 @@ public class ProjectInfoToolTest {
             McpSyncServerExchange.class,
             ChunkDTO.class);
         
-        // getClassifiersThatReferenceOrBeReferencedBy() method
-        getClassifiersThatReferenceOrBeReferencedBy = TestSupport.getAccessibleMethod(
+        // retrieveClassifiersThatReferenceOrBeReferencedBy() method
+        retrieveClassifiersThatReferenceOrBeReferencedBy = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
-            "getClassifiersThatReferenceOrBeReferencedBy",
+            "retrieveClassifiersThatReferenceOrBeReferencedBy",
             McpSyncServerExchange.class,
             IdDTO.class);
 
@@ -103,12 +106,19 @@ public class ProjectInfoToolTest {
             McpSyncServerExchange.class,
             SearchDTO.class);
 
-        // getClassifiersWithinPackage() method
-        getClassifiersWithinPackage = TestSupport.getAccessibleMethod(
+        // retrieveClassifiersWithinPackage() method
+        retrieveClassifiersWithinPackage = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
-            "getClassifiersWithinPackage",
+            "retrieveClassifiersWithinPackage",
             McpSyncServerExchange.class,
             IdDTO.class);
+
+        // retrievePackageStructureAsPlantuml() method
+        retrievePackageStructureAsPlantuml = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "retrievePackageStructureAsPlantuml",
+            McpSyncServerExchange.class,
+            NoInputDTO.class);
 
         // nameIdTypeDTOChunksCache field
         nameIdTypeDTOChunksCacheField = TestSupport.getAccessibleField(
@@ -217,7 +227,7 @@ public class ProjectInfoToolTest {
     }
 
     @Test
-    void getClassifiersThatReferenceOrBeReferencedBy_ok() throws Exception {
+    void retrieveClassifiersThatReferenceOrBeReferencedBy_ok() throws Exception {
         // Get classifier
         IClass classifier = (IClass) TestSupport.instance().getNamedElement(
             IClass.class,
@@ -227,10 +237,10 @@ public class ProjectInfoToolTest {
         IdDTO inputDTO = new IdDTO(classifier.getId());
         
         // ----------------------------------------
-        // Call getClassifiersThatReferenceOrBeReferencedBy()
+        // Call retrieveClassifiersThatReferenceOrBeReferencedBy()
         // ----------------------------------------
         SourceTargetNameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
-            getClassifiersThatReferenceOrBeReferencedBy,
+            retrieveClassifiersThatReferenceOrBeReferencedBy,
             tool,
             inputDTO,
             SourceTargetNameIdTypeListDTO.class);
@@ -532,7 +542,7 @@ public class ProjectInfoToolTest {
     }
 
     @Test
-    void getClassifiersWithinPackage_ok() throws Exception {
+    void retrieveClassifiersWithinPackage_ok() throws Exception {
         // Get package
         IPackage package_ = (IPackage) TestSupport.instance().getNamedElement(
             IPackage.class,
@@ -542,10 +552,10 @@ public class ProjectInfoToolTest {
         IdDTO inputDTO = new IdDTO(package_.getId());
         
         // ----------------------------------------
-        // Call getClassifiersWithinPackage()
+        // Call retrieveClassifiersWithinPackage()
         // ----------------------------------------
         NameIdTypeNamespaceListDTO outputDTO = TestSupport.instance().invokeToolMethod(
-            getClassifiersWithinPackage,
+            retrieveClassifiersWithinPackage,
             tool,
             inputDTO,
             NameIdTypeNamespaceListDTO.class);
@@ -554,5 +564,24 @@ public class ProjectInfoToolTest {
         assertNotNull(outputDTO);
         assertNotNull(outputDTO.value());
         assertEquals(6, outputDTO.value().size());
+    }
+
+    @Test
+    void retrievePackageStructureAsPlantuml_ok() throws Exception {
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call retrievePackageStructureAsPlantuml()
+        // ----------------------------------------
+        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            retrievePackageStructureAsPlantuml,
+            tool,
+            inputDTO,
+            PlantumlDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.plantumlCode());
     }
 }

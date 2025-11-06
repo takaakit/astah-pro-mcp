@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -25,70 +26,86 @@ public class MessageTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public MessageTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public MessageTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "get_msg_info",
-                            "Return detailed information about the specified message (specified by ID).",
-                            this::getInfo,
-                            IdDTO.class,
-                            MessageDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_arg_of_msg",
-                            "Set the argument of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                            this::setArgument,
-                            MessageWithArgumentDTO.class,
-                            MessageDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "set_guard_of_msg",
-                            "Set the guard of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                            this::setGuard,
-                            MessageWithGuardDTO.class,
-                            MessageDTO.class),
-
-                    ToolSupport.definition(
-                            "set_ret_val_of_msg",
-                            "Set the return value of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                            this::setReturnValue,
-                            MessageWithReturnValueDTO.class,
-                            MessageDTO.class),
-
-                    ToolSupport.definition(
-                            "set_ret_val_var_of_msg",
-                            "Set the return value variable of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                            this::setReturnValueVariable,
-                            MessageWithReturnValueVariableDTO.class,
-                            MessageDTO.class),
-
-                    ToolSupport.definition(
-                            "set_async_of_msg",
-                            "Set the asynchronous of the specified message (specified by ID), and return the message information after it is set.",
-                            this::setAsynchronous,
-                            MessageWithAsynchronousDTO.class,
-                            MessageDTO.class),
-
-                    ToolSupport.definition(
-                            "set_ope_of_msg",
-                            "Set the operation of the specified message (specified by ID), and return the message information after it is set.",
-                            this::setOperation,
-                            MessageWithOperationDTO.class,
-                            MessageDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create message tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_msg_info",
+                        "Return detailed information about the specified message (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        MessageDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_arg_of_msg",
+                        "Set the argument of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                        this::setArgument,
+                        MessageWithArgumentDTO.class,
+                        MessageDTO.class),
+
+                ToolSupport.definition(
+                        "set_guard_of_msg",
+                        "Set the guard of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                        this::setGuard,
+                        MessageWithGuardDTO.class,
+                        MessageDTO.class),
+
+                ToolSupport.definition(
+                        "set_ret_val_of_msg",
+                        "Set the return value of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                        this::setReturnValue,
+                        MessageWithReturnValueDTO.class,
+                        MessageDTO.class),
+
+                ToolSupport.definition(
+                        "set_ret_val_var_of_msg",
+                        "Set the return value variable of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                        this::setReturnValueVariable,
+                        MessageWithReturnValueVariableDTO.class,
+                        MessageDTO.class),
+
+                ToolSupport.definition(
+                        "set_async_of_msg",
+                        "Set the asynchronous of the specified message (specified by ID), and return the message information after it is set.",
+                        this::setAsynchronous,
+                        MessageWithAsynchronousDTO.class,
+                        MessageDTO.class),
+
+                ToolSupport.definition(
+                        "set_ope_of_msg",
+                        "Set the operation of the specified message (specified by ID), and return the message information after it is set.",
+                        this::setOperation,
+                        MessageWithOperationDTO.class,
+                        MessageDTO.class)
+        );
     }
 
     private MessageDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -101,14 +118,14 @@ public class MessageTool implements ToolProvider {
 
     private MessageDTO setArgument(McpSyncServerExchange exchange, MessageWithArgumentDTO param) throws Exception {
         log.debug("Set argument of message: {}", param);
-        
+
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
-        
+
         try {
             transactionManager.beginTransaction();
             astahMessage.setArgument(param.argument());
             transactionManager.endTransaction();
-            
+
             return MessageDTOAssembler.toDTO(astahMessage);
 
         } catch (Exception e) {
@@ -119,14 +136,14 @@ public class MessageTool implements ToolProvider {
 
     private MessageDTO setGuard(McpSyncServerExchange exchange, MessageWithGuardDTO param) throws Exception {
         log.debug("Set guard of message: {}", param);
-        
+
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
-        
+
         try {
             transactionManager.beginTransaction();
             astahMessage.setGuard(param.guard());
             transactionManager.endTransaction();
-            
+
             return MessageDTOAssembler.toDTO(astahMessage);
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -136,14 +153,14 @@ public class MessageTool implements ToolProvider {
 
     private MessageDTO setReturnValue(McpSyncServerExchange exchange, MessageWithReturnValueDTO param) throws Exception {
         log.debug("Set return value of message: {}", param);
-        
+
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
-        
+
         try {
             transactionManager.beginTransaction();
             astahMessage.setReturnValue(param.returnValue());
             transactionManager.endTransaction();
-            
+
             return MessageDTOAssembler.toDTO(astahMessage);
 
         } catch (Exception e) {
@@ -154,14 +171,14 @@ public class MessageTool implements ToolProvider {
 
     private MessageDTO setReturnValueVariable(McpSyncServerExchange exchange, MessageWithReturnValueVariableDTO param) throws Exception {
         log.debug("Set return value variable of message: {}", param);
-        
+
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
-        
+
         try {
             transactionManager.beginTransaction();
             astahMessage.setReturnValueVariable(param.returnValueVariable());
             transactionManager.endTransaction();
-            
+
             return MessageDTOAssembler.toDTO(astahMessage);
 
         } catch (Exception e) {
@@ -172,14 +189,14 @@ public class MessageTool implements ToolProvider {
 
     private MessageDTO setAsynchronous(McpSyncServerExchange exchange, MessageWithAsynchronousDTO param) throws Exception {
         log.debug("Set asynchronous of message: {}", param);
-        
+
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
-        
+
         try {
             transactionManager.beginTransaction();
             astahMessage.setAsynchronous(param.isAsynchronous());
             transactionManager.endTransaction();
-            
+
             return MessageDTOAssembler.toDTO(astahMessage);
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -189,7 +206,7 @@ public class MessageTool implements ToolProvider {
 
     private MessageDTO setOperation(McpSyncServerExchange exchange, MessageWithOperationDTO param) throws Exception {
         log.debug("Set operation of message: {}", param);
-        
+
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
         IOperation astahOperation = astahProToolSupport.getOperation(param.operationId());
 
@@ -197,7 +214,7 @@ public class MessageTool implements ToolProvider {
             transactionManager.beginTransaction();
             astahMessage.setOperation(astahOperation);
             transactionManager.endTransaction();
-            
+
             return MessageDTOAssembler.toDTO(astahMessage);
 
         } catch (Exception e) {

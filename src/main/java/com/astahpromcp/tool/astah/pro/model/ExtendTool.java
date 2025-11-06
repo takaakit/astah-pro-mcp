@@ -13,6 +13,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -23,23 +24,44 @@ public class ExtendTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ExtendTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public ExtendTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
-                "get_ext_info",
-                "Return detailed information about the specified extend (specified by ID).",
-                this::getInfo,
-                IdDTO.class,
-                ExtendDTO.class)
+                ToolSupport.definition(
+                        "get_ext_info",
+                        "Return detailed information about the specified extend (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        ExtendDTO.class)
         );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
     }
 
     private ExtendDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {

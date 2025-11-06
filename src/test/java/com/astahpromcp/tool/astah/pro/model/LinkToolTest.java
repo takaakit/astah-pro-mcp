@@ -35,7 +35,8 @@ public class LinkToolTest {
         tool = new LinkTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

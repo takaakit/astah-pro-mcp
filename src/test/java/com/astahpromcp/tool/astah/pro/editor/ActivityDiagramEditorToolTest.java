@@ -63,7 +63,8 @@ public class ActivityDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             activityDiagramEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createAcceptEventAction() method
         createAcceptEventAction = TestSupport.getAccessibleMethod(

@@ -13,19 +13,23 @@ import java.util.List;
 @Slf4j
 public class SequenceDiagramGuideTool implements ToolProvider {
 
+    public SequenceDiagramGuideTool() {
+    }
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "seq_dgm_guide",
-                            "MCP client (you) MUST call this tool function before referencing or editing a sequence diagram to understand its usage and terminology definitions.",
-                            this::getGuide,
-                            NoInputDTO.class,
-                            GuideDTO.class)
-            );
+	        return List.of(
+	                ToolSupport.definition(
+	                        "seq_dgm_guide",
+	                        "MCP client (you) MUST call this tool function before referencing or editing a sequence diagram to understand its usage and terminology definitions.",
+	                        this::getGuide,
+	                        NoInputDTO.class,
+	                        GuideDTO.class)
+	        );
+
         } catch (Exception e) {
-            log.error("Failed to create guide tools", e);
+            log.error("Failed to create sequence diagram guide tools", e);
             return List.of();
         }
     }

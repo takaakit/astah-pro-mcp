@@ -35,7 +35,8 @@ public class RealizationToolTest {
         tool = new RealizationTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

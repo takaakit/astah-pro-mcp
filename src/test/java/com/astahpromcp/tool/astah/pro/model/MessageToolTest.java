@@ -43,7 +43,8 @@ public class MessageToolTest {
         tool = new MessageTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

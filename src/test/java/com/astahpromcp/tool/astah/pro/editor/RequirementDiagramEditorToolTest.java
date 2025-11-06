@@ -38,7 +38,8 @@ public class RequirementDiagramEditorToolTest {
             projectAccessor,
             transactionManager,
             requirementDiagramEditor,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // createRequirementDiagram() method
         createRequirementDiagram = TestSupport.getAccessibleMethod(

@@ -38,7 +38,8 @@ public class LifelineToolTest {
         tool = new LifelineTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

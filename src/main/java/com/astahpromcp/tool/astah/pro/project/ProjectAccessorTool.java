@@ -28,80 +28,96 @@ public class ProjectAccessorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public ProjectAccessorTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport) {
+    public ProjectAccessorTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "create_proj",
-                            "Create an Astah project (root package), and return the project information. The project element is the root package.",
-                            this::createProject,
-                            NoInputDTO.class,
-                            NamedElementDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "open_proj",
-                            "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
-                            this::openProject,
-                            NameDTO.class,
-                            NamedElementDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "get_proj",
-                            "Return the project (root package) information.",
-                            this::getProject,
-                            NoInputDTO.class,
-                            NamedElementDTO.class),
-
-                    ToolSupport.definition(
-                            "is_proj_open",
-                            "Return whether a project is opened or not.",
-                            this::isProjectOpen,
-                            NoInputDTO.class,
-                            BooleanDTO.class),
-
-                    ToolSupport.definition(
-                            "is_proj_mod",
-                            "Return whether the current project is modified or not.",
-                            this::isProjectModified,
-                            NoInputDTO.class,
-                            BooleanDTO.class),
-
-                    ToolSupport.definition(
-                            "find_named_elems_by_name",
-                            "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
-                            this::findNamedElementsByName,
-                            NameDTO.class,
-                            NameIdTypeListDTO.class)
-
-                    /* Saving and closing the project should be performed based on the user's decision.
-                       So these tool functions are disabled.
-
-                    ToolSupport.definition(
-                            "save_proj",
-                            "Save the current project, and return the current project information.",
-                            this::saveProject,
-                            NoInputDTO.class,
-                            NamedElementDTO.class),
-
-                    ToolSupport.definition(
-                            "close_proj",
-                            "Close the current project, and return the current project information.",
-                            this::closeProject,
-                            NoInputDTO.class,
-                            NamedElementDTO.class)
-                    */
-            );
         } catch (Exception e) {
             log.error("Failed to create project accessor tools", e);
             return List.of();
         }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "get_proj",
+                        "Return the project (root package) information.",
+                        this::getProject,
+                        NoInputDTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "is_proj_open",
+                        "Return whether a project is opened or not.",
+                        this::isProjectOpen,
+                        NoInputDTO.class,
+                        BooleanDTO.class),
+
+                ToolSupport.definition(
+                        "is_proj_mod",
+                        "Return whether the current project is modified or not.",
+                        this::isProjectModified,
+                        NoInputDTO.class,
+                        BooleanDTO.class),
+
+                ToolSupport.definition(
+                        "find_named_elems_by_name",
+                        "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
+                        this::findNamedElementsByName,
+                        NameDTO.class,
+                        NameIdTypeListDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "create_proj",
+                        "Create an Astah project (root package), and return the project information. The project element is the root package.",
+                        this::createProject,
+                        NoInputDTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "open_proj",
+                        "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
+                        this::openProject,
+                        NameDTO.class,
+                        NamedElementDTO.class)
+
+                /* Saving and closing the project should be performed based on the user's decision.
+                   So these tool functions are disabled.
+
+                ToolSupport.definition(
+                        "save_proj",
+                        "Save the current project, and return the current project information.",
+                        this::saveProject,
+                        NoInputDTO.class,
+                        NamedElementDTO.class),
+
+                ToolSupport.definition(
+                        "close_proj",
+                        "Close the current project, and return the current project information.",
+                        this::closeProject,
+                        NoInputDTO.class,
+                        NamedElementDTO.class)
+                */
+        );
     }
 
     private NamedElementDTO createProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
@@ -113,7 +129,7 @@ public class ProjectAccessorTool implements ToolProvider {
             throw new RuntimeException("Failed to create project (root package).");
         }
 
-        IModel astahProject = projectAccessor.getProject();
+        IModel astahProject;
         try {
             astahProject = projectAccessor.getProject();
         } catch (Exception e) {
@@ -141,7 +157,7 @@ public class ProjectAccessorTool implements ToolProvider {
 
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
-    
+
     private NamedElementDTO getProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get project (root package): {}", param);
 
@@ -171,14 +187,14 @@ public class ProjectAccessorTool implements ToolProvider {
         log.debug("Find named elements by name: {}", param);
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
-        
+
         List<NameIdTypeDTO> namedIdTypeDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
             if (astahNamedElement.getName().toLowerCase().contains(param.name().toLowerCase())) {
                 namedIdTypeDTOs.add(NameIdTypeDTOAssembler.toDTO(astahNamedElement));
             }
         }
-        
+
         return new NameIdTypeListDTO(namedIdTypeDTOs);
     }
 

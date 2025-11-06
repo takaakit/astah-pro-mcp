@@ -15,57 +15,74 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILinkEnd.html
 @Slf4j
 public class LinkEndTool implements ToolProvider {
-    
+
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public LinkEndTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public LinkEndTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
 
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            return List.of(
-                    ToolSupport.definition(
-                            "set_aggr_of_link_end",
-                            "Set an aggregation of the specified link end (specified by ID), and return the link end information after it is set.",
-                            this::setAggregation,
-                            LinkEndWithAggregationDTO.class,
-                            LinkEndDTO.class),
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
 
-                    ToolSupport.definition(
-                            "set_comp_of_link_end",
-                            "Set a composition of the specified link end (specified by ID), and return the link end information after it is set.",
-                            this::setComposition,
-                            LinkEndWithCompositionDTO.class,
-                            LinkEndDTO.class),
+            return List.copyOf(tools);
 
-                    ToolSupport.definition(
-                            "set_nav_of_link_end",
-                            "Set a navigation of the specified link end (specified by ID), and return the link end information after it is set.",
-                            this::setNavigation,
-                            LinkEndWithNavigationDTO.class,
-                            LinkEndDTO.class)
-            );
         } catch (Exception e) {
             log.error("Failed to create link end tools", e);
             return List.of();
         }
     }
 
+    private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_aggr_of_link_end",
+                        "Set an aggregation of the specified link end (specified by ID), and return the link end information after it is set.",
+                        this::setAggregation,
+                        LinkEndWithAggregationDTO.class,
+                        LinkEndDTO.class),
+
+                ToolSupport.definition(
+                        "set_comp_of_link_end",
+                        "Set a composition of the specified link end (specified by ID), and return the link end information after it is set.",
+                        this::setComposition,
+                        LinkEndWithCompositionDTO.class,
+                        LinkEndDTO.class),
+
+                ToolSupport.definition(
+                        "set_nav_of_link_end",
+                        "Set a navigation of the specified link end (specified by ID), and return the link end information after it is set.",
+                        this::setNavigation,
+                        LinkEndWithNavigationDTO.class,
+                        LinkEndDTO.class)
+        );
+    }
+
     private LinkEndDTO setAggregation(McpSyncServerExchange exchange, LinkEndWithAggregationDTO param) throws Exception {
         log.debug("Set aggregation of link end: {}", param);
-        
+
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
         try {
@@ -80,10 +97,10 @@ public class LinkEndTool implements ToolProvider {
             throw e;
         }
     }
-    
+
     private LinkEndDTO setComposition(McpSyncServerExchange exchange, LinkEndWithCompositionDTO param) throws Exception {
         log.debug("Set composition of link end: {}", param);
-        
+
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
         try {
@@ -101,7 +118,7 @@ public class LinkEndTool implements ToolProvider {
 
     private LinkEndDTO setNavigation(McpSyncServerExchange exchange, LinkEndWithNavigationDTO param) throws Exception {
         log.debug("Set navigation of link end: {}", param);
-        
+
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
         try {

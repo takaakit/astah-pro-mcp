@@ -69,7 +69,8 @@ public class BasicModelEditorToolTest {
             basicModelEditor,
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // changeParent() method
         changeParent = TestSupport.getAccessibleMethod(

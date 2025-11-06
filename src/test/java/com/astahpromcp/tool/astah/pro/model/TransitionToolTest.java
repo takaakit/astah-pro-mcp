@@ -41,7 +41,8 @@ public class TransitionToolTest {
         tool = new TransitionTool(
             projectAccessor,
             transactionManager,
-            astahProToolSupport);
+            astahProToolSupport,
+            true);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

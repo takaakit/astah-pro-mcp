@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -25,36 +26,58 @@ public class FlowTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final boolean includeEditTools;
 
-    public FlowTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport) {
+    public FlowTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.includeEditTools = includeEditTools;
     }
-    
+
+
     @Override
     public List<ToolDefinition> createToolDefinitions() {
+        try {
+            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
+            if (includeEditTools) {
+                tools.addAll(createEditTools());
+            }
+
+            return List.copyOf(tools);
+
+        } catch (Exception e) {
+            log.error("Failed to create tools", e);
+            return List.of();
+        }
+    }
+
+    private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
-                "get_flow_info",
-                "Return detailed information about the specified flow (specified by ID).",
-                this::getInfo,
-                IdDTO.class,
-                FlowDTO.class),
+                ToolSupport.definition(
+                        "get_flow_info",
+                        "Return detailed information about the specified flow (specified by ID).",
+                        this::getInfo,
+                        IdDTO.class,
+                        FlowDTO.class)
+        );
+    }
 
-            ToolSupport.definition(
-                "set_actn_of_flow",
-                "Set the action of the specified flow (specified by ID), and return the flow information after it is set.",
-                this::setAction,
-                FlowWithActionDTO.class,
-                FlowDTO.class),
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "set_actn_of_flow",
+                        "Set the action of the specified flow (specified by ID), and return the flow information after it is set.",
+                        this::setAction,
+                        FlowWithActionDTO.class,
+                        FlowDTO.class),
 
-            ToolSupport.definition(
-                "set_guard_of_flow",
-                "Set the guard of the specified flow (specified by ID), and return the flow information after it is set.",
-                this::setGuard,
-                FlowWithGuardDTO.class,
-                FlowDTO.class)
+                ToolSupport.definition(
+                        "set_guard_of_flow",
+                        "Set the guard of the specified flow (specified by ID), and return the flow information after it is set.",
+                        this::setGuard,
+                        FlowWithGuardDTO.class,
+                        FlowDTO.class)
         );
     }
 
@@ -68,7 +91,7 @@ public class FlowTool implements ToolProvider {
 
     private FlowDTO setAction(McpSyncServerExchange exchange, FlowWithActionDTO param) throws Exception {
         log.debug("Set action of flow: {}", param);
-        
+
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
 
         try {
@@ -86,7 +109,7 @@ public class FlowTool implements ToolProvider {
 
     private FlowDTO setGuard(McpSyncServerExchange exchange, FlowWithGuardDTO param) throws Exception {
         log.debug("Set guard of flow: {}", param);
-        
+
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
 
         try {
