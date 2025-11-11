@@ -11,22 +11,25 @@ public final class McpServerConfig {
     }
 
     // Default host address
-    public static final String DEFAULT_HOST = "127.0.0.1";
+    public static final String HOST = "127.0.0.1";
 
-    // Default port
-    public static final int DEFAULT_PORT = 8888;
+    // Port for full tool access
+    public static final int PORT_FOR_FULL_TOOL = 8888;
 
-    // Default allowlist of host addresses
-    public static final Set<String> DEFAULT_ORIGIN_HOST_ALLOWLIST =
+    // Port for query-only tool access
+    public static final int PORT_FOR_QUERY_ONLY_TOOL = 8889;
+
+    // Allowlist of host addresses
+    public static final Set<String> ORIGIN_HOST_ALLOWLIST =
             Set.of("127.0.0.1", "::1");
 
     // Root directory where generated output is stored.
-    public static final Path DEFAULT_OUTPUT_DIR =
+    public static final Path ROOT_OUTPUT_DIR =
             Paths.get(System.getProperty("user.home"), ".astah-pro-mcp");
 
     // Temporary workspace directory
-    public static final Path DEFAULT_WORKSPACE_DIR =
-            DEFAULT_OUTPUT_DIR.resolve("workspace");
+    public static final Path WORKSPACE_DIR =
+            ROOT_OUTPUT_DIR.resolve("workspace");
 
     // Jetty server idle timeout
     public static final int JETTY_IDLE_TIMEOUT_MS = 300000; // 5min

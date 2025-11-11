@@ -27,7 +27,7 @@ public class AstahProToolFactory {
     private final Path imageOutputDir;
 
     public AstahProToolFactory() {
-        this(McpServerConfig.DEFAULT_WORKSPACE_DIR.resolve("diagram-images"));
+        this(McpServerConfig.WORKSPACE_DIR.resolve("diagram-images"));
     }
 
     public AstahProToolFactory(Path imageOutputDir) {

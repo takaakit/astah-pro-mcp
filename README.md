@@ -30,17 +30,20 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
 - **Astah Professional v10.1 or later** is required. This does not work with Astah UML.
 
-- Supported AI assistants/agents  
-  - **Claude Desktop**  
-  - **Claude Code**  
-  - **Codex CLI**  
-  - **Gemini CLI**
+- Recommended AI assistants/agents
+  - *For using the Full (Query + Edit) tool version:*  
+    With over **200** tools exposed in this version, use the AI assistants/agents listed below. Other AI assistants/agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
+    - **Claude Desktop**
+    - **Claude Code**
+    - **Codex CLI**
+    - **Gemini CLI**
+
+  - *For using the Query-Only tool version:*  
+    This version has exposed around **90** tools, so many AI assistants/agents will likely be able to use this plugin.
 
   <br>
 
-  > *Note 1:* This MCP server exposes **200+** tool functions. Other AI assistants/agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
-
-  > *Note 2*: This MCP server only connects to AI assistants/agents running on the same machine as Astah Professional.
+  > *Note*: This MCP server only connects to AI assistants/agents running on the same machine as Astah Professional.
   According to Astah's terms of use, using Astah via an AI assistant/agent is permitted only if you hold a valid license and access it exclusively for your own use with your licensed Astah. Allowing a non-licensed third party to operate Astah via such an assistant/agent is strictly prohibited.  
   For details, please refer to the FAQ ([English](https://astah.net/support/cv-members-guide/#ai-external-access) / [Japanese](https://astah.change-vision.com/ja/faq/faq-license/ai-external-access.html)) or [contact Change Vision (the developer of Astah)](https://astah.net/about/contact/) directly.
 
@@ -72,7 +75,7 @@ Download [the plugin JAR file (astah-pro-mcp-x.x.x.jar)](https://github.com/taka
 
 ### AI Assistant/Agent Settings
 
-Add the following settings to connect to the MCP server using the *Streamable HTTP* transport.
+To use the *Full* tool version, specify port `8888`; to use the *Query-Only* tool version, specify port `8889`.
 
 #### Claude Desktop
 
@@ -169,7 +172,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 
 3. Send prompts to the AI assistant/agent.
 
-If you want to disable this plugin, click [Plugin] > [Installed Plugin], select the *Astah Pro MCP* entry in the plugin list dialog, click Disable, and then restart Astah.
+If you want to disable this plugin in Astah, click [Plugin] > [Installed Plugin], select the *Astah Pro MCP* entry in the plugin list dialog, click Disable, and then restart Astah.
 
 <br>
 

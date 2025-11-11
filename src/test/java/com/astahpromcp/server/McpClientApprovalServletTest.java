@@ -85,7 +85,7 @@ class McpClientApprovalServletTest {
 
     @Test
     void service_allowsRequestForDefaultIpv6LoopbackOrigin() throws Exception {
-        servlet = new McpClientApprovalServlet(delegate, null, McpServerConfig.DEFAULT_ORIGIN_HOST_ALLOWLIST);
+        servlet = new McpClientApprovalServlet(delegate, null, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
 
         when(request.getHeader("Origin")).thenReturn("http://[::1]:3000");
         when(request.getHeader("Mcp-Session-Id")).thenReturn(null);

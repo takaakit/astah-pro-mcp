@@ -37,7 +37,6 @@ public class StateTool implements ToolProvider {
         this.includeEditTools = includeEditTools;
     }
 
-
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {

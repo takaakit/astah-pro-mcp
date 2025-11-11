@@ -33,10 +33,7 @@ public class ExtraTabView extends JPanel implements IPluginExtraTabView, Project
 
         } catch (Exception e) {
             String message = "An error has occurred, so the astah-pro-mcp plugin will be disabled.";
-            JOptionPane.showMessageDialog(this,
-                message,
-                "astah-pro-mcp",
-                JOptionPane.ERROR_MESSAGE);
+            showErrorDialog(message);
             log.error(message, e);
         }
 
@@ -114,5 +111,19 @@ public class ExtraTabView extends JPanel implements IPluginExtraTabView, Project
         }
         projectAccessor.removeProjectEventListener(this);
         listenerRegistered = false;
+    }
+
+    private void showErrorDialog(String message) {
+        Runnable task = () -> JOptionPane.showMessageDialog(
+                this,
+                message,
+                "astah-pro-mcp",
+                JOptionPane.ERROR_MESSAGE);
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            SwingUtilities.invokeLater(task);
+        }
     }
 }

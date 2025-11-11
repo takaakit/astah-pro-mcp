@@ -11,6 +11,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
+import com.astahpromcp.tool.astah.pro.view.inputdto.PresentationWithHighlightColorDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
@@ -22,6 +23,7 @@ import com.change_vision.jude.api.inf.view.IDiagramViewManager;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -70,31 +72,6 @@ public class DiagramViewManagerTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_cur_dgm",
-                        "Return the information of the currently selected diagram in Diagram Editor.",
-                        this::getCurrentDiagram,
-                        NoInputDTO.class,
-                        DiagramDTO.class),
-
-                ToolSupport.definition(
-                        "get_slct_prst",
-                        "Return the information of the currently selected presentations in Diagram Editor.",
-                        this::getSelectedPresentations,
-                        NoInputDTO.class,
-                        PresentationListDTO.class),
-
-                ToolSupport.definition(
-                        "get_zoom_fac",
-                        "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
-                        this::getZoomFactor,
-                        NoInputDTO.class,
-                        com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class)
-        );
-    }
-
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
-                ToolSupport.definition(
                         "open_dgm",
                         "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the opened diagram information.",
                         this::openDiagram,
@@ -130,20 +107,6 @@ public class DiagramViewManagerTool implements ToolProvider {
                         DiagramDTO.class),
 
                 ToolSupport.definition(
-                        "center_prst_in_dgm",
-                        "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
-                        this::centerPresentationInDiagram,
-                        IdDTO.class,
-                        PresentationDTO.class),
-
-                ToolSupport.definition(
-                        "auto_layout",
-                        "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
-                        this::autoLayout,
-                        NoInputDTO.class,
-                        DiagramDTO.class),
-
-                ToolSupport.definition(
                         "zoom",
                         "Zoom in current diagram, and return the zoomed diagram information.",
                         this::zoom,
@@ -155,7 +118,67 @@ public class DiagramViewManagerTool implements ToolProvider {
                         "Zoom fit in current diagram, and return the zoomed diagram information.",
                         this::zoomFit,
                         NoInputDTO.class,
-                        DiagramDTO.class)
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "center_prst_in_dgm",
+                        "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
+                        this::centerPresentationInDiagram,
+                        IdDTO.class,
+                        PresentationDTO.class),
+
+                ToolSupport.definition(
+                        "get_cur_dgm",
+                        "Return the information of the currently selected diagram in Diagram Editor.",
+                        this::getCurrentDiagram,
+                        NoInputDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "get_slct_prst",
+                        "Return the information of the currently selected presentations in Diagram Editor.",
+                        this::getSelectedPresentations,
+                        NoInputDTO.class,
+                        PresentationListDTO.class),
+
+                ToolSupport.definition(
+                        "get_zoom_fac",
+                        "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
+                        this::getZoomFactor,
+                        NoInputDTO.class,
+                        com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class),
+
+                ToolSupport.definition(
+                        "get_high_prsts_within_dgm",
+                        "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information.",
+                        this::getHighlightedPresentationsWithinDiagram,
+                        IdDTO.class,
+                        PresentationListDTO.class)
+        );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of(
+                ToolSupport.definition(
+                        "auto_layout",
+                        "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
+                        this::autoLayout,
+                        NoInputDTO.class,
+                        DiagramDTO.class),
+
+                ToolSupport.definition(
+                        "highlight_prst",
+                        "Temporarily highlight the specified presentation (specified by ID) in the specified color (in the format #FFFFFF), and return the highlighted presentation information. This highlight is temporary and is rendered only while the diagram is open. When you reopen the diagram, the highlight disappears.",
+                        this::highlightPresentation,
+                        PresentationWithHighlightColorDTO.class,
+                        PresentationDTO.class),
+
+                ToolSupport.definition(
+                        "unhighlight_prst",
+                        "Unhighlight the specified presentation (specified by ID), and return the unhighlighted presentation information.",
+                        this::unhighlightPresentation,
+                        IdDTO.class,
+                        PresentationDTO.class)
         );
     }
 
@@ -508,5 +531,64 @@ public class DiagramViewManagerTool implements ToolProvider {
             log.warn("Failed to convert device coordinates to world coordinates.", e);
             return null;
         }
+    }
+
+    private PresentationDTO highlightPresentation(McpSyncServerExchange exchange, PresentationWithHighlightColorDTO param) throws Exception {
+        log.debug("Highlight presentation: {}", param);
+
+        IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
+
+        try {
+            transactionManager.beginTransaction();
+            if (astahPresentation instanceof INodePresentation) {
+                diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, Color.decode(param.highlightColor()));
+            } else if (astahPresentation instanceof ILinkPresentation) {
+                diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.LINE_COLOR, Color.decode(param.highlightColor()));
+            } else {
+                diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, Color.decode(param.highlightColor()));
+            }
+            transactionManager.endTransaction();
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+
+        return PresentationDTOAssembler.toDTO(astahPresentation);
+    }
+
+    private PresentationDTO unhighlightPresentation(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Unhighlight presentation: {}", param);
+
+        IPresentation astahPresentation = astahProToolSupport.getPresentation(param.id());
+
+        try {
+            transactionManager.beginTransaction();
+            diagramViewManager.clearAllViewProperties(astahPresentation);
+            transactionManager.endTransaction();
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+        
+        return PresentationDTOAssembler.toDTO(astahPresentation);
+    }
+
+    private PresentationListDTO getHighlightedPresentationsWithinDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Get highlighted presentations within diagram: {}", param);
+
+        IDiagram diagram = astahProToolSupport.getDiagram(param.id());
+        
+        List<PresentationDTO> presentationDTOs = new ArrayList<>();
+        for (IPresentation presentation : diagram.getPresentations()) {
+            if (diagramViewManager.getViewProperty(presentation, IDiagramViewManager.BORDER_COLOR) != null
+                || diagramViewManager.getViewProperty(presentation, IDiagramViewManager.LINE_COLOR) != null
+                || diagramViewManager.getViewProperty(presentation, IDiagramViewManager.BACKGROUND_COLOR) != null) {
+                presentationDTOs.add(PresentationDTOAssembler.toDTO(presentation));
+            }
+        }
+
+        return new PresentationListDTO(presentationDTOs);
     }
 }

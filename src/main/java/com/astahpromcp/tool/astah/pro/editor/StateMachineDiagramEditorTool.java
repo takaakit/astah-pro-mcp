@@ -43,7 +43,6 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         this.includeEditTools = includeEditTools;
     }
 
-
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {

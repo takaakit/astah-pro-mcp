@@ -58,17 +58,6 @@ public class ProjectViewManagerTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_slct_elms",
-                        "Get the information of the selected elements in the project view.",
-                        this::getSelectedElements,
-                        NoInputDTO.class,
-                        ElementListDTO.class)
-        );
-    }
-
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
-                ToolSupport.definition(
                         "show_in_prop_view",
                         "Show the property view of the element (specified by ID), and return the shown element information.",
                         this::showInPropertyView,
@@ -80,8 +69,19 @@ public class ProjectViewManagerTool implements ToolProvider {
                         "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
                         this::showInStructureTree,
                         IdDTO.class,
-                        ElementDTO.class)
+                        ElementDTO.class),
+
+                ToolSupport.definition(
+                        "get_slct_elms",
+                        "Get the information of the selected elements in the project view.",
+                        this::getSelectedElements,
+                        NoInputDTO.class,
+                        ElementListDTO.class)
         );
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
     }
 
     private ElementListDTO getSelectedElements(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {

@@ -17,6 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class McpServerAppTest {
 
+    private static final int[] SERVER_PORTS = {
+            McpServerConfig.PORT_FOR_FULL_TOOL,
+            McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL
+    };
+
     private McpServerApp app;
 
     @BeforeEach
@@ -36,17 +41,22 @@ public class McpServerAppTest {
     @Test
     void rejectsConnectionsFromNonLoopbackAddresses() throws Exception {
         InetAddress loopback = InetAddress.getByName("127.0.0.1");
-        assertDoesNotThrow(() -> attemptConnection(loopback), "Loopback connection should succeed");
-
         InetAddress nonLoopback = findNonLoopbackAddress();
-        IOException exception = assertThrows(IOException.class,
-                () -> attemptConnection(nonLoopback),
-                () -> "Expected connection to be rejected for " + nonLoopback);
+        for (int port : SERVER_PORTS) {
+            int targetPort = port;
+            assertDoesNotThrow(
+                    () -> attemptConnection(loopback, targetPort),
+                    () -> "Loopback connection should succeed on port " + targetPort);
 
-        assertTrue(exception instanceof ConnectException || 
-                   exception instanceof NoRouteToHostException ||
-                   exception instanceof java.net.SocketTimeoutException,
-                "Expected the connection to be refused or timeout, but got: " + exception);
+            IOException exception = assertThrows(IOException.class,
+                    () -> attemptConnection(nonLoopback, targetPort),
+                    () -> "Expected connection to be rejected for " + nonLoopback + " on port " + targetPort);
+
+            assertTrue(exception instanceof ConnectException ||
+                       exception instanceof NoRouteToHostException ||
+                       exception instanceof java.net.SocketTimeoutException,
+                    "Expected the connection to be refused or timeout, but got: " + exception);
+        }
     }
 
     @Test
@@ -69,22 +79,28 @@ public class McpServerAppTest {
     }
 
     private void waitForServerReady() throws InterruptedException, UnknownHostException {
+        for (int port : SERVER_PORTS) {
+            waitForPortReady(port);
+        }
+    }
+
+    private void waitForPortReady(int port) throws InterruptedException, UnknownHostException {
         long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
         InetAddress loopback = InetAddress.getByName("127.0.0.1");
         while (System.nanoTime() < deadline) {
             try {
-                attemptConnection(loopback);
+                attemptConnection(loopback, port);
                 return;
             } catch (IOException ignored) {
                 Thread.sleep(100);
             }
         }
-        fail("Server did not start accepting loopback connections within timeout");
+        fail("Server did not start accepting loopback connections within timeout for port " + port);
     }
 
-    private void attemptConnection(InetAddress address) throws IOException {
+    private void attemptConnection(InetAddress address, int port) throws IOException {
         try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(address, McpServerConfig.DEFAULT_PORT), 5_000);
+            socket.connect(new InetSocketAddress(address, port), 5_000);
         }
     }
 

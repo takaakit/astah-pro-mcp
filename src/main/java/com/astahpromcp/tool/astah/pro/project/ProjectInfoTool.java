@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -130,6 +131,13 @@ public class ProjectInfoTool implements ToolProvider {
                         "retrieve_pkg_strct_as_puml",
                         "Return the PlantUML code that represents the package structure of the classifiers within the project. When you need to know the package structure of classifiers across the entire project, use this tool.",
                         this::retrievePackageStructureAsPlantuml,
+                        NoInputDTO.class,
+                        PlantumlDTO.class),
+
+                ToolSupport.definition(
+                        "retrieve_clses_rels_as_puml",
+                        "Return the PlantUML code that represents the relationships between the classifiers within the project. When you need to know the relationships between classifiers across the entire project, use this tool. Note that the relationships returned by this tool include only the relationship types; for example, association role names, multiplicities, composition, aggregation, and association names are not included.",
+                        this::retrieveClassifiersRelationshipsAsPlantuml,
                         NoInputDTO.class,
                         PlantumlDTO.class)
         );
@@ -621,5 +629,83 @@ public class ProjectInfoTool implements ToolProvider {
         }
 
         return plantumlCode.toString();
+    }
+
+    private PlantumlDTO retrieveClassifiersRelationshipsAsPlantuml(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Retrieve classifiers relationships as PlantUML: {}", param);
+
+        StringBuilder plantumlCode = new StringBuilder();
+        plantumlCode.append("@startuml").append("\n");
+
+        // Sort the classifiers by their full namespace
+        INamedElement[] astahNamedElements = projectAccessor.findElements(IClass.class);
+        Arrays.sort(astahNamedElements, Comparator.comparing(
+            element -> element.getFullNamespace(".") != null ? element.getFullNamespace(".") : "",
+            Comparator.naturalOrder()
+        ));
+
+        for (INamedElement astahNamedElement : astahNamedElements) {
+            IClass astahClass = (IClass)astahNamedElement;
+
+            for (IAttribute astahAttribute : astahClass.getAttributes()) {
+                // Association
+                if (astahAttribute.getAssociation() != null) {
+                    // Both navigabilities are unspecified
+                    if (astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Unspecified")
+                        && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Unspecified")) {
+
+                        if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahClass) {
+                            plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --- ").append("\"" + ((IClass)(astahAttribute.getAssociation().getMemberEnds()[1].getOwner())).getName() + "\"").append("\n");
+                        }
+
+                    // One of the navigabilities is specified
+                    } else {
+
+                        if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahClass
+                            && astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Navigable")) {
+                            plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --> ").append("\"" + ((IClass)(astahAttribute.getAssociation().getMemberEnds()[1].getOwner())).getName() + "\"").append("\n");
+                        }
+
+                        if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahClass
+                            && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Navigable")) {
+                            plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --> ").append("\"" + ((IClass)(astahAttribute.getAssociation().getMemberEnds()[0].getOwner())).getName() + "\"").append("\n");
+                        }
+                    }
+                }
+            }
+
+            // Realization
+            for (IRealization astahRealization : astahClass.getClientRealizations()) {
+                if (astahRealization.getSupplier() != null) {
+                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" ..|> ").append("\"" + astahRealization.getSupplier().getName() + "\"").append("\n");
+                }
+            }
+
+            // Generalization
+            for (IGeneralization astahGeneralization : astahClass.getGeneralizations()) {
+                if (astahGeneralization.getSuperType() != null) {
+                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --|> ").append("\"" + astahGeneralization.getSuperType().getName() + "\"").append("\n");
+                }
+            }
+
+            // Dependency
+            for (IDependency astahDependency : astahClass.getClientDependencies()) {
+                if (astahDependency.getSupplier() != null) {
+                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" ..> ").append("\"" + astahDependency.getSupplier().getName() + "\"").append("\n");
+                }
+            }
+
+            // Usage
+            for (IUsage astahUsage : astahClass.getClientUsages()) {
+                if (astahUsage.getSupplier() != null) {
+                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" ..> ").append("\"" + astahUsage.getSupplier().getName() + "\"").append("\n");
+                }
+            }
+        }
+
+        plantumlCode.append("@enduml").append("\n");
+        log.debug("Classifiers relationships as PlantUML: {}", plantumlCode.toString());
+
+        return new PlantumlDTO(plantumlCode.toString());
     }
 }

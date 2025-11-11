@@ -44,14 +44,6 @@ public class DDDReferenceTool implements ToolProvider {
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-            // Check if the DDD Reference URL is accessible
-            try {
-                URI.create(dddReferenceUrl).toURL().openConnection().connect();
-            } catch (Exception e) {
-                log.error("DDD Reference URL is not accessible: " + dddReferenceUrl, e);
-                return List.of();
-            }
-    
             return List.of(
                     ToolSupport.definition(
                             "get_info_of_ddd_ref",
@@ -82,7 +74,6 @@ public class DDDReferenceTool implements ToolProvider {
         }
 
         log.info("Loading Domain-Driven Design Reference from PDF URL.");
-        
         try (InputStream is = URI.create(dddReferenceUrl).toURL().openStream()) {
             if (is == null) {
                 throw new IOException("Domain-Driven Design Reference PDF resource not found.");
@@ -113,6 +104,10 @@ public class DDDReferenceTool implements ToolProvider {
             contentCache.addAll(chunks);
 
             return new DocumentDTO(chunks.size(), chunks.get(0));
+            
+        } catch (IOException e) {
+            log.error("Failed to load Domain-Driven Design Reference from URL: {}", dddReferenceUrl, e);
+            throw e;
         }
     }
 

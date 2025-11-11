@@ -5,8 +5,10 @@ import com.astahpromcp.config.LogbackConfig;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 public class ExtraTabPanel extends JPanel {
     private JTextArea logTextArea;
@@ -75,20 +77,37 @@ public class ExtraTabPanel extends JPanel {
 
     private void openLogFile() {
         Path logFilePath = LogbackConfig.getLogFilePath();
-        if (logFilePath != null && logFilePath.toFile().exists()) {
-            try {
-                Desktop.getDesktop().open(logFilePath.toFile());
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this,
-                        "Failed to open log file: " + e.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+        if (logFilePath == null) {
+            showDialog("Log file not found", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        CompletableFuture.runAsync(() -> {
+            File logFile = logFilePath.toFile();
+            if (!logFile.exists()) {
+                showDialog("Log file not found", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
             }
+
+            if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                showDialog("Opening the log file is not supported on this platform.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                Desktop.getDesktop().open(logFile);
+            } catch (IOException | SecurityException e) {
+                showDialog("Failed to open log file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void showDialog(String message, String title, int messageType) {
+        Runnable task = () -> JOptionPane.showMessageDialog(this, message, title, messageType);
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
         } else {
-            JOptionPane.showMessageDialog(this,
-                    "Log file not found",
-                    "Error",
-                    JOptionPane.WARNING_MESSAGE);
+            SwingUtilities.invokeLater(task);
         }
     }
 }

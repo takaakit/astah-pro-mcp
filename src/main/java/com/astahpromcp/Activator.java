@@ -15,7 +15,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext context) throws Exception {
         // Configure Logback
-        LogbackConfig.configure(McpServerConfig.DEFAULT_OUTPUT_DIR);
+        LogbackConfig.configure(McpServerConfig.ROOT_OUTPUT_DIR);
         
         log.info("MCP-BUNDLE: Starting bundle...");
 
@@ -53,8 +53,8 @@ public class Activator implements BundleActivator {
                 log.info("MCP-BUNDLE: Bundle stopped successfully.");
 
             } catch (Exception e) {
-                log.error("MCP-BUNDLE: Error while stopping MCP server", e);
-                throw e;
+                log.warn("MCP-BUNDLE: Exception occurred during shutdown: {}", e.getMessage());
+                log.debug("MCP-BUNDLE: Shutdown exception details", e);
 
             } finally {
                 this.server = null;

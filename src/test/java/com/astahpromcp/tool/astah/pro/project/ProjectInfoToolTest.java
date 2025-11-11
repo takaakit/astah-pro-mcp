@@ -41,6 +41,7 @@ public class ProjectInfoToolTest {
     private Method searchWithinPresentations;
     private Method retrieveClassifiersWithinPackage;
     private Method retrievePackageStructureAsPlantuml;
+    private Method retrieveClassifiersRelationshipsAsPlantuml;
     private Field nameIdTypeDTOChunksCacheField;
     private Field labelIdTypeDTOChunksCacheField;
 
@@ -117,6 +118,13 @@ public class ProjectInfoToolTest {
         retrievePackageStructureAsPlantuml = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "retrievePackageStructureAsPlantuml",
+            McpSyncServerExchange.class,
+            NoInputDTO.class);
+
+        // retrieveClassifiersRelationshipsAsPlantuml() method
+        retrieveClassifiersRelationshipsAsPlantuml = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "retrieveClassifiersRelationshipsAsPlantuml",
             McpSyncServerExchange.class,
             NoInputDTO.class);
 
@@ -583,5 +591,36 @@ public class ProjectInfoToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertNotNull(outputDTO.plantumlCode());
+    }
+
+    @Test
+    void retrieveClassifiersRelationshipsAsPlantuml_ok() throws Exception {
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call retrieveClassifiersRelationshipsAsPlantuml()
+        // ----------------------------------------
+        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            retrieveClassifiersRelationshipsAsPlantuml,
+            tool,
+            inputDTO,
+            PlantumlDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.plantumlCode());
+        assertTrue(outputDTO.plantumlCode().contains("\"Quuy01\" --- \"Baz\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy02\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy03\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy04\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Quuy05\" --- \"Baz\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy06\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Quuy07\" --- \"Baz\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy08\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --|> \"Quuy09\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..> \"Quuy10\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..> \"Quuy11\""));
+        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..|> \"Quuy16\""));
     }
 }

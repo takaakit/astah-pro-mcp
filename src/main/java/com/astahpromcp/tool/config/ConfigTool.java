@@ -33,6 +33,6 @@ public class ConfigTool implements ToolProvider {
     private WorkspaceDirectoryPathDTO getWorkspaceDirectoryPath(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get workspace directory path: {}", param);
 
-        return new WorkspaceDirectoryPathDTO(McpServerConfig.DEFAULT_WORKSPACE_DIR.toString());
+        return new WorkspaceDirectoryPathDTO(McpServerConfig.WORKSPACE_DIR.toString());
     }
 }

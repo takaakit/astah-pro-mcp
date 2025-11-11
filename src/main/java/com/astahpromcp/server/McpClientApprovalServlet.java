@@ -37,7 +37,7 @@ public class McpClientApprovalServlet extends HttpServlet {
     // For production
     public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate,
                                     McpServerApp.ClientDisconnectHandler disconnectHandler) {
-        this(delegate, disconnectHandler, McpServerConfig.DEFAULT_ORIGIN_HOST_ALLOWLIST);
+        this(delegate, disconnectHandler, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
     }
 
     // For testing
@@ -143,50 +143,10 @@ public class McpClientApprovalServlet extends HttpServlet {
             }
 
             AtomicBoolean approved = new AtomicBoolean(false);
+            String message = buildDialogMessage(context);
+            Object[] options = {"Connect", "Cancel"};
             try {
-                // Invoke the approval dialog
-                SwingUtilities.invokeAndWait(() -> {
-                    String message = buildDialogMessage(context);
-                    Object[] options = {"Connect", "Cancel"};
-
-                    // Create a JOptionPane that keeps the dialog on top
-                    JOptionPane optionPane = new JOptionPane(message,
-                            JOptionPane.INFORMATION_MESSAGE,
-                            JOptionPane.DEFAULT_OPTION,
-                            null,
-                            options,
-                            options[0]);
-
-                    java.awt.Frame tempOwner = null;
-                    javax.swing.JDialog dialog = null;
-                    try {
-                        // Simple approach: create a temporary invisible owner and set DOCUMENT_MODAL
-                        tempOwner = new java.awt.Frame();
-                        tempOwner.setUndecorated(true);
-                        tempOwner.setType(java.awt.Window.Type.UTILITY);
-                        tempOwner.setAlwaysOnTop(true);
-                        tempOwner.setLocationRelativeTo(null);
-                        tempOwner.setVisible(true);
-
-                        dialog = optionPane.createDialog(tempOwner, "MCP Connection Request");
-                        dialog.setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
-                        dialog.setAlwaysOnTop(true);
-                        dialog.setDefaultCloseOperation(javax.swing.JDialog.DISPOSE_ON_CLOSE);
-
-                        dialog.setVisible(true);
-
-                        Object selectedValue = optionPane.getValue();
-                        approved.set(selectedValue != null && selectedValue.equals(options[0]));
-                        
-                    } finally {
-                        if (dialog != null) {
-                            dialog.dispose();
-                        }
-                        if (tempOwner != null) {
-                            tempOwner.dispose();
-                        }
-                    }
-                });
+                runOnEdtBlocking(() -> showApprovalDialog(message, options, approved));
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -257,6 +217,56 @@ public class McpClientApprovalServlet extends HttpServlet {
             trimmed = trimmed.substring(1, trimmed.length() - 1);
         }
         return trimmed.toLowerCase(Locale.ROOT);
+    }
+
+    private static void runOnEdtBlocking(Runnable task) throws InvocationTargetException, InterruptedException {
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            SwingUtilities.invokeAndWait(task);
+        }
+    }
+
+    private static void showApprovalDialog(String message,
+                                           Object[] options,
+                                           AtomicBoolean approved) {
+        // Create a JOptionPane that keeps the dialog on top
+        JOptionPane optionPane = new JOptionPane(message,
+                JOptionPane.INFORMATION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION,
+                null,
+                options,
+                options[0]);
+
+        java.awt.Frame tempOwner = null;
+        javax.swing.JDialog dialog = null;
+        try {
+            // Simple approach: create a temporary invisible owner and set DOCUMENT_MODAL
+            tempOwner = new java.awt.Frame();
+            tempOwner.setUndecorated(true);
+            tempOwner.setType(java.awt.Window.Type.UTILITY);
+            tempOwner.setAlwaysOnTop(true);
+            tempOwner.setLocationRelativeTo(null);
+            tempOwner.setVisible(true);
+
+            dialog = optionPane.createDialog(tempOwner, "MCP Connection Request");
+            dialog.setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
+            dialog.setAlwaysOnTop(true);
+            dialog.setDefaultCloseOperation(javax.swing.JDialog.DISPOSE_ON_CLOSE);
+
+            dialog.setVisible(true);
+
+            Object selectedValue = optionPane.getValue();
+            approved.set(selectedValue != null && selectedValue.equals(options[0]));
+
+        } finally {
+            if (dialog != null) {
+                dialog.dispose();
+            }
+            if (tempOwner != null) {
+                tempOwner.dispose();
+            }
+        }
     }
 
     // Session tracking response wrapper

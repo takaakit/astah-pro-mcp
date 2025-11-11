@@ -6,11 +6,15 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdListDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
+import com.astahpromcp.tool.astah.pro.view.inputdto.PresentationWithHighlightColorDTO;
 import com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IDiagramViewManager;
@@ -41,6 +45,9 @@ public class DiagramViewManagerToolTest {
     private Method autoLayout;
     private Method zoom;
     private Method zoomFit;
+    private Method highlightPresentation;
+    private Method unhighlightPresentation;
+    private Method getHighlightedPresentationsWithinDiagram;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -135,6 +142,27 @@ public class DiagramViewManagerToolTest {
             "zoomFit",
             McpSyncServerExchange.class,
             NoInputDTO.class);
+
+        // highlightPresentation() method
+        highlightPresentation = TestSupport.getAccessibleMethod(
+            DiagramViewManagerTool.class,
+            "highlightPresentation",
+            McpSyncServerExchange.class,
+            PresentationWithHighlightColorDTO.class);
+
+        // unhighlightPresentation() method
+        unhighlightPresentation = TestSupport.getAccessibleMethod(
+            DiagramViewManagerTool.class,
+            "unhighlightPresentation",
+            McpSyncServerExchange.class,
+            IdDTO.class);
+
+        // getHighlightedPresentationsWithinDiagram() method
+        getHighlightedPresentationsWithinDiagram = TestSupport.getAccessibleMethod(
+            DiagramViewManagerTool.class,
+            "getHighlightedPresentationsWithinDiagram",
+            McpSyncServerExchange.class,
+            IdDTO.class);
     }
 
     @AfterEach
@@ -416,5 +444,175 @@ public class DiagramViewManagerToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void highlightPresentation_nodePresentation_ok() throws Exception {
+        // Get diagram
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+            IDiagram.class,
+            "Class Diagram0");
+        
+        // Open diagram
+        diagramViewManager.open(diagram);
+
+        // Get node presentation
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+            "Class",
+            "Foo");
+        
+        // Create input DTO
+        PresentationWithHighlightColorDTO inputDTO = new PresentationWithHighlightColorDTO(
+            nodePresentation.getID(),
+            "#FF0000");
+
+        // ----------------------------------------
+        // Call highlightPresentation()
+        // ----------------------------------------
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            highlightPresentation,
+            tool,
+            inputDTO,
+            PresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(outputDTO.id(), nodePresentation.getID());
+    }
+
+    @Test
+    void highlightPresentation_linkPresentation_ok() throws Exception {
+        // Get diagram
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+            IDiagram.class,
+            "Class Diagram0");
+        
+        // Open diagram
+        diagramViewManager.open(diagram);
+
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentation(
+            "Association",
+            "has");
+        
+        // Create input DTO
+        PresentationWithHighlightColorDTO inputDTO = new PresentationWithHighlightColorDTO(
+            linkPresentation.getID(),
+            "#00FF00");
+
+        // ----------------------------------------
+        // Call highlightPresentation()
+        // ----------------------------------------
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            highlightPresentation,
+            tool,
+            inputDTO,
+            PresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(outputDTO.id(), linkPresentation.getID());
+    }
+
+    @Test
+    void unhighlightPresentation_ok() throws Exception {
+        // Get diagram
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+            IDiagram.class,
+            "Class Diagram0");
+        
+        // Open diagram
+        diagramViewManager.open(diagram);
+
+        // Get node presentation
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+            "Class",
+            "Foo");
+        
+        // Highlight presentation first
+        PresentationWithHighlightColorDTO highlightInputDTO = new PresentationWithHighlightColorDTO(
+            nodePresentation.getID(),
+            "#FF0000");
+        TestSupport.instance().invokeToolMethod(
+            highlightPresentation,
+            tool,
+            highlightInputDTO,
+            PresentationDTO.class);
+
+        // Check presentation is highlighted before unhighlight
+        assertNotNull(diagramViewManager.getViewProperty(nodePresentation, IDiagramViewManager.BACKGROUND_COLOR));
+
+        // Create input DTO for unhighlight
+        IdDTO inputDTO = new IdDTO(nodePresentation.getID());
+
+        // ----------------------------------------
+        // Call unhighlightPresentation()
+        // ----------------------------------------
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            unhighlightPresentation,
+            tool,
+            inputDTO,
+            PresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(outputDTO.id(), nodePresentation.getID());
+
+        // Check presentation is unhighlighted after unhighlight
+        assertNull(diagramViewManager.getViewProperty(nodePresentation, IDiagramViewManager.BACKGROUND_COLOR));
+    }
+
+    @Test
+    void getHighlightedPresentationsWithinDiagram_ok() throws Exception {
+        // Get diagram
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+            IDiagram.class,
+            "Class Diagram0");
+        
+        // Open diagram
+        diagramViewManager.open(diagram);
+
+        // Get presentations
+        INodePresentation nodePresentation1 = (INodePresentation) TestSupport.instance().getPresentation(
+            "Class",
+            "Foo");
+        INodePresentation nodePresentation2 = (INodePresentation) TestSupport.instance().getPresentation(
+            "Class",
+            "Bar");
+
+        // Highlight presentations
+        PresentationWithHighlightColorDTO highlightInputDTO1 = new PresentationWithHighlightColorDTO(
+            nodePresentation1.getID(),
+            "#FF0000");
+        TestSupport.instance().invokeToolMethod(
+            highlightPresentation,
+            tool,
+            highlightInputDTO1,
+            PresentationDTO.class);
+
+        PresentationWithHighlightColorDTO highlightInputDTO2 = new PresentationWithHighlightColorDTO(
+            nodePresentation2.getID(),
+            "#00FF00");
+        TestSupport.instance().invokeToolMethod(
+            highlightPresentation,
+            tool,
+            highlightInputDTO2,
+            PresentationDTO.class);
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(diagram.getId());
+
+        // ----------------------------------------
+        // Call getHighlightedPresentationsWithinDiagram()
+        // ----------------------------------------
+        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getHighlightedPresentationsWithinDiagram,
+            tool,
+            inputDTO,
+            PresentationListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(2, outputDTO.value().size());
     }
 }

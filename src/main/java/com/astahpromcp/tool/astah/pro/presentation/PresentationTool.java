@@ -98,7 +98,6 @@ public class PresentationTool implements ToolProvider {
         );
     }
 
-
     private ElementDTO getElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Get element corresponding to presentation: {}", param);
 
