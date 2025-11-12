@@ -37,9 +37,13 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
     - **Claude Code**
     - **Codex CLI**
     - **Gemini CLI**
+    
+    If you want the AI assistant/agent to edit models or diagrams, use this version.  
 
   - *For using the Query-Only tool version:*  
-    This version has exposed around **90** tools, so many AI assistants/agents will likely be able to use this plugin.
+    This version has exposed around **90** tools, so many AI assistants/agents will likely be able to use this plugin.  
+    
+    In this version, the AI assistant/agent can only reference information about models and diagrams.  
 
   <br>
 
