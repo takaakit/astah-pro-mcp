@@ -41,7 +41,7 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
     If you want the AI assistant/agent to edit models or diagrams, use this version.  
 
   - *For using the Query-Only tool version:*  
-    This version has exposed around **90** tools, so many AI assistants/agents will likely be able to use this plugin.  
+    This version has exposed around **100** tools, so many AI assistants/agents will likely be able to use this plugin.  
     
     In this version, the AI assistant/agent can only reference information about models and diagrams.  
 
@@ -50,8 +50,6 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
   > *Note*: This MCP server only connects to AI assistants/agents running on the same machine as Astah Professional.
   According to Astah's terms of use, using Astah via an AI assistant/agent is permitted only if you hold a valid license and access it exclusively for your own use with your licensed Astah. Allowing a non-licensed third party to operate Astah via such an assistant/agent is strictly prohibited.  
   For details, please refer to the FAQ ([English](https://astah.net/support/cv-members-guide/#ai-external-access) / [Japanese](https://astah.change-vision.com/ja/faq/faq-license/ai-external-access.html)) or [contact Change Vision (the developer of Astah)](https://astah.net/about/contact/) directly.
-
-  > *Tip:* This is just the personal impression, but we recommend *Claude Code* or *Claude Desktop* because they use tool functions more appropriately. Additionally, if processing speed is your priority, go with *Claude Code*.
 
 <br>
 
@@ -62,6 +60,7 @@ This MCP server can view and edit the following diagrams (with more to come):
 - **Class Diagram**  
 - **Sequence Diagram**  
 - **Activity Diagram**
+- **State Machine Diagram**
 
 <br>
 

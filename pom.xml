@@ -15,7 +15,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.astahpromcp</groupId>
 	<artifactId>astah-pro-mcp</artifactId>
-	<version>0.1.4</version>
+	<version>0.1.5</version>
 	<packaging>bundle</packaging>
 	<name>Astah Pro MCP</name>
 	<description>MCP server for Astah professional</description>

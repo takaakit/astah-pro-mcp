@@ -163,8 +163,14 @@ public final class McpServerApp {
     // Start the MCP profiles
     private void startProfiles(ClientDisconnectHandler handler) throws Exception {
         List<ServerProfileConfig> profiles = List.of(
-                new ServerProfileConfig("full", McpServerConfig.PORT_FOR_FULL_TOOL, true),
-                new ServerProfileConfig("query_only", McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL, false)
+                new ServerProfileConfig(
+                    "full",
+                    McpServerConfig.PORT_FOR_FULL_TOOL,
+                    true),
+                new ServerProfileConfig(
+                    "query_only",
+                    McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL,
+                    false)
         );
 
         try {
@@ -222,7 +228,7 @@ public final class McpServerApp {
             true,       // is ClassDiagramEnabled
             true,       // is SequenceDiagramEnabled
             true,       // is ActivityDiagramEnabled
-            false,      // is StateMachineDiagramEnabled
+            true,       // is StateMachineDiagramEnabled
             false,      // is UseCaseDiagramEnabled
             false,      // is RequirementDiagramEnabled
             false       // is CommunicationDiagramEnabled

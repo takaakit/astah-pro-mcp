@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineLinkDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineLinkDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LifelineLinkDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ILifelineLink;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

@@ -10,7 +10,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithEntryDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithExitDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithInternalTransitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.StateDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

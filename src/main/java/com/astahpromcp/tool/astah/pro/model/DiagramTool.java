@@ -6,11 +6,12 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
-import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTOAssembler;
+import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.ImageFileDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
-import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
@@ -20,9 +21,14 @@ import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDiagram.html
@@ -80,7 +86,14 @@ public class DiagramTool implements ToolProvider {
                         "Return the list of presentations on the specified diagram (specified by ID).",
                         this::getPresentationsOnDiagram,
                         IdDTO.class,
-                        PresentationListDTO.class)
+                        PresentationListDTO.class),
+
+                ToolSupport.definition(
+                        "export_dgm_png_img",
+                        "Export a PNG image of the specified diagram (specified by ID), and return the exported image file information. For example, if you need a diagram image file while creating a document, use this tool.",
+                        this::exportPngImage,
+                        IdDTO.class,
+                        ImageFileDTO.class)
         );
     }
 
@@ -116,5 +129,48 @@ public class DiagramTool implements ToolProvider {
         }
         
         return new PresentationListDTO(presentationDTOs);
+    }
+
+    private ImageFileDTO exportPngImage(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+        log.debug("Export PNG image: {}", param);
+
+        IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
+
+        // Ensure the output directory exists and create it when needed
+        log.debug("Create output directory: {}", imageOutputDir);
+        try {
+            Files.createDirectories(imageOutputDir);
+        } catch (Exception e) {
+            throw new Exception("Failed to create output directory: " + e.getMessage());
+        }
+
+        // Verify that the directory is writable
+        if (!Files.isWritable(imageOutputDir)) {
+            throw new Exception("Output directory is not writable: " + imageOutputDir);
+        }
+
+        // Export an image using the Astah API
+        String relativeImagePath;
+        try {
+            relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", 96);
+        } catch (Exception e) {
+            throw new Exception("Astah API exportImage method failed: " + e.getMessage());
+        }
+        
+        if (relativeImagePath == null || relativeImagePath.trim().isEmpty()) {
+            throw new Exception("exportImage returned null or empty file path");
+        }
+        
+        Path absoluteImagePath = Paths.get(imageOutputDir.toString(), relativeImagePath);
+        if (!Files.exists(absoluteImagePath)) {
+            throw new Exception("Exported image file does not exist: " + absoluteImagePath.toString());
+        }
+        
+        // Get the image width and height
+        BufferedImage image = ImageIO.read(absoluteImagePath.toFile());
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+        
+        return new ImageFileDTO(absoluteImagePath.toString(), "png", imageWidth, imageHeight);
     }
 }

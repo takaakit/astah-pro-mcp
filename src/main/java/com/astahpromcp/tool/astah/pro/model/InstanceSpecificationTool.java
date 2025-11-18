@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InstanceSpecificationWithClassifierDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InstanceSpecificationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IInstanceSpecification;

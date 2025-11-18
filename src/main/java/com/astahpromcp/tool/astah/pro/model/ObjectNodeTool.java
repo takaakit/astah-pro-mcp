@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ObjectNodeWithBaseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ObjectNodeDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.ObjectNodeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ObjectNodeDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IObjectNode;

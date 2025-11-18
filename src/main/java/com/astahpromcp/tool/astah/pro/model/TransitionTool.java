@@ -9,7 +9,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithActionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithEventDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.TransitionDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

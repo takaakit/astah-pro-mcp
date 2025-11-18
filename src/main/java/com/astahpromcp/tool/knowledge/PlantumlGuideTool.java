@@ -9,20 +9,12 @@ import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -82,14 +74,14 @@ public class PlantumlGuideTool implements ToolProvider {
         }
 
         log.info("Loading PlantUML guide from web pages.");
-        List<String> urls = readUrlsFromResource("plantuml-guide-url.txt");
+        List<String> urls = KnowledgeToolSupport.readUrlsFromResource(getClass(), "plantuml-guide-url.txt");
         if (urls.isEmpty()) {
             throw new IOException("PlantUML guide URL resource not found or is empty.");
         }
 
         List<CompletableFuture<String>> futures = urls.stream()
                 .filter(url -> !url.trim().isEmpty())
-                .map(this::fetchAndParse)
+                .map(url -> KnowledgeToolSupport.fetchAndParse(httpClient, url))
                 .collect(Collectors.toList());
 
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
@@ -131,41 +123,5 @@ public class PlantumlGuideTool implements ToolProvider {
         }
 
         return new DocumentChunkDTO(contentCache.get(chunkIndex));
-    }
-
-    private List<String> readUrlsFromResource(String resourceName) throws IOException {
-        List<String> urls = new ArrayList<>();
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(resourceName)) {
-            if (is == null) {
-                throw new IOException("Resource not found: " + resourceName);
-            }
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (!line.trim().isEmpty()) {
-                        urls.add(line.trim());
-                    }
-                }
-            }
-        }
-
-        return urls;
-    }
-
-    private CompletableFuture<String> fetchAndParse(String urlString) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(urlString))
-                        .header("User-Agent", "Java HttpClient Bot")
-                        .build();
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                return Jsoup.parse(response.body()).text();
-
-            } catch (Exception e) {
-                log.warn("Failed to fetch or parse {}: {}", urlString, e.getMessage());
-                return "[Error fetching content from " + urlString + "]";
-            }
-        });
     }
 }

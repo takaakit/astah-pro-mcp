@@ -8,7 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.RequirementWithIdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.RequirementWithTextDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.RequirementDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.RequirementDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.RequirementDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IRequirement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

@@ -8,7 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionUseWithArgumentDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionUseWithSequenceDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionUseDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionUseDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionUseDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IInteractionUse;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;

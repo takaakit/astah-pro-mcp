@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LifelineWithBaseClassDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LifelineDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;

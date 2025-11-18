@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.PartitionDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.PartitionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PartitionDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IPartition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

@@ -8,7 +8,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithAggregationDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithCompositionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithNavigationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LinkEndDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.LinkEndDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LinkEndDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

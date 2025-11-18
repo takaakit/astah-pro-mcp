@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewUseCaseDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;

@@ -8,7 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithActionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.FlowDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.FlowDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.FlowDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IFlow;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

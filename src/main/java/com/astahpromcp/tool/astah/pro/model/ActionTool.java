@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ActionWithCallingActivityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActionDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.ActionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActionDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IActivity;

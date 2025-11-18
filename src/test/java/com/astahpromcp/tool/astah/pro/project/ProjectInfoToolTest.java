@@ -5,6 +5,7 @@ import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.SearchDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
+import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllLabelIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllNameIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeDefinitionListDTO;

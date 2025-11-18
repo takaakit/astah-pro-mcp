@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IInteraction;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

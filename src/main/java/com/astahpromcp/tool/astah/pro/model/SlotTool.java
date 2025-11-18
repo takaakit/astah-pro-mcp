@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.SlotWithValueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.SlotDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ISlot;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

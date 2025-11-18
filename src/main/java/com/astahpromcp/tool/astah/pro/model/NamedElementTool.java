@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ElementDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementListDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
@@ -73,7 +73,7 @@ public class ProjectViewManagerTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "get_slct_elms",
-                        "Get the information of the selected elements in the project view.",
+                        "Get the information of the selected elements in the project view (including the structure tree (aka model browser)).",
                         this::getSelectedElements,
                         NoInputDTO.class,
                         ElementListDTO.class)

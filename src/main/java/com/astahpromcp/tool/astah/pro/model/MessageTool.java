@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.MessageDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IOperation;

@@ -9,7 +9,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithAbstractDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithActiveDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithLeafDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ClassDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

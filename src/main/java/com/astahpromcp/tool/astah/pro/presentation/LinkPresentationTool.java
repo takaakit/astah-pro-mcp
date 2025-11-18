@@ -8,7 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithPointsDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
-import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateMachineDiagramDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.StateMachineDiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.StateMachineDiagramDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;

@@ -6,6 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.model.*;

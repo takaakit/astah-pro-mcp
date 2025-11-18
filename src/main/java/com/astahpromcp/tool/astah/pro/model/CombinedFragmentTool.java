@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.CombinedFragmentDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
