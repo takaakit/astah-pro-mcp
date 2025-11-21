@@ -158,6 +158,41 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 ```
 </details>
 
+<span style="color: red;">As of November 21, 2025, [this issue](https://github.com/google-gemini/gemini-cli/issues/13142) prevents the Gemini CLI from connecting.</span>
+
+#### Cursor
+
+<details>
+<summary><code>mcp.json</code></summary>
+
+```json
+{
+  "mcpServers": {
+    "astah-pro-mcp": {
+      "type": "http",
+      "url": "http://127.0.0.1:8889/mcp"
+  }
+}
+```
+</details>
+
+#### VSCode (Copilot)
+
+<details>
+<summary><code>mcp.json</code></summary>
+
+```json
+{
+  "servers": {
+    "astah-pro-mcp": {
+      "type": "http",
+      "url": "http://127.0.0.1:8889/mcp"
+    }
+  }
+}
+```
+</details>
+
 <br>
 
 > *Note:* Use `127.0.0.1` instead of `localhost`. Connections to `localhost` will fail.
