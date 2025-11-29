@@ -158,7 +158,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 ```
 </details>
 
-<span style="color: red;">As of November 21, 2025, [this issue](https://github.com/google-gemini/gemini-cli/issues/13142) prevents the Gemini CLI from connecting.</span>
+As of November 21, 2025, [this issue](https://github.com/google-gemini/gemini-cli/issues/13142) prevents the Gemini CLI from connecting. Later, we confirmed that the issue has been improved in Gemini CLI *v0.19.0-preview.0*.
 
 #### Cursor
 
