@@ -78,7 +78,7 @@ Download [the plugin JAR file (astah-pro-mcp-x.x.x.jar)](https://github.com/taka
 
 ### AI Assistant/Agent Settings
 
-To use the *Full* tool version, specify port `8888`; to use the *Query-Only* tool version, specify port `8889`.
+To use the *Full* tool version, specify port `8888`; to use the *Query-Only* tool version, specify port `8889`. And, use `127.0.0.1` instead of `localhost`. Connections to `localhost` will fail.
 
 #### Claude Desktop
 
@@ -102,7 +102,7 @@ To use the *Full* tool version, specify port `8888`; to use the *Query-Only* too
 ```
 </details>
 
-As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Claude Desktop*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
+> *Note:* As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Claude Desktop*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
 
 #### Claude Code
 
@@ -127,6 +127,8 @@ claude mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8
 ```
 See [here](https://docs.claude.com/en/docs/claude-code/mcp#managing-your-servers) for information on the `--scope` flag.
 
+> *Note:* If you are using *Claude Code* on *WSL2* in Windows, you need to allow WSL to access Windows' 127.0.0.1. So, see [here](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking) and consider enabling Mirrored mode.
+
 #### Codex CLI
 
 <details>
@@ -139,7 +141,9 @@ args = ["mcp-remote@latest", "http://127.0.0.1:8888/mcp", "--allow-http"]
 ```
 </details>
 
-As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Codex CLI*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
+> *Note:* As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Codex CLI*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
+
+> *Note:* If you are using *Codex CLI* on *WSL2* in Windows, you need to allow WSL to access Windows' 127.0.0.1. So, see [here](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking) and consider enabling Mirrored mode.
 
 #### Gemini CLI
 
@@ -158,7 +162,7 @@ As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don'
 ```
 </details>
 
-As of November 21, 2025, [this issue](https://github.com/google-gemini/gemini-cli/issues/13142) prevents the Gemini CLI from connecting. Later, we confirmed that the issue has been improved in Gemini CLI *v0.19.0-preview.0*.
+> *Note:* As of November 21, 2025, [this issue](https://github.com/google-gemini/gemini-cli/issues/13142) prevents the Gemini CLI from connecting. Later, we confirmed that the issue has been improved in Gemini CLI *v0.19.0-preview.0*.
 
 #### Cursor
 
@@ -193,10 +197,6 @@ As of November 21, 2025, [this issue](https://github.com/google-gemini/gemini-cl
 }
 ```
 </details>
-
-<br>
-
-> *Note:* Use `127.0.0.1` instead of `localhost`. Connections to `localhost` will fail.
 
 <br>
 
