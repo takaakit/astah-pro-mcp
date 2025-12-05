@@ -198,6 +198,31 @@ args = ["mcp-remote@latest", "http://127.0.0.1:8888/mcp", "--allow-http"]
 ```
 </details>
 
+#### Antigravity
+
+<details>
+<summary><code>mcp_config.json</code></summary>
+
+```json
+{
+  "mcpServers": {
+    "astah-pro-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "http://127.0.0.1:8889/mcp",
+        "--allow-http"
+      ],
+      "env": {}
+    }
+  }
+}
+```
+</details>
+
+> *Note:* As of December 5, 2025, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Antigravity*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
+
 <br>
 
 ## How to Use
