@@ -28,7 +28,7 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
 ## System Requirements
 
-- **Astah Professional v10.1 or later** is required. This does not work with Astah UML.
+- **Astah Professional v11.0 or later** is required. This does not work with Astah UML.
 
 - Recommended AI assistants/agents
   - *For using the Full (Query + Edit) tool version:*  
