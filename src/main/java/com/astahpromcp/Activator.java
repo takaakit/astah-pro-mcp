@@ -33,9 +33,12 @@ public class Activator implements BundleActivator {
             this.server.start();
             log.info("MCP-BUNDLE: Bundle started successfully.");
 
-        } catch (Exception e) {
-            log.error("MCP-BUNDLE: Failed to start MCP server", e);
-            throw e;
+        } catch (Throwable t) {
+            log.error("MCP-BUNDLE: Failed to start MCP server", t);
+            if (t instanceof Exception) {
+                throw (Exception) t;
+            }
+            throw new Exception("Failed to start MCP server", t);
 
         } finally {
             // Restore the original class loader

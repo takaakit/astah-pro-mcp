@@ -40,6 +40,22 @@ if %ERRORLEVEL% EQU 0 (
     exit /b 1
 )
 
+REM Set cache directory path
+set "CACHE_DIR=%USERPROFILE%\.astah\professional\cache"
+
+REM Delete cache directory if it exists
+if exist "%CACHE_DIR%" (
+    echo Deleting cache directory: %CACHE_DIR%
+    rmdir /s /q "%CACHE_DIR%"
+    if %ERRORLEVEL% EQU 0 (
+        echo Cache directory deleted successfully.
+    ) else (
+        echo Warning: Failed to delete cache directory.
+    )
+) else (
+    echo Cache directory does not exist: %CACHE_DIR%
+)
+
 echo.
 echo Installation completed.
 pause

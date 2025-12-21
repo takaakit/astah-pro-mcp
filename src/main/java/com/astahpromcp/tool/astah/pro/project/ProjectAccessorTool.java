@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
 @Slf4j
 public class ProjectAccessorTool implements ToolProvider {
 
@@ -62,21 +62,21 @@ public class ProjectAccessorTool implements ToolProvider {
                         NamedElementDTO.class),
 
                 ToolSupport.definition(
-                        "is_proj_open",
+                        "is_proj_opened",
                         "Return whether a project is opened or not.",
                         this::isProjectOpen,
                         NoInputDTO.class,
                         BooleanDTO.class),
 
                 ToolSupport.definition(
-                        "is_proj_mod",
+                        "is_proj_modified",
                         "Return whether the current project is modified or not.",
                         this::isProjectModified,
                         NoInputDTO.class,
                         BooleanDTO.class),
 
                 ToolSupport.definition(
-                        "find_named_elems_by_name",
+                        "find_named_elements_by_name",
                         "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
                         this::findNamedElementsByName,
                         NameDTO.class,

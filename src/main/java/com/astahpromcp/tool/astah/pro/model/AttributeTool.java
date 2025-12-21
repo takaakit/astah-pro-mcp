@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAttribute.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAttribute.html
 @Slf4j
 public class AttributeTool implements ToolProvider {
 
@@ -86,17 +86,17 @@ public class AttributeTool implements ToolProvider {
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_type_exp_of_attr",
+                        "set_type_expression_of_attr",
                         "Set the type expression (specified by string) of the specified attribute (specified by ID), and return the attribute information after it is set. Use this tool function to set a primitive type for an attribute only when you want to set a Java or C++ primitive type. If it is not a primitive type, obtain or create the type and then set it to the attribute type. For example, 'int' and 'string' are primitive types, whereas 'Integer' and 'String' require creating a type before they can be used.",
                         this::setTypeExpression,
                         AttributeWithTypeExpressionDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_multi_of_attr_by_int",
-                        "Set the upper and lower multiplicity (specified by integer) of the specified attribute (specified by ID), and return the attribute information after it is set. If you want to set '*', set this value to '-1'. If you want to set undefined, set this value to '-100'. If the upper value and the lower value are the same, set the same value for both.",
-                        this::setMultiplicityByInt,
-                        AttributeWithIntMultiplicityDTO.class,
+                        "set_multiplicity_of_attr",
+                        "Set the upper and lower multiplicity (specified by string) of the specified attribute (specified by ID), and return the attribute information after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
+                        this::setMultiplicity,
+                        AttributeWithMultiplicityDTO.class,
                         AttributeDTO.class)
         );
     }
@@ -182,21 +182,45 @@ public class AttributeTool implements ToolProvider {
         }
     }
 
-    private AttributeDTO setMultiplicityByInt(McpSyncServerExchange exchange, AttributeWithIntMultiplicityDTO param) throws Exception {
-        log.debug("Set integer multiplicity of attribute: {}", param);
+    private AttributeDTO setMultiplicity(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
+        log.debug("Set multiplicity of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
-            astahAttribute.setMultiplicity(new int[][]{{param.lowerIntValue(), param.upperIntValue()}});
-            transactionManager.endTransaction();
+        String lowerStringMultiplicity = param.lowerMultiplicity();
+        String upperStringMultiplicity = param.upperMultiplicity();
 
-            return AttributeDTOAssembler.toDTO(astahAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
+        if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAttribute.setMultiplicityStrings(new String[][]{{lowerStringMultiplicity, upperStringMultiplicity}});
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else if (!lowerStringMultiplicity.isEmpty() && upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAttribute.setMultiplicityString(lowerStringMultiplicity);
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else if (lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAttribute.setMultiplicityString(upperStringMultiplicity);
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else {
+            throw new IllegalArgumentException("Lower multiplicity and upper multiplicity are both empty.");
         }
+
+        return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 }

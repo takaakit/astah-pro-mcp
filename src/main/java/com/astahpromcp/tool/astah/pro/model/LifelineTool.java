@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILifeline.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILifeline.html
 @Slf4j
 public class LifelineTool implements ToolProvider {
 
@@ -54,7 +54,7 @@ public class LifelineTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_life_info",
+                        "get_lifeline_info",
                         "Return detailed information about the specified lifeline (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
@@ -65,7 +65,7 @@ public class LifelineTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_base_cls_of_life",
+                        "set_base_class_of_lifeline",
                         "Set the base class of the specified lifeline (specified by ID), and return the lifeline information after it is set.",
                         this::setBaseClass,
                         LifelineWithBaseClassDTO.class,

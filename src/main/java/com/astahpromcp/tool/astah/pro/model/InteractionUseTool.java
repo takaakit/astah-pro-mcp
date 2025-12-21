@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInteractionUse.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInteractionUse.html
 @Slf4j
 public class InteractionUseTool implements ToolProvider {
 
@@ -55,7 +55,7 @@ public class InteractionUseTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_intr_use_info",
+                        "get_interaction_use_info",
                         "Return detailed information about the specified interaction use (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
@@ -66,14 +66,14 @@ public class InteractionUseTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_arg_of_intr_use",
+                        "set_arg_of_interaction_use",
                         "Set the argument of the specified interaction use (specified by ID), and return the interaction use information after it is set.",
                         this::setArgument,
                         InteractionUseWithArgumentDTO.class,
                         InteractionUseDTO.class),
 
                 ToolSupport.definition(
-                        "set_seq_dgm_to_intr_use",
+                        "set_seq_dgm_to_interaction_use",
                         "Set the sequence diagram (specified by ID) to the specified interaction use (specified by ID), and return the interaction use information after it is set.",
                         this::setSequenceDiagram,
                         InteractionUseWithSequenceDiagramDTO.class,

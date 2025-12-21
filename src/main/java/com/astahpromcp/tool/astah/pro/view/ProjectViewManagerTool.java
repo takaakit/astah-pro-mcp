@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IProjectViewManager.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IProjectViewManager.html
 @Slf4j
 public class ProjectViewManagerTool implements ToolProvider {
 
@@ -58,21 +58,21 @@ public class ProjectViewManagerTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "show_in_prop_view",
+                        "show_in_property_view",
                         "Show the property view of the element (specified by ID), and return the shown element information.",
                         this::showInPropertyView,
                         IdDTO.class,
                         ElementDTO.class),
 
                 ToolSupport.definition(
-                        "show_in_strct_tree",
+                        "show_in_structure_tree",
                         "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
                         this::showInStructureTree,
                         IdDTO.class,
                         ElementDTO.class),
 
                 ToolSupport.definition(
-                        "get_slct_elms",
+                        "get_selected_elements",
                         "Get the information of the selected elements in the project view (including the structure tree (aka model browser)).",
                         this::getSelectedElements,
                         NoInputDTO.class,

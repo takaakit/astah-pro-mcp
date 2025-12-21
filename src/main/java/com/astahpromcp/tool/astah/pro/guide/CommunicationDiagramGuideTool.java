@@ -21,7 +21,7 @@ public class CommunicationDiagramGuideTool implements ToolProvider {
         try {
 	        return List.of(
 	                ToolSupport.definition(
-	                        "comm_dgm_guide",
+	                        "communication_dgm_guide",
 	                        "MCP client (you) MUST call this tool function before referencing or editing a communication diagram to understand its usage and terminology definitions.",
 	                        this::getGuide,
 	                        NoInputDTO.class,

@@ -21,7 +21,7 @@ public class ActivityDiagramGuideTool implements ToolProvider {
         try {
 	        return List.of(
 	                ToolSupport.definition(
-	                        "act_dgm_guide",
+	                        "activity_dgm_guide",
 	                        "MCP client (you) MUST call this tool function before referencing or editing a activity diagram to understand its usage and terminology definitions.",
 	                        this::getGuide,
 	                        NoInputDTO.class,

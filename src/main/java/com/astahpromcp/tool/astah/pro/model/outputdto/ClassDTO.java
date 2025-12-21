@@ -30,6 +30,9 @@ public record ClassDTO(
     @JsonPropertyDescription("Template parameters")
     List<NameIdTypeDTO> templateParameters,
 
+    @JsonPropertyDescription("Owned diagrams")
+    List<NameIdTypeDTO> ownedDiagrams,
+
     @JsonPropertyDescription("Is Abstract")
     boolean isAbstract,
 

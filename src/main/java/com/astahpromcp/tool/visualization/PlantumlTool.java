@@ -34,7 +34,6 @@ public class PlantumlTool implements ToolProvider {
     }
 
     private ToolDefinition generateDiagramImageFromPlantumlTool() {
-
         McpSchema.Tool schema = McpSchema.Tool.builder()
                 .name("generate_dgm_img_from_puml")
                 .description("Generate a diagram image based on the provided PlantUML code. Make use of this tool when the MCP client (you) wants to visually understand the structure and behavior of architectures and algorithms.")
@@ -99,7 +98,7 @@ public class PlantumlTool implements ToolProvider {
 
     private ToolDefinition getRelationshipsAsPlantumlCodeTool() {
         return ToolSupport.definition(
-            "get_rels_as_puml_code",
+            "get_relationships_as_puml_code",
             "Return the PlantUML code for a class diagram that shows only the relationships among NamedElements in the Astah project. However, do not include the role names, multiplicities, or composition types of the relationships. If you need that information, retrieve the detail information for each individual relationship. This tool is recommended when you want to understand the overall element relationships in the Astah project.",
             this::getRelationshipsAsPlantumlCode,
             NoInputDTO.class,

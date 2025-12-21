@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
 @Slf4j
 public class ActivityDiagramEditorTool implements ToolProvider {
 
@@ -68,63 +68,63 @@ public class ActivityDiagramEditorTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "create_acpt_evt_actn",
+                        "create_accept_event_act",
                         "Create a new accept event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept event action information. An empty string is not allowed as an action name.",
                         this::createAcceptEventAction,
                         NewAcceptEventActionDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_acpt_time_evt_actn",
+                        "create_accept_time_event_act",
                         "Create a new accept time event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept time event action information. An empty string is not allowed as an action name.",
                         this::createAcceptTimeEventAction,
                         NewAcceptTimeEventActionDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_actn",
+                        "create_act",
                         "Create a new action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created action information. An empty string is not allowed as an action name.",
                         this::createAction,
                         NewActionDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_actv_dgm",
+                        "create_activity_dgm",
                         "Create a new activity diagram under the specified package (specified by ID), and return the newly created activity diagram information.",
                         this::createActivityDiagram,
                         NewActivityDiagramDTO.class,
                         ActivityDiagramDTO.class),
 
                 ToolSupport.definition(
-                        "create_actv_param_node",
+                        "create_activity_param_node",
                         "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created activity parameter node information. An empty string is not allowed as a node name.",
                         this::createActivityParameterNode,
                         NewActivityParameterNodeDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_call_behv_actn",
+                        "create_call_behavior_act",
                         "Create a new call behavior action of the specified activity diagram (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created call behavior action information. An empty string is not allowed as an action name.",
                         this::createCallBehaviorAction,
                         NewCallBehaviorActionDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_conn",
+                        "create_connector",
                         "Create a new connector at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created connector information. An empty string is not allowed as a connector name.",
                         this::createConnector,
                         NewConnectorDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_deci_merge_node",
+                        "create_decision_merge_node",
                         "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified package (specified by ID) of the specified activity diagram (specified by ID), and return the newly created decision merge node information.",
                         this::createDecisionMergeNode,
                         NewDecisionMergeNodeDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_dep_bet_nodes",
+                        "create_dep_between_nodes",
                         "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created dependency information.",
                         this::createDependency,
                         NewDependencyDTO.class,
@@ -180,7 +180,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_part",
+                        "create_partition",
                         "Create a new partition by specifying the super partition (specified by ID) and the previous partition (specified by ID) on the specified activity diagram (specified by ID), and return the newly created partition information. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
                         this::createPartition,
                         NewPartitionDTO.class,
@@ -194,14 +194,14 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_proc",
+                        "create_process",
                         "Create a new process at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created process information. An empty string is not allowed as a process name.",
                         this::createProcess,
                         NewProcessDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_send_sig_actn",
+                        "create_send_signal_act",
                         "Create a new send signal action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created send signal action information. An empty string is not allowed as an action name.",
                         this::createSendSignalAction,
                         NewSendSignalActionDTO.class,

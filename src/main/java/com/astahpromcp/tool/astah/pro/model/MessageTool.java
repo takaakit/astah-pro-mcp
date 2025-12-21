@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IMessage.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IMessage.html
 @Slf4j
 public class MessageTool implements ToolProvider {
 
@@ -79,14 +79,14 @@ public class MessageTool implements ToolProvider {
                         MessageDTO.class),
 
                 ToolSupport.definition(
-                        "set_ret_val_of_msg",
+                        "set_return_val_of_msg",
                         "Set the return value of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
                         this::setReturnValue,
                         MessageWithReturnValueDTO.class,
                         MessageDTO.class),
 
                 ToolSupport.definition(
-                        "set_ret_val_var_of_msg",
+                        "set_return_val_variable_of_msg",
                         "Set the return value variable of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
                         this::setReturnValueVariable,
                         MessageWithReturnValueVariableDTO.class,

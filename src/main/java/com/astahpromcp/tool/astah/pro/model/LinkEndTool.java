@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILinkEnd.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILinkEnd.html
 @Slf4j
 public class LinkEndTool implements ToolProvider {
 
@@ -65,14 +65,14 @@ public class LinkEndTool implements ToolProvider {
                         LinkEndDTO.class),
 
                 ToolSupport.definition(
-                        "set_comp_of_link_end",
+                        "set_composition_of_link_end",
                         "Set a composition of the specified link end (specified by ID), and return the link end information after it is set.",
                         this::setComposition,
                         LinkEndWithCompositionDTO.class,
                         LinkEndDTO.class),
 
                 ToolSupport.definition(
-                        "set_nav_of_link_end",
+                        "set_navigation_of_link_end",
                         "Set a navigation of the specified link end (specified by ID), and return the link end information after it is set.",
                         this::setNavigation,
                         LinkEndWithNavigationDTO.class,

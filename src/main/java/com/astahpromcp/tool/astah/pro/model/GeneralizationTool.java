@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IGeneralization.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IGeneralization.html
 @Slf4j
 public class GeneralizationTool implements ToolProvider {
 
@@ -52,7 +52,7 @@ public class GeneralizationTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_gen_info",
+                        "get_generalization_info",
                         "Return detailed information about the specified generalization (specified by ID).",
                         this::getInfo,
                         IdDTO.class,

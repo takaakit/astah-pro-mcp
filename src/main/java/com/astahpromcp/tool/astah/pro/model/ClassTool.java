@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IClass.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IClass.html
 @Slf4j
 public class ClassTool implements ToolProvider {
 
@@ -55,7 +55,7 @@ public class ClassTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_cls_info",
+                        "get_class_info",
                         "Return detailed information about the specified class or interface (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
@@ -66,14 +66,14 @@ public class ClassTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_abs_of_class",
+                        "set_abstract_of_class",
                         "Set the Abstract property of the specified class (specified by ID), and return the class information after it is set.",
                         this::setAbstract,
                         ClassWithAbstractDTO.class,
                         ClassDTO.class),
 
                 ToolSupport.definition(
-                        "set_act_of_class",
+                        "set_active_of_class",
                         "Set the Active property of the specified class (specified by ID), and return the class information after it is set.",
                         this::setActive,
                         ClassWithActiveDTO.class,

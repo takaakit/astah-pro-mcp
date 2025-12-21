@@ -51,13 +51,14 @@ public class AstahProToolFactory {
             StateMachineDiagramEditor stateMachineDiagramEditor = diagramEditorFactory.getStateMachineDiagramEditor();
             RequirementDiagramEditor requirementDiagramEditor = diagramEditorFactory.getRequirementDiagramEditor();
             UseCaseDiagramEditor useCaseDiagramEditor = diagramEditorFactory.getUseCaseDiagramEditor();
+            UseCaseModelEditor useCaseModelEditor = modelEditorFactory.getUseCaseModelEditor();
             AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
             DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
 
             List<ToolProvider> providers = new ArrayList<>();
             
             // Common tools
-            providers.add(new AstahProMcpGuideTool());
+            providers.add(new AstahProMcpGuideTool(projectAccessor));
             providers.add(new DiagramViewManagerTool(projectAccessor, diagramViewManager, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new ProjectViewManagerTool(projectAccessor, projectViewManager, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new BasicDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));
@@ -131,14 +132,17 @@ public class AstahProToolFactory {
                 providers.add(new StateMachineDiagramEditorTool(projectAccessor, transactionManager, stateMachineDiagramEditor, astahProToolSupport, includeEditorTools));
                 providers.add(new StateMachineDiagramTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new StateMachineTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+                providers.add(new StateTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new TransitionTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new VertexTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+                providers.add(new PseudostateTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             }
 
             // Use case diagram tools
             if (categoryFlags.isUseCaseDiagramEnabled()) {
                 providers.add(new UseCaseDiagramGuideTool());
                 providers.add(new UseCaseDiagramEditorTool(projectAccessor, transactionManager, useCaseDiagramEditor, astahProToolSupport, includeEditorTools));
+                providers.add(new UseCaseModelEditorTool(projectAccessor, transactionManager, useCaseModelEditor, astahProToolSupport, includeEditorTools));
                 providers.add(new UseCaseTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new IncludeTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new ExtendTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));

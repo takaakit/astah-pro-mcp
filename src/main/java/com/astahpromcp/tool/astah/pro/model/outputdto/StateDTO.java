@@ -25,6 +25,12 @@ public record StateDTO(
     @JsonPropertyDescription("SubmachineState")
     NameIdTypeDTO submachineState,
 
+    @JsonPropertyDescription("Number of regions")
+    int numberOfRegions,
+
+    @JsonPropertyDescription("States of region")
+    List<NameIdTypeDTO> regionStates,
+
     @JsonPropertyDescription("Rectangles of region")
     List<RectangleDTO> regionRectangles,
 

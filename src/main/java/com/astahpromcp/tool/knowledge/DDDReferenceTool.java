@@ -46,14 +46,14 @@ public class DDDReferenceTool implements ToolProvider {
         try {
             return List.of(
                     ToolSupport.definition(
-                            "get_info_of_ddd_ref",
+                            "get_info_of_ddd_reference",
                             "Return the total number of chunks and the data of the first chunk of Domain-Driven Design Reference. If you want to learn the theory of Domain-Driven Design (DDD), use this tool.",
                             this::getDDDReference,
                             NoInputDTO.class,
                             DocumentDTO.class),
 
                     ToolSupport.definition(
-                            "get_chunk_of_ddd_ref",
+                            "get_chunk_of_ddd_reference",
                             "Return the chunk data of Domain-Driven Design Reference. If no chunk data exists, an empty string is set.",
                             this::getDDDReferenceChunk,
                             ChunkDTO.class,

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StateMachineDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StateMachineDiagramEditor.html
 @Slf4j
 public class StateMachineDiagramEditorTool implements ToolProvider {
 
@@ -66,77 +66,77 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "add_reg",
+                        "add_region",
                         "Add a new region in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation information.",
                         this::addRegion,
                         NewRegionDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "delete_reg",
+                        "delete_region",
                         "Delete the specified region (specified by index) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation information.",
                         this::deleteRegion,
                         DeleteRegionDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "change_prt_of_state",
+                        "change_parent_state",
                         "Change the parent state (specified by ID) of the specified state (specified by ID) on the specified state machine diagram (specified by ID), and return the parent-changed state information. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
                         this::changeParentOfState,
                         ChangeParentStateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_choic_pse",
+                        "create_choice_pseudostate",
                         "Create a new choice pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created choice pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createChoicePseudostate,
                         NewChoicePseudostateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_deep_his_pse",
+                        "create_deep_history_pseudostate",
                         "Create a new deep history pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created deep history pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createDeepHistoryPseudostate,
                         NewDeepHistoryPseudostateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_shal_his_pse",
+                        "create_shallow_history_pseudostate",
                         "Create a new shallow history pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created shallow history pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createShallowHistoryPseudostate,
                         NewShallowHistoryPseudostateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_fin_state",
+                        "create_final_state",
                         "Create a new final state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created final state information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createFinalState,
                         NewFinalStateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_fork_pse",
+                        "create_fork_pseudostate",
                         "Create a new fork pseudostate of the specified size (specified by width and height) at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created fork pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createForkPseudostate,
                         NewForkPseudostateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_init_pse",
+                        "create_init_pseudostate",
                         "Create a new initial pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created initial pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createInitialPseudostate,
                         NewInitialPseudostateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_join_pse",
+                        "create_join_pseudostate",
                         "Create a new join pseudostate of the specified size (specified by width and height) at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created join pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createJoinPseudostate,
                         NewJoinPseudostateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_junc_pse",
+                        "create_junction_pseudostate",
                         "Create a new junction pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created junction pseudostate information. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                         this::createJunctionPseudostate,
                         NewJunctionPseudostateDTO.class,
@@ -150,21 +150,21 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_state_dgm",
+                        "create_state_machine_dgm",
                         "Create a new state machine diagram under the specified package (specified by ID), and return the newly created state machine diagram information.",
                         this::createStateMachineDiagram,
                         NewStateMachineDiagramDTO.class,
                         DiagramDTO.class),
 
                 ToolSupport.definition(
-                        "create_sub_stat",
+                        "create_sub_machine_state",
                         "Create a new sub machine state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created sub machine state information.",
                         this::createSubMachineState,
                         NewSubMachineStateDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_trans",
+                        "create_transition",
                         "Create a new transition between the specified source state (specified by ID) and the specified target state (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created transition information.",
                         this::createTransition,
                         NewTransitionDTO.class,

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IParameter.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IParameter.html
 @Slf4j
 public class ParameterTool implements ToolProvider {
 
@@ -65,7 +65,7 @@ public class ParameterTool implements ToolProvider {
                         ParameterDTO.class),
 
                 ToolSupport.definition(
-                        "set_type_exp_of_param",
+                        "set_type_expression_of_param",
                         "Set the type expression (specified by string) of the specified parameter (specified by ID), and return the parameter information after it is set. If it is not a primitive type, obtain or create the type and then set it to the parameter type. For example, 'int' and 'string' are primitive types, whereas 'Integer' and 'String' require creating a type before they can be used.",
                         this::setTypeExpression,
                         ParameterWithTypeExpressionDTO.class,

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IDiagramViewManager.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IDiagramViewManager.html
 @Slf4j
 public class DiagramViewManagerTool implements ToolProvider {
 
@@ -86,21 +86,21 @@ public class DiagramViewManagerTool implements ToolProvider {
                         DiagramDTO.class),
 
                 ToolSupport.definition(
-                        "select_prst",
+                        "select_prsts",
                         "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations information.",
                         this::selectPresentations,
                         IdListDTO.class,
                         PresentationListDTO.class),
 
                 ToolSupport.definition(
-                        "select_all_prst",
+                        "select_all_prsts",
                         "Select all presentations in current diagram, and return the selected presentations information.",
                         this::selectAllPresentations,
                         NoInputDTO.class,
                         PresentationListDTO.class),
 
                 ToolSupport.definition(
-                        "unselect_all",
+                        "unselect_all_prsts",
                         "Unselect all presentations in current diagram, and return the current diagram information.",
                         this::unselectAllPresentations,
                         NoInputDTO.class,
@@ -128,28 +128,28 @@ public class DiagramViewManagerTool implements ToolProvider {
                         PresentationDTO.class),
 
                 ToolSupport.definition(
-                        "get_cur_dgm",
+                        "get_current_dgm",
                         "Return the information of the currently selected diagram in Diagram Editor.",
                         this::getCurrentDiagram,
                         NoInputDTO.class,
                         DiagramDTO.class),
 
                 ToolSupport.definition(
-                        "get_slct_prst",
+                        "get_selected_prst",
                         "Return the information of the currently selected presentations in Diagram Editor.",
                         this::getSelectedPresentations,
                         NoInputDTO.class,
                         PresentationListDTO.class),
 
                 ToolSupport.definition(
-                        "get_zoom_fac",
+                        "get_zoom_factor",
                         "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
                         this::getZoomFactor,
                         NoInputDTO.class,
                         com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class),
 
                 ToolSupport.definition(
-                        "get_high_prsts_within_dgm",
+                        "get_highlighted_prsts_within_dgm",
                         "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information.",
                         this::getHighlightedPresentationsWithinDiagram,
                         IdDTO.class,
@@ -311,9 +311,13 @@ public class DiagramViewManagerTool implements ToolProvider {
         }
 
         try {
+            transactionManager.beginTransaction();
             diagramViewManager.layoutAll();
+            transactionManager.endTransaction();
+            
         } catch (Exception e) {
-            throw new RuntimeException("Failed to layout all presentations.");
+            transactionManager.abortTransaction();
+            throw e;
         }
 
         return DiagramDTOAssembler.toDTO(currentDiagram);

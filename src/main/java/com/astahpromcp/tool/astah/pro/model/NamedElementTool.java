@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
 @Slf4j
 public class NamedElementTool implements ToolProvider {
 
@@ -53,7 +53,7 @@ public class NamedElementTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_named_elem_info",
+                        "get_named_element_info",
                         "Return the named element information of the specified named element (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
@@ -85,14 +85,14 @@ public class NamedElementTool implements ToolProvider {
                         NamedElementDTO.class),
 
                 ToolSupport.definition(
-                        "set_def",
+                        "set_definition",
                         "Set the definition of the specified named element (specified by ID), and return the named element information after it is edited.",
                         this::setDefinition,
                         NamedElementWithDefinitionDTO.class,
                         NamedElementDTO.class),
 
                 ToolSupport.definition(
-                        "set_visi",
+                        "set_visibility",
                         "Set the visibility of the specified named element (specified by ID), and return the named element information after it is edited.",
                         this::setVisibility,
                         NamedElementWithVisibilityDTO.class,

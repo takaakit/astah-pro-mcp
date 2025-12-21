@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ICombinedFragment.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ICombinedFragment.html
 @Slf4j
 public class CombinedFragmentTool implements ToolProvider {
 
@@ -57,14 +57,14 @@ public class CombinedFragmentTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "add_inter_oper",
+                        "add_interaction_operand",
                         "Add an interaction operand to the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
                         this::addInteractionOperand,
                         NewInteractionOperandDTO.class,
                         CombinedFragmentDTO.class),
 
                 ToolSupport.definition(
-                        "set_comb_flag_kind",
+                        "set_combined_fragment_kind",
                         "Set the kind (specified by string) of the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
                         this::setCombinedFragmentKind,
                         CombinedFragmentWithKindDTO.class,

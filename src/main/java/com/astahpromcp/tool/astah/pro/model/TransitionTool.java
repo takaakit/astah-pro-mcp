@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ITransition.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ITransition.html
 @Slf4j
 public class TransitionTool implements ToolProvider {
 
@@ -55,7 +55,7 @@ public class TransitionTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_trans_info",
+                        "get_transition_info",
                         "Return detailed information about the specified transition (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
@@ -66,21 +66,21 @@ public class TransitionTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_act_of_trans",
+                        "set_action_of_transition",
                         "Set the action of the specified transition (specified by ID), and return the transition information after it is set.",
                         this::setAction,
                         TransitionWithActionDTO.class,
                         TransitionDTO.class),
 
                 ToolSupport.definition(
-                        "set_event_of_trans",
+                        "set_event_of_transition",
                         "Set the event of the specified transition (specified by ID), and return the transition information after it is set.",
                         this::setEvent,
                         TransitionWithEventDTO.class,
                         TransitionDTO.class),
 
                 ToolSupport.definition(
-                        "set_guard_of_trans",
+                        "set_guard_of_transition",
                         "Set the guard of the specified transition (specified by ID), and return the transition information after it is set.",
                         this::setGuard,
                         TransitionWithGuardDTO.class,

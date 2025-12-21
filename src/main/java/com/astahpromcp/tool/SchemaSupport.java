@@ -14,7 +14,7 @@ public final class SchemaSupport {
 
     private static SchemaGenerator createSchemaGenerator() {
         SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(
-            SchemaVersion.DRAFT_7,
+            SchemaVersion.DRAFT_2020_12,
             OptionPreset.PLAIN_JSON);
 
         // Configure for simpler JSON output

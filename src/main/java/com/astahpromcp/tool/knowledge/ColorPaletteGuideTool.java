@@ -46,14 +46,14 @@ public class ColorPaletteGuideTool implements ToolProvider {
         try {
             return List.of(
                     ToolSupport.definition(
-                            "get_info_of_color_palet_guide",
+                            "get_info_of_color_palette_guide",
                             "Return the total number of chunks and the data of the first chunk of Color Palette guide. If you want to learn the rules for refining the color scheme of diagrams, use this tool.",
                             this::getColorPaletteGuideInfo,
                             NoInputDTO.class,
                             DocumentDTO.class),
 
                     ToolSupport.definition(
-                            "get_chunk_of_color_palet_guide",
+                            "get_chunk_of_color_palette_guide",
                             "Return the chunk data of Color Palette guide. If no chunk data exists, an empty string is set.",
                             this::getColorPaletteGuideChunk,
                             ChunkDTO.class,

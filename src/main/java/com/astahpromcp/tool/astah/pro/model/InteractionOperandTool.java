@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInteractionOperand.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInteractionOperand.html
 @Slf4j
 public class InteractionOperandTool implements ToolProvider {
 
@@ -53,7 +53,7 @@ public class InteractionOperandTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_intr_oprd_info",
+                        "get_interaction_operand_info",
                         "Return detailed information about the specified interaction operand (specified by ID).",
                         this::getInfo,
                         IdDTO.class,
@@ -64,7 +64,7 @@ public class InteractionOperandTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_guard_of_intr_oprd",
+                        "set_guard_of_interaction_operand",
                         "Set the guard of the specified interaction operand (specified by ID), and return the interaction operand information after it is set.",
                         this::setGuard,
                         InteractionOperandWithGuardDTO.class,

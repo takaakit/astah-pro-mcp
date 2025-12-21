@@ -30,8 +30,8 @@ public class AssociationToolTest {
     private Method setInitialValueOfAssociationEndB;
     private Method setStaticOfAssociationEndA;
     private Method setStaticOfAssociationEndB;
-    private Method setMultiplicityByIntOfAssociationEndA;
-    private Method setMultiplicityByIntOfAssociationEndB;
+    private Method setMultiplicityOfAssociationEndA;
+    private Method setMultiplicityOfAssociationEndB;
     private Method setAggregationKindOfAssociationEndA;
     private Method setAggregationKindOfAssociationEndB;
     private Method setNavigabilityOfAssociationEndA;
@@ -101,19 +101,19 @@ public class AssociationToolTest {
             McpSyncServerExchange.class,
             AttributeWithStaticDTO.class);
 
-        // setMultiplicityByIntOfAssociationEndA() method
-        setMultiplicityByIntOfAssociationEndA = TestSupport.getAccessibleMethod(
+        // setMultiplicityOfAssociationEndA() method
+        setMultiplicityOfAssociationEndA = TestSupport.getAccessibleMethod(
             AssociationTool.class,
-            "setMultiplicityByIntOfAssociationEndA",
+            "setMultiplicityOfAssociationEndA",
             McpSyncServerExchange.class,
-            AttributeWithIntMultiplicityDTO.class);
+            AttributeWithMultiplicityDTO.class);
 
-        // setMultiplicityByIntOfAssociationEndB() method
-        setMultiplicityByIntOfAssociationEndB = TestSupport.getAccessibleMethod(
+        // setMultiplicityOfAssociationEndB() method
+        setMultiplicityOfAssociationEndB = TestSupport.getAccessibleMethod(
             AssociationTool.class,
-            "setMultiplicityByIntOfAssociationEndB",
+            "setMultiplicityOfAssociationEndB",
             McpSyncServerExchange.class,
-            AttributeWithIntMultiplicityDTO.class);
+            AttributeWithMultiplicityDTO.class);
 
         // setAggregationKindOfAssociationEndA() method
         setAggregationKindOfAssociationEndA = TestSupport.getAccessibleMethod(
@@ -363,7 +363,7 @@ public class AssociationToolTest {
     }
 
     @Test
-    void setMultiplicityByIntOfAssociationEndA_ok() throws Exception {
+    void setMultiplicityOfAssociationEndA_ok_byInt_1() throws Exception {
         // Get association
         IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
             IAssociation.class,
@@ -373,20 +373,19 @@ public class AssociationToolTest {
         String associationEndAId = association.getMemberEnds()[0].getId();
 
         // Create input DTO
-        AttributeWithIntMultiplicityDTO inputDTO = new AttributeWithIntMultiplicityDTO(
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             associationEndAId,
-            1,
-            10);
+            "1",
+            "10");
 
         // Check multiplicity before setting
-        assertNotEquals(1, association.getMemberEnds()[0].getMultiplicity()[0].getLower());
-        assertNotEquals(10, association.getMemberEnds()[0].getMultiplicity()[0].getUpper());
+        assertNotEquals("1..10", association.getMemberEnds()[0].getMultiplicityRangeString());
 
         // ----------------------------------------
-        // Call setMultiplicityByIntOfAssociationEndA()
+        // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
         AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
-            setMultiplicityByIntOfAssociationEndA,
+            setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
             AttributeDTO.class);
@@ -395,12 +394,326 @@ public class AssociationToolTest {
         assertNotNull(outputDTO);
 
         // Check multiplicity after setting
-        assertEquals(1, association.getMemberEnds()[0].getMultiplicity()[0].getLower());
-        assertEquals(10, association.getMemberEnds()[0].getMultiplicity()[0].getUpper());
+        assertEquals("1..10", association.getMemberEnds()[0].getMultiplicityRangeString());
     }
 
     @Test
-    void setMultiplicityByIntOfAssociationEndB_ok() throws Exception {
+    void setMultiplicityOfAssociationEndA_ok_byInt_2() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "-10",
+            "*");
+
+        // Check multiplicity before setting
+        assertNotEquals("-10..*", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("-10..*", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byString() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "MIN",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("MIN..MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MIN..MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byIntAndString() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "0",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("0..MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("0..MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byStringAndInt() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "MIN",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("MIN..5", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MIN..5", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byString_withOneValue_1() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "MAX",
+            "");
+
+        // Check multiplicity before setting
+        assertNotEquals("MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byString_withOneValue_2() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MAX", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byInt_withOneValue_1() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "5",
+            "");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_byInt_withOneValue_2() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndA_ok_withSameValue() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end A
+        String associationEndAId = association.getMemberEnds()[0].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndAId,
+            "5",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", association.getMemberEnds()[0].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndA()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndA,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", association.getMemberEnds()[0].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byInt_1() throws Exception {
         // Get association
         IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
             IAssociation.class,
@@ -410,20 +723,19 @@ public class AssociationToolTest {
         String associationEndBId = association.getMemberEnds()[1].getId();
 
         // Create input DTO
-        AttributeWithIntMultiplicityDTO inputDTO = new AttributeWithIntMultiplicityDTO(
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             associationEndBId,
-            1,
-            10);
+            "1",
+            "10");
 
         // Check multiplicity before setting
-        assertNotEquals(1, association.getMemberEnds()[1].getMultiplicity()[0].getLower());
-        assertNotEquals(10, association.getMemberEnds()[1].getMultiplicity()[0].getUpper());
+        assertNotEquals("1..10", association.getMemberEnds()[1].getMultiplicityRangeString());
 
         // ----------------------------------------
-        // Call setMultiplicityByIntOfAssociationEndB()
+        // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
         AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
-            setMultiplicityByIntOfAssociationEndB,
+            setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
             AttributeDTO.class);
@@ -432,8 +744,322 @@ public class AssociationToolTest {
         assertNotNull(outputDTO);
 
         // Check multiplicity after setting
-        assertEquals(1, association.getMemberEnds()[1].getMultiplicity()[0].getLower());
-        assertEquals(10, association.getMemberEnds()[1].getMultiplicity()[0].getUpper());
+        assertEquals("1..10", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byInt_2() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "-10",
+            "*");
+
+        // Check multiplicity before setting
+        assertNotEquals("-10..*", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("-10..*", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byString() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "MIN",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("MIN..MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MIN..MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byIntAndString() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "0",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("0..MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("0..MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byStringAndInt() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "MIN",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("MIN..5", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MIN..5", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byString_withOneValue_1() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "MAX",
+            "");
+
+        // Check multiplicity before setting
+        assertNotEquals("MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byString_withOneValue_2() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MAX", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byInt_withOneValue_1() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "5",
+            "");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_byInt_withOneValue_2() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", association.getMemberEnds()[1].getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicityOfAssociationEndB_ok_withSameValue() throws Exception {
+        // Get association
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+            IAssociation.class,
+            "");
+
+        // Get association end B
+        String associationEndBId = association.getMemberEnds()[1].getId();
+
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            associationEndBId,
+            "5",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", association.getMemberEnds()[1].getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicityOfAssociationEndB()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicityOfAssociationEndB,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", association.getMemberEnds()[1].getMultiplicityRangeString());
     }
 
     @Test

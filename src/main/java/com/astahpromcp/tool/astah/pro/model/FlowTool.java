@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IFlow.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IFlow.html
 @Slf4j
 public class FlowTool implements ToolProvider {
 
@@ -65,7 +65,7 @@ public class FlowTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_actn_of_flow",
+                        "set_action_of_flow",
                         "Set the action of the specified flow (specified by ID), and return the flow information after it is set.",
                         this::setAction,
                         FlowWithActionDTO.class,

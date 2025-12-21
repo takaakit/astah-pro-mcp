@@ -63,7 +63,7 @@ public class ObjectNodeTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_base_cls_of_obj_node",
+                        "set_base_class_of_obj_node",
                         "Set the base class (specified by ID) of the specified object node (specified by ID), and return the object node information after it is set.",
                         this::setBase,
                         ObjectNodeWithBaseDTO.class,

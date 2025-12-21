@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/IPresentation.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/IPresentation.html
 @Slf4j
 public class PresentationTool implements ToolProvider {
 
@@ -58,7 +58,7 @@ public class PresentationTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_elem_of_prst",
+                        "get_element_of_prst",
                         "Return the element information that corresponds to the specified presentation (specified by ID).",
                         this::getElement,
                         IdDTO.class,

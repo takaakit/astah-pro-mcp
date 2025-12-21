@@ -32,12 +32,12 @@ class McpClientApprovalServletTest {
 
     @BeforeEach
     void setUp() {
-        servlet = new McpClientApprovalServlet(delegate, null, Set.of("localhost", "127.0.0.1"));
+        servlet = new McpClientApprovalServlet(delegate, null, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
     }
 
     @Test
     void service_allowsRequestWhenOriginIsPermitted() throws Exception {
-        when(request.getHeader("Origin")).thenReturn("http://localhost:3000");
+        when(request.getHeader("Origin")).thenReturn("http://127.0.0.1:3000");
         when(request.getHeader("Mcp-Session-Id")).thenReturn(null);
         when(request.getMethod()).thenReturn("GET");
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");

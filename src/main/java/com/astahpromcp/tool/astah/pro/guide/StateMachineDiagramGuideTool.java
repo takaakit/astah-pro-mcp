@@ -21,7 +21,7 @@ public class StateMachineDiagramGuideTool implements ToolProvider {
         try {
 	        return List.of(
 	                ToolSupport.definition(
-	                        "stat_dgm_guide",
+	                        "state_machine_dgm_guide",
 	                        "MCP client (you) MUST call this tool function before referencing or editing a state machine diagram to understand its usage and terminology definitions.",
 	                        this::getGuide,
 	                        NoInputDTO.class,

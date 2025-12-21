@@ -67,14 +67,14 @@ public class ProjectInfoTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_info_of_all_named_elems",
+                        "get_info_of_all_named_elements",
                         "Return the total number of chunks and the data of the first chunk of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
                         this::getAllNamedElements,
                         NoInputDTO.class,
                         AllNameIdTypeInfoDTO.class),
 
                 ToolSupport.definition(
-                        "get_chunk_of_all_named_elems",
+                        "get_chunk_of_all_named_elements",
                         "Return the chunk data of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
                         this::getNamedElementsChunk,
                         ChunkDTO.class,
@@ -102,14 +102,14 @@ public class ProjectInfoTool implements ToolProvider {
                         LabelIdTypeListDTO.class),
 
                 ToolSupport.definition(
-                        "retrieve_clses_that_ref_or_be_refed_by",
+                        "retrieve_classifiers_that_ref_or_be_refed_by",
                         "Return all classifiers (classes, interfaces, and enumerations) that the specified classifier (specified by ID) references or that reference it. The returned data is a simplified information: name, identifier, and type. For example, when you need to understand the scope of impact of changes to a specific element, use this tool. If you want to traverse references recursively, you'll need to use this tool repeatedly. Note that using a classifier as a type is considered a reference to that classifier.",
                         this::retrieveClassifiersThatReferenceOrBeReferencedBy,
                         IdDTO.class,
                         SourceTargetNameIdTypeListDTO.class),
 
                 ToolSupport.definition(
-                        "search_within_named_elems",
+                        "search_within_named_elements",
                         "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope.",
                         this::searchWithinNamedElements,
                         SearchDTO.class,
@@ -123,21 +123,21 @@ public class ProjectInfoTool implements ToolProvider {
                         LabelIdTypeListDTO.class),
 
                 ToolSupport.definition(
-                        "retrieve_clses_within_pkg",
+                        "retrieve_classifiers_within_pkg",
                         "Return all classifiers (classes, interfaces, and enumerations) within the specified package (specified by ID), including those in its subpackages. The returned data is a simplified information: name, identifier, type, and namespace.",
                         this::retrieveClassifiersWithinPackage,
                         IdDTO.class,
                         NameIdTypeNamespaceListDTO.class),
 
                 ToolSupport.definition(
-                        "retrieve_pkg_strct_as_puml",
+                        "retrieve_pkg_structure_as_puml",
                         "Return the PlantUML code that represents the package structure of the classifiers within the project. When you need to know the package structure of classifiers across the entire project, use this tool.",
                         this::retrievePackageStructureAsPlantuml,
                         NoInputDTO.class,
                         PlantumlDTO.class),
 
                 ToolSupport.definition(
-                        "retrieve_clses_rels_as_puml",
+                        "retrieve_classifier_relationships_as_puml",
                         "Return the PlantUML code that represents the relationships between the classifiers within the project. When you need to know the relationships between classifiers across the entire project, use this tool. Note that the relationships returned by this tool include only the relationship types; for example, association role names, multiplicities, composition, aggregation, and association names are not included.",
                         this::retrieveClassifiersRelationshipsAsPlantuml,
                         NoInputDTO.class,

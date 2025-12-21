@@ -58,49 +58,49 @@ public class BasicModelEditorTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "change_par",
+                        "change_parent",
                         "Change the parent named element (specified by ID) on the specified named element (specified by ID), and return the newly created package information. For example, this tool is used when you want to change the package structure.",
                         this::changeParent,
                         NamedElementWithParentDTO.class,
                         NamedElementDTO.class),
 
                 ToolSupport.definition(
-                        "create_pkg_in_prt_pkg",
+                        "create_pkg_in_parent_pkg",
                         "Create a new package under the specified parent package (specified by ID), and return the newly created package information. Note that this tool cannot create a root package (i.e., a project).",
                         this::createPackageInParentPackage,
                         NewPackageInPackageDTO.class,
                         PackageDTO.class),
 
                 ToolSupport.definition(
-                        "create_cls_in_prt_pkg",
+                        "create_class_in_parent_pkg",
                         "Create a new class under the specified parent package (specified by ID), and return the newly created class information.",
                         this::createClassInParentPackage,
                         NewClassInPackageDTO.class,
                         ClassDTO.class),
 
                 ToolSupport.definition(
-                        "create_cls_in_prt_cls",
+                        "create_class_in_parent_class",
                         "Create a new class under the specified parent class (specified by ID), and return the newly created class information.",
                         this::createClassInParentClass,
                         NewClassInClassDTO.class,
                         ClassDTO.class),
 
                 ToolSupport.definition(
-                        "create_enum_in_prt_pkg",
+                        "create_enum_in_parent_pkg",
                         "Create a new enumeration under the specified parent package (specified by ID), and return the newly created enumeration information.",
                         this::createEnumerationInParentPackage,
                         NewEnumerationInPackageDTO.class,
                         EnumerationDTO.class),
 
                 ToolSupport.definition(
-                        "create_intf_in_prt_pkg",
+                        "create_interface_in_parent_pkg",
                         "Create a new interface under the specified parent package (specified by ID), and return the newly created interface information.",
                         this::createInterfaceInParentPackage,
                         NewInterfaceInPackageDTO.class,
                         ClassDTO.class),
 
                 ToolSupport.definition(
-                        "create_intf_in_prt_cls",
+                        "create_interface_in_parent_class",
                         "Create a new interface under the specified parent class (specified by ID), and return the newly created interface information.",
                         this::createInterfaceInParentClass,
                         NewInterfaceInClassDTO.class,
@@ -114,7 +114,7 @@ public class BasicModelEditorTool implements ToolProvider {
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "create_enum_lite",
+                        "create_enum_literal",
                         "Create a new enumeration literal under the specified enumeration (specified by ID), and return the newly created enumeration literal information.",
                         this::createEnumerationLiteral,
                         NewEnumerationLiteralInEnumerationDTO.class,
@@ -142,7 +142,7 @@ public class BasicModelEditorTool implements ToolProvider {
                         AssociationDTO.class),
 
                 ToolSupport.definition(
-                        "create_asso_cls",
+                        "create_asso_class",
                         "Create a new association and association class between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association end A and B role names are set to empty strings.",
                         this::createAssociationClass,
                         NewAssociationClassDTO.class,
@@ -170,28 +170,28 @@ public class BasicModelEditorTool implements ToolProvider {
                         RealizationDTO.class),
 
                 ToolSupport.definition(
-                        "create_use",
+                        "create_usage",
                         "Create a new usage between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created usage information.",
                         this::createUsage,
                         NewUsageDTO.class,
                         UsageDTO.class),
 
                 ToolSupport.definition(
-                        "create_qual",
+                        "create_qualifier",
                         "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created qualifier information. Limitation: Because an ID of the qualifier type is required, a qualifier of a primitive type cannot be created.",
                         this::createQualifier,
                         NewQualifierToAssociationEndDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "create_tag_val",
+                        "create_tagged_val",
                         "Create a new tagged value (name and value) to the specified element (specified by ID), and return the element information after it is edited.",
                         this::createTaggedValue,
                         NewTaggedValueToElementDTO.class,
                         ElementDTO.class),
 
                 ToolSupport.definition(
-                        "create_temp_param",
+                        "create_template_param",
                         "Create a template parameter of the specified type (specified by ID) to the specified class (specified by ID), and return the class information after it is edited.",
                         this::createTemplateParameter,
                         NewTemplateParameterToClassDTO.class,
@@ -205,28 +205,28 @@ public class BasicModelEditorTool implements ToolProvider {
                         ElementDTO.class),
 
                 ToolSupport.definition(
-                        "create_req_in_prt_pkg",
+                        "create_req_in_parent_pkg",
                         "Create a new requirement under the specified parent package (specified by ID), and return the newly created requirement information.",
                         this::createRequirementInParentPackage,
                         NewRequirementInPackageDTO.class,
                         RequirementDTO.class),
 
                 ToolSupport.definition(
-                        "create_req_in_prt_req",
+                        "create_req_in_parent_req",
                         "Create a new requirement under the specified parent requirement (specified by ID), and return the newly created requirement information.",
                         this::createRequirementInParentRequirement,
                         NewRequirementInRequirementDTO.class,
                         RequirementDTO.class),
 
                 ToolSupport.definition(
-                        "create_test_in_prt_pkg",
+                        "create_test_case_in_parent_pkg",
                         "Create a new test case under the specified parent package (specified by ID), and return the newly created test case information.",
                         this::createTestCaseInParentPackage,
                         NewTestCaseInPackageDTO.class,
                         TestCaseDTO.class),
 
                 ToolSupport.definition(
-                        "create_test_in_prt_test",
+                        "create_test_case_in_parent_test_case",
                         "Create a new test case under the specified parent test case (specified by ID), and return the newly created test case information.",
                         this::createTestCaseInParentTestCase,
                         NewTestCaseInTestCaseDTO.class,
@@ -240,21 +240,21 @@ public class BasicModelEditorTool implements ToolProvider {
                         DependencyDTO.class),
 
                 ToolSupport.definition(
-                        "create_derv_reqt_dep",
+                        "create_derive_req_dep",
                         "Create a DeriveReqt dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
                         this::createDeriveReqtDependency,
                         NewDeriveReqtDependencyDTO.class,
                         DependencyDTO.class),
 
                 ToolSupport.definition(
-                        "create_refn_dep",
+                        "create_refine_dep",
                         "Create a refine dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
                         this::createRefineDependency,
                         NewRefineDependencyDTO.class,
                         DependencyDTO.class),
 
                 ToolSupport.definition(
-                        "create_satfy_dep",
+                        "create_satisfy_dep",
                         "Create a satisfy dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
                         this::createSatisfyDependency,
                         NewSatisfyDependencyDTO.class,
@@ -268,7 +268,7 @@ public class BasicModelEditorTool implements ToolProvider {
                         DependencyDTO.class),
 
                 ToolSupport.definition(
-                        "create_ver_dep",
+                        "create_verify_dep",
                         "Create a verify dependency from the specified source test case (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
                         this::createVerifyDependency,
                         NewVerifyDependencyDTO.class,

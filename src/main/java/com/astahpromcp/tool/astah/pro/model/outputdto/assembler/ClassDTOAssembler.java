@@ -51,6 +51,11 @@ public class ClassDTOAssembler {
             templateParameterDTOs.add(NameIdTypeDTOAssembler.toDTO(astahTemplateParameter.getType()));
         }
 
+        List<NameIdTypeDTO> ownedDiagramDTOs = new ArrayList<>();
+        for (IDiagram astahDiagram : astahClass.getOwnedDiagrams()) {
+            ownedDiagramDTOs.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
+        }
+
         return new ClassDTO(
             NamedElementDTOAssembler.toDTO(astahClass),
             attributeDTOs,
@@ -60,6 +65,7 @@ public class ClassDTOAssembler {
             specializationDTOs,
             nestedClassDTOs,
             templateParameterDTOs,
+            ownedDiagramDTOs,
             astahClass.isAbstract(),
             astahClass.isActive(),
             astahClass.isLeaf());

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IActivityNode.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IActivityNode.html
 @Slf4j
 public class ActivityNodeTool implements ToolProvider {
 
@@ -53,7 +53,7 @@ public class ActivityNodeTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_actv_node_info",
+                        "get_activity_node_info",
                         "Return detailed information about the specified activity node (specified by ID).",
                         this::getInfo,
                         IdDTO.class,

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAssociation.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAssociation.html
 @Slf4j
 public class AssociationTool implements ToolProvider {
 
@@ -109,42 +109,42 @@ public class AssociationTool implements ToolProvider {
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_multi_of_asso_end_a_by_int",
-                        "Set the upper and lower multiplicity (specified by integer) of the specified association end A (specified by ID), and return the association end information after it is set. If you want to set '*', set this value to '-1'. If you want to set undefined, set this value to '-100'. If the upper value and the lower value are the same, set the same value for both.",
-                        this::setMultiplicityByIntOfAssociationEndA,
-                        AttributeWithIntMultiplicityDTO.class,
+                        "set_multiplicity_of_asso_end_a",
+                        "Set the upper and lower multiplicity (specified by string) of the specified association end A (specified by ID), and return the association end information after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
+                        this::setMultiplicityOfAssociationEndA,
+                        AttributeWithMultiplicityDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_multi_of_asso_end_b_by_int",
-                        "Set the upper and lower multiplicity (specified by integer) of the specified association end B (specified by ID), and return the association end information after it is set. If you want to set '*', set this value to '-1'. If you want to set undefined, set this value to '-100'. If the upper value and the lower value are the same, set the same value for both.",
-                        this::setMultiplicityByIntOfAssociationEndB,
-                        AttributeWithIntMultiplicityDTO.class,
+                        "set_multiplicity_of_asso_end_b",
+                        "Set the upper and lower multiplicity (specified by string) of the specified association end B (specified by ID), and return the association end information after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
+                        this::setMultiplicityOfAssociationEndB,
+                        AttributeWithMultiplicityDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_aggr_kind_of_asso_end_a",
+                        "set_aggregation_kind_of_asso_end_a",
                         "Set the aggregation kind of the specified association end A (specified by ID), and return the association end information after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end A. When 'composite' is specified, a filled (black) diamond is placed on association end A.",
                         this::setAggregationKindOfAssociationEndA,
                         AssociationEndWithAggregationKindDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_aggr_kind_of_asso_end_b",
+                        "set_aggregation_kind_of_asso_end_b",
                         "Set the aggregation kind of the specified association end B (specified by ID), and return the association end information after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end B. When 'composite' is specified, a filled (black) diamond is placed on association end B.",
                         this::setAggregationKindOfAssociationEndB,
                         AssociationEndWithAggregationKindDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_navi_of_asso_end_a",
+                        "set_navigability_of_asso_end_a",
                         "Set the navigability of the specified association end A (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end A to 'navigable', the arrowhead appears on the association end B side.",
                         this::setNavigabilityOfAssociationEndA,
                         AssociationEndWithNavigabilityDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
-                        "set_navi_of_asso_end_b",
+                        "set_navigability_of_asso_end_b",
                         "Set the navigability of the specified association end B (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end B to 'navigable', the arrowhead appears on the association end A side.",
                         this::setNavigabilityOfAssociationEndB,
                         AssociationEndWithNavigabilityDTO.class,
@@ -248,40 +248,88 @@ public class AssociationTool implements ToolProvider {
         }
     }
 
-    private AttributeDTO setMultiplicityByIntOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithIntMultiplicityDTO param) throws Exception {
-        log.debug("Set multiplicity by int of association end A: {}", param);
+    private AttributeDTO setMultiplicityOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
+        log.debug("Set multiplicity of association end A: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
-            astahAssociationEndA.setMultiplicity(new int[][]{{param.lowerIntValue(), param.upperIntValue()}});
-            transactionManager.endTransaction();
+        String lowerStringMultiplicity = param.lowerMultiplicity();
+        String upperStringMultiplicity = param.upperMultiplicity();
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndA);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
+        if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAssociationEndA.setMultiplicityStrings(new String[][]{{lowerStringMultiplicity, upperStringMultiplicity}});
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else if (!lowerStringMultiplicity.isEmpty() && upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAssociationEndA.setMultiplicityString(lowerStringMultiplicity);
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else if (lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAssociationEndA.setMultiplicityString(upperStringMultiplicity);
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else {
+            throw new IllegalArgumentException("Lower multiplicity and upper multiplicity are both empty.");
         }
+
+        return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO setMultiplicityByIntOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithIntMultiplicityDTO param) throws Exception {
-        log.debug("Set multiplicity by int of association end B: {}", param);
+    private AttributeDTO setMultiplicityOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
+        log.debug("Set multiplicity of association end B: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
-            astahAssociationEndB.setMultiplicity(new int[][]{{param.lowerIntValue(), param.upperIntValue()}});
-            transactionManager.endTransaction();
+        String lowerStringMultiplicity = param.lowerMultiplicity();
+        String upperStringMultiplicity = param.upperMultiplicity();
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndB);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
+        if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAssociationEndB.setMultiplicityStrings(new String[][]{{lowerStringMultiplicity, upperStringMultiplicity}});
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else if (!lowerStringMultiplicity.isEmpty() && upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAssociationEndB.setMultiplicityString(lowerStringMultiplicity);
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else if (lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
+            try {
+                transactionManager.beginTransaction();
+                astahAssociationEndB.setMultiplicityString(upperStringMultiplicity);
+                transactionManager.endTransaction();
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
+        } else {
+            throw new IllegalArgumentException("Lower multiplicity and upper multiplicity are both empty.");
         }
+
+        return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
     private AttributeDTO setAggregationKindOfAssociationEndA(McpSyncServerExchange exchange, AssociationEndWithAggregationKindDTO param) throws Exception {

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseModelEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseModelEditor.html
 @Slf4j
 public class UseCaseModelEditorTool implements ToolProvider {
 
@@ -60,35 +60,35 @@ public class UseCaseModelEditorTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "create_actr",
+                        "create_actor",
                         "Create a new actor in the specified package (specified by ID), and return the newly created actor information.",
                         this::createActor,
                         NewActorDTO.class,
                         ClassDTO.class),
 
                 ToolSupport.definition(
-                        "create_incld",
+                        "create_include",
                         "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created include information.",
                         this::createInclude,
                         NewIncludeDTO.class,
                         IncludeDTO.class),
 
                 ToolSupport.definition(
-                        "create_extnd",
+                        "create_extend",
                         "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extend information.",
                         this::createExtend,
                         NewExtendDTO.class,
                         ExtendDTO.class),
 
                 ToolSupport.definition(
-                        "create_ext_point",
+                        "create_extension_point",
                         "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extension point information.",
                         this::createExtensionPoint,
                         NewExtensionPointDTO.class,
                         NamedElementDTO.class),
 
                 ToolSupport.definition(
-                        "create_use",
+                        "create_usecase",
                         "Create a new usecase in the specified package (specified by ID), and return the newly created usecase information.",
                         this::createUseCase,
                         NewUseCaseDTO.class,

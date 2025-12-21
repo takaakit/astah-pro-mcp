@@ -21,7 +21,7 @@ public class UseCaseDiagramGuideTool implements ToolProvider {
         try {
 	        return List.of(
 	                ToolSupport.definition(
-	                        "use_dgm_guide",
+	                        "usecase_dgm_guide",
 	                        "MCP client (you) MUST call this tool function before referencing or editing a usecase diagram to understand its usage and terminology definitions.",
 	                        this::getGuide,
 	                        NoInputDTO.class,

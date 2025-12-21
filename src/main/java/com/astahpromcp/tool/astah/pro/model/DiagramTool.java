@@ -31,7 +31,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDiagram.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDiagram.html
 @Slf4j
 public class DiagramTool implements ToolProvider {
 
@@ -75,14 +75,14 @@ public class DiagramTool implements ToolProvider {
                         DiagramDTO.class),
 
                 ToolSupport.definition(
-                        "get_dgm_rect",
+                        "get_dgm_rectangle",
                         "Return a rectangle (x, y, width, height) representing the boundary of the specified diagram (specified by ID).",
                         this::getDiagramBoundRect,
                         IdDTO.class,
                         RectangleDTO.class),
 
                 ToolSupport.definition(
-                        "get_prst_on_dgm",
+                        "get_prsts_on_dgm",
                         "Return the list of presentations on the specified diagram (specified by ID).",
                         this::getPresentationsOnDiagram,
                         IdDTO.class,

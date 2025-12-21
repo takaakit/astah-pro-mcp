@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/SequenceDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/SequenceDiagramEditor.html
 @Slf4j
 public class SequenceDiagramEditorTool implements ToolProvider {
 
@@ -74,7 +74,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
                         SequenceDiagramDTO.class),
 
                 ToolSupport.definition(
-                        "create_comb_frag",
+                        "create_combined_fragment",
                         "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created combined fragment information.",
                         this::createCombinedFragment,
                         NewCombinedFragmentDTO.class,
@@ -88,21 +88,21 @@ public class SequenceDiagramEditorTool implements ToolProvider {
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_cre_msg",
+                        "create_create_msg",
                         "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created message information.",
                         this::createCreateMessage,
                         NewCreateMessageDTO.class,
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_des_msg",
+                        "create_destroy_msg",
                         "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created message information.",
                         this::createDestroyMessage,
                         NewDestroyMessageDTO.class,
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_ret_msg",
+                        "create_return_msg",
                         "Create a new return message to the specified message (specified by ID) on the specified sequence diagram (specified by ID), and return the newly created message information.",
                         this::createReturnMessage,
                         NewReturnMessageDTO.class,
@@ -116,28 +116,28 @@ public class SequenceDiagramEditorTool implements ToolProvider {
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_fnd_msg",
+                        "create_found_msg",
                         "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created message information.",
                         this::createFoundMessage,
                         NewFoundMessageDTO.class,
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_intr_use",
+                        "create_interaction_use",
                         "Create a new interaction use on the specified sequence diagram (specified by ID), and return the newly created interaction use information. Note that the InteractionUse to be created must cover at least one lifeline. In other words, attempting to create an InteractionUse in an area where no lifelines exist will result in failure.",
                         this::createInteractionUse,
                         NewInteractionUseDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_life",
+                        "create_lifeline",
                         "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created lifeline information.",
                         this::createLifeline,
                         NewLifelineDTO.class,
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_term",
+                        "create_termination",
                         "Create a new termination on the specified sequence diagram (specified by ID), and return the newly created termination information.",
                         this::createTermination,
                         NewTerminationDTO.class,

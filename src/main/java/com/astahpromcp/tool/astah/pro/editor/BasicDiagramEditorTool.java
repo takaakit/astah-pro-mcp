@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicDiagramEditor.html
 @Slf4j
 public class BasicDiagramEditorTool implements ToolProvider {
 
@@ -73,7 +73,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "create_note_anc",
+                        "create_note_anchor",
                         "Create a new note anchor between the specified note (specified by ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created note anchor information (link presentation information).",
                         this::createNoteAnchor,
                         NewNoteAnchorDTO.class,

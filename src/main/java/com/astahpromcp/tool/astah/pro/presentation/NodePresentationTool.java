@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
 @Slf4j
 public class NodePresentationTool implements ToolProvider {
 
@@ -66,7 +66,7 @@ public class NodePresentationTool implements ToolProvider {
                         NodePresentationDTO.class),
 
                 ToolSupport.definition(
-                        "get_node_prst_rect",
+                        "get_node_prst_rectangle",
                         "Return the rectangle of the specified node presentation (specified by ID).",
                         this::getNodePresentationRectangle,
                         IdDTO.class,
@@ -77,7 +77,7 @@ public class NodePresentationTool implements ToolProvider {
     private List<ToolDefinition> createEditTools() {
         return List.of(
                 ToolSupport.definition(
-                        "set_node_prst_loc",
+                        "set_node_prst_location",
                         "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting.",
                         this::setNodePresentationLocation,
                         NodePresentationWithLocationDTO.class,

@@ -21,7 +21,7 @@ public class ClassDiagramGuideTool implements ToolProvider {
         try {
 	        return List.of(
 	                ToolSupport.definition(
-	                        "cls_dgm_guide",
+	                        "class_dgm_guide",
 	                        "MCP client (you) MUST call this tool function before referencing or editing a class diagram (also serving as an object diagram and package diagram) to understand its usage and terminology definitions.",
 	                        this::getGuide,
 	                        NoInputDTO.class,

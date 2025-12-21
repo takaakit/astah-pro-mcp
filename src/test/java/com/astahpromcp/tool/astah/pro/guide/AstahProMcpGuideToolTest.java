@@ -3,6 +3,8 @@ package com.astahpromcp.tool.astah.pro.guide;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +16,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AstahProMcpGuideToolTest {
 
+    private ProjectAccessor projectAccessor;
     private AstahProMcpGuideTool tool;
     private Method getGuide;
 
     @BeforeEach
     void setUp() throws Exception {
+        AstahAPI astahApi = AstahAPI.getAstahAPI();
+        projectAccessor = astahApi.getProjectAccessor();
+        projectAccessor.open("src/test/resources/modelfile/guide/AstahProMcpGuideToolTest.asta");
+
         // Tool
-        tool = new AstahProMcpGuideTool();
+        tool = new AstahProMcpGuideTool(projectAccessor);
 
         // getGuide() method
         getGuide = TestSupport.getAccessibleMethod(
@@ -32,7 +39,9 @@ public class AstahProMcpGuideToolTest {
 
     @AfterEach
     void tearDown() throws Exception {
-        // Cleanup if needed
+        if (projectAccessor != null) {
+            projectAccessor.close();
+        }
     }
 
     @Test

@@ -5,6 +5,8 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.change_vision.jude.api.inf.project.ProjectAccessor;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +15,10 @@ import java.util.List;
 @Slf4j
 public class AstahProMcpGuideTool implements ToolProvider {
 
-    public AstahProMcpGuideTool() {
+    private final ProjectAccessor projectAccessor;
+
+    public AstahProMcpGuideTool(ProjectAccessor projectAccessor) {
+        this.projectAccessor = projectAccessor;
     }
 
     @Override
@@ -36,6 +41,11 @@ public class AstahProMcpGuideTool implements ToolProvider {
 
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get Astah Pro MCP Guide: {}", param);
+
+        String primitiveTypes = "";
+        for (INamedElement primitiveType : projectAccessor.getPrimitiveTypes()) {
+            primitiveTypes += primitiveType.getName() + System.lineSeparator();
+        }
         
         String content = """
 This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, you can reference and edit an Astah project.
@@ -224,7 +234,12 @@ LinkPresentation ---> "source end" Presentation
 LinkPresentation ---> "target end" Presentation
 @enduml
 ```
-""";
+
+
+Primitive Types:
+The following types are defined by default in the Astah project, so you can use them without adding model elements for those types. Note that names are case-sensitive when using them.
+%s
+""".formatted(primitiveTypes);
 
         return new GuideDTO(content);
     }

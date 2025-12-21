@@ -27,5 +27,17 @@ echo "Destination: $PLUGIN_DIR"
 
 cp -f "$jar_file" "$PLUGIN_DIR/"
 
+# Set cache directory path
+CACHE_DIR="$HOME/.astah/professional/cache"
+
+# Delete cache directory if it exists
+if [ -d "$CACHE_DIR" ]; then
+  echo "Deleting cache directory: $CACHE_DIR"
+  rm -rf "$CACHE_DIR"
+  echo "Cache directory deleted successfully."
+else
+  echo "Cache directory does not exist: $CACHE_DIR"
+fi
+
 echo "Installation completed."
 

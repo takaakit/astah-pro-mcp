@@ -19,20 +19,14 @@ public record AttributeDTO(
     @JsonPropertyDescription("Is Derived")
     boolean isDerived,
 
-    @JsonPropertyDescription("Is Enable")
-    boolean isEnable,
-
     @JsonPropertyDescription("Is Static")
     boolean isStatic,
 
     @JsonPropertyDescription("Is initial value")
     String initialValue,
 
-    @JsonPropertyDescription("Upper Multiplicity. The value '-1' represents '*', and the value '-100' represents undefined.")
-    int upperMultiplicity,
-
-    @JsonPropertyDescription("Lower Multiplicity. The value '-1' represents '*', and the value '-100' represents undefined.")
-    int lowerMultiplicity,
+    @JsonPropertyDescription("Multiplicity")
+    String multiplicity,
 
     @JsonPropertyDescription("Navigability")
     String navigability,

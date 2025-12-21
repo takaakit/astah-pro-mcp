@@ -26,8 +26,7 @@ public class AttributeToolTest {
     private Method getInfo;
     private Method setInitialValue;
     private Method setLower;
-    private Method setMultiplicityByInt;
-    private Method setMultiplicityByString;
+    private Method setMultiplicity;
     private Method setStatic;
     private Method setType;
     private Method setTypeExpression;
@@ -83,12 +82,12 @@ public class AttributeToolTest {
             McpSyncServerExchange.class,
             AttributeWithTypeExpressionDTO.class);
 
-        // setMultiplicityByInt() method
-        setMultiplicityByInt = TestSupport.getAccessibleMethod(
+        // setMultiplicity() method
+        setMultiplicity = TestSupport.getAccessibleMethod(
             AttributeTool.class,
-            "setMultiplicityByInt",
+            "setMultiplicity",
             McpSyncServerExchange.class,
-            AttributeWithIntMultiplicityDTO.class);
+            AttributeWithMultiplicityDTO.class);
     }
 
     @AfterEach
@@ -253,27 +252,26 @@ public class AttributeToolTest {
     }
 
     @Test
-    void setMultiplicityByInt_ok() throws Exception {
+    void setMultiplicity_ok_byInt_1() throws Exception {
         // Get attribute
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
             IAttribute.class,
             "sum");
         
         // Create input DTO
-        AttributeWithIntMultiplicityDTO inputDTO = new AttributeWithIntMultiplicityDTO(
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
-            2,
-            5);
+            "2",
+            "5");
 
         // Check multiplicity before setting
-        assertNotEquals(2, attribute.getMultiplicity()[0].getLower());
-        assertNotEquals(5, attribute.getMultiplicity()[0].getUpper());
+        assertNotEquals("2..5", attribute.getMultiplicityRangeString());
 
         // ----------------------------------------
-        // Call setMultiplicityByInt()
+        // Call setMultiplicity()
         // ----------------------------------------
         AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
-            setMultiplicityByInt,
+            setMultiplicity,
             tool,
             inputDTO,
             AttributeDTO.class);
@@ -282,7 +280,294 @@ public class AttributeToolTest {
         assertNotNull(outputDTO);
 
         // Check multiplicity after setting
-        assertEquals(2, attribute.getMultiplicity()[0].getLower());
-        assertEquals(5, attribute.getMultiplicity()[0].getUpper());
+        assertEquals("2..5", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byInt_2() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "-10",
+            "*");
+
+        // Check multiplicity before setting
+        assertNotEquals("-10..*", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("-10..*", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byString() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "MIN",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("MIN..MAX", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MIN..MAX", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byIntAndString() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "0",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("0..MAX", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("0..MAX", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byStringAndInt() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "MIN",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("MIN..5", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MIN..5", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byString_withOneValue_1() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "MAX",
+            "");
+
+        // Check multiplicity before setting
+        assertNotEquals("MAX", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MAX", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byString_withOneValue_2() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "",
+            "MAX");
+
+        // Check multiplicity before setting
+        assertNotEquals("MAX", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("MAX", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byInt_withOneValue_1() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "5",
+            "");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_byInt_withOneValue_2() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ok_withSameValue() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+            IAttribute.class,
+            "sum");
+        
+        // Create input DTO
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "5",
+            "5");
+
+        // Check multiplicity before setting
+        assertNotEquals("5", attribute.getMultiplicityRangeString());
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setMultiplicity,
+            tool,
+            inputDTO,
+            AttributeDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check multiplicity after setting
+        assertEquals("5", attribute.getMultiplicityRangeString());
     }
 }

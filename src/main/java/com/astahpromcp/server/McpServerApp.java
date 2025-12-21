@@ -229,9 +229,9 @@ public final class McpServerApp {
             true,       // is SequenceDiagramEnabled
             true,       // is ActivityDiagramEnabled
             true,       // is StateMachineDiagramEnabled
-            false,      // is UseCaseDiagramEnabled
+            true,       // is UseCaseDiagramEnabled
             false,      // is RequirementDiagramEnabled
-            false       // is CommunicationDiagramEnabled
+            true        // is CommunicationDiagramEnabled
         );
 
         log.info("Add tool providers");

@@ -27,6 +27,12 @@ public class StateDTOAssembler {
         } else {
             submachineState = NameIdTypeDTO.empty();
         }
+
+        // States of region
+        List<NameIdTypeDTO> regionStates = new ArrayList<>();
+        for (IState state : astahState.getStateRegions()) {
+            regionStates.add(NameIdTypeDTOAssembler.toDTO(state));
+        }
         
         // Rectangles of region
         List<RectangleDTO> regionRectangles = new ArrayList<>();
@@ -53,6 +59,8 @@ public class StateDTOAssembler {
             astahState.getExit(),
             astahState.isSubmachineState(),
             submachineState,
+            astahState.getRegionSize(),
+            regionStates,
             regionRectangles,
             internalTransitions,
             subVertexes);

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/10_1_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IElement.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IElement.html
 @Slf4j
 public class ElementTool implements ToolProvider {
 
@@ -61,7 +61,7 @@ public class ElementTool implements ToolProvider {
     private List<ToolDefinition> createQueryTools() {
         return List.of(
                 ToolSupport.definition(
-                        "get_dgms_of_elem",
+                        "get_dgms_of_element",
                         "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
                         this::getDiagramsOfElement,
                         IdDTO.class,
@@ -93,7 +93,7 @@ public class ElementTool implements ToolProvider {
                         ElementDTO.class),
 
                 ToolSupport.definition(
-                        "change_tagged_value",
+                        "change_tagged_val",
                         "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element information after it is changed.",
                         this::changeTaggedValue,
                         ElementWithTaggedValueDTO.class,
