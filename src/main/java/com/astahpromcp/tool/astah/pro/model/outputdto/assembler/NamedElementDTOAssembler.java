@@ -58,6 +58,11 @@ public class NamedElementDTOAssembler {
             log.warn("Failed to get diagrams: {}", e.getMessage());
         }
 
+        List<NameIdTypeDTO> constraints = new ArrayList<>();
+        for (IConstraint constraint : astahNamedElement.getConstraints()) {
+            constraints.add(NameIdTypeDTOAssembler.toDTO(constraint));
+        }
+
         VisibilityKind visibility;
         if (astahNamedElement.isPublicVisibility()) {
             visibility = VisibilityKind.public_;
@@ -86,6 +91,7 @@ public class NamedElementDTOAssembler {
             supplierRealizations,
             clientUsages,
             supplierUsages,
-            renderedInDiagrams);
+            renderedInDiagrams,
+            constraints);
     }
 }

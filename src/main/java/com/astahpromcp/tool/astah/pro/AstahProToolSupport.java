@@ -38,6 +38,10 @@ public class AstahProToolSupport {
     public IClassDiagram getClassDiagram(String id) {
         return getEntity(id, IClassDiagram.class, "class diagram");
     }
+
+    public ICompositeStructureDiagram getCompositeStructureDiagram(String id) {
+        return getEntity(id, ICompositeStructureDiagram.class, "composite structure diagram");
+    }
     
     public IElement getElement(String id) {
         return getEntity(id, IElement.class, "element");
@@ -261,5 +265,61 @@ public class AstahProToolSupport {
 
     public ICommunicationDiagram getCommunicationDiagram(String id) {
         return getEntity(id, ICommunicationDiagram.class, "communication diagram");
+    }
+
+    public IPort getPort(String id) {
+        return getEntity(id, IPort.class, "port");
+    }
+
+    public IConnector getConnector(String id) {
+        return getEntity(id, IConnector.class, "connector");
+    }
+
+    public IConstraint getConstraint(String id) {
+        return getEntity(id, IConstraint.class, "constraint");
+    }
+
+    public IERDiagram getERDiagram(String id) {
+        return getEntity(id, IERDiagram.class, "ER diagram");
+    }
+
+    public IERDatatype getERDatatype(String id) {
+        return getEntity(id, IERDatatype.class, "ER datatype");
+    }
+
+    public IERDomain getERDomain(String id) {
+        return getEntity(id, IERDomain.class, "ER domain");
+    }
+
+    public IERAttribute getERAttribute(String id) {
+        return getEntity(id, IERAttribute.class, "ER attribute");
+    }
+
+    public IEREntity getEREntity(String id) {
+        return getEntity(id, IEREntity.class, "ER entity");
+    }
+
+    public IERIndex getERIndex(String id) {
+        return getEntity(id, IERIndex.class, "ER index");
+    }
+
+    public IERModel getERModel(String id) {
+        return getEntity(id, IERModel.class, "ER model");
+    }
+
+    public IERPackage getERPackage(String id) {
+        return getEntity(id, IERPackage.class, "ER package");
+    }
+
+    public IERRelationship getERRelationship(String id) {
+        return getEntity(id, IERRelationship.class, "ER relationship");
+    }
+
+    public IERSchema getERSchema(String id) {
+        return getEntity(id, IERSchema.class, "ER schema");
+    }
+
+    public IERSubtypeRelationship getERSubtypeRelationship(String id) {
+        return getEntity(id, IERSubtypeRelationship.class, "ER subtype relationship");
     }
 }

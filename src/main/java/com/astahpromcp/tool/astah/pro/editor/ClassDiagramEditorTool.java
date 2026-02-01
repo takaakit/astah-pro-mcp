@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/ClassDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ClassDiagramEditor.html
 @Slf4j
 public class ClassDiagramEditorTool implements ToolProvider {
 

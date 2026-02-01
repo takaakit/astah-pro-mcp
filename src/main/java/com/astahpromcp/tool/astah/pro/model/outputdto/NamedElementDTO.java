@@ -51,7 +51,10 @@ public record NamedElementDTO(
         List<UsageDTO> supplierUsages,
 
         @JsonPropertyDescription("Diagrams where this element is rendered")
-        List<NameIdTypeDTO> renderedInDiagrams
+        List<NameIdTypeDTO> renderedInDiagrams,
+
+        @JsonPropertyDescription("Constraints")
+        List<NameIdTypeDTO> constraints
 ) {
     public enum Type {
         Action("Action", IAction.class, 4),

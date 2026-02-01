@@ -63,6 +63,8 @@ This MCP server can view and edit the following diagrams (with more to come):
 - **State Machine Diagram**
 - **Usecase Diagram**
 - **Communication Diagram** (for query only; editing is not possible)
+- **Composite Structure Diagram** (for query only; editing is not possible)
+- **ER Diagram** (for query only; editing is not possible)
 
 <br>
 
@@ -293,7 +295,7 @@ As with source code, AI assistants/agents can make mistakes or misinterpret UML 
 
 ## License
 
-Some tool functions provided by this MCP server return excerpts from the [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF) and [OMG SysML 1.7](https://www.omg.org/spec/SysML/1.7/PDF) specifications. These specifications are licensed as stated at the beginning of each document. When a tool function returns such material, it explicitly indicates that it is an excerpt.
+Some tool functions provided by this MCP server return excerpts from the [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF), [OMG SysML 1.7](https://www.omg.org/spec/SysML/1.7/PDF) specifications, and [FIPS PUB 184 IDEF1X](https://www.govinfo.gov/app/details/GOVPUB-C13-986bf8b12a4fed44eb78fca0bb55d668). The OMG UML/SysML specifications are licensed as stated at the beginning of each document. FIPS PUB 184 IDEF1X is a U.S. Government work (NIST) and is not subject to copyright protection in the United States (17 U.S.C. §105), but may be subject to foreign copyright. When content from these specifications/documents is returned by tool functions, it is explicitly indicated as an excerpt.
 
 All other source code is copyrighted by **Takaaki Teshima** and released under the **MIT-0** license.  
 [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue.svg)](https://opensource.org/licenses/MIT-0)

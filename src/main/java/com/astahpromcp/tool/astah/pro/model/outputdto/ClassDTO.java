@@ -24,6 +24,9 @@ public record ClassDTO(
     @JsonPropertyDescription("Specializations")
     List<GeneralizationDTO> specializations,
 
+    @JsonPropertyDescription("Ports")
+    List<PortDTO> ports,
+
     @JsonPropertyDescription("Nested classes")
     List<NameIdTypeDTO> nestedClasses,
 

@@ -9,6 +9,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.GeneralizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.OperationDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.PortDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,11 @@ public class ClassDTOAssembler {
             specializationDTOs.add(GeneralizationDTOAssembler.toDTO(astahGeneralization));
         }
 
+        List<PortDTO> portDTOs = new ArrayList<>();
+        for (IPort port : astahClass.getPorts()) {
+            portDTOs.add(PortDTOAssembler.toDTO(port));
+        }
+
         List<NameIdTypeDTO> nestedClassDTOs = new ArrayList<>();
         for (IClass astahNestedClass : astahClass.getNestedClasses()) {
             nestedClassDTOs.add(NameIdTypeDTOAssembler.toDTO(astahNestedClass));
@@ -63,6 +69,7 @@ public class ClassDTOAssembler {
             associationDTOs,
             generalizationDTOs,
             specializationDTOs,
+            portDTOs,
             nestedClassDTOs,
             templateParameterDTOs,
             ownedDiagramDTOs,

@@ -231,7 +231,9 @@ public final class McpServerApp {
             true,       // is StateMachineDiagramEnabled
             true,       // is UseCaseDiagramEnabled
             false,      // is RequirementDiagramEnabled
-            true        // is CommunicationDiagramEnabled
+            true,       // is CommunicationDiagramEnabled
+            true,       // is CompositeStructureDiagramEnabled
+            true        // is ErDiagramEnabled
         );
 
         log.info("Add tool providers");

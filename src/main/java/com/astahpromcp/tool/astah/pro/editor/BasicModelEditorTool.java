@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
+// Tools definition for the following Astah API.
+//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicModelEditor.html
 @Slf4j
 public class BasicModelEditorTool implements ToolProvider {
 
@@ -65,6 +67,13 @@ public class BasicModelEditorTool implements ToolProvider {
                         NamedElementDTO.class),
 
                 ToolSupport.definition(
+                        "create_artifact",
+                        "Create a new artifact under the specified parent package (specified by ID), and return the newly created artifact information.",
+                        this::createArtifact,
+                        NewArtifactInPackageDTO.class,
+                        ArtifactDTO.class),
+
+                ToolSupport.definition(
                         "create_pkg_in_parent_pkg",
                         "Create a new package under the specified parent package (specified by ID), and return the newly created package information. Note that this tool cannot create a root package (i.e., a project).",
                         this::createPackageInParentPackage,
@@ -105,6 +114,20 @@ public class BasicModelEditorTool implements ToolProvider {
                         this::createInterfaceInParentClass,
                         NewInterfaceInClassDTO.class,
                         ClassDTO.class),
+
+                ToolSupport.definition(
+                        "create_component",
+                        "Create a new component under the specified parent package (specified by ID), and return the newly created component information.",
+                        this::createComponent,
+                        NewComponentInPackageDTO.class,
+                        ComponentDTO.class),
+
+                ToolSupport.definition(
+                        "create_port",
+                        "Create a new port under the specified class (specified by ID), and return the newly created port information.",
+                        this::createPort,
+                        NewPortInClassDTO.class,
+                        PortDTO.class),
 
                 ToolSupport.definition(
                         "create_attr",
@@ -272,7 +295,14 @@ public class BasicModelEditorTool implements ToolProvider {
                         "Create a verify dependency from the specified source test case (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
                         this::createVerifyDependency,
                         NewVerifyDependencyDTO.class,
-                        DependencyDTO.class)
+                        DependencyDTO.class),
+
+                ToolSupport.definition(
+                        "create_constraint",
+                        "Create a constraint to the specified named element (specified by ID), and return the newly created constraint information.",
+                        this::createConstraint,
+                        NewConstraintDTO.class,
+                        ConstraintDTO.class)
         );
     }
 
@@ -288,6 +318,24 @@ public class BasicModelEditorTool implements ToolProvider {
             transactionManager.endTransaction();
 
             return NamedElementDTOAssembler.toDTO(astahTargetNamedElement);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private ArtifactDTO createArtifact(McpSyncServerExchange exchange, NewArtifactInPackageDTO param) throws Exception {
+        log.debug("Create artifact in parent package: {}", param);
+
+        IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
+
+        try {
+            transactionManager.beginTransaction();
+            IArtifact createdAstahArtifact = basicModelEditor.createArtifact(parentAstahPackage, param.newArtifactName());
+            transactionManager.endTransaction();
+
+            return ArtifactDTOAssembler.toDTO(createdAstahArtifact);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -396,6 +444,42 @@ public class BasicModelEditorTool implements ToolProvider {
             transactionManager.endTransaction();
 
             return ClassDTOAssembler.toDTO(createdAstahInterface);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private ComponentDTO createComponent(McpSyncServerExchange exchange, NewComponentInPackageDTO param) throws Exception {
+        log.debug("Create component in parent package: {}", param);
+
+        IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
+
+        try {
+            transactionManager.beginTransaction();
+            IComponent createdAstahComponent = basicModelEditor.createComponent(parentAstahPackage, param.newComponentName());
+            transactionManager.endTransaction();
+
+            return ComponentDTOAssembler.toDTO(createdAstahComponent);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private PortDTO createPort(McpSyncServerExchange exchange, NewPortInClassDTO param) throws Exception {
+        log.debug("Create port: {}", param);
+
+        IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
+
+        try {
+            transactionManager.beginTransaction();
+            IPort createdAstahPort = basicModelEditor.createPort(parentAstahClass, param.newPortName());
+            transactionManager.endTransaction();
+
+            return PortDTOAssembler.toDTO(createdAstahPort);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -912,6 +996,26 @@ public class BasicModelEditorTool implements ToolProvider {
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private ConstraintDTO createConstraint(McpSyncServerExchange exchange, NewConstraintDTO param) throws Exception {
+        log.debug("Create constraint: {}", param);
+
+        INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
+
+        try {
+            transactionManager.beginTransaction();
+            IConstraint createdAstahConstraint = basicModelEditor.createConstraint(
+                astahTargetNamedElement,
+                param.newConstraintName());
+            transactionManager.endTransaction();
+
+            return ConstraintDTOAssembler.toDTO(createdAstahConstraint);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
