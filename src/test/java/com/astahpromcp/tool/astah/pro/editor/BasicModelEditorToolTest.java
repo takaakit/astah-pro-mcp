@@ -589,10 +589,10 @@ public class BasicModelEditorToolTest {
         NewAssociationDTO inputDTO = new NewAssociationDTO(
             sourceClass.getId(),
             targetClass.getId(),
-            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.non_navigable,
-            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.navigable,
-            com.astahpromcp.tool.astah.pro.common.AggregationKind.aggregate,
-            com.astahpromcp.tool.astah.pro.common.AggregationKind.none);
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NON_NAVIGABLE,
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NAVIGABLE,
+            com.astahpromcp.tool.astah.pro.common.AggregationKind.AGGREGATE,
+            com.astahpromcp.tool.astah.pro.common.AggregationKind.NONE);
         
         // ----------------------------------------
         // Call createAssociation()

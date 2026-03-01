@@ -1,9 +1,14 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler;
 
+import com.change_vision.jude.api.inf.model.IHyperlink;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PresentationDTOAssembler {
     public static PresentationDTO toDTO(@NonNull IPresentation astahPresentation) throws Exception {

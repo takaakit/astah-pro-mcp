@@ -38,10 +38,6 @@ public class UseCaseDiagramGuideTool implements ToolProvider {
         log.debug("Get usecase diagram guide: {}", param);
         
         String content = """
-IMPORTANT POINTS to Keep in Mind:
-* After editing a diagram, retrieve its drawing content and verify that the edits and layout are as intended.
-
-
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * UseCases are a means to capture the requirements of systems, i.e., what systems are supposed to do. The key concepts specified in this clause are Actors, UseCases, and subjects. Each UseCase’s subject represents a system under consideration to which the UseCase applies. Users and any other systems that may interact with a subject are represented as Actors.
 * Actors may represent roles played by human users, external hardware, or other systems.

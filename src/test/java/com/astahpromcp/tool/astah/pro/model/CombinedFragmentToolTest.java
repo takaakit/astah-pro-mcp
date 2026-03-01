@@ -106,7 +106,7 @@ public class CombinedFragmentToolTest {
         // Create input DTO
         CombinedFragmentWithKindDTO inputDTO = new CombinedFragmentWithKindDTO(
             combinedFragment.getId(),
-            CombinedFragmentKind.loop);
+            CombinedFragmentKind.LOOP);
 
         // Check combined fragment kind before setting
         assertFalse(combinedFragment.isLoop());

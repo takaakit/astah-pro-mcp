@@ -86,6 +86,7 @@ public class LinkPresentationToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(linkPresentation.getID(), outputDTO.presentation().id());
     }
 
     @Test

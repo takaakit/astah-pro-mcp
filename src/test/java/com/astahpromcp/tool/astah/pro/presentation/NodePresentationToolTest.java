@@ -93,8 +93,8 @@ public class NodePresentationToolTest {
     void getInfo_ok() throws Exception {
         // Get node presentation
         INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
-            "Class",
-            "Foo");
+            "State",
+            "Quux");
         
         // Create input DTO
         IdDTO inputDTO = new IdDTO(nodePresentation.getID());
@@ -111,6 +111,10 @@ public class NodePresentationToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(nodePresentation.getID(), outputDTO.presentation().id());
+        assertEquals("https://www.mlb.com/en", outputDTO.urlHyperlinks().get(0).url());
+        assertEquals(".\\data\\sample1.xlsx", outputDTO.filePathHyperlinks().get(0).filePath());
+        assertEquals("C:\\data\\sample2.xlsx", outputDTO.filePathHyperlinks().get(1).filePath());
+        assertFalse(outputDTO.namedElementHyperlinks().get(0).namedElementId().isEmpty());
     }
 
     @Test
@@ -142,8 +146,8 @@ public class NodePresentationToolTest {
     void setNodePresentationLocation_ok() throws Exception {
         // Get node presentation
         INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
-            "Class",
-            "Foo");
+            "State",
+            "Quux");
         
         // Create input DTO
         NodePresentationWithLocationDTO inputDTO = new NodePresentationWithLocationDTO(
@@ -178,8 +182,8 @@ public class NodePresentationToolTest {
     void setNodePresentationWidth_ok() throws Exception {
         // Get node presentation
         INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
-            "Class",
-            "Foo");
+            "State",
+            "Quux");
         
         // Create input DTO
         NodePresentationWithWidthDTO inputDTO = new NodePresentationWithWidthDTO(
@@ -210,8 +214,8 @@ public class NodePresentationToolTest {
     void setNodePresentationHeight_ok() throws Exception {
         // Get node presentation
         INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
-            "Class",
-            "Foo");
+            "State",
+            "Quux");
         
         // Create input DTO
         NodePresentationWithHeightDTO inputDTO = new NodePresentationWithHeightDTO(

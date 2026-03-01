@@ -577,10 +577,10 @@ public class BasicModelEditorTool implements ToolProvider {
                 "",
                 "");
 
-            createdAstahAssociation.getMemberEnds()[0].setNavigability(param.sourceNavigability().toAstahValue());
-            createdAstahAssociation.getMemberEnds()[1].setNavigability(param.targetNavigability().toAstahValue());
-            createdAstahAssociation.getMemberEnds()[0].setAggregationKind(param.sourceAggregationKind().toAstahValue());
-            createdAstahAssociation.getMemberEnds()[1].setAggregationKind(param.targetAggregationKind().toAstahValue());
+            createdAstahAssociation.getMemberEnds()[0].setNavigability(param.sourceNavigability().astahValue);
+            createdAstahAssociation.getMemberEnds()[1].setNavigability(param.targetNavigability().astahValue);
+            createdAstahAssociation.getMemberEnds()[0].setAggregationKind(param.sourceAggregationKind().astahValue);
+            createdAstahAssociation.getMemberEnds()[1].setAggregationKind(param.targetAggregationKind().astahValue);
             transactionManager.endTransaction();
 
             return AssociationDTOAssembler.toDTO(createdAstahAssociation);

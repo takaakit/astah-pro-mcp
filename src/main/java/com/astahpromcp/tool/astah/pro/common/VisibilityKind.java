@@ -1,18 +1,21 @@
 package com.astahpromcp.tool.astah.pro.common;
 
-public enum VisibilityKind {
-    // Since some AI agents tend to specify ENUM literals in lowercase even when they are defined in uppercase, the literals are defined in lowercase.
-    public_,
-    protected_,
-    private_,
-    package_;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public String toAstahValue() {
-        return switch (this) {
-            case public_ -> "public";
-            case protected_ -> "protected";
-            case private_ -> "private";
-            case package_ -> "package";
-        };
+public enum VisibilityKind {
+    // Some AI agents tend to specify ENUM literals in lowercase even when they are defined in uppercase, so JSON keys should be defined in lowercase using @JsonProperty.
+    @JsonProperty("public")
+    PUBLIC("public"),
+    @JsonProperty("protected")
+    PROTECTED("protected"),
+    @JsonProperty("private")
+    PRIVATE("private"),
+    @JsonProperty("package")
+    PACKAGE("package");
+
+    public final String astahValue;
+
+    private VisibilityKind(String astahValue) {
+        this.astahValue = astahValue;
     }
 }

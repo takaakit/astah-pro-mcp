@@ -55,8 +55,10 @@ public class AstahProToolFactory {
             UseCaseModelEditor useCaseModelEditor = modelEditorFactory.getUseCaseModelEditor();
             AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
             DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
+            ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
             ERModelEditor erModelEditor = modelEditorFactory.getERModelEditor();
             ERDiagramEditor erDiagramEditor = diagramEditorFactory.getERDiagramEditor();
+            MindmapEditor mindmapEditor = diagramEditorFactory.getMindmapEditor();
 
             List<ToolProvider> providers = new ArrayList<>();
             
@@ -66,7 +68,7 @@ public class AstahProToolFactory {
             providers.add(new ProjectViewManagerTool(projectAccessor, projectViewManager, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new BasicDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));
             providers.add(new BasicModelEditorTool(basicModelEditor, projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new DiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));
+            providers.add(new DiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, imageConvertSupport, includeEditorTools));
             providers.add(new StructureDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));
             providers.add(new CommentTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramTool(projectAccessor, transactionManager, astahProToolSupport, imageOutputDir, includeEditorTools));
@@ -78,6 +80,7 @@ public class AstahProToolFactory {
             providers.add(new ProjectAccessorTool(projectAccessor, astahProToolSupport, includeEditorTools));
             providers.add(new ProjectInfoTool(projectAccessor, astahProToolSupport, includeEditorTools));
             providers.add(new ImageCaptureTool(astahProToolSupport, imageOutputDir));
+            providers.add(new HyperlinkOwnerTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
 
             // Activity diagram tools
             if (categoryFlags.activityDiagramEnabled()) {
@@ -195,6 +198,13 @@ public class AstahProToolFactory {
                 providers.add(new ERIndexTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERRelationshipTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERSubtypeRelationshipTool(projectAccessor, transactionManager, astahProToolSupport, false));
+            }
+
+            // Mind map diagram tools
+            if (categoryFlags.mindMapDiagramEnabled()) {
+                providers.add(new MindMapGuideTool());
+                providers.add(new MindmapEditorTool(projectAccessor, transactionManager, mindmapEditor, astahProToolSupport, imageConvertSupport, includeEditorTools));
+                providers.add(new MindMapDiagramTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             }
 
             return providers;

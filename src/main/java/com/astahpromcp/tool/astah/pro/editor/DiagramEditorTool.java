@@ -29,23 +29,10 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.ImageTranscoder;
-import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.Document;
-
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/DiagramEditor.html
@@ -56,13 +43,15 @@ public class DiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
+    private final ImageConvertSupport imageConvertSupport;
     private final boolean includeEditTools;
 
-    public DiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, boolean includeEditTools) {
+    public DiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageConvertSupport imageConvertSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
         this.diagramEditorSupport = diagramEditorSupport;
+        this.imageConvertSupport = imageConvertSupport;
         this.includeEditTools = includeEditTools;
     }
 
@@ -146,7 +135,7 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        Image image = svgToImage(param.imageSvgCode());
+        Image image = imageConvertSupport.svgToImage(param.imageSvgCode());
 
         try {
             transactionManager.beginTransaction();
@@ -167,54 +156,6 @@ public class DiagramEditorTool implements ToolProvider {
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;
-        }
-    }
-
-    private Image svgToImage(String svgCode) {
-        if (svgCode == null || svgCode.isBlank()) {
-            throw new IllegalArgumentException("SVG code must not be null or blank");
-        }
-
-        // Validate SVG code
-        String parser = XMLResourceDescriptor.getXMLParserClassName();
-        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-        try (StringReader reader = new StringReader(svgCode)) {
-            Document document = factory.createDocument("internal:svg", reader);
-            if (document == null || document.getDocumentElement() == null
-                    || !"svg".equals(document.getDocumentElement().getLocalName())) {
-                throw new IllegalArgumentException("SVG code must have an <svg> root element");
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid SVG markup", e);
-        }
-
-        // Create ImageTranscoder
-        final BufferedImage[] imageHolder = new BufferedImage[1];
-        ImageTranscoder transcoder = new ImageTranscoder() {
-
-            @Override
-            public BufferedImage createImage(int width, int height) {
-                return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            }
-
-            @Override
-            public void writeImage(BufferedImage img, TranscoderOutput out) throws TranscoderException {
-                imageHolder[0] = img;
-            }
-        };
-
-        // Convert SVG to Image
-        try (StringReader reader = new StringReader(svgCode)) {
-            TranscoderInput input = new TranscoderInput(reader);
-            transcoder.transcode(input, null);
-            BufferedImage result = imageHolder[0];
-            if (result == null) {
-                throw new IllegalStateException("ImageTranscoder did not produce an image");
-            }
-            return result;
-
-        } catch (TranscoderException e) {
-            throw new IllegalArgumentException("Failed to convert SVG to Image", e);
         }
     }
 
@@ -232,7 +173,7 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        Image image = urlToImage(param.imageUrl());
+        Image image = imageConvertSupport.urlToImage(param.imageUrl());
 
         try {
             transactionManager.beginTransaction();
@@ -256,26 +197,6 @@ public class DiagramEditorTool implements ToolProvider {
         }
     }
 
-    private Image urlToImage(String imageUrl) {
-        if (imageUrl == null || imageUrl.isBlank()) {
-            throw new IllegalArgumentException("Image URL must not be null or blank");
-        }
-
-        try {
-            URI uri = URI.create(imageUrl);
-            try (InputStream inputStream = uri.toURL().openStream()) {
-                BufferedImage image = ImageIO.read(inputStream);
-                if (image == null) {
-                    throw new IllegalArgumentException("Failed to read image from URL: " + imageUrl);
-                }
-                return image;
-            }
-            
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to load image from URL: " + imageUrl, e);
-        }
-    }
-
     private RectangleDTO insertJpgImage(McpSyncServerExchange exchange, NewJpgImageWithPointDTO param) throws Exception {
         log.debug("Insert JPG image: {}", param);
 
@@ -290,7 +211,7 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        Image image = urlToImage(param.imageUrl());
+        Image image = imageConvertSupport.urlToImage(param.imageUrl());
 
         try {
             transactionManager.beginTransaction();

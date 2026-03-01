@@ -33,7 +33,6 @@ public class ActivityNodeTool implements ToolProvider {
         this.includeEditTools = includeEditTools;
     }
 
-
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {

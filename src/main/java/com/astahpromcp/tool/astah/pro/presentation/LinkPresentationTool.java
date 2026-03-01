@@ -67,7 +67,7 @@ public class LinkPresentationTool implements ToolProvider {
         return List.of(
                 ToolSupport.definition(
                         "set_points_of_link_prst",
-                        "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation).",
+                        "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
                         this::setAllPoints,
                         LinkPresentationWithPointsDTO.class,
                         LinkPresentationDTO.class)

@@ -1075,7 +1075,7 @@ public class AssociationToolTest {
         // Create input DTO
         AssociationEndWithAggregationKindDTO inputDTO = new AssociationEndWithAggregationKindDTO(
             associationEndAId,
-            com.astahpromcp.tool.astah.pro.common.AggregationKind.aggregate);
+            com.astahpromcp.tool.astah.pro.common.AggregationKind.AGGREGATE);
 
         // Check aggregation kind before setting
         assertFalse(association.getMemberEnds()[0].isAggregate());
@@ -1109,7 +1109,7 @@ public class AssociationToolTest {
         // Create input DTO
         AssociationEndWithAggregationKindDTO inputDTO = new AssociationEndWithAggregationKindDTO(
             associationEndBId,
-            com.astahpromcp.tool.astah.pro.common.AggregationKind.composite);
+            com.astahpromcp.tool.astah.pro.common.AggregationKind.COMPOSITE);
 
         // Check aggregation kind before setting
         assertFalse(association.getMemberEnds()[1].isComposite());
@@ -1143,7 +1143,7 @@ public class AssociationToolTest {
         // Create input DTO
         AssociationEndWithNavigabilityDTO inputDTO = new AssociationEndWithNavigabilityDTO(
             associationEndAId,
-            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.navigable);
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NAVIGABLE);
 
         // Check navigability before setting
         assertNotEquals("Navigable", association.getMemberEnds()[0].getNavigability());
@@ -1177,7 +1177,7 @@ public class AssociationToolTest {
         // Create input DTO
         AssociationEndWithNavigabilityDTO inputDTO = new AssociationEndWithNavigabilityDTO(
             associationEndBId,
-            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.non_navigable);
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NON_NAVIGABLE);
 
         // Check navigability before setting
         assertNotEquals("Non_Navigable", association.getMemberEnds()[1].getNavigability());

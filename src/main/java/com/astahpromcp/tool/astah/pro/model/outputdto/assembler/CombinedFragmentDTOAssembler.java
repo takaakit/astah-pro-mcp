@@ -16,29 +16,29 @@ public class CombinedFragmentDTOAssembler {
 
         CombinedFragmentKind kind;
         if (astahCombinedFragment.isAlt()) {
-            kind = CombinedFragmentKind.alt;
+            kind = CombinedFragmentKind.ALT;
         } else if (astahCombinedFragment.isAssert()) {
-            kind = CombinedFragmentKind.assert_;
+            kind = CombinedFragmentKind.ASSERT;
         } else if (astahCombinedFragment.isBreak()) {
-            kind = CombinedFragmentKind.break_;
+            kind = CombinedFragmentKind.BREAK;
         } else if (astahCombinedFragment.isConsider()) {
-            kind = CombinedFragmentKind.consider;
+            kind = CombinedFragmentKind.CONSIDER;
         } else if (astahCombinedFragment.isCritical()) {
-            kind = CombinedFragmentKind.critical;
+            kind = CombinedFragmentKind.CRITICAL;
         } else if (astahCombinedFragment.isIgnore()) {
-            kind = CombinedFragmentKind.ignore;
+            kind = CombinedFragmentKind.IGNORE;
         } else if (astahCombinedFragment.isLoop()) {
-            kind = CombinedFragmentKind.loop;
+            kind = CombinedFragmentKind.LOOP;
         } else if (astahCombinedFragment.isNeg()) {
-            kind = CombinedFragmentKind.neg;
+            kind = CombinedFragmentKind.NEG;
         } else if (astahCombinedFragment.isOpt()) {
-            kind = CombinedFragmentKind.opt;
+            kind = CombinedFragmentKind.OPT;
         } else if (astahCombinedFragment.isPar()) {
-            kind = CombinedFragmentKind.par;
+            kind = CombinedFragmentKind.PAR;
         } else if (astahCombinedFragment.isSeq()) {
-            kind = CombinedFragmentKind.seq;
+            kind = CombinedFragmentKind.SEQ;
         } else if (astahCombinedFragment.isStrict()) {
-            kind = CombinedFragmentKind.strict;
+            kind = CombinedFragmentKind.STRICT;
         } else {
             throw new Exception("Invalid combined fragment kind");
         }

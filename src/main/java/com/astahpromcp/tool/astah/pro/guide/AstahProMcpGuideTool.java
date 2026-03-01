@@ -27,7 +27,7 @@ public class AstahProMcpGuideTool implements ToolProvider {
 	        return List.of(
 	                ToolSupport.definition(
 	                        "astah_pro_mcp_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server.",
+	                        "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server. To run this tool, an Astah project must be open.",
 	                        this::getGuide,
 	                        NoInputDTO.class,
 	                        GuideDTO.class)
@@ -42,6 +42,11 @@ public class AstahProMcpGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get Astah Pro MCP Guide: {}", param);
 
+        // If the Astah project is not open, throw an exception.
+        if (!projectAccessor.hasProject()) {
+            throw new RuntimeException("The Astah project is not open. Open an Astah project or create a new one, then run this tool again.");
+        }
+
         String primitiveTypes = "";
         for (INamedElement primitiveType : projectAccessor.getPrimitiveTypes()) {
             primitiveTypes += primitiveType.getName() + System.lineSeparator();
@@ -54,6 +59,7 @@ This MCP server operates as a plugin for the modeling tool Astah. Using the tool
 
 
 IMPORTANT POINTS to Keep in Mind:
+* When you place new elements on the diagram, as a final check, be sure to re-verify that the placement coordinates of the elements you placed are appropriate and properly aligned (e.g., centered alignment, top-edge alignment, etc.), and always make any necessary fine adjustments to the coordinates of the newly placed elements.  
 * When creating a presentation on a diagram that corresponds to a model, you must provide not only the diagram information but also the information of the corresponding model. In contrast, when creating a presentation that is not associated with a model (such as notes), no corresponding model information is required.  
 * Deleting a presentation does not remove the corresponding model. In contrast, deleting a model will also remove its corresponding presentation.  
 * Association ends are attribute elements (member ends) of the association. Therefore, the information of association ends can be obtained through the information of the association.  
@@ -139,7 +145,6 @@ Message --|> NamedElement
 MindMapDiagram --|> Diagram
 Model --|> Package
 NamedElement --|> Element
-NamedElement --|> HyperlinkOwner
 Node --|> Class
 ObjectNode --|> ActivityNode
 Operation --|> NamedElement
@@ -180,7 +185,6 @@ HeaderCell --|> Cell
 LinkPresentation --|> Presentation
 NodePresentation --|> Presentation
 Presentation --|> Entity
-Presentation --|> HyperlinkOwner
 TopicPresentation --|> Presentation
 ValueCell --|> Cell
 @enduml

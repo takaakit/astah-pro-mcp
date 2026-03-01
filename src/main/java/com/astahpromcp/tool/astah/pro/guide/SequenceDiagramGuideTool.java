@@ -39,7 +39,6 @@ public class SequenceDiagramGuideTool implements ToolProvider {
         
         String content = """
 IMPORTANT POINTS to Keep in Mind:
-* After editing a diagram, retrieve its drawing content and verify that the edits and layout are as intended.
 * When creating a lifeline, if a corresponding base class exists, set that class as the type of the lifeline.
 * When adding a message name, if a corresponding operation exists in the base class associated with the target lifeline of the message, assign that operation to the message. Otherwise, specify an arbitrary message name, arguments, and return value.
 

@@ -159,12 +159,14 @@ public class DiagramViewManagerTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
+                /* To leverage the AI's layout capabilities, do not register the automatic layout tool.
                 ToolSupport.definition(
                         "auto_layout",
                         "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
                         this::autoLayout,
                         NoInputDTO.class,
                         DiagramDTO.class),
+                */
 
                 ToolSupport.definition(
                         "highlight_prst",

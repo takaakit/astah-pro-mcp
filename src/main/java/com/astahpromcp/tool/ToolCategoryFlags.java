@@ -10,5 +10,6 @@ public record ToolCategoryFlags(
         boolean requirementDiagramEnabled,
         boolean communicationDiagramEnabled,
         boolean compositeStructureDiagramEnabled,
-        boolean erDiagramEnabled) {
+        boolean erDiagramEnabled,
+        boolean mindMapDiagramEnabled) {
 }

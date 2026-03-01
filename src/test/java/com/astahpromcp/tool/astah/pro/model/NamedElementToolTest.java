@@ -116,6 +116,11 @@ public class NamedElementToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(namedElement.getId(), outputDTO.element().id());
+        assertEquals("https://www.mlb.com/en", outputDTO.urlHyperlinks().get(0).url());
+        assertEquals(".\\data\\sample1.xlsx", outputDTO.filePathHyperlinks().get(0).filePath());
+        assertEquals("C:\\data\\sample2.xlsx", outputDTO.filePathHyperlinks().get(1).filePath());
+        assertFalse(outputDTO.namedElementHyperlinks().get(0).namedElementId().isEmpty());
     }
 
     @Test
@@ -252,7 +257,7 @@ public class NamedElementToolTest {
         // Create input DTO
         NamedElementWithVisibilityDTO inputDTO = new NamedElementWithVisibilityDTO(
             namedElement.getId(),
-            VisibilityKind.private_);
+            VisibilityKind.PRIVATE);
 
         // Check visibility before setting
         assertFalse(namedElement.isPrivateVisibility());

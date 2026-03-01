@@ -10,7 +10,7 @@ public class NameIdTypeDefinitionDTOAssembler {
         return new NameIdTypeDefinitionDTO(
             namedElement.getName(),
             namedElement.getId(),
-            NamedElementDTO.Type.getCorrespondingType(namedElement).getTypeName(),
+            NamedElementDTO.Type.getCorrespondingType(namedElement).typeName,
             namedElement.getDefinition());
     }
 }

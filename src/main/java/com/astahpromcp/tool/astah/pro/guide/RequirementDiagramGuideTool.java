@@ -38,10 +38,6 @@ public class RequirementDiagramGuideTool implements ToolProvider {
         log.debug("Get requirement diagram guide: {}", param);
         
         String content = """
-IMPORTANT POINTS to Keep in Mind:
-* After editing a diagram, retrieve its drawing content and verify that the edits and layout are as intended.
-
-
 Terminology Definitions (quoted from OMG SysML Specification v.1.7):
 * A standard requirement includes properties to specify its unique identifier and text requirement. Additional properties such as verification status, can be specified by the user.
 * Several requirements relationships are specified that enable the modeler to relate requirements to other requirements as well as to other model elements. These include relationships for defining a requirements hierarchy, deriving requirements, satisfying requirements, verifying requirements, and refining requirements.

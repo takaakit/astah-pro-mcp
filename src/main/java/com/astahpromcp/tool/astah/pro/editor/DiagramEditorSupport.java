@@ -12,28 +12,28 @@ import java.util.List;
 public class DiagramEditorSupport {
     
     public enum DiagramEditorType {
-        ActivityDiagram(IActivityDiagram.class, ActivityDiagramEditor.class),
-        ClassDiagram(IClassDiagram.class, ClassDiagramEditor.class),
-        CommunicationDiagram(ICommunicationDiagram.class, BehaviorDiagramEditor.class),
-        ComponentDiagram(IComponentDiagram.class, StructureDiagramEditor.class),
-        CompositeStructureDiagram(ICompositeStructureDiagram.class, CompositeStructureDiagramEditor.class),
-        DataFlowDiagram(IDataFlowDiagram.class, BehaviorDiagramEditor.class),
-        DeploymentDiagram(IDeploymentDiagram.class, StructureDiagramEditor.class),
-        ERDiagram(IERDiagram.class, ERDiagramEditor.class),
-        MatrixDiagram(IMatrixDiagram.class, DiagramEditor.class),
-        MindMapDiagram(IMindMapDiagram.class, MindmapEditor.class),
-        RequirementDiagram(IRequirementDiagram.class, RequirementDiagramEditor.class),
-        RequirementTable(IRequirementTable.class, DiagramEditor.class),
-        SequenceDiagram(ISequenceDiagram.class, SequenceDiagramEditor.class),
-        StateMachineDiagram(IStateMachineDiagram.class, StateMachineDiagramEditor.class),
-        TimingDiagram(ITimingDiagram.class, BehaviorDiagramEditor.class),
-        TraceabilityMap(ITraceabilityMap.class, MindmapEditor.class),
-        UseCaseDiagram(IUseCaseDiagram.class, UseCaseDiagramEditor.class);
+        ACTIVITY_DIAGRAM(IActivityDiagram.class, ActivityDiagramEditor.class),
+        CLASS_DIAGRAM(IClassDiagram.class, ClassDiagramEditor.class),
+        COMMUNICATION_DIAGRAM(ICommunicationDiagram.class, BehaviorDiagramEditor.class),
+        COMPONENT_DIAGRAM(IComponentDiagram.class, StructureDiagramEditor.class),
+        COMPOSITE_STRUCTURE_DIAGRAM(ICompositeStructureDiagram.class, CompositeStructureDiagramEditor.class),
+        DATA_FLOW_DIAGRAM(IDataFlowDiagram.class, BehaviorDiagramEditor.class),
+        DEPLOYMENT_DIAGRAM(IDeploymentDiagram.class, StructureDiagramEditor.class),
+        ER_DIAGRAM(IERDiagram.class, ERDiagramEditor.class),
+        MATRIX_DIAGRAM(IMatrixDiagram.class, DiagramEditor.class),
+        MIND_MAP_DIAGRAM(IMindMapDiagram.class, MindmapEditor.class),
+        REQUIREMENT_DIAGRAM(IRequirementDiagram.class, RequirementDiagramEditor.class),
+        REQUIREMENT_TABLE(IRequirementTable.class, DiagramEditor.class),
+        SEQUENCE_DIAGRAM(ISequenceDiagram.class, SequenceDiagramEditor.class),
+        STATE_MACHINE_DIAGRAM(IStateMachineDiagram.class, StateMachineDiagramEditor.class),
+        TIMING_DIAGRAM(ITimingDiagram.class, BehaviorDiagramEditor.class),
+        TRACEABILITY_MAP(ITraceabilityMap.class, MindmapEditor.class),
+        USE_CASE_DIAGRAM(IUseCaseDiagram.class, UseCaseDiagramEditor.class);
 
         public final Class<? extends IDiagram> diagramInterface;
         public final Class<? extends DiagramEditor> diagramEditor;
         
-        DiagramEditorType(Class<? extends IDiagram> diagramInterface, Class<? extends DiagramEditor> diagramEditor) {
+        private DiagramEditorType(Class<? extends IDiagram> diagramInterface, Class<? extends DiagramEditor> diagramEditor) {
             this.diagramInterface = diagramInterface;
             this.diagramEditor = diagramEditor;
         }

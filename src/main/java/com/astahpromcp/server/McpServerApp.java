@@ -233,7 +233,8 @@ public final class McpServerApp {
             false,      // is RequirementDiagramEnabled
             true,       // is CommunicationDiagramEnabled
             true,       // is CompositeStructureDiagramEnabled
-            true        // is ErDiagramEnabled
+            true,       // is ErDiagramEnabled
+            true        // is MindMapDiagramEnabled
         );
 
         log.info("Add tool providers");

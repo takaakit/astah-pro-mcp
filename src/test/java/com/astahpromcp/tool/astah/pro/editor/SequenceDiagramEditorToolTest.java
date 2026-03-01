@@ -179,7 +179,7 @@ public class SequenceDiagramEditorToolTest {
         NewCombinedFragmentDTO inputDTO = new NewCombinedFragmentDTO(
             sequenceDiagram.getId(),
             "Test Combined Fragment",
-            CombinedFragmentKind.alt,
+            CombinedFragmentKind.ALT,
             100,
             200,
             150,

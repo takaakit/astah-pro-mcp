@@ -138,14 +138,14 @@ public class AssociationTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "set_navigability_of_asso_end_a",
-                        "Set the navigability of the specified association end A (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end A to 'navigable', the arrowhead appears on the association end B side.",
+                        "Set the navigability of the specified association end A (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end A to 'navigable', the arrowhead appears on the association end A side.",
                         this::setNavigabilityOfAssociationEndA,
                         AssociationEndWithNavigabilityDTO.class,
                         AttributeDTO.class),
 
                 ToolSupport.definition(
                         "set_navigability_of_asso_end_b",
-                        "Set the navigability of the specified association end B (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end B to 'navigable', the arrowhead appears on the association end A side.",
+                        "Set the navigability of the specified association end B (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end B to 'navigable', the arrowhead appears on the association end B side.",
                         this::setNavigabilityOfAssociationEndB,
                         AssociationEndWithNavigabilityDTO.class,
                         AttributeDTO.class)
@@ -339,7 +339,7 @@ public class AssociationTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            astahAssociationEndA.setAggregationKind(param.aggregationKind().toAstahValue());
+            astahAssociationEndA.setAggregationKind(param.aggregationKind().astahValue);
             transactionManager.endTransaction();
 
             return AttributeDTOAssembler.toDTO(astahAssociationEndA);
@@ -357,7 +357,7 @@ public class AssociationTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            astahAssociationEndB.setAggregationKind(param.aggregationKind().toAstahValue());
+            astahAssociationEndB.setAggregationKind(param.aggregationKind().astahValue);
             transactionManager.endTransaction();
 
             return AttributeDTOAssembler.toDTO(astahAssociationEndB);
@@ -375,7 +375,7 @@ public class AssociationTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            astahAssociationEndA.setNavigability(param.navigabilityKind().toAstahValue());
+            astahAssociationEndA.setNavigability(param.navigabilityKind().astahValue);
             transactionManager.endTransaction();
 
             return AttributeDTOAssembler.toDTO(astahAssociationEndA);
@@ -393,7 +393,7 @@ public class AssociationTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            astahAssociationEndB.setNavigability(param.navigabilityKind().toAstahValue());
+            astahAssociationEndB.setNavigability(param.navigabilityKind().astahValue);
             transactionManager.endTransaction();
 
             return AttributeDTOAssembler.toDTO(astahAssociationEndB);

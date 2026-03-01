@@ -1,16 +1,19 @@
 package com.astahpromcp.tool.astah.pro.common;
 
-public enum NavigabilityKind {
-    // Since some AI agents tend to specify ENUM literals in lowercase even when they are defined in uppercase, the literals are defined in lowercase.
-    navigable,
-    non_navigable,
-    unspecified;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public String toAstahValue() {
-        return switch (this) {
-            case navigable -> "Navigable";
-            case non_navigable -> "Non_Navigable";
-            case unspecified -> "Unspecified";
-        };
+public enum NavigabilityKind {
+    // Some AI agents tend to specify ENUM literals in lowercase even when they are defined in uppercase, so JSON keys should be defined in lowercase using @JsonProperty.
+    @JsonProperty("navigable")
+    NAVIGABLE("Navigable"),
+    @JsonProperty("non_navigable")
+    NON_NAVIGABLE("Non_Navigable"),
+    @JsonProperty("unspecified")
+    UNSPECIFIED("Unspecified");
+
+    public final String astahValue;
+
+    private NavigabilityKind(String astahValue) {
+        this.astahValue = astahValue;
     }
 }

@@ -12,4 +12,10 @@ public record LabelIdTypeDTO(
     @JsonPropertyDescription("Type")
     String type
 ) {
+    public static LabelIdTypeDTO empty() {
+        return new LabelIdTypeDTO(
+            "",
+            "",
+            "");
+    }
 }

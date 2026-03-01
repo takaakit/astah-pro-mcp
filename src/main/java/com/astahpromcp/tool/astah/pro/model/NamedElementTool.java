@@ -187,7 +187,7 @@ public class NamedElementTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            astahNamedElement.setVisibility(param.visibility().toAstahValue());
+            astahNamedElement.setVisibility(param.visibility().astahValue);
             transactionManager.endTransaction();
 
             return NamedElementDTOAssembler.toDTO(astahNamedElement);

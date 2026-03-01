@@ -6,6 +6,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.NameDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.BooleanDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeListDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
+import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
@@ -32,6 +33,7 @@ public class ProjectAccessorToolTest {
     private Method findNamedElementsByName;
     private Method saveProject;
     private Method closeProject;
+    private Method getProjectPath;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -100,6 +102,13 @@ public class ProjectAccessorToolTest {
         closeProject = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "closeProject",
+            McpSyncServerExchange.class,
+            NoInputDTO.class);
+
+        // getProjectPath() method
+        getProjectPath = TestSupport.getAccessibleMethod(
+            ProjectAccessorTool.class,
+            "getProjectPath",
             McpSyncServerExchange.class,
             NoInputDTO.class);
     }
@@ -306,5 +315,24 @@ public class ProjectAccessorToolTest {
         
         // Check that the project was closed
         assertThrows(Exception.class, () -> projectAccessor.getProject());
+    }
+
+    @Test
+    void getProjectPath_ok() throws Exception {
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call getProjectPath()
+        // ----------------------------------------
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getProjectPath,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class);
+            
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(outputDTO.projectPath(), projectAccessor.getProjectPath());
     }
 }

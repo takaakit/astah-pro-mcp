@@ -7,10 +7,14 @@ import com.change_vision.jude.api.inf.model.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DependencyDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementHyperlinkDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.FilePathHyperlinkDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.UrlHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.RealizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.UsageDTO;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,20 +69,44 @@ public class NamedElementDTOAssembler {
 
         VisibilityKind visibility;
         if (astahNamedElement.isPublicVisibility()) {
-            visibility = VisibilityKind.public_;
+            visibility = VisibilityKind.PUBLIC;
         } else if (astahNamedElement.isProtectedVisibility()) {
-            visibility = VisibilityKind.protected_;
+            visibility = VisibilityKind.PROTECTED;
         } else if (astahNamedElement.isPrivateVisibility()) {
-            visibility = VisibilityKind.private_;
+            visibility = VisibilityKind.PRIVATE;
         } else if (astahNamedElement.isPackageVisibility()) {
-            visibility = VisibilityKind.package_;
+            visibility = VisibilityKind.PACKAGE;
         } else {
-            visibility = VisibilityKind.public_;
+            visibility = VisibilityKind.PUBLIC;
         }
+
+        List<UrlHyperlinkDTO> urlHyperlinks = new ArrayList<>();
+        List<FilePathHyperlinkDTO> filePathHyperlinks = new ArrayList<>();
+        List<NamedElementHyperlinkDTO> namedElementHyperlinks = new ArrayList<>();
+        for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
+            if (hyperlink.isURL()) {
+                urlHyperlinks.add(
+                    new UrlHyperlinkDTO(
+                        hyperlink.getName(),
+                        hyperlink.getComment()));
+            
+            } else if (hyperlink.isFile()) {
+                filePathHyperlinks.add(
+                    new FilePathHyperlinkDTO(
+                        Path.of(hyperlink.getPath(), hyperlink.getName()).toString(),
+                        hyperlink.getComment()));
+            
+            } else if (hyperlink.isModel()) {
+                namedElementHyperlinks.add(
+                    new NamedElementHyperlinkDTO(
+                        hyperlink.getName(),
+                        hyperlink.getComment()));
+            }
+        }   
 
         return new NamedElementDTO(
             ElementDTOAssembler.toDTO(astahNamedElement),
-            NamedElementDTO.Type.getCorrespondingType(astahNamedElement).getTypeName(),
+            NamedElementDTO.Type.getCorrespondingType(astahNamedElement).typeName,
             astahNamedElement.getName(),
             astahNamedElement.getFullNamespace("."),
             visibility,
@@ -92,6 +120,9 @@ public class NamedElementDTOAssembler {
             clientUsages,
             supplierUsages,
             renderedInDiagrams,
-            constraints);
+            constraints,
+            urlHyperlinks,
+            filePathHyperlinks,
+            namedElementHyperlinks);
     }
 }

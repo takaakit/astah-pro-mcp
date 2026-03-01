@@ -39,7 +39,7 @@ public class StateMachineDiagramGuideTool implements ToolProvider {
         
         String content = """
 IMPORTANT POINTS to Keep in Mind:
-* After editing a diagram, retrieve its drawing content and verify that the edits and layout are as intended.
+* When adding new transition lines to a diagram, adjust the vertex coordinates after the lines are added so that they become right-angled.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):

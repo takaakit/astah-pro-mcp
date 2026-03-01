@@ -9,27 +9,27 @@ public class PseudostateDTOAssembler {
     public static PseudostateDTO toDTO(@NonNull IPseudostate astahPseudostate) throws Exception {
         PseudostateKind pseudostateKind;
         if (astahPseudostate.isChoicePseudostate()) {
-            pseudostateKind = PseudostateKind.choice;
+            pseudostateKind = PseudostateKind.CHOICE;
         } else if (astahPseudostate.isDeepHistoryPseudostate()) {
-            pseudostateKind = PseudostateKind.deep_history;
+            pseudostateKind = PseudostateKind.DEEP_HISTORY;
         } else if (astahPseudostate.isEntryPointPseudostate()) {
-            pseudostateKind = PseudostateKind.entry_point;
+            pseudostateKind = PseudostateKind.ENTRY_POINT;
         } else if (astahPseudostate.isExitPointPseudostate()) {
-            pseudostateKind = PseudostateKind.exit_point;
+            pseudostateKind = PseudostateKind.EXIT_POINT;
         } else if (astahPseudostate.isForkPseudostate()) {
-            pseudostateKind = PseudostateKind.fork;
+            pseudostateKind = PseudostateKind.FORK;
         } else if (astahPseudostate.isInitialPseudostate()) {
-            pseudostateKind = PseudostateKind.initial;
+            pseudostateKind = PseudostateKind.INITIAL;
         } else if (astahPseudostate.isJoinPseudostate()) {
-            pseudostateKind = PseudostateKind.join;
+            pseudostateKind = PseudostateKind.JOIN;
         } else if (astahPseudostate.isJunctionPseudostate()) {
-            pseudostateKind = PseudostateKind.junction;
+            pseudostateKind = PseudostateKind.JUNCTION;
         } else if (astahPseudostate.isShallowHistoryPseudostate()) {
-            pseudostateKind = PseudostateKind.shallow_history;
+            pseudostateKind = PseudostateKind.SHALLOW_HISTORY;
         } else if (astahPseudostate.isStubState()) {
-            pseudostateKind = PseudostateKind.stub;
+            pseudostateKind = PseudostateKind.STUB;
         } else {
-            pseudostateKind = PseudostateKind.initial;
+            pseudostateKind = PseudostateKind.INITIAL;
         }
         
         return new PseudostateDTO(

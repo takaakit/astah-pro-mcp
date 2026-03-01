@@ -118,7 +118,7 @@ public class ImageCaptureTool implements ToolProvider {
             int height = image.getHeight();
             int cropWidth, cropHeight;
             
-            if (region == ImageRegion.full) {
+            if (region == ImageRegion.FULL) {
                 cropWidth = width;
                 cropHeight = height;
             } else {
@@ -126,10 +126,10 @@ public class ImageCaptureTool implements ToolProvider {
                 int halfHeight = height / 2;
                 
                 switch (region) {
-                    case top_left -> { cropWidth = halfWidth; cropHeight = halfHeight; }
-                    case top_right -> { cropWidth = width - halfWidth; cropHeight = halfHeight; }
-                    case bottom_left -> { cropWidth = halfWidth; cropHeight = height - halfHeight; }
-                    case bottom_right -> { cropWidth = width - halfWidth; cropHeight = height - halfHeight; }
+                    case TOP_LEFT -> { cropWidth = halfWidth; cropHeight = halfHeight; }
+                    case TOP_RIGHT -> { cropWidth = width - halfWidth; cropHeight = halfHeight; }
+                    case BOTTOM_LEFT -> { cropWidth = halfWidth; cropHeight = height - halfHeight; }
+                    case BOTTOM_RIGHT -> { cropWidth = width - halfWidth; cropHeight = height - halfHeight; }
                     default -> { cropWidth = width; cropHeight = height; }
                 }
             }
@@ -144,15 +144,15 @@ public class ImageCaptureTool implements ToolProvider {
                 Thumbnails.Builder<BufferedImage> thumbnailBuilder = Thumbnails.of(image);
                 
                 // Crop according to the selected region
-                if (region != ImageRegion.full) {
+                if (region != ImageRegion.FULL) {
                     int halfWidth = width / 2;
                     int halfHeight = height / 2;
                     
                     switch (region) {
-                        case top_left -> thumbnailBuilder.sourceRegion(0, 0, halfWidth, halfHeight);
-                        case top_right -> thumbnailBuilder.sourceRegion(halfWidth, 0, width - halfWidth, halfHeight);
-                        case bottom_left -> thumbnailBuilder.sourceRegion(0, halfHeight, halfWidth, height - halfHeight);
-                        case bottom_right -> thumbnailBuilder.sourceRegion(halfWidth, halfHeight, width - halfWidth, height - halfHeight);
+                        case TOP_LEFT -> thumbnailBuilder.sourceRegion(0, 0, halfWidth, halfHeight);
+                        case TOP_RIGHT -> thumbnailBuilder.sourceRegion(halfWidth, 0, width - halfWidth, halfHeight);
+                        case BOTTOM_LEFT -> thumbnailBuilder.sourceRegion(0, halfHeight, halfWidth, height - halfHeight);
+                        case BOTTOM_RIGHT -> thumbnailBuilder.sourceRegion(halfWidth, halfHeight, width - halfWidth, height - halfHeight);
                     }
                 }
                 

@@ -10,7 +10,7 @@ public class NameIdTypeNamespaceDTOAssembler {
         return new NameIdTypeNamespaceDTO(
             astahClass.getName(),
             astahClass.getId(),
-            NamedElementDTO.Type.getCorrespondingType(astahClass).getTypeName(),
+            NamedElementDTO.Type.getCorrespondingType(astahClass).typeName,
             astahClass.getFullNamespace("."));
     }
 }

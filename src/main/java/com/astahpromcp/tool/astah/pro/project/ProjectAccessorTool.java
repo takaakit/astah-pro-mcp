@@ -11,7 +11,9 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAs
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeListDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
+import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -80,7 +82,14 @@ public class ProjectAccessorTool implements ToolProvider {
                         "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
                         this::findNamedElementsByName,
                         NameDTO.class,
-                        NameIdTypeListDTO.class)
+                        NameIdTypeListDTO.class),
+
+                ToolSupport.definition(
+                        "get_proj_path",
+                        "Return the full path of the Astah project file (e.g., /path/to/project.asta). If the project has not been saved, return an empty string. For example, use this tool when you want to derive a relative path from an absolute path based on the Astah project file location.",
+                        this::getProjectPath,
+                        NoInputDTO.class,
+                        ProjectPathDTO.class)
         );
     }
 
@@ -234,5 +243,15 @@ public class ProjectAccessorTool implements ToolProvider {
         }
 
         return NamedElementDTOAssembler.toDTO(astahProject);
+    }
+
+    private ProjectPathDTO getProjectPath(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Get project path: {}", param);
+
+        try {
+            return new ProjectPathDTO(projectAccessor.getProjectPath());
+        } catch (ProjectNotFoundException e) {
+            return new ProjectPathDTO("");
+        }
     }
 }

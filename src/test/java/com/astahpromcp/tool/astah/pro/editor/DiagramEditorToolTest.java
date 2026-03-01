@@ -49,6 +49,7 @@ public class DiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/DiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
+        ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
 
         // Tool
         tool = new DiagramEditorTool(
@@ -56,6 +57,7 @@ public class DiagramEditorToolTest {
             transactionManager,
             astahProToolSupport,
             diagramEditorSupport,
+            imageConvertSupport,
             true);
 
         // insertSvgImage() method

@@ -176,7 +176,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             transactionManager.beginTransaction();
             INodePresentation combinedFragment = sequenceDiagramEditor.createCombinedFragment(
                 param.newCombinedFragmentName(),
-                param.combinedFragmentKind().toAstahValue(),
+                param.combinedFragmentKind().astahValue,
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()),

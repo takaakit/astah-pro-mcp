@@ -1,13 +1,15 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import java.util.List;
 
 public record UseCaseDTO(
     @JsonPropertyDescription("Class information")
-    ClassDTO clazz,
+    @JsonProperty("class")
+    ClassDTO class_,   // For avoiding Java keyword collision
 
     @JsonPropertyDescription("Includes")
     List<NameIdTypeDTO> includes,
@@ -16,7 +18,8 @@ public record UseCaseDTO(
     List<NameIdTypeDTO> inverseIncludes,
 
     @JsonPropertyDescription("Extends")
-    List<NameIdTypeDTO> extends_,
+    @JsonProperty("extends")
+    List<NameIdTypeDTO> extends_,   // For avoiding Java keyword collision
 
     @JsonPropertyDescription("Inverse extends")
     List<NameIdTypeDTO> inverseExtends,

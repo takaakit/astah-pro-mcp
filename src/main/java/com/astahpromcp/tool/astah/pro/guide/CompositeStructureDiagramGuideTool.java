@@ -39,7 +39,6 @@ public class CompositeStructureDiagramGuideTool implements ToolProvider {
         
         String content = """
 IMPORTANT POINTS to Keep in Mind:
-* After editing a diagram, retrieve its drawing content and verify that the edits and layout are as intended.
 * In the definition below, StructuredClassifier and EncapsulatedClassifier correspond to the Class element in Astah. Therefore, understand StructuredClassifier as Class.
 
 

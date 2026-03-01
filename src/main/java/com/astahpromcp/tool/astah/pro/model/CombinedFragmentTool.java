@@ -97,7 +97,7 @@ public class CombinedFragmentTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            astahCombinedFragment.setInteractionOperator(param.kind().toAstahValue());
+            astahCombinedFragment.setInteractionOperator(param.kind().astahValue);
             transactionManager.endTransaction();
 
             return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);

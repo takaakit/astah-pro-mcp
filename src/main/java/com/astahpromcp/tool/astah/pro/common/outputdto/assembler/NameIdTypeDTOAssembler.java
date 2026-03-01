@@ -11,6 +11,6 @@ public class NameIdTypeDTOAssembler {
         return new NameIdTypeDTO(
             namedElement.getName(),
             namedElement.getId(),
-            NamedElementDTO.Type.getCorrespondingType(namedElement).getTypeName());
+            NamedElementDTO.Type.getCorrespondingType(namedElement).typeName);
     }
 }

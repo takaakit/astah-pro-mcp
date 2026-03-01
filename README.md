@@ -32,8 +32,7 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
 - Recommended AI assistants/agents
   - *For using the Full (Query + Edit) tool version:*  
-    With over **200** tools exposed in this version, use the AI assistants/agents listed below. Other AI assistants/agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
-    - **Claude Desktop**
+    With around **300** tools exposed in this version, use the AI assistants/agents listed below. Other AI assistants/agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
     - **Claude Code**
     - **Codex CLI**
     - **Gemini CLI**
@@ -55,7 +54,7 @@ Prompt: *Draw an activity diagram to illustrate the behavior of returning a book
 
 ## Supported Diagram Types
 
-This MCP server can view and edit the following diagrams (with more to come):
+This MCP server can view and edit the following diagrams:
 
 - **Class Diagram**  
 - **Sequence Diagram**  
@@ -65,6 +64,7 @@ This MCP server can view and edit the following diagrams (with more to come):
 - **Communication Diagram** (for query only; editing is not possible)
 - **Composite Structure Diagram** (for query only; editing is not possible)
 - **ER Diagram** (for query only; editing is not possible)
+- **Mind Map**
 
 <br>
 
@@ -242,10 +242,6 @@ If you want to disable this plugin in Astah, click [Plugin] > [Installed Plugin]
 
 <br>
 
-> *Troubleshooting:* If *Claude Desktop* cannot connect to the MCP server, completely quit *Claude Desktop* (e.g., end the 'Claude' process in Task Manager), then restart it.
-
-<br>
-
 ## Build & Test
 
 If you want to build and test locally:
@@ -295,7 +291,7 @@ As with source code, AI assistants/agents can make mistakes or misinterpret UML 
 
 ## License
 
-Some tool functions provided by this MCP server return excerpts from the [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF), [OMG SysML 1.7](https://www.omg.org/spec/SysML/1.7/PDF) specifications, and [FIPS PUB 184 IDEF1X](https://www.govinfo.gov/app/details/GOVPUB-C13-986bf8b12a4fed44eb78fca0bb55d668). The OMG UML/SysML specifications are licensed as stated at the beginning of each document. FIPS PUB 184 IDEF1X is a U.S. Government work (NIST) and is not subject to copyright protection in the United States (17 U.S.C. §105), but may be subject to foreign copyright. When content from these specifications/documents is returned by tool functions, it is explicitly indicated as an excerpt.
+Some tool functions provided by this MCP server return excerpts from the [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF), [OMG SysML 1.7](https://www.omg.org/spec/SysML/1.7/PDF) specifications, and [FIPS PUB 184 IDEF1X](https://www.govinfo.gov/app/details/GOVPUB-C13-986bf8b12a4fed44eb78fca0bb55d668). The OMG UML/SysML specifications are licensed as stated at the beginning of each document. FIPS PUB 184 IDEF1X is a U.S. Government work (NIST) and is not subject to copyright protection in the United States (17 U.S.C. §105), but may be subject to foreign copyright. When content from these specifications/documents is returned by tool functions, it is explicitly indicated as an excerpt. "Mind Map" is a registered trademark of The Buzan Organisation Limited (1990).
 
 All other source code is copyrighted by **Takaaki Teshima** and released under the **MIT-0** license.  
 [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue.svg)](https://opensource.org/licenses/MIT-0)

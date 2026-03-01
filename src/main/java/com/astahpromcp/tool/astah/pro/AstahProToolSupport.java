@@ -322,4 +322,8 @@ public class AstahProToolSupport {
     public IERSubtypeRelationship getERSubtypeRelationship(String id) {
         return getEntity(id, IERSubtypeRelationship.class, "ER subtype relationship");
     }
+
+    public IMindMapDiagram getMindMapDiagram(String id) {
+        return getEntity(id, IMindMapDiagram.class, "mind map diagram");
+    }
 }
