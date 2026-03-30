@@ -10,6 +10,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.SequenceDiagramD
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
@@ -196,8 +197,21 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         log.debug("Create message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
+        if (senderNode.getType() != Type.ACTIVATION.typeName
+            && senderNode.getType() != Type.LIFELINE.typeName
+            && senderNode.getType() != Type.INTERACTION_USE.typeName
+            && senderNode.getType() != Type.FRAME.typeName) {
+            throw new IllegalArgumentException("Message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+        }
+
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
+        if (receiverNode.getType() != Type.LIFELINE.typeName
+            && receiverNode.getType() != Type.INTERACTION_USE.typeName
+            && receiverNode.getType() != Type.FRAME.typeName) {
+            throw new IllegalArgumentException("Message receiver node must be one of the following node presentation types: Lifeline, InteractionUse, or Frame.");
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -222,8 +236,19 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         log.debug("Create create message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
+        if (senderNode.getType() != Type.ACTIVATION.typeName
+            && senderNode.getType() != Type.LIFELINE.typeName
+            && senderNode.getType() != Type.INTERACTION_USE.typeName
+            && senderNode.getType() != Type.FRAME.typeName) {
+            throw new IllegalArgumentException("Create message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+        }
+
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
+        if (receiverNode.getType() != Type.LIFELINE.typeName) {
+            throw new IllegalArgumentException("Create message receiver node must be one of the following node presentation types: Lifeline.");
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -248,8 +273,19 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         log.debug("Create destroy message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
+        if (senderNode.getType() != Type.ACTIVATION.typeName
+            && senderNode.getType() != Type.LIFELINE.typeName
+            && senderNode.getType() != Type.INTERACTION_USE.typeName
+            && senderNode.getType() != Type.FRAME.typeName) {
+            throw new IllegalArgumentException("Destroy message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+        }
+
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
+        if (receiverNode.getType() != Type.LIFELINE.typeName) {
+            throw new IllegalArgumentException("Destroy message receiver node must be one of the following node presentation types: Lifeline.");
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -274,7 +310,11 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         log.debug("Create return message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+
         ILinkPresentation targetMessage = astahProToolSupport.getLinkPresentation(param.targetMessageId());
+        if (targetMessage.getType() != Type.MESSAGE.typeName) {
+            throw new IllegalArgumentException("Target message for return message must be one of the following link presentation types: Message.");
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -297,7 +337,14 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         log.debug("Create lost message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
-        INodePresentation targetNode = astahProToolSupport.getNodePresentation(param.targetSenderNodePresentationId());
+
+        INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
+        if (senderNode.getType() != Type.ACTIVATION.typeName
+            && senderNode.getType() != Type.LIFELINE.typeName
+            && senderNode.getType() != Type.INTERACTION_USE.typeName
+            && senderNode.getType() != Type.FRAME.typeName) {
+            throw new IllegalArgumentException("Lost message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -305,7 +352,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             transactionManager.beginTransaction();
             ILinkPresentation lostMessage = sequenceDiagramEditor.createLostMessage(
                 param.newLostMessageName(),
-                targetNode,
+                senderNode,
                 new Point2D.Double(param.endPointX(), param.endPointY()));
             transactionManager.endTransaction();
 
@@ -321,7 +368,13 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         log.debug("Create found message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
-        INodePresentation targetNode = astahProToolSupport.getNodePresentation(param.targetReceiverNodePresentationId());
+
+        INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
+        if (receiverNode.getType() != Type.LIFELINE.typeName
+            && receiverNode.getType() != Type.INTERACTION_USE.typeName
+            && receiverNode.getType() != Type.FRAME.typeName) {
+            throw new IllegalArgumentException("Found message receiver node must be one of the following node presentation types: Lifeline, InteractionUse, or Frame.");
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -330,7 +383,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             ILinkPresentation foundMessage = sequenceDiagramEditor.createFoundMessage(
                 param.newFoundMessageName(),
                 new Point2D.Double(param.startPointX(), param.startPointY()),
-                targetNode);
+                receiverNode);
             transactionManager.endTransaction();
 
             return LinkPresentationDTOAssembler.toDTO(foundMessage);

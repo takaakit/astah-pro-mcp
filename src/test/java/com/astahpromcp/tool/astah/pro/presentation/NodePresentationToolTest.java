@@ -92,7 +92,7 @@ public class NodePresentationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
         
@@ -120,7 +120,7 @@ public class NodePresentationToolTest {
     @Test
     void getNodePresentationRectangle_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -145,7 +145,7 @@ public class NodePresentationToolTest {
     @Test
     void setNodePresentationLocation_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
         
@@ -181,7 +181,7 @@ public class NodePresentationToolTest {
     @Test
     void setNodePresentationWidth_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
         
@@ -213,7 +213,7 @@ public class NodePresentationToolTest {
     @Test
     void setNodePresentationHeight_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
         

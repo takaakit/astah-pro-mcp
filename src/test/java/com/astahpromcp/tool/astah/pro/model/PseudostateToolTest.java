@@ -56,7 +56,7 @@ public class PseudostateToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get pseudostate
-        IPseudostate pseudostate = (IPseudostate) TestSupport.instance().getNamedElement(
+        IPseudostate pseudostate = (IPseudostate) TestSupport.instance().getNamedElementByClassAndName(
             IPseudostate.class,
             "InitialPseudostate0");
         

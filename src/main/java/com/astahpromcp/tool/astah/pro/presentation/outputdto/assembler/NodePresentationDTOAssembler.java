@@ -1,5 +1,7 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler;
 
+import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.LabelIdTypeDTOAssembler;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.FilePathHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementHyperlinkDTO;
@@ -17,9 +19,9 @@ import java.util.List;
 public class NodePresentationDTOAssembler {
     public static NodePresentationDTO toDTO(@NonNull INodePresentation astahNodePresentation) throws Exception {
 
-        List<String> linkIds = new ArrayList<>();
+        List<LabelIdTypeDTO> links = new ArrayList<>();
         for (ILinkPresentation linkPresentation : astahNodePresentation.getLinks()) {
-            linkIds.add(linkPresentation.getID());
+            links.add(LabelIdTypeDTOAssembler.toDTO(linkPresentation));
         }
 
         List<UrlHyperlinkDTO> urlHyperlinks = new ArrayList<>();
@@ -48,7 +50,7 @@ public class NodePresentationDTOAssembler {
 
         return new NodePresentationDTO(
             PresentationDTOAssembler.toDTO(astahNodePresentation),
-            linkIds,
+            links,
             RectangleDTOAssembler.toDTO(astahNodePresentation.getRectangle()),
             urlHyperlinks,
             filePathHyperlinks,

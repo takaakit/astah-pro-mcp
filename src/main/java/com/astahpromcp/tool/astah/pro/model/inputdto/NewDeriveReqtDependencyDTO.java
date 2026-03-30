@@ -7,9 +7,6 @@ public record NewDeriveReqtDependencyDTO(
     String sourceRequirementId,
     
     @JsonPropertyDescription("Target requirement identifier")
-    String targetRequirementId,
-    
-    @JsonPropertyDescription("New derive reqt dependency name")
-    String newDeriveReqtDependencyName
+    String targetRequirementId
 ) {
 }

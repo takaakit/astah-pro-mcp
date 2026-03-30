@@ -56,7 +56,7 @@ public class EnumerationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get enumeration
-        IEnumeration enumeration = (IEnumeration) TestSupport.instance().getNamedElement(
+        IEnumeration enumeration = (IEnumeration) TestSupport.instance().getNamedElementByClassAndName(
             IEnumeration.class,
             "Foo");
         

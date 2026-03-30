@@ -154,7 +154,7 @@ public class AssociationToolTest {
     @Test
     void getAssociationInfo_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -177,7 +177,7 @@ public class AssociationToolTest {
     @Test
     void getAssociationEndAInfo_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -203,7 +203,7 @@ public class AssociationToolTest {
     @Test
     void getAssociationEndBInfo_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -229,7 +229,7 @@ public class AssociationToolTest {
     @Test
     void setInitialValueOfAssociationEndA_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -263,7 +263,7 @@ public class AssociationToolTest {
     @Test
     void setInitialValueOfAssociationEndB_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -297,7 +297,7 @@ public class AssociationToolTest {
     @Test
     void setStaticOfAssociationEndA_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -331,7 +331,7 @@ public class AssociationToolTest {
     @Test
     void setStaticOfAssociationEndB_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -365,7 +365,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byInt_1() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -400,7 +400,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byInt_2() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -435,7 +435,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byString() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -470,7 +470,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byIntAndString() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -505,7 +505,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byStringAndInt() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -540,7 +540,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byString_withOneValue_1() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -575,7 +575,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byString_withOneValue_2() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -610,7 +610,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byInt_withOneValue_1() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -645,7 +645,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_byInt_withOneValue_2() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -680,7 +680,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndA_ok_withSameValue() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -715,7 +715,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byInt_1() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -750,7 +750,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byInt_2() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -785,7 +785,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byString() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -820,7 +820,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byIntAndString() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -855,7 +855,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byStringAndInt() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -890,7 +890,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byString_withOneValue_1() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -925,7 +925,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byString_withOneValue_2() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -960,7 +960,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byInt_withOneValue_1() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -995,7 +995,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_byInt_withOneValue_2() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -1030,7 +1030,7 @@ public class AssociationToolTest {
     @Test
     void setMultiplicityOfAssociationEndB_ok_withSameValue() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -1065,7 +1065,7 @@ public class AssociationToolTest {
     @Test
     void setAggregationKindOfAssociationEndA_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -1094,12 +1094,15 @@ public class AssociationToolTest {
 
         // Check aggregation kind after setting
         assertTrue(association.getMemberEnds()[0].isAggregate());
+        assertFalse(association.getMemberEnds()[0].isComposite());
+        assertFalse(association.getMemberEnds()[1].isAggregate());
+        assertFalse(association.getMemberEnds()[1].isComposite());
     }
 
     @Test
     void setAggregationKindOfAssociationEndB_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -1127,13 +1130,16 @@ public class AssociationToolTest {
         assertNotNull(outputDTO);
 
         // Check aggregation kind after setting
+        assertFalse(association.getMemberEnds()[0].isAggregate());
+        assertFalse(association.getMemberEnds()[0].isComposite());
+        assertFalse(association.getMemberEnds()[1].isAggregate());
         assertTrue(association.getMemberEnds()[1].isComposite());
     }
 
     @Test
     void setNavigabilityOfAssociationEndA_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -1143,10 +1149,10 @@ public class AssociationToolTest {
         // Create input DTO
         AssociationEndWithNavigabilityDTO inputDTO = new AssociationEndWithNavigabilityDTO(
             associationEndAId,
-            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NAVIGABLE);
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NON_NAVIGABLE);
 
         // Check navigability before setting
-        assertNotEquals("Navigable", association.getMemberEnds()[0].getNavigability());
+        assertNotEquals("Non_Navigable", association.getMemberEnds()[0].getNavigability());
 
         // ----------------------------------------
         // Call setNavigabilityOfAssociationEndA()
@@ -1161,13 +1167,14 @@ public class AssociationToolTest {
         assertNotNull(outputDTO);
 
         // Check navigability after setting
-        assertEquals("Navigable", association.getMemberEnds()[0].getNavigability());
+        assertEquals("Non_Navigable", association.getMemberEnds()[0].getNavigability());
+        assertNotEquals("Non_Navigable", association.getMemberEnds()[1].getNavigability());
     }
 
     @Test
     void setNavigabilityOfAssociationEndB_ok() throws Exception {
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
 
@@ -1195,6 +1202,7 @@ public class AssociationToolTest {
         assertNotNull(outputDTO);
 
         // Check navigability after setting
+        assertNotEquals("Non_Navigable", association.getMemberEnds()[0].getNavigability());
         assertEquals("Non_Navigable", association.getMemberEnds()[1].getNavigability());
     }
 }

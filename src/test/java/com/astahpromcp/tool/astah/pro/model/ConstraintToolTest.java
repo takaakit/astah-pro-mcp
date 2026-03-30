@@ -66,7 +66,7 @@ public class ConstraintToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -93,7 +93,7 @@ public class ConstraintToolTest {
     @Test
     void setSpecification_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         

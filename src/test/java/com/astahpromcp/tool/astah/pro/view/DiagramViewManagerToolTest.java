@@ -175,7 +175,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void openDiagram_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -207,7 +207,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void closeDiagram_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -239,7 +239,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void getCurrentDiagram_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -266,7 +266,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void getSelectedPresentations_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -277,7 +277,7 @@ public class DiagramViewManagerToolTest {
         diagramViewManager.open(diagram);
         
         // Select presentation
-        IPresentation presentation = TestSupport.instance().getPresentation(
+        IPresentation presentation = TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         diagramViewManager.select(presentation);
@@ -300,7 +300,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void selectAllPresentations_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -330,7 +330,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void unselectAllPresentations_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -365,7 +365,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void autoLayout_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -391,7 +391,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void zoom_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
 
@@ -423,7 +423,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void zoomFit_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -449,7 +449,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void highlightPresentation_nodePresentation_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -457,7 +457,7 @@ public class DiagramViewManagerToolTest {
         diagramViewManager.open(diagram);
 
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -483,7 +483,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void highlightPresentation_linkPresentation_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -491,7 +491,7 @@ public class DiagramViewManagerToolTest {
         diagramViewManager.open(diagram);
 
         // Get link presentation
-        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentation(
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Association",
             "has");
         
@@ -517,7 +517,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void unhighlightPresentation_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -525,7 +525,7 @@ public class DiagramViewManagerToolTest {
         diagramViewManager.open(diagram);
 
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -565,7 +565,7 @@ public class DiagramViewManagerToolTest {
     @Test
     void getHighlightedPresentationsWithinDiagram_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -573,10 +573,10 @@ public class DiagramViewManagerToolTest {
         diagramViewManager.open(diagram);
 
         // Get presentations
-        INodePresentation nodePresentation1 = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation1 = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
-        INodePresentation nodePresentation2 = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation2 = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Bar");
 

@@ -74,7 +74,7 @@ public class LinkEndToolTest {
     @Test
     void setAggregation_ok() throws Exception {
         // Get link end
-        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElement(
+        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElementByClassAndName(
             ILinkEnd.class,
             "fooLinkEnd");
         
@@ -105,7 +105,7 @@ public class LinkEndToolTest {
     @Test
     void setComposition_ok() throws Exception {
         // Get link end
-        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElement(
+        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElementByClassAndName(
             ILinkEnd.class,
             "fooLinkEnd");
         
@@ -136,7 +136,7 @@ public class LinkEndToolTest {
     @Test
     void setNavigation_ok() throws Exception {
         // Get link end
-        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElement(
+        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElementByClassAndName(
             ILinkEnd.class,
             "fooLinkEnd");
         

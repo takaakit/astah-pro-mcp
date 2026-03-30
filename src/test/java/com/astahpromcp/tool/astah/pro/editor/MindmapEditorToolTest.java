@@ -163,7 +163,7 @@ public class MindmapEditorToolTest {
     @Test
     void createMindmapDiagram_ok() throws Exception {
         // Get package
-        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
 
@@ -188,7 +188,7 @@ public class MindmapEditorToolTest {
     @Test
     void createFloatingTopic_ok() throws Exception {
         // Get mind map diagram
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
 
@@ -215,7 +215,7 @@ public class MindmapEditorToolTest {
     @Test
     void createTopic_ok() throws Exception {
         // Get mind map diagram and root topic
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -242,7 +242,7 @@ public class MindmapEditorToolTest {
     @Test
     void createTopicLink_ok() throws Exception {
         // Get mind map diagram, root topic and a floating topic
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -273,7 +273,7 @@ public class MindmapEditorToolTest {
     @Test
     void changeToFloatingTopic_ok() throws Exception {
         // Get mind map diagram and a child topic (not root, not floating)
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -303,7 +303,7 @@ public class MindmapEditorToolTest {
     @Test
     void changeParentOfTopic_ok() throws Exception {
         // Get mind map diagram, target topic and new parent
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -335,7 +335,7 @@ public class MindmapEditorToolTest {
     @Test
     void moveTopicWithinSiblingOrder_ok() throws Exception {
         // Get mind map diagram and a topic with siblings
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -366,7 +366,7 @@ public class MindmapEditorToolTest {
     @Test
     void insertSvgImageIntoTopic_ok() throws Exception {
         // Get mind map diagram and a topic
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -395,7 +395,7 @@ public class MindmapEditorToolTest {
     @Test
     void insertPngImageIntoTopic_ok() throws Exception {
         // Get mind map diagram and a topic
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -426,7 +426,7 @@ public class MindmapEditorToolTest {
     @Test
     void insertJpgImageIntoTopic_ok() throws Exception {
         // Get mind map diagram and a topic
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -457,7 +457,7 @@ public class MindmapEditorToolTest {
     @Test
     void deleteChildTopics_ok() throws Exception {
         // Get mind map diagram and a topic (use root - deleteChildren on empty is no-op)
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -484,7 +484,7 @@ public class MindmapEditorToolTest {
     void deleteImageFromTopic_ok() throws Exception {
         // Get mind map diagram and root topic
         // First insert an image, then delete it
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();
@@ -510,7 +510,7 @@ public class MindmapEditorToolTest {
     @Test
     void setBoundaryOfTopic_ok() throws Exception {
         // Get mind map diagram and a topic
-        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElement(
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
         INodePresentation rootTopic = mindMapDiagram.getRoot();

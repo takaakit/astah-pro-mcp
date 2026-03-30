@@ -56,7 +56,7 @@ public class PartitionToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get partition
-        IPartition partition = (IPartition) TestSupport.instance().getNamedElement(
+        IPartition partition = (IPartition) TestSupport.instance().getNamedElementByClassAndName(
             IPartition.class,
             "Partition0");
         

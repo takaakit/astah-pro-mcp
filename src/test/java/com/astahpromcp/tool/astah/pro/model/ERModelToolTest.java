@@ -56,7 +56,7 @@ public class ERModelToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER model
-        IERModel erModel = (IERModel) TestSupport.instance().getNamedElement(
+        IERModel erModel = (IERModel) TestSupport.instance().getNamedElementByClassAndName(
             IERModel.class,
             "ER Model");
 

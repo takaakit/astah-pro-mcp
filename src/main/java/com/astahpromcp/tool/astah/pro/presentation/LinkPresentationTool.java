@@ -6,11 +6,13 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
+import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithLineStyleDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithPointsDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +72,13 @@ public class LinkPresentationTool implements ToolProvider {
                         "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
                         this::setAllPoints,
                         LinkPresentationWithPointsDTO.class,
+                        LinkPresentationDTO.class),
+
+                ToolSupport.definition(
+                        "set_line_style_of_link_prst",
+                        "Set the line style of the specified link presentation (specified by ID), and return the link presentation information after it is set.",
+                        this::setLineStyle,
+                        LinkPresentationWithLineStyleDTO.class,
                         LinkPresentationDTO.class)
         );
     }
@@ -96,6 +105,24 @@ public class LinkPresentationTool implements ToolProvider {
 		try {
             transactionManager.beginTransaction();
 			linkPresentation.setAllPoints(pointArray);
+            transactionManager.endTransaction();
+
+            return LinkPresentationDTOAssembler.toDTO(linkPresentation);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private LinkPresentationDTO setLineStyle(McpSyncServerExchange exchange, LinkPresentationWithLineStyleDTO param) throws Exception {
+        log.debug("Set line style of link presentation: {}", param);
+
+        ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());
+
+        try {
+            transactionManager.beginTransaction();
+            linkPresentation.setProperty(Key.LINE_SHAPE, param.lineStyle().astahValue);
             transactionManager.endTransaction();
 
             return LinkPresentationDTOAssembler.toDTO(linkPresentation);

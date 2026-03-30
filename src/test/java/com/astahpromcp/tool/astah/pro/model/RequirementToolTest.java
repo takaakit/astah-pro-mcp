@@ -74,7 +74,7 @@ public class RequirementToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get requirement
-        IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElement(
+        IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElementByClassAndName(
             IRequirement.class,
             "Requirement0");
         
@@ -97,7 +97,7 @@ public class RequirementToolTest {
     @Test
     void setRequirementId_ok() throws Exception {
         // Get requirement
-        IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElement(
+        IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElementByClassAndName(
             IRequirement.class,
             "Requirement0");
         
@@ -128,7 +128,7 @@ public class RequirementToolTest {
     @Test
     void setRequirementText_ok() throws Exception {
         // Get requirement
-        IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElement(
+        IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElementByClassAndName(
             IRequirement.class,
             "Requirement0");
         

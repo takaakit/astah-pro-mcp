@@ -65,7 +65,7 @@ public class SlotToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get slot
-        ISlot slot = (ISlot) TestSupport.instance().getNamedElement(
+        ISlot slot = (ISlot) TestSupport.instance().getNamedElementByClassAndName(
             ISlot.class,
             "attribute0");
         
@@ -88,7 +88,7 @@ public class SlotToolTest {
     @Test
     void setValue_ok() throws Exception {
         // Get slot
-        ISlot slot = (ISlot) TestSupport.instance().getNamedElement(
+        ISlot slot = (ISlot) TestSupport.instance().getNamedElementByClassAndName(
             ISlot.class,
             "attribute0");
         

@@ -56,7 +56,7 @@ public class InteractionToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get interaction
-        IInteraction interaction = (IInteraction) TestSupport.instance().getNamedElement(
+        IInteraction interaction = (IInteraction) TestSupport.instance().getNamedElementByClassAndName(
             IInteraction.class,
             "");
         

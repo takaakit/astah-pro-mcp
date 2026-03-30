@@ -56,7 +56,7 @@ public class LinkToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get link
-        ILink link = (ILink) TestSupport.instance().getNamedElement(
+        ILink link = (ILink) TestSupport.instance().getNamedElementByClassAndName(
             ILink.class,
             "");
         

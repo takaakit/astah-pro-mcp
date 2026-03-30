@@ -94,7 +94,7 @@ public class ElementToolTest {
     @Test
     void addStereotype_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -125,7 +125,7 @@ public class ElementToolTest {
     @Test
     void removeStereotype_ok() throws Exception {
         // Get element
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -156,7 +156,7 @@ public class ElementToolTest {
     @Test
     void setTypeModifier_ok() throws Exception {
         // Get element
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -187,7 +187,7 @@ public class ElementToolTest {
     @Test
     void changeTaggedValue_ok() throws Exception {
         // Get element
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -218,7 +218,7 @@ public class ElementToolTest {
     @Test
     void getDiagramsOfElement_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         

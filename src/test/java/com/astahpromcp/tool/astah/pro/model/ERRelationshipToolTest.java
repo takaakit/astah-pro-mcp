@@ -120,7 +120,7 @@ public class ERRelationshipToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
@@ -145,7 +145,7 @@ public class ERRelationshipToolTest {
     @Test
     void setCardinality_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
@@ -171,12 +171,12 @@ public class ERRelationshipToolTest {
     @Test
     void setERIndex_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
         // Get ER index
-        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElement(
+        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
 
@@ -202,7 +202,7 @@ public class ERRelationshipToolTest {
     @Test
     void setLogicalName_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
@@ -228,7 +228,7 @@ public class ERRelationshipToolTest {
     @Test
     void setPhysicalName_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
@@ -254,7 +254,7 @@ public class ERRelationshipToolTest {
     @Test
     void setParentRequired_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship1");
         boolean nextValue = !erRelationship.isParentRequired();
@@ -281,7 +281,7 @@ public class ERRelationshipToolTest {
     @Test
     void setVerbPhraseParent_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
@@ -307,7 +307,7 @@ public class ERRelationshipToolTest {
     @Test
     void setVerbPhraseChild_ok() throws Exception {
         // Get ER relationship
-        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship erRelationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 

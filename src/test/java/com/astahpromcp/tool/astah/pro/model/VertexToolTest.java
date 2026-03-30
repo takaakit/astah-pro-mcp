@@ -56,7 +56,7 @@ public class VertexToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get vertex
-        IVertex vertex = (IVertex) TestSupport.instance().getNamedElement(
+        IVertex vertex = (IVertex) TestSupport.instance().getNamedElementByClassAndName(
             IVertex.class,
             "State0");
         

@@ -56,7 +56,7 @@ public class GateToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get gate
-        IGate gate = (IGate) TestSupport.instance().getNamedElement(
+        IGate gate = (IGate) TestSupport.instance().getNamedElementByClassAndName(
             IGate.class,
             "");
         

@@ -74,7 +74,7 @@ public class PortToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get port
-        IPort port = (IPort) TestSupport.instance().getNamedElement(
+        IPort port = (IPort) TestSupport.instance().getNamedElementByClassAndName(
             IPort.class,
             "port0");
         
@@ -98,7 +98,7 @@ public class PortToolTest {
     @Test
     void setBehavior_ok() throws Exception {
         // Get port
-        IPort port = (IPort) TestSupport.instance().getNamedElement(
+        IPort port = (IPort) TestSupport.instance().getNamedElementByClassAndName(
             IPort.class,
             "port0");
         
@@ -130,7 +130,7 @@ public class PortToolTest {
     @Test
     void setService_ok() throws Exception {
         // Get port
-        IPort port = (IPort) TestSupport.instance().getNamedElement(
+        IPort port = (IPort) TestSupport.instance().getNamedElementByClassAndName(
             IPort.class,
             "port0");
         

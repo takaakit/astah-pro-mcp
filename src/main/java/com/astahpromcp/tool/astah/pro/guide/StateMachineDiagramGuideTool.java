@@ -38,10 +38,6 @@ public class StateMachineDiagramGuideTool implements ToolProvider {
         log.debug("Get state machine diagram guide: {}", param);
         
         String content = """
-IMPORTANT POINTS to Keep in Mind:
-* When adding new transition lines to a diagram, adjust the vertex coordinates after the lines are added so that they become right-angled.
-
-
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * Due to its event-driven nature, a StateMachine execution is either in transit or in state, alternating between the two. It is in transit when an event is dispatched that matches at least one of its associated Triggers. While in transit, it may execute a number of Behaviors associated with the paths it is taking.
 * A Region denotes a behavior fragment that may execute concurrently with its orthogonal Regions. Two or more Regions are orthogonal to each other if they are either owned by the same State or, at the topmost level, by the same StateMachine.

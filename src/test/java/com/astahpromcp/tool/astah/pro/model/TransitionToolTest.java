@@ -83,7 +83,7 @@ public class TransitionToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get transition
-        ITransition transition = (ITransition) TestSupport.instance().getNamedElement(
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
         
@@ -106,7 +106,7 @@ public class TransitionToolTest {
     @Test
     void setAction_ok() throws Exception {
         // Get transition
-        ITransition transition = (ITransition) TestSupport.instance().getNamedElement(
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
         
@@ -137,7 +137,7 @@ public class TransitionToolTest {
     @Test
     void setEvent_ok() throws Exception {
         // Get transition
-        ITransition transition = (ITransition) TestSupport.instance().getNamedElement(
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
         
@@ -168,7 +168,7 @@ public class TransitionToolTest {
     @Test
     void setGuard_ok() throws Exception {
         // Get transition
-        ITransition transition = (ITransition) TestSupport.instance().getNamedElement(
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
         

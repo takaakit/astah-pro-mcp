@@ -65,7 +65,7 @@ public class InteractionOperandToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get interaction operand - assuming there's an interaction operand in the test model
-        IInteractionOperand interactionOperand = (IInteractionOperand) TestSupport.instance().getNamedElement(
+        IInteractionOperand interactionOperand = (IInteractionOperand) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionOperand.class,
             "");
         
@@ -88,7 +88,7 @@ public class InteractionOperandToolTest {
     @Test
     void setGuard_ok() throws Exception {
         // Get interaction operand
-        IInteractionOperand interactionOperand = (IInteractionOperand) TestSupport.instance().getNamedElement(
+        IInteractionOperand interactionOperand = (IInteractionOperand) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionOperand.class,
             "");
 

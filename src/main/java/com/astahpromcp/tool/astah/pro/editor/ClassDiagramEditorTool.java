@@ -93,7 +93,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "create_link_between_instance_specs",
-                        "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation information.",
+                        "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation information. Note that the created link has no arrowheads.",
                         this::createInstanceSpecificationLink,
                         NewLinkSourceAndTargetDTO.class,
                         LinkPresentationDTO.class)

@@ -56,7 +56,7 @@ public class CommentToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get comment
-        IComment astahComment = (IComment) TestSupport.instance().getNamedElement(
+        IComment astahComment = (IComment) TestSupport.instance().getNamedElementByClassAndName(
             IComment.class,
             "");
         

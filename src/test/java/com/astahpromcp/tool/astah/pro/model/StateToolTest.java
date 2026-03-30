@@ -95,7 +95,7 @@ public class StateToolTest {
     @Test
     void getInfo() throws Exception {
         // Get state
-        IState state = (IState) TestSupport.instance().getNamedElement(
+        IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
             "State0");
         
@@ -118,7 +118,7 @@ public class StateToolTest {
     @Test
     void addInternalTransition() throws Exception {
         // Get state
-        IState state = (IState) TestSupport.instance().getNamedElement(
+        IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
             "State0");
         
@@ -145,7 +145,7 @@ public class StateToolTest {
     @Test
     void deleteAllInternalTransitions() throws Exception {
         // Get state
-        IState state = (IState) TestSupport.instance().getNamedElement(
+        IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
             "State0");
         
@@ -168,7 +168,7 @@ public class StateToolTest {
     @Test
     void setEntry() throws Exception {
         // Get state
-        IState state = (IState) TestSupport.instance().getNamedElement(
+        IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
             "State0");
         
@@ -193,7 +193,7 @@ public class StateToolTest {
     @Test
     void setDoActivity() throws Exception {
         // Get state
-        IState state = (IState) TestSupport.instance().getNamedElement(
+        IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
             "State0");
         
@@ -218,7 +218,7 @@ public class StateToolTest {
     @Test
     void setExit() throws Exception {
         // Get state
-        IState state = (IState) TestSupport.instance().getNamedElement(
+        IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
             "State0");
         

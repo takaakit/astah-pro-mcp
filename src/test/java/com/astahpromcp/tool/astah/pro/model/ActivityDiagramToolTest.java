@@ -65,7 +65,7 @@ public class ActivityDiagramToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -88,7 +88,7 @@ public class ActivityDiagramToolTest {
     @Test
     void getActivity_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         

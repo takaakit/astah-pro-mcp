@@ -145,7 +145,7 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createSequenceDiagram_ok() throws Exception {
         // Get package
-        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         
@@ -171,7 +171,7 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createCombinedFragment_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
@@ -202,15 +202,15 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createMessage_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
         // Get lifelines
-        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
-        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
         
@@ -239,15 +239,15 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createCreateMessage_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
 
         // Get lifelines
-        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
-        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
         
@@ -276,15 +276,15 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createDestroyMessage_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
         // Get lifelines
-        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
-        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
         
@@ -313,12 +313,12 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createReturnMessage_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
 
         // Get target message
-        ILinkPresentation targetMessage = (ILinkPresentation) TestSupport.instance().getPresentation(
+        ILinkPresentation targetMessage = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Message",
             "Message0()");
         
@@ -344,12 +344,12 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createLostMessage_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
         // Get target sender node
-        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
         
@@ -378,12 +378,12 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createFoundMessage_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
         // Get target receiver node
-        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
         
@@ -412,7 +412,7 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createInteractionUse_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
@@ -442,7 +442,7 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createLifeline_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
@@ -469,12 +469,12 @@ public class SequenceDiagramEditorToolTest {
     @Test
     void createTermination_ok() throws Exception {
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
         
         // Get target node
-        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
         

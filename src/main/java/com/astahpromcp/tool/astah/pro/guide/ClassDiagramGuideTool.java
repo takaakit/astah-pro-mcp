@@ -39,7 +39,7 @@ public class ClassDiagramGuideTool implements ToolProvider {
         
         String content = """
 IMPORTANT POINTS to Keep in Mind:
-* When adding new association, generalization, or realization lines to a diagram, adjust the vertex coordinates after the lines are added so that they become right-angled.
+* An arrowhead is attached to the end of an association or link on the side that is set to be navigable. The end without an arrowhead shall have its navigability set to unspecified. Non-navigable shall be set only when explicitly specified by the user.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):

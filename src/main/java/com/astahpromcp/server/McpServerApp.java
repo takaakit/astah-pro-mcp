@@ -261,7 +261,7 @@ public final class McpServerApp {
         log.info("Build MCP server capabilities");
 
         McpSchema.ServerCapabilities capabilities = McpSchema.ServerCapabilities.builder()
-                .tools(!toolProviders.isEmpty())
+                .tools(false)               // listChanged off
                 .build();
 
         McpServer.SyncSpecification<?> serverBuilder = McpServer.sync(transport)

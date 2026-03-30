@@ -56,7 +56,7 @@ public class ConnectorToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get connector
-        IConnector connector = (IConnector) TestSupport.instance().getNamedElement(
+        IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
             IConnector.class,
             "connector0");
         

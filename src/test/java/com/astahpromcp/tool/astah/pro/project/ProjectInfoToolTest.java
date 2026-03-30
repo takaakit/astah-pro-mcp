@@ -238,7 +238,7 @@ public class ProjectInfoToolTest {
     @Test
     void retrieveClassifiersThatReferenceOrBeReferencedBy_ok() throws Exception {
         // Get classifier
-        IClass classifier = (IClass) TestSupport.instance().getNamedElement(
+        IClass classifier = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Baz");
         
@@ -255,98 +255,98 @@ public class ProjectInfoToolTest {
             SourceTargetNameIdTypeListDTO.class);
         
         // Get classifier
-        IClass quux01 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux01 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux01");
-        IClass quux02 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux02 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux02");
-        IClass quux03 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux03 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux03");
-        IClass quux04 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux04 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux04");
-        IClass quux05 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux05 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux05");
-        IClass quux06 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux06 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux06");
-        IClass quux07 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux07 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux07");
-        IClass quux08 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux08 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux08");
-        IClass quux09 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux09 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux09");
-        IClass quux10 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux10 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux10");
-        IClass quux11 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux11 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux11");
-        IClass quux12 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux12 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux12");
-        IClass quux13 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux13 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux13");
-        IClass quux14 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux14 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux14");
-        IClass quux15 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quux15 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux15");
         
-        IClass quuy01 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy01 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy01");
-        IClass quuy02 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy02 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy02");
-        IClass quuy03 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy03 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy03");
-        IClass quuy04 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy04 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy04");
-        IClass quuy05 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy05 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy05");
-        IClass quuy06 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy06 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy06");
-        IClass quuy07 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy07 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy07");
-        IClass quuy08 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy08 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy08");
-        IClass quuy09 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy09 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy09");
-        IClass quuy10 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy10 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy10");
-        IClass quuy11 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy11 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy11");
-        IClass quuy12 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy12 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy12");
-        IClass quuy13 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy13 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy13");
-        IClass quuy14 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy14 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy14");
-        IClass quuy15 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy15 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy15");
-        IClass quuy16 = (IClass) TestSupport.instance().getNamedElement(
+        IClass quuy16 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy16");
         
@@ -553,7 +553,7 @@ public class ProjectInfoToolTest {
     @Test
     void retrieveClassifiersWithinPackage_ok() throws Exception {
         // Get package
-        IPackage package_ = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage package_ = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "package0");
         

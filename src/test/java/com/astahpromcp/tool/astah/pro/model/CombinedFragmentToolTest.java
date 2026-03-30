@@ -66,7 +66,7 @@ public class CombinedFragmentToolTest {
     @Test
     void addInteractionOperand_ok() throws Exception {
         // Get combined fragment
-        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElement(
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
             ICombinedFragment.class,
             "");
 
@@ -99,7 +99,7 @@ public class CombinedFragmentToolTest {
     @Test
     void setCombinedFragmentKind_ok() throws Exception {
         // Get combined fragment
-        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElement(
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
             ICombinedFragment.class,
             "");
 

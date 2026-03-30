@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.project;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.FilePathDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.NameDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.BooleanDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeListDTO;
@@ -14,9 +15,9 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +33,7 @@ public class ProjectAccessorToolTest {
     private Method isProjectModified;
     private Method findNamedElementsByName;
     private Method saveProject;
+    private Method saveProjectAs;
     private Method closeProject;
     private Method getProjectPath;
 
@@ -61,7 +63,7 @@ public class ProjectAccessorToolTest {
             ProjectAccessorTool.class,
             "openProject",
             McpSyncServerExchange.class,
-            NameDTO.class);
+            FilePathDTO.class);
 
         // getProject() method
         getProject = TestSupport.getAccessibleMethod(
@@ -97,6 +99,13 @@ public class ProjectAccessorToolTest {
             "saveProject",
             McpSyncServerExchange.class,
             NoInputDTO.class);
+
+        // saveProjectAs() method
+        saveProjectAs = TestSupport.getAccessibleMethod(
+            ProjectAccessorTool.class,
+            "saveProjectAs",
+            McpSyncServerExchange.class,
+            FilePathDTO.class);
 
         // closeProject() method
         closeProject = TestSupport.getAccessibleMethod(
@@ -142,9 +151,34 @@ public class ProjectAccessorToolTest {
     }
 
     @Test
-    void openProject_ok() throws Exception {
+    void openProject_ok_1() throws Exception {
         // Create input DTO
-        NameDTO inputDTO = new NameDTO("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta");
+        // Relative path
+        FilePathDTO inputDTO = new FilePathDTO("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta");
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            openProject,
+            tool,
+            inputDTO,
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(outputDTO.name(), projectAccessor.getProject().getName());
+        
+        // Check that the project was opened
+        assertNotNull(projectAccessor.getProject());
+    }
+
+    @Test
+    void openProject_ok_2() throws Exception {
+        // Create input DTO
+        // Absolute path
+        final String currentDirectory = System.getProperty("user.dir");
+        FilePathDTO inputDTO = new FilePathDTO(currentDirectory + "/src/test/resources/modelfile/project/ProjectAccessorToolTest.asta");
 
         // ----------------------------------------
         // Call openProject()
@@ -272,7 +306,6 @@ public class ProjectAccessorToolTest {
         assertEquals(outputDTO.value().get(0).name(), "Foo");
     }
 
-    @Disabled
     @Test
     void saveProject_ok() throws Exception {
         // Create input DTO
@@ -281,15 +314,170 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
             saveProject,
             tool,
             inputDTO,
-            NamedElementDTO.class);
+            ProjectPathDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(outputDTO.name(), projectAccessor.getProject().getName());
+        assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
+    }
+
+    @Test
+    void saveProject_ng_1() throws Exception {
+        // Create a new project
+        projectAccessor.create();
+
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call saveProject()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            saveProject,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class));
+    }
+
+    @Test
+    void saveProject_ng_2() throws Exception {
+        // Close the project
+        projectAccessor.close();
+
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call saveProject()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            saveProject,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class));
+    }
+
+    @Test
+    void saveProjectAs_ok_1() throws Exception {
+        // Create input DTO
+        // Relative path
+        FilePathDTO inputDTO = new FilePathDTO("./ProjectAccessorToolTest_2.asta");
+
+        // Delete the stale file if it exists
+        File targetFile = new File(inputDTO.filePath());
+        if (targetFile.exists()) {
+            assertTrue(targetFile.delete(), "failed to delete stale file: " + targetFile);
+        }
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            saveProjectAs,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
+
+        // Check that the project file exists
+        assertTrue(new File(inputDTO.filePath()).exists());
+
+        // Cleanup: Delete the saved project file
+        new File(inputDTO.filePath()).delete();
+    }
+
+    @Test
+    void saveProjectAs_ok_2() throws Exception {
+        // Create input DTO
+        // Absolute path
+        final String currentDirectory = System.getProperty("user.dir");
+        FilePathDTO inputDTO = new FilePathDTO(currentDirectory + "/ProjectAccessorToolTest_2.asta");
+
+        // Delete the stale file if it exists
+        File targetFile = new File(inputDTO.filePath());
+        if (targetFile.exists()) {
+            assertTrue(targetFile.delete(), "failed to delete stale file: " + targetFile);
+        }
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            saveProjectAs,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
+
+        // Check that the project file exists
+        assertTrue(new File(inputDTO.filePath()).exists());
+
+        // Cleanup: Delete the saved project file
+        new File(inputDTO.filePath()).delete();
+    }
+
+    @Test
+    void saveProjectAs_ng_1() throws Exception {
+        // Create input DTO
+        // Dummy file path
+        FilePathDTO inputDTO = new FilePathDTO("C:/dummy/ProjectAccessorToolTest_2.asta");
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            saveProjectAs,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class));
+    }
+
+    @Test
+    void saveProjectAs_ng_2() throws Exception {
+        // Create input DTO
+        // Incorrect file path
+        FilePathDTO inputDTO = new FilePathDTO("./ProjectAccessorToolTest_2.txt");
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            saveProjectAs,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class));
+    }
+
+    @Test
+    void saveProjectAs_ng_3() throws Exception {
+        // Create input DTO
+        FilePathDTO inputDTO = new FilePathDTO("./ProjectAccessorToolTest_2.asta");
+
+        // Create the file
+        File targetFile = new File(inputDTO.filePath());
+        assertTrue(targetFile.createNewFile(), "failed to create file: " + targetFile);
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            saveProjectAs,
+            tool,
+            inputDTO,
+            ProjectPathDTO.class));
+
+        // Cleanup: Delete the created file
+        targetFile.delete();
     }
 
     @Test

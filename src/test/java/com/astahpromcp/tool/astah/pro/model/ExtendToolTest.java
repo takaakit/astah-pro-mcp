@@ -56,7 +56,7 @@ public class ExtendToolTest {
     @Test
     void getInfo() throws Exception {
         // Get extend
-        IExtend extend = (IExtend) TestSupport.instance().getNamedElement(
+        IExtend extend = (IExtend) TestSupport.instance().getNamedElementByClassAndName(
             IExtend.class,
             "Extend0");
         

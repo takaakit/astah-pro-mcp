@@ -98,7 +98,7 @@ public class ProjectViewManagerToolTest {
     @Test
     void showInPropertyView_ok() throws Exception {
         // Get element
-        IElement element = TestSupport.instance().getNamedElement(
+        IElement element = TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -121,7 +121,7 @@ public class ProjectViewManagerToolTest {
     @Test
     void showInStructureTree_ok() throws Exception {
         // Get element
-        IElement element = TestSupport.instance().getNamedElement(
+        IElement element = TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         

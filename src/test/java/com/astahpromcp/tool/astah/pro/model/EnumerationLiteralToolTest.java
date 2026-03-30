@@ -56,7 +56,7 @@ public class EnumerationLiteralToolTest {
     @Test
     void setValue_ok() throws Exception {
         // Get enumeration literal
-        IEnumerationLiteral enumerationLiteral = (IEnumerationLiteral) TestSupport.instance().getNamedElement(
+        IEnumerationLiteral enumerationLiteral = (IEnumerationLiteral) TestSupport.instance().getNamedElementByClassAndName(
             IEnumerationLiteral.class,
             "Enumeration Literal0");
         

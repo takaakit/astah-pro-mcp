@@ -34,6 +34,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
     private final boolean includeEditTools;
+    private static final double NOTE_MAX_WIDTH = 400.0;
 
     public BasicDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
@@ -102,6 +103,12 @@ public class BasicDiagramEditorTool implements ToolProvider {
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
+            
+            // If the note width exceeds the limit, adjust it to the limit.
+            if (astahNodePresentation.getWidth() > NOTE_MAX_WIDTH) {
+                astahNodePresentation.setWidth(NOTE_MAX_WIDTH);
+                astahNodePresentation.setLocation(new Point2D.Double(param.locationX(), param.locationY()));
+            }
             transactionManager.endTransaction();
 
             return NodePresentationDTOAssembler.toDTO(astahNodePresentation);

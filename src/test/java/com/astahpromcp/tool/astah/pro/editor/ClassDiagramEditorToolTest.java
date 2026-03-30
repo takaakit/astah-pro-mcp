@@ -13,10 +13,14 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IAssociationClass;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
+import com.change_vision.jude.api.inf.model.ILink;
+import com.change_vision.jude.api.inf.model.ILinkEnd;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -93,7 +97,7 @@ public class ClassDiagramEditorToolTest {
     @Test
     void createClassDiagram_ok() throws Exception {
         // Get package
-        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         
@@ -103,7 +107,7 @@ public class ClassDiagramEditorToolTest {
             "TestClassDiagram");
         
         // Check that the diagram does not exist
-        assertNull(TestSupport.instance().getNamedElement(
+        assertNull(TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "TestClassDiagram"));
 
@@ -121,7 +125,7 @@ public class ClassDiagramEditorToolTest {
         assertEquals("TestClassDiagram", outputDTO.namedElement().name());
 
         // Check that the diagram exists
-        assertNotNull(TestSupport.instance().getNamedElement(
+        assertNotNull(TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "TestClassDiagram"));
     }
@@ -129,22 +133,22 @@ public class ClassDiagramEditorToolTest {
     @Test
     void createAssociationClassPresentation_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
 
         // Get association class
-        IAssociationClass associationClass = (IAssociationClass) TestSupport.instance().getNamedElement(
+        IAssociationClass associationClass = (IAssociationClass) TestSupport.instance().getNamedElementByClassAndName(
             IAssociationClass.class,
             "AssociationClass0");
 
         // Get source node presentation (class presentation)
-        INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
 
         // Get target node presentation (class presentation)
-        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Bar");
 
@@ -171,12 +175,12 @@ public class ClassDiagramEditorToolTest {
     @Test
     void createInstanceSpecification_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -204,17 +208,17 @@ public class ClassDiagramEditorToolTest {
     @Test
     void createInstanceSpecificationLink_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
 
         // Get instance specification
-        INodePresentation instanceSpecificationFoo = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation instanceSpecificationFoo = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "InstanceSpecification",
             "foo");
 
         // Get instance specification
-        INodePresentation instanceSpecificationBar = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation instanceSpecificationBar = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "InstanceSpecification",
             "bar");
 
@@ -235,5 +239,19 @@ public class ClassDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get created instance specification link
+        ILinkPresentation createdInstanceSpecificationLinkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationById(
+            outputDTO.presentation().id());
+        ILink createdInstanceSpecificationLink = (ILink) TestSupport.instance().getNamedElementById(
+            ((INamedElement) createdInstanceSpecificationLinkPresentation.getModel()).getId());
+
+        // Get created source link end
+        ILinkEnd createdSourceLinkEnd = createdInstanceSpecificationLink.getMemberEnds()[0];
+        ILinkEnd createdTargetLinkEnd = createdInstanceSpecificationLink.getMemberEnds()[1];
+        
+        // Check with the created instance specification link
+        assertEquals(com.astahpromcp.tool.astah.pro.common.NavigabilityKind.UNSPECIFIED.astahValue, createdSourceLinkEnd.getNavigability());
+        assertEquals(com.astahpromcp.tool.astah.pro.common.NavigabilityKind.UNSPECIFIED.astahValue, createdTargetLinkEnd.getNavigability());
     }
 }

@@ -98,7 +98,7 @@ public class OperationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         
@@ -121,7 +121,7 @@ public class OperationToolTest {
     @Test
     void setAbstract_ok() throws Exception {
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         
@@ -152,7 +152,7 @@ public class OperationToolTest {
     @Test
     void setLeaf_ok() throws Exception {
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         
@@ -183,7 +183,7 @@ public class OperationToolTest {
     @Test
     void setStatic_ok() throws Exception {
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         
@@ -214,12 +214,12 @@ public class OperationToolTest {
     @Test
     void setReturnType_ok() throws Exception {
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
         
@@ -250,7 +250,7 @@ public class OperationToolTest {
     @Test
     void setReturnTypeExpression_ok() throws Exception {
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         

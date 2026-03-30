@@ -4,11 +4,13 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
+import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithLineStyleDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithPointsDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Point2D;
+import java.beans.Transient;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -27,6 +30,7 @@ public class LinkPresentationToolTest {
     private LinkPresentationTool tool;
     private Method getInfo;
     private Method setAllPoints;
+    private Method setLineStyle;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -56,6 +60,13 @@ public class LinkPresentationToolTest {
             "setAllPoints",
             McpSyncServerExchange.class,
             LinkPresentationWithPointsDTO.class);
+
+        // setLineStyle() method
+        setLineStyle = TestSupport.getAccessibleMethod(
+            LinkPresentationTool.class,
+            "setLineStyle",
+            McpSyncServerExchange.class,
+            LinkPresentationWithLineStyleDTO.class);
     }
 
     @AfterEach
@@ -68,7 +79,7 @@ public class LinkPresentationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get link presentation
-        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentation(
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Association",
             "");
         
@@ -90,9 +101,117 @@ public class LinkPresentationToolTest {
     }
 
     @Test
+    void getInfo_lineStyle_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "line style");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(linkPresentation.getID());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getInfo,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+            
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.LINE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.LINE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void getInfo_lineRightAngleStyle_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "line right angle style");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(linkPresentation.getID());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getInfo,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+            
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.LINE_RIGHT_ANGLE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.LINE_RIGHT_ANGLE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void getInfo_curveStyle_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "curve style");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(linkPresentation.getID());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getInfo,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.CURVE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.CURVE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void getInfo_curveRightAngleStyle_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "curve right angle style");
+        
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(linkPresentation.getID());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            getInfo,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+            
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.CURVE_RIGHT_ANGLE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.CURVE_RIGHT_ANGLE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
     void setAllPoints_ok() throws Exception {
         // Get link presentation
-        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentation(
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Association",
             "");
 
@@ -129,5 +248,133 @@ public class LinkPresentationToolTest {
 
         // Check points after setting
         assertEquals(5, linkPresentation.getPoints().length);
+    }
+
+    @Test
+    void setLineStyle_lineToCurve_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "line style");
+
+        // Create input DTO
+        LinkPresentationWithLineStyleDTO inputDTO = new LinkPresentationWithLineStyleDTO(
+            linkPresentation.getID(),
+            LineStyleKind.CURVE);
+
+        // Check line style before setting
+        assertEquals(LineStyleKind.LINE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+
+        // ----------------------------------------
+        // Call setLineStyle()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setLineStyle,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.CURVE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.CURVE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void setLineStyle_curveToLineRightAngle_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "curve style");
+
+        // Create input DTO
+        LinkPresentationWithLineStyleDTO inputDTO = new LinkPresentationWithLineStyleDTO(
+            linkPresentation.getID(),
+            LineStyleKind.LINE_RIGHT_ANGLE);
+
+        // Check line style before setting
+        assertEquals(LineStyleKind.CURVE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+
+        // ----------------------------------------
+        // Call setLineStyle()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setLineStyle,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.LINE_RIGHT_ANGLE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.LINE_RIGHT_ANGLE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void setLineStyle_lineRightAngleToCurveRightAngle_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "line right angle style");
+
+        // Create input DTO
+        LinkPresentationWithLineStyleDTO inputDTO = new LinkPresentationWithLineStyleDTO(
+            linkPresentation.getID(),
+            LineStyleKind.CURVE_RIGHT_ANGLE);
+
+        // Check line style before setting
+        assertEquals(LineStyleKind.LINE_RIGHT_ANGLE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+
+        // ----------------------------------------
+        // Call setLineStyle()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setLineStyle,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.CURVE_RIGHT_ANGLE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.CURVE_RIGHT_ANGLE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void setLineStyle_curveRightAngleToLine_ok() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "curve right angle style");
+
+        // Create input DTO
+        LinkPresentationWithLineStyleDTO inputDTO = new LinkPresentationWithLineStyleDTO(
+            linkPresentation.getID(),
+            LineStyleKind.LINE);
+
+        // Check line style before setting
+        assertEquals(LineStyleKind.CURVE_RIGHT_ANGLE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+
+        // ----------------------------------------
+        // Call setLineStyle()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setLineStyle,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(LineStyleKind.LINE, outputDTO.lineStyle());
+
+        // Check link presentation
+        assertEquals(LineStyleKind.LINE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
     }
 }

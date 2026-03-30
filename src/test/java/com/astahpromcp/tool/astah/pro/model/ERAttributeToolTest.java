@@ -130,7 +130,7 @@ public class ERAttributeToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -155,12 +155,12 @@ public class ERAttributeToolTest {
     @Test
     void setDatatype_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -186,12 +186,12 @@ public class ERAttributeToolTest {
     @Test
     void setDomain_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
@@ -217,7 +217,7 @@ public class ERAttributeToolTest {
     @Test
     void setDefaultValue_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -243,7 +243,7 @@ public class ERAttributeToolTest {
     @Test
     void setLengthPrecision_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -269,7 +269,7 @@ public class ERAttributeToolTest {
     @Test
     void setLogicalName_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -295,7 +295,7 @@ public class ERAttributeToolTest {
     @Test
     void setPhysicalName_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -321,7 +321,7 @@ public class ERAttributeToolTest {
     @Test
     void setPrimaryKey_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
         boolean nextValue = !erAttribute.isPrimaryKey();
@@ -348,7 +348,7 @@ public class ERAttributeToolTest {
     @Test
     void setNotNull_ok() throws Exception {
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
         boolean nextValue = !erAttribute.isNotNull();

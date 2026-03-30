@@ -56,7 +56,7 @@ public class UseCaseToolTest {
     @Test
     void getInfo() throws Exception {
         // Get usecase
-        IUseCase useCase = (IUseCase) TestSupport.instance().getNamedElement(
+        IUseCase useCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase0");
         

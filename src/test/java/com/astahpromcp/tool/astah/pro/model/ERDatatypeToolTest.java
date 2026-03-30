@@ -92,7 +92,7 @@ public class ERDatatypeToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -117,7 +117,7 @@ public class ERDatatypeToolTest {
     @Test
     void setLengthConstraint_ok() throws Exception {
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -143,7 +143,7 @@ public class ERDatatypeToolTest {
     @Test
     void setPrecisionConstraint_ok() throws Exception {
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -169,7 +169,7 @@ public class ERDatatypeToolTest {
     @Test
     void setDefaultLengthPrecision_ok() throws Exception {
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -195,7 +195,7 @@ public class ERDatatypeToolTest {
     @Test
     void setDescription_ok() throws Exception {
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 

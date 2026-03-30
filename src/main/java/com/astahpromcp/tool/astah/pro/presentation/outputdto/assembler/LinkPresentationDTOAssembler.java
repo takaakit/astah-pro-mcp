@@ -1,8 +1,12 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.PointDoubleDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.LabelIdTypeDTOAssembler;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import lombok.NonNull;
+import com.astahpromcp.tool.astah.pro.presentation.LineStyleKind;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 
 import java.awt.geom.Point2D;
@@ -12,18 +16,18 @@ import java.util.List;
 public class LinkPresentationDTOAssembler {
     public static LinkPresentationDTO toDTO(@NonNull ILinkPresentation astahLinkPresentation) throws Exception {
 
-        String sourceNodeEndId;
+        LabelIdTypeDTO sourceNodeEnd;
         if (astahLinkPresentation.getSourceEnd() != null) {
-            sourceNodeEndId = astahLinkPresentation.getSourceEnd().getID();
+            sourceNodeEnd = LabelIdTypeDTOAssembler.toDTO(astahLinkPresentation.getSourceEnd());
         } else {
-            sourceNodeEndId = "";
+            sourceNodeEnd = LabelIdTypeDTO.empty();
         }
 
-        String targetNodeEndId;
+        LabelIdTypeDTO targetNodeEnd;
         if (astahLinkPresentation.getTargetEnd() != null) {
-            targetNodeEndId = astahLinkPresentation.getTargetEnd().getID();
+            targetNodeEnd = LabelIdTypeDTOAssembler.toDTO(astahLinkPresentation.getTargetEnd());
         } else {
-            targetNodeEndId = "";
+            targetNodeEnd = LabelIdTypeDTO.empty();
         }
 
         List<PointDoubleDTO> drawPoints = new ArrayList<>();
@@ -33,8 +37,9 @@ public class LinkPresentationDTOAssembler {
 
         return new LinkPresentationDTO(
             PresentationDTOAssembler.toDTO(astahLinkPresentation),
-            sourceNodeEndId,
-            targetNodeEndId,
-            drawPoints);
+            sourceNodeEnd,
+            targetNodeEnd,
+            drawPoints,
+            LineStyleKind.getCorrespondingType(astahLinkPresentation.getProperty(Key.LINE_SHAPE)));
     }
 }

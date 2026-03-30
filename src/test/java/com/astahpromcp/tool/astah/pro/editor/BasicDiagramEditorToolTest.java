@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BasicDiagramEditorToolTest {
@@ -67,9 +68,9 @@ public class BasicDiagramEditorToolTest {
     }
 
     @Test
-    void createNote_ok() throws Exception {
+    void createNote_ok_1() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
@@ -94,19 +95,55 @@ public class BasicDiagramEditorToolTest {
     }
 
     @Test
+    void createNote_ok_2() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+        
+        // Create input DTO
+        NewNoteDTO inputDTO = new NewNoteDTO(
+            classDiagram.getId(),
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            100,
+            200);
+
+        // ----------------------------------------
+        // Call createNote()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            createNote,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Get created note
+        INodePresentation createdNote = (INodePresentation) TestSupport.instance().getPresentationById(
+            outputDTO.presentation().id());
+        
+        // Check with the created note
+        assertEquals(400.0, createdNote.getWidth(), 0.1);
+        assertEquals(100.0, createdNote.getLocation().getX(), 0.1);
+        assertEquals(200.0, createdNote.getLocation().getY(), 0.1);
+    }
+
+    @Test
     void createNoteAnchor_ok() throws Exception {
         // Get class diagram
-        IClassDiagram astahClassDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram astahClassDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
 
         // Get note
-        INodePresentation astahNote = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation astahNote = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Note",
             "Note0");
         
         // Get class (node presentation)
-        INodePresentation astahClassFoo = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation astahClassFoo = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
 

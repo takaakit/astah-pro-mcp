@@ -83,7 +83,7 @@ public class EREntityToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER entity
-        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
@@ -108,7 +108,7 @@ public class EREntityToolTest {
     @Test
     void setLogicalName_ok() throws Exception {
         // Get ER entity
-        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
@@ -134,7 +134,7 @@ public class EREntityToolTest {
     @Test
     void setPhysicalName_ok() throws Exception {
         // Get ER entity
-        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
@@ -160,7 +160,7 @@ public class EREntityToolTest {
     @Test
     void setType_ok() throws Exception {
         // Get ER entity
-        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 

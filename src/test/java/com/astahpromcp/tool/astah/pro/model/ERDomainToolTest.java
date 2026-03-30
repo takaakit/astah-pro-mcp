@@ -120,7 +120,7 @@ public class ERDomainToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
@@ -145,12 +145,12 @@ public class ERDomainToolTest {
     @Test
     void setDatatype_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -176,7 +176,7 @@ public class ERDomainToolTest {
     @Test
     void setDefaultValue_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
@@ -202,7 +202,7 @@ public class ERDomainToolTest {
     @Test
     void setLengthPrecision_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
@@ -228,7 +228,7 @@ public class ERDomainToolTest {
     @Test
     void setLogicalName_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
@@ -254,7 +254,7 @@ public class ERDomainToolTest {
     @Test
     void setPhysicalName_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
@@ -280,7 +280,7 @@ public class ERDomainToolTest {
     @Test
     void setNotNull_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
         boolean nextValue = !erDomain.isNotNull();
@@ -307,12 +307,12 @@ public class ERDomainToolTest {
     @Test
     void setParentERDomain_ok() throws Exception {
         // Get ER domain
-        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
         // Get parent ER domain
-        IERDomain parentDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain parentDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain1");
 

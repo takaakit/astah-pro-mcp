@@ -3,6 +3,8 @@ package com.astahpromcp.tool;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.function.BiFunction;
 
@@ -80,18 +82,20 @@ public final class ToolSupport {
         }
 
         try {
-            INPUT param = parsed.dto();
-            OUTPUT dto = function.apply(exchange, param);
-            if (dto == null) {
-                String msg = String.format("Failure: %s", toolName);
+            INPUT inputDto = parsed.dto();
+            log.debug("Tool input of {}: \n{}", toolName, ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE));
+            OUTPUT outputDto = function.apply(exchange, inputDto);
+            log.debug("Tool output of {}: \n{}", toolName, ReflectionToStringBuilder.toString(outputDto, ToStringStyle.MULTI_LINE_STYLE));
+            if (outputDto == null) {
+                String msg = String.format("Failure @tool=%s", toolName);
                 log.error(msg);
                 return ResponseSupport.error(msg);
             }
             
-            return ResponseSupport.success(dto);
+            return ResponseSupport.success(outputDto);
             
         } catch (Exception e) {
-            String msg = String.format("Exception: %s %s", toolName, e.getMessage());
+            String msg = String.format("Exception @tool=%s: %s", toolName, e.getMessage());
             log.error(msg);
             return ResponseSupport.error(msg);
         }

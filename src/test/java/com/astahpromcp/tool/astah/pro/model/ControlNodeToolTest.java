@@ -56,7 +56,7 @@ public class ControlNodeToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get control node
-        IControlNode controlNode = (IControlNode) TestSupport.instance().getNamedElement(
+        IControlNode controlNode = (IControlNode) TestSupport.instance().getNamedElementByClassAndName(
             IControlNode.class,
             "Decision Node & Merge Node0");
         

@@ -66,7 +66,7 @@ public class InstanceSpecificationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get instance specification
-        IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElement(
+        IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElementByClassAndName(
             IInstanceSpecification.class,
             "foo");
         
@@ -89,12 +89,12 @@ public class InstanceSpecificationToolTest {
     @Test
     void setClassifier_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
         
         // Get instance specification
-        IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElement(
+        IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElementByClassAndName(
             IInstanceSpecification.class,
             "foo");
 

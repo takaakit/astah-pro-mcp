@@ -158,7 +158,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addUrlHyperlinkToNamedElement_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -194,7 +194,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addUrlHyperlinkToNamedElement_ng() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -218,7 +218,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addFilePathHyperlinkToNamedElement_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -254,12 +254,12 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addNamedElementHyperlinkToNamedElement_ok() throws Exception {
         // Get target element
-        INamedElement targetElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement targetElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
         // Get element to link
-        INamedElement elementToLink = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement elementToLink = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Baz");
 
@@ -295,7 +295,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void removeAllUrlHyperlinksFromNamedElement_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -327,7 +327,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void removeAllFilePathHyperlinksFromNamedElement_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -359,7 +359,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void removeAllNamedElementHyperlinksFromNamedElement_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
 
@@ -391,7 +391,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addUrlHyperlinkToNodePresentation_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 
@@ -430,7 +430,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addUrlHyperlinkToNodePresentation_ng() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 
@@ -454,7 +454,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addFilePathHyperlinkToNodePresentation_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 
@@ -493,12 +493,12 @@ public class HyperlinkOwnerToolTest {
     @Test
     void addNamedElementHyperlinkToNodePresentation_ok() throws Exception {
         // Get target node presentation
-        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 
         // Get element to link
-        INamedElement elementToLink = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement elementToLink = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Baz");
 
@@ -537,7 +537,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void removeAllUrlHyperlinksFromNodePresentation_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 
@@ -572,7 +572,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void removeAllFilePathHyperlinksFromNodePresentation_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 
@@ -607,7 +607,7 @@ public class HyperlinkOwnerToolTest {
     @Test
     void removeAllNamedElementHyperlinksFromNodePresentation_ok() throws Exception {
         // Get node presentation
-        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "Quux");
 

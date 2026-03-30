@@ -100,7 +100,7 @@ public class AttributeToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -125,7 +125,7 @@ public class AttributeToolTest {
     @Test
     void setInitialValue_ok() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -156,7 +156,7 @@ public class AttributeToolTest {
     @Test
     void setStatic_ok() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -187,12 +187,12 @@ public class AttributeToolTest {
     @Test
     void setType_ok() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "String");
         
@@ -223,7 +223,7 @@ public class AttributeToolTest {
     @Test
     void setTypeExpression_ok() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -254,7 +254,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byInt_1() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -286,7 +286,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byInt_2() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -318,7 +318,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byString() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -350,7 +350,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byIntAndString() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -382,7 +382,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byStringAndInt() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -414,7 +414,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byString_withOneValue_1() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -446,7 +446,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byString_withOneValue_2() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -478,7 +478,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byInt_withOneValue_1() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -510,7 +510,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_byInt_withOneValue_2() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         
@@ -542,7 +542,7 @@ public class AttributeToolTest {
     @Test
     void setMultiplicity_ok_withSameValue() throws Exception {
         // Get attribute
-        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElement(
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
         

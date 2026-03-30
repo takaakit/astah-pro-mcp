@@ -7,9 +7,6 @@ public record NewVerifyDependencyDTO(
     String sourceTestCaseId,
     
     @JsonPropertyDescription("Target requirement identifier")
-    String targetRequirementId,
-    
-    @JsonPropertyDescription("New verify dependency name")
-    String newVerifyDependencyName
+    String targetRequirementId
 ) {
 }

@@ -74,7 +74,7 @@ public class FlowToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get flow
-        IFlow flow = (IFlow) TestSupport.instance().getNamedElement(
+        IFlow flow = (IFlow) TestSupport.instance().getNamedElementByClassAndName(
             IFlow.class,
             "");
         
@@ -97,7 +97,7 @@ public class FlowToolTest {
     @Test
     void setAction_ok() throws Exception {
         // Get flow
-        IFlow flow = (IFlow) TestSupport.instance().getNamedElement(
+        IFlow flow = (IFlow) TestSupport.instance().getNamedElementByClassAndName(
             IFlow.class,
             "");
         
@@ -128,7 +128,7 @@ public class FlowToolTest {
     @Test
     void setGuard_ok() throws Exception {
         // Get flow
-        IFlow flow = (IFlow) TestSupport.instance().getNamedElement(
+        IFlow flow = (IFlow) TestSupport.instance().getNamedElementByClassAndName(
             IFlow.class,
             "");
         

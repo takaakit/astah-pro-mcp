@@ -57,7 +57,7 @@ public class AssociationClassToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get association class
-        IAssociationClass associationClass = (IAssociationClass) TestSupport.instance().getNamedElement(
+        IAssociationClass associationClass = (IAssociationClass) TestSupport.instance().getNamedElementByClassAndName(
             IAssociationClass.class,
             "AssociationClass0");
 

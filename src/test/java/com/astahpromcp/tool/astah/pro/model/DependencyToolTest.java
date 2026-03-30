@@ -56,7 +56,7 @@ public class DependencyToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get dependency
-        IDependency dependency = (IDependency) TestSupport.instance().getNamedElement(
+        IDependency dependency = (IDependency) TestSupport.instance().getNamedElementByClassAndName(
             IDependency.class,
             "");
         

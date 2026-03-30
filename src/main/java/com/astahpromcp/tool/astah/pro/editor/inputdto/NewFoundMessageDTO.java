@@ -15,7 +15,7 @@ public record NewFoundMessageDTO(
     @JsonPropertyDescription("Start point Y coordinate")
     int startPointY,
     
-    @JsonPropertyDescription("Target receiver node presentation identifier")
-    String targetReceiverNodePresentationId
+    @JsonPropertyDescription("Receiver node presentation identifier. Must be one of the following node presentation types: Lifeline, InteractionUse, or Frame.")
+    String receiverNodePresentationId
 ) {
 }

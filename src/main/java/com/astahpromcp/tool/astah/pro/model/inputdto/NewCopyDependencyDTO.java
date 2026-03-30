@@ -7,9 +7,6 @@ public record NewCopyDependencyDTO(
     String sourceRequirementId,
     
     @JsonPropertyDescription("Target requirement identifier")
-    String targetRequirementId,
-    
-    @JsonPropertyDescription("New copy dependency name")
-    String newCopyDependencyName
+    String targetRequirementId
 ) {
 }

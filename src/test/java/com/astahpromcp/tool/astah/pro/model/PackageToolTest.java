@@ -56,7 +56,7 @@ public class PackageToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get package
-        IPackage pkg = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage pkg = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         

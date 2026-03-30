@@ -66,7 +66,7 @@ public class ObjectNodeToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get object node
-        IObjectNode objectNode = (IObjectNode) TestSupport.instance().getNamedElement(
+        IObjectNode objectNode = (IObjectNode) TestSupport.instance().getNamedElementByClassAndName(
             IObjectNode.class,
             "Object0");
         
@@ -89,12 +89,12 @@ public class ObjectNodeToolTest {
     @Test
     void setBase_ok() throws Exception {
         // Get object node
-        IObjectNode objectNode = (IObjectNode) TestSupport.instance().getNamedElement(
+        IObjectNode objectNode = (IObjectNode) TestSupport.instance().getNamedElementByClassAndName(
             IObjectNode.class,
             "Object0");
         
         // Get base class
-        IClass baseClass = (IClass) TestSupport.instance().getNamedElement(
+        IClass baseClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         

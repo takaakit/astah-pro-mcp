@@ -7,6 +7,8 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
+import com.change_vision.jude.api.inf.model.IInclude;
+import com.change_vision.jude.api.inf.model.IExtend;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IUseCase;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UseCaseModelEditorToolTest {
@@ -92,7 +95,7 @@ public class UseCaseModelEditorToolTest {
     @Test
     void createActor_ok() throws Exception {
         // Get package
-        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         
@@ -118,7 +121,7 @@ public class UseCaseModelEditorToolTest {
     @Test
     void createUseCase_ok() throws Exception {
         // Get package
-        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         
@@ -144,10 +147,10 @@ public class UseCaseModelEditorToolTest {
     @Test
     void createInclude_ok() throws Exception {
         // Get use cases
-        IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElement(
+        IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase0");
-        IUseCase astahIncludedUseCase = (IUseCase) TestSupport.instance().getNamedElement(
+        IUseCase astahIncludedUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase1");
         
@@ -168,15 +171,23 @@ public class UseCaseModelEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get created include
+        IInclude createdInclude = (IInclude) TestSupport.instance().getNamedElementById(
+            outputDTO.namedElement().element().id());
+        
+        // Check with the created include
+        assertEquals(astahUseCase.getId(), createdInclude.getIncludingCase().getId());
+        assertEquals(astahIncludedUseCase.getId(), createdInclude.getAddition().getId());
     }
 
     @Test
     void createExtend_ok() throws Exception {
         // Get use cases
-        IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElement(
+        IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase0");
-        IUseCase astahExtendedUseCase = (IUseCase) TestSupport.instance().getNamedElement(
+        IUseCase astahExtendedUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase1");
         
@@ -197,12 +208,20 @@ public class UseCaseModelEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get created extend
+        IExtend createdExtend = (IExtend) TestSupport.instance().getNamedElementById(
+            outputDTO.namedElement().element().id());
+        
+        // Check with the created extend
+        assertEquals(astahUseCase.getId(), createdExtend.getExtension().getId());
+        assertEquals(astahExtendedUseCase.getId(), createdExtend.getExtendedCase().getId());
     }
 
     @Test
     void createExtensionPoint_ok() throws Exception {
         // Get use case
-        IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElement(
+        IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase0");
         

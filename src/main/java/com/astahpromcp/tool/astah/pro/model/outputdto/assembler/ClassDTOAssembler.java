@@ -54,7 +54,7 @@ public class ClassDTOAssembler {
 
         List<NameIdTypeDTO> templateParameterDTOs = new ArrayList<>();
         for (IClassifierTemplateParameter astahTemplateParameter : astahClass.getTemplateParameters()) {
-            templateParameterDTOs.add(NameIdTypeDTOAssembler.toDTO(astahTemplateParameter.getType()));
+            templateParameterDTOs.add(NameIdTypeDTOAssembler.toDTO(astahTemplateParameter));
         }
 
         List<NameIdTypeDTO> ownedDiagramDTOs = new ArrayList<>();

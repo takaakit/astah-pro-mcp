@@ -92,7 +92,7 @@ public class PresentationToolTest {
     @Test
     void getElement_ok() throws Exception {
         // Get presentation
-        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentation(
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -115,7 +115,7 @@ public class PresentationToolTest {
     @Test
     void setLabel_ok() throws Exception {
         // Get presentation
-        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentation(
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -147,7 +147,7 @@ public class PresentationToolTest {
     @Test
     void changeFillColor_ok() throws Exception {
         // Get presentation
-        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentation(
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -179,7 +179,7 @@ public class PresentationToolTest {
     @Test
     void changeLineColor_ok() throws Exception {
         // Get presentation
-        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentation(
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         
@@ -208,7 +208,7 @@ public class PresentationToolTest {
     @Test
     void changeFontColor_ok() throws Exception {
         // Get presentation
-        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentation(
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
         

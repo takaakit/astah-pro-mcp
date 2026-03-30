@@ -56,7 +56,7 @@ public class UsageToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get usage
-        IUsage usage = (IUsage) TestSupport.instance().getNamedElement(
+        IUsage usage = (IUsage) TestSupport.instance().getNamedElementByClassAndName(
             IUsage.class,
             "");
         

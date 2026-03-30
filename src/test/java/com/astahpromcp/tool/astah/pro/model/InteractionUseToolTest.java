@@ -75,7 +75,7 @@ public class InteractionUseToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get interaction use - assuming there's an interaction use in the test model
-        IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElement(
+        IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionUse.class,
             "");
         
@@ -98,7 +98,7 @@ public class InteractionUseToolTest {
     @Test
     void setArgument_ok() throws Exception {
         // Get interaction use
-        IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElement(
+        IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionUse.class,
             "");
 
@@ -129,12 +129,12 @@ public class InteractionUseToolTest {
     @Test
     void setSequenceDiagram_ok() throws Exception {
         // Get interaction use
-        IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElement(
+        IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionUse.class,
             "");
         
         // Get sequence diagram
-        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElement(
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram1");
 

@@ -56,7 +56,7 @@ public class ActivityNodeToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get activity node
-        IActivityNode activityNode = (IActivityNode) TestSupport.instance().getNamedElement(
+        IActivityNode activityNode = (IActivityNode) TestSupport.instance().getNamedElementByClassAndName(
             IActivityNode.class,
             "Object0");
         

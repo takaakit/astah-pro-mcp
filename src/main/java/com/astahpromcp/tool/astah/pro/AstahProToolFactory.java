@@ -64,6 +64,7 @@ public class AstahProToolFactory {
             
             // Common tools
             providers.add(new AstahProMcpGuideTool(projectAccessor));
+            providers.add(new DiagramLayoutGuideTool());
             providers.add(new DiagramViewManagerTool(projectAccessor, diagramViewManager, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new ProjectViewManagerTool(projectAccessor, projectViewManager, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new BasicDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));

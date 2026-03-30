@@ -100,7 +100,7 @@ public class DiagramToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -123,7 +123,7 @@ public class DiagramToolTest {
     @Test
     void getDiagramBoundRect_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -148,7 +148,7 @@ public class DiagramToolTest {
     @Test
     void getPresentationsOnDiagram_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
         
@@ -173,7 +173,7 @@ public class DiagramToolTest {
     @Test
     void exportPngImage_ok() throws Exception {
         // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElement(
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
 

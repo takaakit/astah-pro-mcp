@@ -56,7 +56,7 @@ public class ERPackageToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER package
-        IERPackage erPackage = (IERPackage) TestSupport.instance().getNamedElement(
+        IERPackage erPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package0");
 

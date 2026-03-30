@@ -56,7 +56,7 @@ public class RealizationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get realization
-        IRealization realization = (IRealization) TestSupport.instance().getNamedElement(
+        IRealization realization = (IRealization) TestSupport.instance().getNamedElementByClassAndName(
             IRealization.class,
             "");
         

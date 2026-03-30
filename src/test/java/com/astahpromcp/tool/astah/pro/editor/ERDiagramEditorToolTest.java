@@ -97,7 +97,7 @@ public class ERDiagramEditorToolTest {
     @Test
     void createERDiagram_ok() throws Exception {
         // Get ER package
-        IERPackage erPackage = (IERPackage) TestSupport.instance().getNamedElement(
+        IERPackage erPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package0");
 
@@ -123,12 +123,12 @@ public class ERDiagramEditorToolTest {
     @Test
     void createNodePresentation_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 
         // Get ER entity
-        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity erEntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
@@ -155,22 +155,22 @@ public class ERDiagramEditorToolTest {
     @Test
     void createLinkPresentation_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 
         // Get relationship
-        IERRelationship relationship = (IERRelationship) TestSupport.instance().getNamedElement(
+        IERRelationship relationship = (IERRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERRelationship.class,
             "Relationship0");
 
         // Get source node presentation
-        IPresentation sourceNodePresentation = TestSupport.instance().getPresentation(
+        IPresentation sourceNodePresentation = TestSupport.instance().getPresentationByTypeAndLabel(
             "EREntity",
             "Entity0");
 
         // Get target node presentation
-        IPresentation targetNodePresentation = TestSupport.instance().getPresentation(
+        IPresentation targetNodePresentation = TestSupport.instance().getPresentationByTypeAndLabel(
             "EREntity",
             "Entity1");
 
@@ -197,16 +197,16 @@ public class ERDiagramEditorToolTest {
     @Test
     void createSubtypeRelationshipGroup_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 
         // Get subtype relationship link presentation
-        ILinkPresentation subtypeRelationshipPresentation0 = (ILinkPresentation) TestSupport.instance().getPresentation(
+        ILinkPresentation subtypeRelationshipPresentation0 = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Subtype",
             "Subtype0");
 
-        ILinkPresentation subtypeRelationshipPresentation1 = (ILinkPresentation) TestSupport.instance().getPresentation(
+        ILinkPresentation subtypeRelationshipPresentation1 = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Subtype",
             "Subtype1");
         

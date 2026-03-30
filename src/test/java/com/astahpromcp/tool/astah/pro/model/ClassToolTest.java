@@ -83,7 +83,7 @@ public class ClassToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -106,7 +106,7 @@ public class ClassToolTest {
     @Test
     void setAbstract_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -137,7 +137,7 @@ public class ClassToolTest {
     @Test
     void setActive_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -168,7 +168,7 @@ public class ClassToolTest {
     @Test
     void setLeaf_ok() throws Exception {
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         

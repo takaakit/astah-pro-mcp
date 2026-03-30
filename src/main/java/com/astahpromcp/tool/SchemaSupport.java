@@ -1,8 +1,8 @@
 package com.astahpromcp.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.github.victools.jsonschema.generator.*;
-import com.github.victools.jsonschema.module.jackson.JacksonModule;
+import com.github.victools.jsonschema.module.jackson.JacksonSchemaModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
 
 // JSON schema utility
@@ -21,7 +21,7 @@ public final class SchemaSupport {
         // Configure for simpler JSON output
         return new SchemaGenerator(
             configBuilder
-                .with(new JacksonModule(JacksonOption.FLATTENED_ENUMS_FROM_JSONPROPERTY))
+                .with(new JacksonSchemaModule(JacksonOption.FLATTENED_ENUMS_FROM_JSONPROPERTY))
                 .without(Option.SCHEMA_VERSION_INDICATOR)      // Remove the $schema field
                 .without(Option.DEFINITIONS_FOR_ALL_OBJECTS)   // Suppress automatic $defs generation
                 // Note: INLINE_ALL_SCHEMAS cannot be used because schemas are recursive

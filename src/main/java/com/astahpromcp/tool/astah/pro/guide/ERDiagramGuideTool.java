@@ -38,10 +38,6 @@ public class ERDiagramGuideTool implements ToolProvider {
         log.debug("Get ER diagram guide: {}", param);
 
         String content = """
-IMPORTANT POINTS to Keep in Mind:
-* When adding new relationship lines to a diagram, adjust the vertex coordinates after the lines are added so that they become right-angled.
-
-
 Terminology Definitions (quoted from FIPS PUB 184, Integration Definition for Information Modeling (IDEF1X)):
 * Attribute: A property or characteristic that is common to some or all of the instances of an entity. An attribute represents the use of a domain in the context of an entity.
 * Constraint: A rule that specifies a valid condition of data.

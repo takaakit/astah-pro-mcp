@@ -1,9 +1,9 @@
 package com.astahpromcp.tool;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +32,7 @@ public final class ResponseSupport {
                     .structuredContent(structuredContent)
                     .build();
             
-        } catch (JsonProcessingException | IllegalArgumentException e) {
+        } catch (JacksonException | IllegalArgumentException e) {
             String dtoType = dto == null ? "null" : dto.getClass().getName();
             log.error("Failed to serialize DTO of type {}", dtoType, e);
             String message = e.getMessage();

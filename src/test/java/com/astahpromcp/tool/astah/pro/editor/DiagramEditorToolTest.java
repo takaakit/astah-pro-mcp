@@ -114,7 +114,7 @@ public class DiagramEditorToolTest {
     @Test
     void insertSvgImage_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
@@ -147,7 +147,7 @@ public class DiagramEditorToolTest {
     @Test
     void insertPngImage_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
@@ -179,7 +179,7 @@ public class DiagramEditorToolTest {
     @Test
     void insertJpgImage_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
@@ -210,7 +210,7 @@ public class DiagramEditorToolTest {
     @Test
     void insertText_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
@@ -237,7 +237,7 @@ public class DiagramEditorToolTest {
     @Test
     void deleteDiagram_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
@@ -258,7 +258,7 @@ public class DiagramEditorToolTest {
         assertNotNull(outputDTO);
 
         // Check that the diagram does not exist
-        assertNull(TestSupport.instance().getNamedElement(
+        assertNull(TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0"));
     }
@@ -266,12 +266,12 @@ public class DiagramEditorToolTest {
     @Test
     void deletePresentation_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
 
         // Get class (node presentation)
-        IPresentation classFoo = TestSupport.instance().getPresentation(
+        IPresentation classFoo = TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
 
@@ -293,7 +293,7 @@ public class DiagramEditorToolTest {
         assertNotNull(outputDTO);
 
         // Check that the presentation does not exist
-        assertNull(TestSupport.instance().getPresentation(
+        assertNull(TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo"));
     }

@@ -56,7 +56,7 @@ public class TestCaseToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get test case
-        ITestCase testCase = (ITestCase) TestSupport.instance().getNamedElement(
+        ITestCase testCase = (ITestCase) TestSupport.instance().getNamedElementByClassAndName(
             ITestCase.class,
             "TestCase0");
         

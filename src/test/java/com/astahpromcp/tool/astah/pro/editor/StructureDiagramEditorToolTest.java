@@ -69,12 +69,12 @@ public class StructureDiagramEditorToolTest {
     @Test
     void createNodePresentation_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
         
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -101,22 +101,22 @@ public class StructureDiagramEditorToolTest {
     @Test
     void createLinkPresentation_ok() throws Exception {
         // Get class diagram
-        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElement(
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
 
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElement(
+        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
             IAssociation.class,
             "");
         
         // Get class (source node presentation)
-        INodePresentation classBar = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation classBar = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Bar");
         
         // Get class (target node presentation)
-        INodePresentation classBaz = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation classBaz = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Baz");
 

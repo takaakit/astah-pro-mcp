@@ -56,7 +56,7 @@ public class GeneralizationToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get generalization
-        IGeneralization generalization = (IGeneralization) TestSupport.instance().getNamedElement(
+        IGeneralization generalization = (IGeneralization) TestSupport.instance().getNamedElementByClassAndName(
             IGeneralization.class,
             "");
         

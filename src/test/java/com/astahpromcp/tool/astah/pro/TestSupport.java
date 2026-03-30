@@ -4,6 +4,7 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
+import com.change_vision.jude.api.inf.project.ModelFinder;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +37,7 @@ public class TestSupport {
         return instance;
     }
 
-    public INamedElement getNamedElement(Class<? extends INamedElement> clazz, String name) {
+    public INamedElement getNamedElementByClassAndName(Class<? extends INamedElement> clazz, String name) {
         try {
             INamedElement[] namedElements = projectAccessor.findElements(clazz, name);
 
@@ -50,7 +51,34 @@ public class TestSupport {
         }
     }
 
-    public IPresentation getPresentation(String presentationType, String label) {
+    public INamedElement getNamedElementById(String id) {
+        try {
+            INamedElement[] namedElements = projectAccessor.findElements(new ModelFinder() {
+                @Override
+                public boolean isTarget(INamedElement element) {
+                    return element.getId().equals(id);
+                }
+            });
+
+            if (namedElements.length != 1) {
+                return null;
+            }
+            return namedElements[0];
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<INamedElement> getNamedElementsByClass(Class<? extends INamedElement> clazz) {
+        try {
+            return List.of(projectAccessor.findElements(clazz));
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    public IPresentation getPresentationByTypeAndLabel(String presentationType, String label) {
         try {
             INamedElement[] namedElements = projectAccessor.findElements(IDiagram.class);
 
@@ -72,6 +100,51 @@ public class TestSupport {
 
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public IPresentation getPresentationById(String id) {
+        try {
+            INamedElement[] namedElements = projectAccessor.findElements(IDiagram.class);
+
+            List<IPresentation> presentations = new ArrayList<>();
+            for (INamedElement namedElement : namedElements) {
+                IDiagram diagram = (IDiagram)namedElement;
+                for (IPresentation presentation : diagram.getPresentations()) {
+                    if (presentation.getID().equals(id)) {
+                        presentations.add(presentation);
+                    }
+                }
+            }
+
+            if (presentations.size() != 1) {
+                return null;
+            }
+            return presentations.get(0);
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<IPresentation> getPresentationsByType(String type) {
+        try {
+            INamedElement[] namedElements = projectAccessor.findElements(IDiagram.class);
+
+            List<IPresentation> presentations = new ArrayList<>();
+            for (INamedElement namedElement : namedElements) {
+                IDiagram diagram = (IDiagram)namedElement;
+                for (IPresentation presentation : diagram.getPresentations()) {
+                    if (presentation.getType().equals(type)) {
+                        presentations.add(presentation);
+                    }
+                }
+            }
+            
+            return presentations;
+
+        } catch (Exception e) {
+            return List.of();
         }
     }
 

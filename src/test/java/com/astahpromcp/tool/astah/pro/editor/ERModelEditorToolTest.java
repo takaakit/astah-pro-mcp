@@ -158,7 +158,7 @@ public class ERModelEditorToolTest {
     @Test
     void createERModel_ok() throws Exception {
         // Delete existing ER model
-        IERModel existingERModel = (IERModel) TestSupport.instance().getNamedElement(
+        IERModel existingERModel = (IERModel) TestSupport.instance().getNamedElementByClassAndName(
             IERModel.class,
             "ER Model");
 
@@ -189,7 +189,7 @@ public class ERModelEditorToolTest {
     @Test
     void createERPackage_ok() throws Exception {
         // Get parent ER package
-        IERPackage parentERPackage = (IERPackage) TestSupport.instance().getNamedElement(
+        IERPackage parentERPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package0");
 
@@ -215,7 +215,7 @@ public class ERModelEditorToolTest {
     @Test
     void createEREntity_ok() throws Exception {
         // Get parent ER package
-        IERPackage parentERPackage = (IERPackage) TestSupport.instance().getNamedElement(
+        IERPackage parentERPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package0");
 
@@ -242,12 +242,12 @@ public class ERModelEditorToolTest {
     @Test
     void createERAttribute_ok() throws Exception {
         // Get target ER entity
-        IEREntity targetEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity targetEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -275,7 +275,7 @@ public class ERModelEditorToolTest {
     @Test
     void createERDatatype_ok() throws Exception {
         // Get target ER model
-        IERModel erModel = (IERModel) TestSupport.instance().getNamedElement(
+        IERModel erModel = (IERModel) TestSupport.instance().getNamedElementByClassAndName(
             IERModel.class,
             "ER Model");
 
@@ -300,12 +300,12 @@ public class ERModelEditorToolTest {
     @Test
     void createERDomainInERModel_ok() throws Exception {
         // Get target ER model
-        IERModel erModel = (IERModel) TestSupport.instance().getNamedElement(
+        IERModel erModel = (IERModel) TestSupport.instance().getNamedElementByClassAndName(
             IERModel.class,
             "ER Model");
 
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -334,12 +334,12 @@ public class ERModelEditorToolTest {
     @Test
     void createERDomainInERDomain_ok() throws Exception {
         // Get parent ER domain
-        IERDomain parentERDomain = (IERDomain) TestSupport.instance().getNamedElement(
+        IERDomain parentERDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
             IERDomain.class,
             "Domain0");
 
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
@@ -367,11 +367,11 @@ public class ERModelEditorToolTest {
     @Test
     void createIdentifyingRelationship_ok() throws Exception {
         // Get ER entities
-        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
-        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity1");
 
@@ -396,16 +396,24 @@ public class ERModelEditorToolTest {
         assertNotNull(outputDTO);
         assertEquals("TestIdentifyingRelationship", outputDTO.logicalName());
         assertTrue(outputDTO.isIdentifying());
+
+        // Get created relationship
+        IERRelationship createdRelationship = (IERRelationship) TestSupport.instance().getNamedElementById(
+            outputDTO.namedElement().element().id());
+        
+        // Check with the created relationship
+        assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
+        assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
     }
 
     @Test
     void createNonIdentifyingRelationship_ok() throws Exception {
         // Get ER entities
-        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
-        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity1");
 
@@ -430,16 +438,24 @@ public class ERModelEditorToolTest {
         assertNotNull(outputDTO);
         assertEquals("TestNonIdentifyingRelationship", outputDTO.logicalName());
         assertTrue(outputDTO.isNonIdentifying());
+
+        // Get created relationship
+        IERRelationship createdRelationship = (IERRelationship) TestSupport.instance().getNamedElementById(
+            outputDTO.namedElement().element().id());
+        
+        // Check with the created relationship
+        assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
+        assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
     }
 
     @Test
     void createManyToManyRelationship_ok() throws Exception {
         // Get ER entities
-        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
-        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity1");
 
@@ -463,16 +479,24 @@ public class ERModelEditorToolTest {
         assertNotNull(outputDTO);
         assertEquals("TestManyToManyRelationship", outputDTO.logicalName());
         assertTrue(outputDTO.isManyToMany());
+
+        // Get created relationship
+        IERRelationship createdRelationship = (IERRelationship) TestSupport.instance().getNamedElementById(
+            outputDTO.namedElement().element().id());
+        
+        // Check with the created relationship
+        assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
+        assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
     }
 
     @Test
     void createSubtypeRelationship_ok() throws Exception {
         // Get ER entities
-        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
-        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity childEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity1");
 
@@ -495,22 +519,30 @@ public class ERModelEditorToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals("TestSubtypeRelationship", outputDTO.logicalName());
+
+        // Get created relationship
+        IERSubtypeRelationship createdRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementById(
+            outputDTO.namedElement().element().id());
+        
+        // Check with the created relationship
+        assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
+        assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
     }
 
     @Test
     void createERIndex_ok() throws Exception {
         // Get parent ER entity
-        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElement(
+        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
             IEREntity.class,
             "Entity0");
 
         // Get ER datatype
-        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElement(
+        IERDatatype erDatatype = (IERDatatype) TestSupport.instance().getNamedElementByClassAndName(
             IERDatatype.class,
             "INT");
 
         // Get ER attribute
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute1");
 
@@ -544,12 +576,12 @@ public class ERModelEditorToolTest {
     @Test
     void delete_ok() throws Exception {
         // Get parent ER package
-        IERPackage parentERPackage = (IERPackage) TestSupport.instance().getNamedElement(
+        IERPackage parentERPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package0");
 
         // Get ER package
-        IERPackage targetERPackage = (IERPackage) TestSupport.instance().getNamedElement(
+        IERPackage targetERPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package1");
 
@@ -567,7 +599,7 @@ public class ERModelEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertNull(TestSupport.instance().getNamedElement(
+        assertNull(TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package1"));
     }

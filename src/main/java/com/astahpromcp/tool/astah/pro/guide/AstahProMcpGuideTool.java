@@ -65,6 +65,9 @@ IMPORTANT POINTS to Keep in Mind:
 * Association ends are attribute elements (member ends) of the association. Therefore, the information of association ends can be obtained through the information of the association.  
 * The Astah that this MCP server references and edits is also edited by users. Therefore, assume that the project itself—and the model elements and presentations it contains—may be updated, and retrieve the latest information from Astah as needed. For example, a user may switch to a different Astah project, or make changes to model elements or presentations.  
 * Object diagrams and package diagrams are substituted with class diagrams. This means that, for example, instance specifications and instance specification links are drawn on class diagrams.  
+* Save the Astah project using tools only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.
+  DO NOT save the Astah project on your own initiative.
+* When a new node presentation or link presentation is placed on the diagram, adjust the layout of those presentations in accordance with the diagram layout guide.
 
 
 Procedure for Editing Models and Diagrams:

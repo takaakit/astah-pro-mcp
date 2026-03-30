@@ -105,7 +105,7 @@ public class ConceptualModelConventionTool implements ToolProvider {
 
         List<String> chunks = KnowledgeToolSupport.splitText(allTextContentString, CHUNK_SIZE);
         if (chunks.isEmpty()) {
-            chunks.add("");
+            chunks.add(""); // Ensure there is at least one empty chunk
         }
 
         contentCache.clear();

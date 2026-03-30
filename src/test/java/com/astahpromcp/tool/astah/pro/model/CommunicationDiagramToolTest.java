@@ -65,7 +65,7 @@ public class CommunicationDiagramToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get communication diagram
-        ICommunicationDiagram communicationDiagram = (ICommunicationDiagram) TestSupport.instance().getNamedElement(
+        ICommunicationDiagram communicationDiagram = (ICommunicationDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ICommunicationDiagram.class,
             "Communication Diagram0");
         
@@ -88,7 +88,7 @@ public class CommunicationDiagramToolTest {
     @Test
     void getInteraction_ok() throws Exception {
         // Get communication diagram
-        ICommunicationDiagram communicationDiagram = (ICommunicationDiagram) TestSupport.instance().getNamedElement(
+        ICommunicationDiagram communicationDiagram = (ICommunicationDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ICommunicationDiagram.class,
             "Communication Diagram0");
         

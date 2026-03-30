@@ -106,7 +106,7 @@ public class MessageToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
@@ -129,7 +129,7 @@ public class MessageToolTest {
     @Test
     void setArgument_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
@@ -160,7 +160,7 @@ public class MessageToolTest {
     @Test
     void setGuard_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
@@ -191,7 +191,7 @@ public class MessageToolTest {
     @Test
     void setReturnValue_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
@@ -222,7 +222,7 @@ public class MessageToolTest {
     @Test
     void setReturnValueVariable_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
@@ -253,7 +253,7 @@ public class MessageToolTest {
     @Test
     void setAsynchronous_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
@@ -284,12 +284,12 @@ public class MessageToolTest {
     @Test
     void setOperation_ok() throws Exception {
         // Get message
-        IMessage message = (IMessage) TestSupport.instance().getNamedElement(
+        IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
         
         // Get operation
-        IOperation operation = (IOperation) TestSupport.instance().getNamedElement(
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
         

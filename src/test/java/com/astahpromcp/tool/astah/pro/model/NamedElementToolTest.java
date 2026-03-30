@@ -98,7 +98,7 @@ public class NamedElementToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
         
@@ -126,7 +126,7 @@ public class NamedElementToolTest {
     @Test
     void setName_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
         
@@ -157,7 +157,7 @@ public class NamedElementToolTest {
     @Test
     void setAlias1_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
         
@@ -188,7 +188,7 @@ public class NamedElementToolTest {
     @Test
     void setAlias2_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
         
@@ -219,7 +219,7 @@ public class NamedElementToolTest {
     @Test
     void setDefinition_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
         
@@ -250,7 +250,7 @@ public class NamedElementToolTest {
     @Test
     void setVisibility_ok() throws Exception {
         // Get named element
-        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElement(
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
         

@@ -66,7 +66,7 @@ public class LifelineToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get lifeline - assuming there's a lifeline in the test model
-        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElement(
+        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElementByClassAndName(
             ILifeline.class,
             "foo");
         
@@ -89,12 +89,12 @@ public class LifelineToolTest {
     @Test
     void setBaseClass_ok() throws Exception {
         // Get lifeline
-        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElement(
+        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElementByClassAndName(
             ILifeline.class,
             "foo");
         
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
 

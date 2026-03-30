@@ -93,7 +93,7 @@ public class ERSubtypeRelationshipToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER subtype relationship
-        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElement(
+        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERSubtypeRelationship.class,
             "Subtype0");
 
@@ -118,7 +118,7 @@ public class ERSubtypeRelationshipToolTest {
     @Test
     void setConclusive_ok() throws Exception {
         // Get ER subtype relationship
-        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElement(
+        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERSubtypeRelationship.class,
             "Subtype0");
         boolean nextValue = !erSubtypeRelationship.isConclusive();
@@ -145,11 +145,11 @@ public class ERSubtypeRelationshipToolTest {
     @Test
     void setDiscriminatorAttr_ok() throws Exception {
         // Get ER subtype relationship
-        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElement(
+        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERSubtypeRelationship.class,
             "Subtype0");
 
-        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -176,7 +176,7 @@ public class ERSubtypeRelationshipToolTest {
     @Test
     void setLogicalName_ok() throws Exception {
         // Get ER subtype relationship
-        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElement(
+        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERSubtypeRelationship.class,
             "Subtype0");
 
@@ -202,7 +202,7 @@ public class ERSubtypeRelationshipToolTest {
     @Test
     void setPhysicalName_ok() throws Exception {
         // Get ER subtype relationship
-        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElement(
+        IERSubtypeRelationship erSubtypeRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementByClassAndName(
             IERSubtypeRelationship.class,
             "Subtype0");
 

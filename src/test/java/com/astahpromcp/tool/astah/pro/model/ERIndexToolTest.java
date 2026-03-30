@@ -92,7 +92,7 @@ public class ERIndexToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER index
-        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElement(
+        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
 
@@ -117,12 +117,12 @@ public class ERIndexToolTest {
     @Test
     void addERAttribute_ok() throws Exception {
         // Get ER index
-        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElement(
+        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
 
         // Get ER attribute
-        IERAttribute targetAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute targetAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute1");
 
@@ -148,12 +148,12 @@ public class ERIndexToolTest {
     @Test
     void removeERAttribute_ok() throws Exception {
         // Get ER index
-        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElement(
+        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
         
         // Get ER attribute
-        IERAttribute targetAttribute = (IERAttribute) TestSupport.instance().getNamedElement(
+        IERAttribute targetAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,
             "Attribute0");
 
@@ -179,7 +179,7 @@ public class ERIndexToolTest {
     @Test
     void setKey_ok() throws Exception {
         // Get ER index
-        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElement(
+        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
         boolean nextValue = !erIndex.isKey();
@@ -206,7 +206,7 @@ public class ERIndexToolTest {
     @Test
     void setUnique_ok() throws Exception {
         // Get ER index
-        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElement(
+        IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
         boolean nextValue = !erIndex.isUnique();

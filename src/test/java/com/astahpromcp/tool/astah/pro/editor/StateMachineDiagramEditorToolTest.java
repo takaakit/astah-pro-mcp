@@ -4,13 +4,15 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.StateMachineDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
+import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class StateMachineDiagramEditorToolTest {
@@ -161,12 +164,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void addRegion() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
 
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State0");
         
@@ -192,12 +195,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void deleteRegion() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State3");
         
@@ -223,17 +226,17 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void changeParentOfState() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
 
         // Get target node presentation
-        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State1");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -259,12 +262,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createChoicePseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -291,12 +294,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createDeepHistoryPseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -323,12 +326,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createShallowHistoryPseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -355,12 +358,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createFinalState() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -387,12 +390,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createForkPseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -421,12 +424,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createInitialPseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -453,12 +456,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createJoinPseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -487,12 +490,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createJunctionPseudostate() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -519,12 +522,12 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createState() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -532,6 +535,7 @@ public class StateMachineDiagramEditorToolTest {
         NewStateDTO inputDTO = new NewStateDTO(
             stateMachineDiagram.getId(),
             parentNodePresentation.getID(),
+            "NewState",
             100,
             100);
 
@@ -551,7 +555,7 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createStateMachineDiagram() throws Exception {
         // Get parent node presentation
-        IPackage parentPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage parentPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
 
@@ -576,16 +580,16 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createSubMachineState() throws Exception {
         // Get state machine diagrams
-        IStateMachineDiagram stateMachineDiagram0 = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram0 = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
 
-        IStateMachineDiagram stateMachineDiagram1 = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram1 = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
                 IStateMachineDiagram.class,
                 "Statemachine Diagram1");
 
         // Get parent node presentation
-        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "SubmachineState",
             "SubmachineState0");
 
@@ -615,17 +619,17 @@ public class StateMachineDiagramEditorToolTest {
     @Test
     void createTransition() throws Exception {
         // Get state machine diagram
-        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElement(
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
             "Statemachine Diagram0");
         
         // Get source node presentation
-        INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State1");
         
         // Get target node presentation
-        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "State",
             "State2");
         
@@ -638,13 +642,21 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createTransition()
         // ----------------------------------------
-        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
             createTransition,
             tool,
             inputDTO,
-            TransitionDTO.class);
+            LinkPresentationDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get created link presentation
+        ILinkPresentation createdLinkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationById(
+            outputDTO.presentation().id());
+        
+        // Check with the created link presentation
+        assertEquals(sourceNodePresentation.getModel().getId(), ((ITransition) createdLinkPresentation.getModel()).getSource().getId());
+        assertEquals(targetNodePresentation.getModel().getId(), ((ITransition) createdLinkPresentation.getModel()).getTarget().getId());
     }
 }

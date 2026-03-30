@@ -92,7 +92,7 @@ public class ERDiagramToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 
@@ -117,7 +117,7 @@ public class ERDiagramToolTest {
     @Test
     void setAlignAttributeItems_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
         boolean nextValue = !erDiagram.isAlignAttributeItems();
@@ -144,7 +144,7 @@ public class ERDiagramToolTest {
     @Test
     void setInitialDisplayLevel_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 
@@ -170,7 +170,7 @@ public class ERDiagramToolTest {
     @Test
     void setModelType_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 
@@ -196,7 +196,7 @@ public class ERDiagramToolTest {
     @Test
     void setNotation_ok() throws Exception {
         // Get ER diagram
-        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElement(
+        IERDiagram erDiagram = (IERDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IERDiagram.class,
             "ER Diagram0");
 

@@ -56,7 +56,7 @@ public class ActivityToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get activity
-        IActivity activity = (IActivity) TestSupport.instance().getNamedElement(
+        IActivity activity = (IActivity) TestSupport.instance().getNamedElementByClassAndName(
             IActivity.class,
             "Activity0");
         

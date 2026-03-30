@@ -9,20 +9,27 @@ A **local MCP server** that runs as a plugin for **Astah Professional**, a UML m
 
 <br>
 
-The videos below show *Claude Code* designing a simple library management system and drawing a class diagram, a sequence diagram, and an activity diagram. These videos are sped up 5×.
+The videos below show *Claude Code* designing a simple library management system and drawing a class diagram, a sequence diagram, and an activity diagram. These videos are sped up 10×.
 
-Prompt: *Design a simple library management system and draw a class diagram in Astah to represent its structure.*  
+Prompt: *Design a simple library management system and draw a class diagram in Astah to illustrate its structure.*  
 ![class-diagram.gif](img/class-diagram.gif)
 
-Prompt: *Draw a sequence diagram to illustrate the behavior of borrowing a book.*  
+Prompt: *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of borrowing a book.*  
 ![sequence-diagram.gif](img/sequence-diagram.gif)
 
-Prompt: *Draw an activity diagram to illustrate the behavior of returning a book.*  
+Prompt: *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of returning a book.*  
 ![activity-diagram.gif](img/activity-diagram.gif)
 
 <br>
 
-> *Note:* As of October 10, 2025, AI assistants/agents are reasonably good at viewing and editing model information, but their ability to view and edit visual diagram information is still developing.
+Diagrams created in the above videos with *Claude Code (Opus 4.6)*.
+<table>
+  <tr>
+    <td><a href="img/class-diagram.png"><img src="img/class-diagram.png"></a></td>
+    <td><a href="img/sequence-diagram.png"><img src="img/sequence-diagram.png"></a></td>
+    <td><a href="img/activity-diagram.png"><img src="img/activity-diagram.png"></a></td>
+  </tr>
+</table>
 
 <br>
 

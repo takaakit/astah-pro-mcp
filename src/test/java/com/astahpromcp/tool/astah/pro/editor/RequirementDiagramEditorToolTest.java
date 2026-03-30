@@ -59,7 +59,7 @@ public class RequirementDiagramEditorToolTest {
     @Test
     void createRequirementDiagram_ok() throws Exception {
         // Get package
-        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         

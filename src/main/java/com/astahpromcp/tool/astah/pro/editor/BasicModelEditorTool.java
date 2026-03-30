@@ -222,7 +222,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "delete_elem",
-                        "Delete the specified element (specified by ID), and return the deleted element information.",
+                        "Delete the specified element (specified by ID), and return the deleted element information. Note that deleting an element also deletes all corresponding presentations.",
                         this::deleteElement,
                         IdDTO.class,
                         ElementDTO.class),
@@ -285,7 +285,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "create_trace_dep",
-                        "Create a trace dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                        "Create a trace dependency from the specified source named element (specified by ID) to the specified target named element (specified by ID), and return the newly created dependency information.",
                         this::createTraceDependency,
                         NewTraceDependencyDTO.class,
                         DependencyDTO.class),
@@ -618,14 +618,15 @@ public class BasicModelEditorTool implements ToolProvider {
     private DependencyDTO createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
         log.debug("Create dependency: {}", param);
 
-        INamedElement astahSourceNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
-        INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
+        INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
+        INamedElement targetAstahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         try {
             transactionManager.beginTransaction();
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
             IDependency createdAstahDependency = basicModelEditor.createDependency(
-                astahSourceNamedElement,
-                astahTargetNamedElement,
+                targetAstahNamedElement,
+                sourceAstahNamedElement,
                 "");
             transactionManager.endTransaction();
 
@@ -879,10 +880,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            IDependency createdAstahDependency = basicModelEditor.createCopyDependency(
-                sourceAstahRequirement,
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+            IDependency createdAstahDependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
-                param.newCopyDependencyName());
+                sourceAstahRequirement,
+                "");
+            
+            createdAstahDependency.addStereotype("copy");
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
@@ -901,10 +905,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            IDependency createdAstahDependency = basicModelEditor.createDeriveReqtDependency(
-                sourceAstahRequirement,
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+            IDependency createdAstahDependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
-                param.newDeriveReqtDependencyName());
+                sourceAstahRequirement,
+                "");
+
+            createdAstahDependency.addStereotype("deriveReqt");
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
@@ -918,15 +925,18 @@ public class BasicModelEditorTool implements ToolProvider {
     private DependencyDTO createRefineDependency(McpSyncServerExchange exchange, NewRefineDependencyDTO param) throws Exception {
         log.debug("Create refine dependency: {}", param);
 
-        IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
+        INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
         try {
             transactionManager.beginTransaction();
-            IDependency createdAstahDependency = basicModelEditor.createRefineDependency(
-                sourceAstahRequirement,
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+            IDependency createdAstahDependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
-                param.newRefineDependencyName());
+                sourceAstahNamedElement,
+                "");
+
+            createdAstahDependency.addStereotype("refine");
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
@@ -940,15 +950,18 @@ public class BasicModelEditorTool implements ToolProvider {
     private DependencyDTO createSatisfyDependency(McpSyncServerExchange exchange, NewSatisfyDependencyDTO param) throws Exception {
         log.debug("Create satisfy dependency: {}", param);
 
-        IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
+        INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
         try {
             transactionManager.beginTransaction();
-            IDependency createdAstahDependency = basicModelEditor.createSatisfyDependency(
-                sourceAstahRequirement,
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+            IDependency createdAstahDependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
-                param.newSatisfyDependencyName());
+                sourceAstahNamedElement,
+                "");
+
+            createdAstahDependency.addStereotype("satisfy");
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
@@ -962,15 +975,18 @@ public class BasicModelEditorTool implements ToolProvider {
     private DependencyDTO createTraceDependency(McpSyncServerExchange exchange, NewTraceDependencyDTO param) throws Exception {
         log.debug("Create trace dependency: {}", param);
 
-        IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
-        IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
+        INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
+        INamedElement targetAstahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         try {
             transactionManager.beginTransaction();
-            IDependency createdAstahDependency = basicModelEditor.createTraceDependency(
-                sourceAstahRequirement,
-                targetAstahRequirement,
-                param.newTraceDependencyName());
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+            IDependency createdAstahDependency = basicModelEditor.createDependency(
+                targetAstahNamedElement,
+                sourceAstahNamedElement,
+                "");
+
+            createdAstahDependency.addStereotype("trace");
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);
@@ -989,10 +1005,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            IDependency createdAstahDependency = basicModelEditor.createVerifyDependency(
-                sourceAstahTestCase,
+            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+            IDependency createdAstahDependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
-                param.newVerifyDependencyName());
+                sourceAstahTestCase,
+                "");
+
+            createdAstahDependency.addStereotype("verify");
             transactionManager.endTransaction();
 
             return DependencyDTOAssembler.toDTO(createdAstahDependency);

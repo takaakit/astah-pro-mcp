@@ -114,7 +114,7 @@ public class DiagramEditorTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "delete_prst",
-                        "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation information.",
+                        "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation information. Note that deleting a presentation does not delete the corresponding element.",
                         this::deletePresentation,
                         DeletePresentationDTO.class,
                         PresentationDTO.class)

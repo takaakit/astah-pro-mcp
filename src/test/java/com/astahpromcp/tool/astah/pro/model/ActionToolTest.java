@@ -66,7 +66,7 @@ public class ActionToolTest {
     @Test
     void getInfo_ok() throws Exception {
         // Get action
-        IAction action = (IAction) TestSupport.instance().getNamedElement(
+        IAction action = (IAction) TestSupport.instance().getNamedElementByClassAndName(
             IAction.class,
             "Action0");
         
@@ -89,12 +89,12 @@ public class ActionToolTest {
     @Test
     void setCallingActivity_ok() throws Exception {
         // Get action
-        IAction action = (IAction) TestSupport.instance().getNamedElement(
+        IAction action = (IAction) TestSupport.instance().getNamedElementByClassAndName(
             IAction.class,
             "CallBehaviorAction0");
 
         // Get activity
-        IActivity activity = (IActivity) TestSupport.instance().getNamedElement(
+        IActivity activity = (IActivity) TestSupport.instance().getNamedElementByClassAndName(
             IActivity.class,
             "Activity1");
 

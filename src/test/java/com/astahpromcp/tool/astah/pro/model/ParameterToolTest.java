@@ -66,12 +66,12 @@ public class ParameterToolTest {
     @Test
     void setType_ok() throws Exception {
         // Get parameter
-        IParameter parameter = (IParameter) TestSupport.instance().getNamedElement(
+        IParameter parameter = (IParameter) TestSupport.instance().getNamedElementByClassAndName(
             IParameter.class,
             "param0");
         
         // Get class
-        IClass clazz = (IClass) TestSupport.instance().getNamedElement(
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
         
@@ -102,7 +102,7 @@ public class ParameterToolTest {
     @Test
     void setTypeExpression_ok() throws Exception {
         // Get parameter
-        IParameter parameter = (IParameter) TestSupport.instance().getNamedElement(
+        IParameter parameter = (IParameter) TestSupport.instance().getNamedElementByClassAndName(
             IParameter.class,
             "param1");
         

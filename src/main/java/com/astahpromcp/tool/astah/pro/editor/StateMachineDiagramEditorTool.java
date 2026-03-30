@@ -7,10 +7,10 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
-import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.TransitionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.StateMachineDiagramEditor;
 import com.change_vision.jude.api.inf.model.*;
@@ -168,7 +168,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
                         "Create a new transition between the specified source state (specified by ID) and the specified target state (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created transition information.",
                         this::createTransition,
                         NewTransitionDTO.class,
-                        TransitionDTO.class)
+                        LinkPresentationDTO.class)
         );
     }
 
@@ -517,7 +517,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             INodePresentation astahState = stateMachineDiagramEditor.createState(
-                "State",
+                param.newStateName(),
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
@@ -579,7 +579,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private TransitionDTO createTransition(McpSyncServerExchange exchange, NewTransitionDTO param) throws Exception {
+    private LinkPresentationDTO createTransition(McpSyncServerExchange exchange, NewTransitionDTO param) throws Exception {
         log.debug("Create transition: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -590,12 +590,12 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         try {
             transactionManager.beginTransaction();
-            ILinkPresentation astahTransition = stateMachineDiagramEditor.createTransition(
+            ILinkPresentation astahLinkPresentation = stateMachineDiagramEditor.createTransition(
                 astahSourceNodePresentation,
                 astahTargetNodePresentation);
             transactionManager.endTransaction();
 
-            return TransitionDTOAssembler.toDTO((ITransition) astahTransition.getModel());
+            return LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

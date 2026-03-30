@@ -4,6 +4,7 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.FilePathDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.NameDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.BooleanDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
@@ -106,18 +108,25 @@ public class ProjectAccessorTool implements ToolProvider {
                         "open_proj",
                         "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
                         this::openProject,
-                        NameDTO.class,
-                        NamedElementDTO.class)
-
-                /* Saving and closing the project should be performed based on the user's decision.
-                   So these tool functions are disabled.
+                        FilePathDTO.class,
+                        NamedElementDTO.class),
 
                 ToolSupport.definition(
                         "save_proj",
-                        "Save the current project, and return the current project information.",
+                        "Save the current project, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
                         this::saveProject,
                         NoInputDTO.class,
-                        NamedElementDTO.class),
+                        ProjectPathDTO.class),
+
+                ToolSupport.definition(
+                        "save_proj_as",
+                        "Save the current project with a new name, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
+                        this::saveProjectAs,
+                        FilePathDTO.class,
+                        ProjectPathDTO.class)
+
+                /* Closing the project should be performed based on the user's decision.
+                   So these tool functions are disabled.
 
                 ToolSupport.definition(
                         "close_proj",
@@ -148,13 +157,13 @@ public class ProjectAccessorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
-    private NamedElementDTO openProject(McpSyncServerExchange exchange, NameDTO param) throws Exception {
+    private NamedElementDTO openProject(McpSyncServerExchange exchange, FilePathDTO param) throws Exception {
         log.debug("Open project: {}", param);
 
         try {
-            projectAccessor.open(param.name());
+            projectAccessor.open(param.filePath());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to open project: " + param.name());
+            throw new RuntimeException("Failed to open project: " + param.filePath());
         }
 
         IModel astahProject;
@@ -207,14 +216,18 @@ public class ProjectAccessorTool implements ToolProvider {
         return new NameIdTypeListDTO(namedIdTypeDTOs);
     }
 
-    private NamedElementDTO saveProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private ProjectPathDTO saveProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Save project: {}", param);
 
-        IModel astahProject;
-        try {
-            astahProject = projectAccessor.getProject();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current project.");
+        // Check that the current project is created
+        if (!projectAccessor.hasProject()) {
+            throw new RuntimeException("The current project is not created.");
+        }
+
+        // To prevent the save file path input dialog from appearing, check if the project has been saved.
+        String projectPath = projectAccessor.getProjectPath();
+        if (projectPath == null || projectPath.isEmpty() || !new File(projectPath).exists()) {
+            throw new RuntimeException("The current project has not been saved yet, so specify a file path when saving it.");
         }
 
         try {
@@ -223,7 +236,35 @@ public class ProjectAccessorTool implements ToolProvider {
             throw new RuntimeException("Failed to save the current project.");
         }
 
-        return NamedElementDTOAssembler.toDTO(astahProject);
+        return new ProjectPathDTO(projectAccessor.getProjectPath());
+    }
+
+    private ProjectPathDTO saveProjectAs(McpSyncServerExchange exchange, FilePathDTO param) throws Exception {
+        log.debug("Save project as: {}", param);
+
+        // Check that the parent directory of the file path exists
+        File folder = new File(param.filePath()).getParentFile();
+        if (folder == null || !folder.exists()) {
+            throw new RuntimeException("The parent folder of the specified file path does not exist: " + param.filePath());
+        }
+
+        // Check that the file path has the .asta extension
+        if (!param.filePath().endsWith(".asta")) {
+            throw new RuntimeException("The specified file path is not a valid Astah project file (*.asta): " + param.filePath());
+        }
+
+        // Check that the target file does not already exist
+        if (new File(param.filePath()).exists()) {
+            throw new RuntimeException("The specified file path already exists: " + param.filePath());
+        }
+
+        try {
+            projectAccessor.saveAs(param.filePath());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save the current project as: " + param.filePath());
+        }
+
+        return new ProjectPathDTO(projectAccessor.getProjectPath());
     }
 
     private NamedElementDTO closeProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {

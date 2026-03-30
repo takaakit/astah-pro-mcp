@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto;
 
+import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.FilePathHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementHyperlinkDTO;
@@ -12,8 +13,8 @@ public record NodePresentationDTO(
     @JsonPropertyDescription("Presentation information")
     PresentationDTO presentation,
 
-    @JsonPropertyDescription("Identifiers of connected links")
-    List<String> linkIds,
+    @JsonPropertyDescription("Label, identifier and type of connected links")
+    List<LabelIdTypeDTO> links,
 
     @JsonPropertyDescription("Drawn rectangle")
     RectangleDTO drawnRectangle,

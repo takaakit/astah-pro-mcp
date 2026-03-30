@@ -10,8 +10,12 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ActivityDiagramEditor;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
+import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IPackage;
+import com.change_vision.jude.api.inf.model.IFlow;
+import com.change_vision.jude.api.inf.model.IDependency;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ActivityDiagramEditorToolTest {
@@ -217,7 +222,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createAcceptEventAction_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -244,7 +249,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createAcceptTimeEventAction_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -271,7 +276,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createAction_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -298,7 +303,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createActivityDiagram_ok() throws Exception {
         // Get package
-        IPackage package_ = (IPackage) TestSupport.instance().getNamedElement(
+        IPackage package_ = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
         
@@ -323,12 +328,12 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createActivityParameterNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get class
-        IClass class_ = (IClass) TestSupport.instance().getNamedElement(
+        IClass class_ = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -356,12 +361,12 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createCallBehaviorAction_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get reference activity diagram
-        IActivityDiagram referenceActivityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram referenceActivityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram1");
         
@@ -389,7 +394,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createConnector_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -416,7 +421,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createDecisionMergeNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -442,18 +447,18 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createDependency_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get client node presentation
-        INodePresentation clientNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation clientNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action0");
         
         // Get supplier node presentation
-        INodePresentation supplierNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
-                "Action",
+        INodePresentation supplierNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Action",
             "Action1");
         
         // Create input DTO
@@ -474,12 +479,20 @@ public class ActivityDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get created link presentation
+        ILinkPresentation createdLinkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationById(
+            outputDTO.presentation().id());
+        
+        // Check with the created link presentation
+        assertEquals(((IAction) clientNodePresentation.getModel()).getId(), ((IDependency) createdLinkPresentation.getModel()).getClient().getId());
+        assertEquals(((IAction) supplierNodePresentation.getModel()).getId(), ((IDependency) createdLinkPresentation.getModel()).getSupplier().getId());
     }
 
     @Test
     void createFinalNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -506,18 +519,18 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createFlow_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get source node presentation
-        INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action0");
         
         // Get target node presentation
-        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentation(
-                "Action",
+        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Action",
             "Action1");
         
         // Create input DTO
@@ -537,12 +550,20 @@ public class ActivityDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get created link presentation
+        ILinkPresentation createdLinkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationById(
+            outputDTO.presentation().id());
+        
+        // Check with the created link presentation
+        assertEquals(((IAction) sourceNodePresentation.getModel()).getId(), ((IFlow) createdLinkPresentation.getModel()).getSource().getId());
+        assertEquals(((IAction) targetNodePresentation.getModel()).getId(), ((IFlow) createdLinkPresentation.getModel()).getTarget().getId());
     }
 
     @Test
     void createFlowFinalNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -569,7 +590,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createForkNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -595,7 +616,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createInitialNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -622,7 +643,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createJoinNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -648,12 +669,12 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createObjectNode_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get class
-        IClass class_ = (IClass) TestSupport.instance().getNamedElement(
+        IClass class_ = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
@@ -682,17 +703,17 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createPartition_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get super partition
-        INodePresentation superPartition = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation superPartition = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Partition",
             "Partition0");
         
         // Get previous partition
-        INodePresentation previousPartition = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation previousPartition = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Partition",
             "Partition3");    
     
@@ -720,17 +741,17 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createPin_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
         // Get class
-        IClass class_ = (IClass) TestSupport.instance().getNamedElement(
+        IClass class_ = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
         
         // Get parent action
-        INodePresentation parentAction = (INodePresentation) TestSupport.instance().getPresentation(
+        INodePresentation parentAction = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action0");
         
@@ -760,7 +781,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createProcess_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         
@@ -787,7 +808,7 @@ public class ActivityDiagramEditorToolTest {
     @Test
     void createSendSignalAction_ok() throws Exception {
         // Get activity diagram
-        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElement(
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
         

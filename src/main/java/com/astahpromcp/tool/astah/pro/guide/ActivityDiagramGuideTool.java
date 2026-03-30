@@ -38,10 +38,6 @@ public class ActivityDiagramGuideTool implements ToolProvider {
         log.debug("Get activity diagram guide: {}", param);
         
         String content = """
-IMPORTANT POINTS to Keep in Mind:
-* When adding new flow lines to a diagram, adjust the vertex coordinates after the lines are added so that they become right-angled.
-
-
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * ActivityNodes are used to model the individual steps in the behavior specified by an Activity.
 * ControlNodes act as "traffic switches" managing the flow of tokens across ActivityEdges. Tokens cannot "rest" at ControlNodes.
