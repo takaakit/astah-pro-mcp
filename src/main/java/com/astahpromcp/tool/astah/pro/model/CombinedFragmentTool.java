@@ -5,11 +5,17 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandIndexWithHeightDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.CombinedFragmentDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionOperandDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionOperandDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.model.IInteractionOperand;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyUtil;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +74,15 @@ public class CombinedFragmentTool implements ToolProvider {
                         "Set the kind (specified by string) of the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
                         this::setCombinedFragmentKind,
                         CombinedFragmentWithKindDTO.class,
-                        CombinedFragmentDTO.class)
+                        CombinedFragmentDTO.class),
+
+                // Note: To set the height of an interaction operand, the index of the operand known by the combined fragment is required. Therefore, this tool is defined as a tool for the combined fragment rather than for the interaction operand.
+                ToolSupport.definition(
+                        "set_height_of_interaction_operand",
+                        "Set the height of the specified interaction operand (specified by 1-based index), and return the interaction operand information after it is edited.",
+                        this::setHeightOfInteractionOperand,
+                        InteractionOperandIndexWithHeightDTO.class,
+                        InteractionOperandDTO.class)
         );
     }
 
@@ -101,6 +115,40 @@ public class CombinedFragmentTool implements ToolProvider {
             transactionManager.endTransaction();
 
             return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private InteractionOperandDTO setHeightOfInteractionOperand(McpSyncServerExchange exchange, InteractionOperandIndexWithHeightDTO param) throws Exception {
+        log.debug("Set height of interaction operand: {}", param);
+
+        ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
+
+        // Get the presentation of the target combined fragment
+        IPresentation[] astahCombinedFragmentPresentations = astahCombinedFragment.getPresentations();
+        if (astahCombinedFragmentPresentations.length != 1) {
+            throw new RuntimeException("The combined fragment does not have exactly one presentation: count = " + astahCombinedFragmentPresentations.length);
+        }
+        IPresentation astahCombinedFragmentPresentation = astahCombinedFragmentPresentations[0];
+
+        // Validate the target interaction operand index
+        if (param.targetInteractionOperandIndex() < 1 || param.targetInteractionOperandIndex() > astahCombinedFragment.getInteractionOperands().length) {
+            throw new IllegalArgumentException("Invalid interaction operand index: " + param.targetInteractionOperandIndex());
+        }
+        // Get the key for the operand length property
+        String key = PresentationPropertyUtil.createOperandLengthKey(param.targetInteractionOperandIndex());
+        // Get the target interaction operand
+        IInteractionOperand astahInteractionOperand = astahCombinedFragment.getInteractionOperands()[param.targetInteractionOperandIndex() - 1];
+
+        try {
+            transactionManager.beginTransaction();
+            astahCombinedFragmentPresentation.setProperty(key, String.valueOf(param.height()));
+            transactionManager.endTransaction();
+
+            return InteractionOperandDTOAssembler.toDTO(astahInteractionOperand);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

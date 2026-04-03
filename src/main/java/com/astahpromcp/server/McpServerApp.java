@@ -7,6 +7,7 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolRegistrar;
 import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
 import com.astahpromcp.tool.config.ConfigToolFactory;
+import com.astahpromcp.tool.info.InfoToolFactory;
 import com.astahpromcp.tool.knowledge.KnowledgeToolFactory;
 import com.astahpromcp.tool.log.LogToolFactory;
 import com.astahpromcp.tool.visualization.VisualizationToolFactory;
@@ -244,6 +245,7 @@ public final class McpServerApp {
         toolProviders.addAll(new KnowledgeToolFactory(McpServerConfig.WORKSPACE_DIR).createToolProviders(categoryFlags));
         toolProviders.addAll(new VisualizationToolFactory().createToolProviders(categoryFlags));
         toolProviders.addAll(new ConfigToolFactory().createToolProviders(categoryFlags));
+        toolProviders.addAll(new InfoToolFactory().createToolProviders(categoryFlags));
         
         log.info("Total tool providers: {}", toolProviders.size());
         log.info("Tool providers:");

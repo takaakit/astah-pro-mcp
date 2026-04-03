@@ -4,8 +4,10 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.CombinedFragmentKind;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandIndexWithHeightDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionOperandDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
@@ -25,6 +27,7 @@ public class CombinedFragmentToolTest {
     private CombinedFragmentTool tool;
     private Method addInteractionOperand;
     private Method setCombinedFragmentKind;
+    private Method setHeightOfInteractionOperand;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -54,6 +57,13 @@ public class CombinedFragmentToolTest {
             "setCombinedFragmentKind",
             McpSyncServerExchange.class,
             CombinedFragmentWithKindDTO.class);
+
+        // setHeightOfInteractionOperand() method
+        setHeightOfInteractionOperand = TestSupport.getAccessibleMethod(
+            CombinedFragmentTool.class,
+            "setHeightOfInteractionOperand",
+            McpSyncServerExchange.class,
+            InteractionOperandIndexWithHeightDTO.class);
     }
 
     @AfterEach
@@ -125,5 +135,103 @@ public class CombinedFragmentToolTest {
 
         // Check combined fragment kind after setting
         assertTrue(combinedFragment.isLoop());
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ok_1() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getId(),
+            1,
+            120);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            InteractionOperandDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ok_2() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getId(),
+            3,
+            120);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            InteractionOperandDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_1() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getId(),
+            0,
+            120);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            InteractionOperandDTO.class));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_2() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getId(),
+            4,
+            120);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            InteractionOperandDTO.class));
     }
 }

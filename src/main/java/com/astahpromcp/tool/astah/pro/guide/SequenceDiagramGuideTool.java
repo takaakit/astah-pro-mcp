@@ -42,6 +42,7 @@ IMPORTANT POINTS to Keep in Mind:
 * When creating a lifeline, if a corresponding base class exists, set that class as the type of the lifeline.
 * When adding a message name, if a corresponding operation exists in the base class associated with the target lifeline of the message, assign that operation to the message. Otherwise, specify an arbitrary message name, arguments, and return value.
 * When creating a message, if you want the sender lifeline's activation to remain continuous (that is, the activation segments stay connected), you need to specify the activation as the sender of the message. If, in such a case, you specify the lifeline itself as the sender of the message, the sender lifeline's activation will be split.
+* When the height of an interaction operand in a combined fragment is changed, the drawing positions of the presentations contained within the combined fragment are also automatically changed as a result. Therefore, when newly placing node/link presentations within a combined fragment, be sure to finish adjusting the height of the interaction operand beforehand.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):

@@ -83,21 +83,21 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "create_msg",
-                        "Create a new message on the specified sequence diagram (specified by ID), and return the newly created message information.",
+                        "Create a new message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
                         this::createMessage,
                         NewMessageDTO.class,
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
                         "create_create_msg",
-                        "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created message information.",
+                        "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
                         this::createCreateMessage,
                         NewCreateMessageDTO.class,
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
                         "create_destroy_msg",
-                        "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created message information.",
+                        "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
                         this::createDestroyMessage,
                         NewDestroyMessageDTO.class,
                         LinkPresentationDTO.class),
@@ -111,14 +111,14 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
                 ToolSupport.definition(
                         "create_lost_msg",
-                        "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created message information.",
+                        "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
                         this::createLostMessage,
                         NewLostMessageDTO.class,
                         LinkPresentationDTO.class),
 
                 ToolSupport.definition(
                         "create_found_msg",
-                        "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created message information.",
+                        "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
                         this::createFoundMessage,
                         NewFoundMessageDTO.class,
                         LinkPresentationDTO.class),

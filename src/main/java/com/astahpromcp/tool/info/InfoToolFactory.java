@@ -1,4 +1,4 @@
-package com.astahpromcp.tool.config;
+package com.astahpromcp.tool.info;
 
 import com.astahpromcp.tool.ToolCategoryFlags;
 import com.astahpromcp.tool.ToolProvider;
@@ -6,21 +6,21 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-// Factory for creating config tools
+// Factory for creating info tools
 @Slf4j
-public class ConfigToolFactory {
-    
-    public ConfigToolFactory() {
+public class InfoToolFactory {
+
+    public InfoToolFactory() {
     }
 
     public List<ToolProvider> createToolProviders(ToolCategoryFlags categoryFlags) {
         try {
             return List.of(
-                    new ConfigTool()
+                    new InfoTool()
             );
-            
+
         } catch (Exception e) {
-            log.warn("Error creating config tools", e);
+            log.warn("Error creating info tools", e);
             return List.of();
         }
     }

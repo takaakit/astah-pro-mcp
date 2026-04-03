@@ -13,6 +13,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.Presentat
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
 import com.astahpromcp.tool.astah.pro.view.inputdto.PresentationWithHighlightColorDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
@@ -23,9 +24,9 @@ import com.change_vision.jude.api.inf.view.IDiagramViewManager;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +35,8 @@ import java.util.List;
 @Slf4j
 public class DiagramViewManagerTool implements ToolProvider {
 
-    private static final double FIT_EPS = 1e-3;
-    private static final double FIT_PADDING = 0.95;
-    private static final double MIN_ZOOM = 0.05;
-    private static final double MAX_ZOOM = 4.0;
+    private static final String FIT_WINDOW_TOOLBAR_BUTTON_NAME = "managementview.tool_button.drop_down_fit_window";
+    private static final String FIT_WINDOW_ACTION_COMMAND = "FitWindow%both";
 
     private final ProjectAccessor projectAccessor;
     private final IDiagramViewManager diagramViewManager;
@@ -344,7 +343,7 @@ public class DiagramViewManagerTool implements ToolProvider {
     }
 
     private DiagramDTO zoomFit(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
-        log.debug("Zoom fit using presentation bounds: {}", param);
+        log.debug("Zoom fit: {}", param);
 
         IDiagram currentDiagram;
         try {
@@ -353,190 +352,82 @@ public class DiagramViewManagerTool implements ToolProvider {
             throw new RuntimeException("Failed to get the current diagram.");
         }
 
-        IPresentation[] presentations = currentDiagram.getPresentations();
-
-        // If no presentations are found, reset the zoom to 1.0.
-        if (presentations == null || presentations.length == 0) {
-            log.debug("No presentations found in the diagram. Resetting zoom to 1.0.");
-            diagramViewManager.zoom(1.0, true);
-            return DiagramDTOAssembler.toDTO(currentDiagram);
+        JFrame mainFrame = AstahAPI.getAstahAPI().getProjectAccessor().getViewManager().getMainFrame();
+        if (mainFrame == null) {
+            throw new RuntimeException("Main window is unavailable.");
         }
 
-        // Compute the bounds of the presentations.
-        Rectangle2D contentBounds = computePresentationsBounds(currentDiagram, presentations);
-        if (contentBounds == null || contentBounds.isEmpty()) {
-            log.warn("Unable to calculate presentation bounds. Aborting zoom fit.");
-            return DiagramDTOAssembler.toDTO(currentDiagram);
+        Component fitControl = findComponentByName(mainFrame, FIT_WINDOW_TOOLBAR_BUTTON_NAME);
+        if (fitControl == null) {
+            throw new RuntimeException("Fit window button not found (name=" + FIT_WINDOW_TOOLBAR_BUTTON_NAME + ").");
         }
 
-        // Get the bounds of the diagram editor.
-        Rectangle2D viewDeviceBounds = diagramViewManager.getCurrentDiagramEditorBoundsRect();
-        if (viewDeviceBounds == null || viewDeviceBounds.getWidth() <= FIT_EPS || viewDeviceBounds.getHeight() <= FIT_EPS) {
-            log.warn("Diagram editor bounds are unavailable or too small. Aborting zoom fit.");
-            return DiagramDTOAssembler.toDTO(currentDiagram);
-        }
-
-        // Compute the target zoom.
-        double targetZoom = computeTargetZoom(viewDeviceBounds, contentBounds);
-        diagramViewManager.zoom(targetZoom, true);
-
-        // Get the bounds of the diagram editor after zooming.
-        Rectangle2D updatedViewDeviceBounds = diagramViewManager.getCurrentDiagramEditorBoundsRect();
-        Point2D viewCenterWorld = toWorldCenter(updatedViewDeviceBounds);
-        if (viewCenterWorld != null) {
-            // Compute the delta to pan the diagram.
-            double deltaX = contentBounds.getCenterX() - viewCenterWorld.getX();
-            double deltaY = contentBounds.getCenterY() - viewCenterWorld.getY();
-            if (Math.abs(deltaX) > FIT_EPS || Math.abs(deltaY) > FIT_EPS) {
-                diagramViewManager.pan(deltaX, deltaY);
+        AbstractButton button = resolveClickableFitButton(fitControl);
+        Runnable click = () -> button.doClick();
+        try {
+            if (SwingUtilities.isEventDispatchThread()) {
+                click.run();
+            } else {
+                SwingUtilities.invokeAndWait(click);
             }
-        } else {
-            log.warn("Failed to convert view center to world coordinates. Skipping pan.");
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while clicking fit window.", e);
+            
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw new RuntimeException("Failed to click fit window button.", cause != null ? cause : e);
         }
 
         return DiagramDTOAssembler.toDTO(currentDiagram);
     }
 
-    // Compute the bounds of the presentations.
-    private Rectangle2D computePresentationsBounds(IDiagram diagram, IPresentation[] presentations) {
-        double minX = Double.POSITIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
-
-        for (IPresentation presentation : presentations) {
-            if (presentation == null) {
-                continue;
-            }
-
-            if (presentation instanceof INodePresentation) {
-                INodePresentation nodePresentation = (INodePresentation) presentation;
-                Rectangle2D rectangle = nodePresentation.getRectangle();
-                if (rectangle == null) {
-                    continue;
-                }
-
-                minX = Math.min(minX, rectangle.getMinX());
-                minY = Math.min(minY, rectangle.getMinY());
-                maxX = Math.max(maxX, rectangle.getMaxX());
-                maxY = Math.max(maxY, rectangle.getMaxY());
-
-            } else if (presentation instanceof ILinkPresentation) {
-                ILinkPresentation linkPresentation = (ILinkPresentation) presentation;
-                Point2D[] points = linkPresentation.getAllPoints();
-                if (points == null || points.length == 0) {
-                    continue;
-                }
-
-                for (Point2D point : points) {
-                    if (point == null) {
-                        continue;
-                    }
-                    minX = Math.min(minX, point.getX());
-                    minY = Math.min(minY, point.getY());
-                    maxX = Math.max(maxX, point.getX());
-                    maxY = Math.max(maxY, point.getY());
-                }
-            }
+    private static AbstractButton resolveClickableFitButton(Component fitControl) {
+        if (fitControl instanceof AbstractButton ab) {
+            return ab;
         }
-
-        Rectangle2D boundsFromPresentations = null;
-
-        if (minX != Double.POSITIVE_INFINITY && minY != Double.POSITIVE_INFINITY
-                && maxX != Double.NEGATIVE_INFINITY && maxY != Double.NEGATIVE_INFINITY) {
-            double width = maxX - minX;
-            double height = maxY - minY;
-
-            double adjustedMinX = minX;
-            double adjustedMinY = minY;
-            double adjustedMaxX = maxX;
-            double adjustedMaxY = maxY;
-
-            if (width < FIT_EPS) {
-                double half = FIT_EPS / 2.0;
-                double centerX = (minX + maxX) / 2.0;
-                adjustedMinX = centerX - half;
-                adjustedMaxX = centerX + half;
-            }
-
-            if (height < FIT_EPS) {
-                double half = FIT_EPS / 2.0;
-                double centerY = (minY + maxY) / 2.0;
-                adjustedMinY = centerY - half;
-                adjustedMaxY = centerY + half;
-            }
-
-            boundsFromPresentations = new Rectangle2D.Double(
-                    adjustedMinX,
-                    adjustedMinY,
-                    adjustedMaxX - adjustedMinX,
-                    adjustedMaxY - adjustedMinY);
+        AbstractButton byAction = findAbstractButtonByActionCommand(fitControl, FIT_WINDOW_ACTION_COMMAND);
+        if (byAction != null) {
+            return byAction;
         }
-
-        Rectangle2D diagramBounds = null;
-        try {
-            diagramBounds = diagram.getBoundRect();
-        } catch (Exception e) {
-            log.warn("Failed to obtain diagram bound rectangle.", e);
-        }
-
-        if (diagramBounds != null && !diagramBounds.isEmpty()) {
-            if (boundsFromPresentations != null) {
-                boundsFromPresentations = boundsFromPresentations.createUnion(diagramBounds);
-            } else {
-                boundsFromPresentations = (Rectangle2D) diagramBounds.clone();
-            }
-        }
-
-        return boundsFromPresentations;
+        throw new RuntimeException(
+                "Fit window control is not clickable (expected AbstractButton or descendant with actionCommand "
+                        + FIT_WINDOW_ACTION_COMMAND
+                        + ").");
     }
 
-    // Compute the target zoom.
-    private double computeTargetZoom(Rectangle2D viewDeviceBounds, Rectangle2D contentBounds) {
-        double widthRatio = viewDeviceBounds.getWidth() / Math.max(contentBounds.getWidth(), FIT_EPS);
-        double heightRatio = viewDeviceBounds.getHeight() / Math.max(contentBounds.getHeight(), FIT_EPS);
-        double zoom = Math.min(widthRatio, heightRatio) * FIT_PADDING;
-
-        if (!Double.isFinite(zoom) || zoom <= 0.0) {
-            double currentZoom = diagramViewManager.getZoomFactor();
-            double fallbackZoom = currentZoom > 0.0 ? currentZoom : 1.0;
-            return clampZoom(fallbackZoom);
-        }
-
-        return clampZoom(zoom);
-    }
-
-    // Clamp the zoom to the minimum and maximum values.
-    private double clampZoom(double zoom) {
-        return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
-    }
-
-    // Convert the device bounds to the world center.
-    private Point2D toWorldCenter(Rectangle2D deviceBounds) {
-        if (deviceBounds == null) {
+    private static Component findComponentByName(Component root, String name) {
+        if (root == null || name == null) {
             return null;
         }
-
-        try {
-            Point2D topLeft = diagramViewManager.toWorldCoord(
-                    (int) Math.round(deviceBounds.getX()),
-                    (int) Math.round(deviceBounds.getY()));
-            Point2D bottomRight = diagramViewManager.toWorldCoord(
-                    (int) Math.round(deviceBounds.getX() + deviceBounds.getWidth()),
-                    (int) Math.round(deviceBounds.getY() + deviceBounds.getHeight()));
-
-            if (topLeft == null || bottomRight == null) {
-                return null;
-            }
-
-            return new Point2D.Double(
-                    (topLeft.getX() + bottomRight.getX()) / 2.0,
-                    (topLeft.getY() + bottomRight.getY()) / 2.0);
-
-        } catch (Exception e) {
-            log.warn("Failed to convert device coordinates to world coordinates.", e);
-            return null;
+        if (name.equals(root.getName())) {
+            return root;
         }
+        if (root instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                Component found = findComponentByName(child, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static AbstractButton findAbstractButtonByActionCommand(Component root, String actionCommand) {
+        if (root instanceof AbstractButton ab && actionCommand.equals(ab.getActionCommand())) {
+            return ab;
+        }
+        if (root instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                AbstractButton found = findAbstractButtonByActionCommand(child, actionCommand);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     private PresentationDTO highlightPresentation(McpSyncServerExchange exchange, PresentationWithHighlightColorDTO param) throws Exception {

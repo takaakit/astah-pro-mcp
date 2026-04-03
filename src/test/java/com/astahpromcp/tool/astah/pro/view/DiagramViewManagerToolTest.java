@@ -426,9 +426,9 @@ public class DiagramViewManagerToolTest {
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
-        
+
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(diagram.getId());
+        NoInputDTO inputDTO = new NoInputDTO();
 
         // Open diagram
         diagramViewManager.open(diagram);
@@ -444,6 +444,7 @@ public class DiagramViewManagerToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(diagram.getId(), outputDTO.namedElement().element().id());
     }
 
     @Test
