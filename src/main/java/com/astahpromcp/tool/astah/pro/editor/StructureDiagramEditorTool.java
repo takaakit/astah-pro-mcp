@@ -16,6 +16,8 @@ import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Value;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +105,11 @@ public class StructureDiagramEditorTool implements ToolProvider {
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
+            
+            // Set the notation type to normal. This causes interfaces, for example, to be displayed as rectangles rather than as lollipops.
+            astahNodePresentation.setProperty(
+                Key.NOTATION_TYPE,
+                Value.NOTATION_TYPE_NORMAL);
             transactionManager.endTransaction();
 
             return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
