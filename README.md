@@ -132,11 +132,17 @@ To use the *Full* tool version, specify port `8888`; to use the *Query-Only* too
 ```
 </details>
 
-Or run this command:
+Or run this command for project scope in your project directory:
 ```bash
 claude mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8888/mcp
 ```
-See [here](https://docs.claude.com/en/docs/claude-code/mcp#managing-your-servers) for information on the `--scope` flag.
+
+Or run this command for user scope:
+```bash
+claude mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888/mcp
+```
+
+See [here](https://code.claude.com/docs/en/mcp#mcp-installation-scopes) for information on the `--scope` flag.
 
 > *Note:* If you are using *Claude Code* on *WSL2* in Windows, you need to allow WSL to access Windows' 127.0.0.1. So, see [here](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking) and consider enabling Mirrored mode.
 
