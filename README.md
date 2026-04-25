@@ -153,12 +153,14 @@ See [here](https://code.claude.com/docs/en/mcp#mcp-installation-scopes) for info
 
 ```toml
 [mcp_servers.astah-pro-mcp]
-command = "npx"
-args = ["mcp-remote@latest", "http://127.0.0.1:8888/mcp", "--allow-http"]
+url = "http://127.0.0.1:8888/mcp"
 ```
 </details>
 
-> *Note:* As of October 10, 2025, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Codex CLI*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
+Or run this command for user scope:
+```bash
+codex mcp add astah-pro-mcp --url http://127.0.0.1:8888/mcp
+```
 
 > *Note:* If you are using *Codex CLI* on *WSL2* in Windows, you need to allow WSL to access Windows' 127.0.0.1. So, see [here](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking) and consider enabling Mirrored mode.
 
