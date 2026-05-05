@@ -57,19 +57,19 @@ public class ParameterTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_type_of_param",
-                        "Set the type (specified by ID) of the specified parameter (specified by ID), and return the parameter information after it is set. Before using this tool function, obtain or create the type to assign to the parameter type. If you want to set a primitive type, use a different tool function.",
-                        this::setType,
-                        ParameterWithTypeDTO.class,
-                        ParameterDTO.class),
+            ToolSupport.definition(
+                "set_type_of_param",
+                "Set the type (specified by ID) of the specified parameter (specified by ID), and return the parameter information after it is set. Before using this tool function, obtain or create the type to assign to the parameter type. If you want to set a primitive type, use a different tool function.",
+                this::setType,
+                ParameterWithTypeDTO.class,
+                ParameterDTO.class),
 
-                ToolSupport.definition(
-                        "set_type_expression_of_param",
-                        "Set the type expression (specified by string) of the specified parameter (specified by ID), and return the parameter information after it is set. If it is not a primitive type, obtain or create the type and then set it to the parameter type. For example, 'int' and 'string' are primitive types, whereas 'Integer' and 'String' require creating a type before they can be used.",
-                        this::setTypeExpression,
-                        ParameterWithTypeExpressionDTO.class,
-                        ParameterDTO.class)
+            ToolSupport.definition(
+                "set_type_expression_of_param",
+                "Set the type expression (specified by string) of the specified parameter (specified by ID), and return the parameter information after it is set. If it is not a primitive type, obtain or create the type and then set it to the parameter type. For example, 'int' and 'string' are primitive types, whereas 'Integer' and 'String' require creating a type before they can be used.",
+                this::setTypeExpression,
+                ParameterWithTypeExpressionDTO.class,
+                ParameterDTO.class)
         );
     }
 

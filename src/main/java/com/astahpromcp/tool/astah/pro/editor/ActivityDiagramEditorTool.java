@@ -67,145 +67,145 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_accept_event_act",
-                        "Create a new accept event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept event action information. An empty string is not allowed as an action name.",
-                        this::createAcceptEventAction,
-                        NewAcceptEventActionDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_accept_event_act",
+                "Create a new accept event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept event action information. An empty string is not allowed as an action name.",
+                this::createAcceptEventAction,
+                NewAcceptEventActionDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_accept_time_event_act",
-                        "Create a new accept time event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept time event action information. An empty string is not allowed as an action name.",
-                        this::createAcceptTimeEventAction,
-                        NewAcceptTimeEventActionDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_accept_time_event_act",
+                "Create a new accept time event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept time event action information. An empty string is not allowed as an action name.",
+                this::createAcceptTimeEventAction,
+                NewAcceptTimeEventActionDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_act",
-                        "Create a new action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created action information. An empty string is not allowed as an action name.",
-                        this::createAction,
-                        NewActionDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_act",
+                "Create a new action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created action information. An empty string is not allowed as an action name.",
+                this::createAction,
+                NewActionDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_activity_dgm",
-                        "Create a new activity diagram under the specified package (specified by ID), and return the newly created activity diagram information.",
-                        this::createActivityDiagram,
-                        NewActivityDiagramDTO.class,
-                        ActivityDiagramDTO.class),
+            ToolSupport.definition(
+                "create_activity_dgm",
+                "Create a new activity diagram under the specified package (specified by ID), and return the newly created activity diagram information.",
+                this::createActivityDiagram,
+                NewActivityDiagramDTO.class,
+                ActivityDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "create_activity_param_node",
-                        "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created activity parameter node information. An empty string is not allowed as a node name.",
-                        this::createActivityParameterNode,
-                        NewActivityParameterNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_activity_param_node",
+                "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created activity parameter node information. An empty string is not allowed as a node name.",
+                this::createActivityParameterNode,
+                NewActivityParameterNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_call_behavior_act",
-                        "Create a new call behavior action of the specified activity diagram (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created call behavior action information. An empty string is not allowed as an action name.",
-                        this::createCallBehaviorAction,
-                        NewCallBehaviorActionDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_call_behavior_act",
+                "Create a new call behavior action of the specified activity diagram (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created call behavior action information. An empty string is not allowed as an action name.",
+                this::createCallBehaviorAction,
+                NewCallBehaviorActionDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_connector",
-                        "Create a new connector at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created connector information. An empty string is not allowed as a connector name.",
-                        this::createConnector,
-                        NewConnectorDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_connector",
+                "Create a new connector at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created connector information. An empty string is not allowed as a connector name.",
+                this::createConnector,
+                NewConnectorDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_decision_merge_node",
-                        "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified package (specified by ID) of the specified activity diagram (specified by ID), and return the newly created decision merge node information.",
-                        this::createDecisionMergeNode,
-                        NewDecisionMergeNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_decision_merge_node",
+                "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified package (specified by ID) of the specified activity diagram (specified by ID), and return the newly created decision merge node information.",
+                this::createDecisionMergeNode,
+                NewDecisionMergeNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_dep_between_nodes",
-                        "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created dependency information.",
-                        this::createDependency,
-                        NewDependencyDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_dep_between_nodes",
+                "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created dependency information.",
+                this::createDependency,
+                NewDependencyDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_final_node",
-                        "Create a new final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created final node information. An empty string is not allowed as a node name.",
-                        this::createFinalNode,
-                        NewFinalNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_final_node",
+                "Create a new final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created final node information. An empty string is not allowed as a node name.",
+                this::createFinalNode,
+                NewFinalNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_flow",
-                        "Create a new flow between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created flow information.",
-                        this::createFlow,
-                        NewFlowDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_flow",
+                "Create a new flow between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created flow information.",
+                this::createFlow,
+                NewFlowDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_flow_final_node",
-                        "Create a new flow final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created flow final node information. An empty string is not allowed as a node name.",
-                        this::createFlowFinalNode,
-                        NewFlowFinalNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_flow_final_node",
+                "Create a new flow final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created flow final node information. An empty string is not allowed as a node name.",
+                this::createFlowFinalNode,
+                NewFlowFinalNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_fork_node",
-                        "Create a new fork node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created fork node information.",
-                        this::createForkNode,
-                        NewForkNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_fork_node",
+                "Create a new fork node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created fork node information.",
+                this::createForkNode,
+                NewForkNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_init_node",
-                        "Create a new initial node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created initial node information. An empty string is not allowed as a node name. An empty string is not allowed as a node name.",
-                        this::createInitialNode,
-                        NewInitialNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_init_node",
+                "Create a new initial node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created initial node information. An empty string is not allowed as a node name. An empty string is not allowed as a node name.",
+                this::createInitialNode,
+                NewInitialNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_join_node",
-                        "Create a new join node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created join node information.",
-                        this::createJoinNode,
-                        NewJoinNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_join_node",
+                "Create a new join node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created join node information.",
+                this::createJoinNode,
+                NewJoinNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_obj_node",
-                        "Create a new object node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created object node information. An empty string is not allowed as a node name.",
-                        this::createObjectNode,
-                        NewObjectNodeDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_obj_node",
+                "Create a new object node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created object node information. An empty string is not allowed as a node name.",
+                this::createObjectNode,
+                NewObjectNodeDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_partition",
-                        "Create a new partition by specifying the super partition (specified by ID) and the previous partition (specified by ID) on the specified activity diagram (specified by ID), and return the newly created partition information. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
-                        this::createPartition,
-                        NewPartitionDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_partition",
+                "Create a new partition by specifying the super partition (specified by ID) and the previous partition (specified by ID) on the specified activity diagram (specified by ID), and return the newly created partition information. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
+                this::createPartition,
+                NewPartitionDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_in_or_out_pin",
-                        "Create a new input/output pin of the base class (specified by ID) on the specified parent action (specified by ID) on the specified activity diagram (specified by ID), and return the newly created pin information. An empty string is not allowed as a pin name.",
-                        this::createPin,
-                        NewPinWithBaseClassAndParentActionDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_in_or_out_pin",
+                "Create a new input/output pin of the base class (specified by ID) on the specified parent action (specified by ID) on the specified activity diagram (specified by ID), and return the newly created pin information. An empty string is not allowed as a pin name.",
+                this::createPin,
+                NewPinWithBaseClassAndParentActionDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_process",
-                        "Create a new process at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created process information. An empty string is not allowed as a process name.",
-                        this::createProcess,
-                        NewProcessDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_process",
+                "Create a new process at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created process information. An empty string is not allowed as a process name.",
+                this::createProcess,
+                NewProcessDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_send_signal_act",
-                        "Create a new send signal action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created send signal action information. An empty string is not allowed as an action name.",
-                        this::createSendSignalAction,
-                        NewSendSignalActionDTO.class,
-                        NodePresentationDTO.class)
+            ToolSupport.definition(
+                "create_send_signal_act",
+                "Create a new send signal action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created send signal action information. An empty string is not allowed as an action name.",
+                this::createSendSignalAction,
+                NewSendSignalActionDTO.class,
+                NodePresentationDTO.class)
         );
     }
 

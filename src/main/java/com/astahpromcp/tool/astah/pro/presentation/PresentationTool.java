@@ -57,44 +57,44 @@ public class PresentationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_element_of_prst",
-                        "Return the element information that corresponds to the specified presentation (specified by ID).",
-                        this::getElement,
-                        IdDTO.class,
-                        ElementDTO.class)
+            ToolSupport.definition(
+                "get_element_of_prst",
+                "Return the element information that corresponds to the specified presentation (specified by ID).",
+                this::getElement,
+                IdDTO.class,
+                ElementDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_label",
-                        "Set the label of the specified presentation (specified by ID), and return the presentation information after it is set. Note that newline characters (\\n) cannot be used in labels.",
-                        this::setLabel,
-                        PresentationWithLabelDTO.class,
-                        PresentationDTO.class),
+            ToolSupport.definition(
+                "set_label",
+                "Set the label of the specified presentation (specified by ID), and return the presentation information after it is set. Note that newline characters (\\n) cannot be used in labels.",
+                this::setLabel,
+                PresentationWithLabelDTO.class,
+                PresentationDTO.class),
 
-                ToolSupport.definition(
-                        "change_fill_color",
-                        "Change the fill color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
-                        this::changeFillColor,
-                        PresentationWithColorDTO.class,
-                        PresentationDTO.class),
+            ToolSupport.definition(
+                "change_fill_color",
+                "Change the fill color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
+                this::changeFillColor,
+                PresentationWithColorDTO.class,
+                PresentationDTO.class),
 
-                ToolSupport.definition(
-                        "change_line_color",
-                        "Change the line color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
-                        this::changeLineColor,
-                        PresentationWithColorDTO.class,
-                        PresentationDTO.class),
+            ToolSupport.definition(
+                "change_line_color",
+                "Change the line color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
+                this::changeLineColor,
+                PresentationWithColorDTO.class,
+                PresentationDTO.class),
 
-                ToolSupport.definition(
-                        "change_font_color",
-                        "Change the font color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
-                        this::changeFontColor,
-                        PresentationWithColorDTO.class,
-                        PresentationDTO.class)
+            ToolSupport.definition(
+                "change_font_color",
+                "Change the font color of the specified presentation (specified by ID), and return the presentation information after it is changed.",
+                this::changeFontColor,
+                PresentationWithColorDTO.class,
+                PresentationDTO.class)
         );
     }
 

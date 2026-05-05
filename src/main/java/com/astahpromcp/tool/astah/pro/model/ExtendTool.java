@@ -51,12 +51,12 @@ public class ExtendTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_extend_info",
-                        "Return detailed information about the specified extend (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ExtendDTO.class)
+            ToolSupport.definition(
+                "get_extend_info",
+                "Return detailed information about the specified extend (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ExtendDTO.class)
         );
     }
 

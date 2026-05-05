@@ -616,4 +616,5 @@ public class DiagramViewManagerToolTest {
         assertNotNull(outputDTO);
         assertEquals(2, outputDTO.value().size());
     }
+
 }

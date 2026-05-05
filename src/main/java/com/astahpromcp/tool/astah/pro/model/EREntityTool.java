@@ -54,37 +54,37 @@ public class EREntityTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_entity_info",
-                        "Return detailed information about the specified ER entity (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        EREntityDTO.class)
+            ToolSupport.definition(
+                "get_er_entity_info",
+                "Return detailed information about the specified ER entity (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                EREntityDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_logical_name_of_er_entity",
-                        "Set the logical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
-                        this::setLogicalName,
-                        EREntityWithLogicalNameDTO.class,
-                        EREntityDTO.class),
+            ToolSupport.definition(
+                "set_logical_name_of_er_entity",
+                "Set the logical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
+                this::setLogicalName,
+                EREntityWithLogicalNameDTO.class,
+                EREntityDTO.class),
 
-                ToolSupport.definition(
-                        "set_physical_name_of_er_entity",
-                        "Set the physical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
-                        this::setPhysicalName,
-                        EREntityWithPhysicalNameDTO.class,
-                        EREntityDTO.class),
+            ToolSupport.definition(
+                "set_physical_name_of_er_entity",
+                "Set the physical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
+                this::setPhysicalName,
+                EREntityWithPhysicalNameDTO.class,
+                EREntityDTO.class),
 
-                ToolSupport.definition(
-                        "set_type_of_er_entity",
-                        "Set the type (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
-                        this::setType,
-                        EREntityWithTypeDTO.class,
-                        EREntityDTO.class)
+            ToolSupport.definition(
+                "set_type_of_er_entity",
+                "Set the type (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
+                this::setType,
+                EREntityWithTypeDTO.class,
+                EREntityDTO.class)
         );
     }
 

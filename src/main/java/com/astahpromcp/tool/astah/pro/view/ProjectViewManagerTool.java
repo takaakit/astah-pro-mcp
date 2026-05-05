@@ -57,26 +57,26 @@ public class ProjectViewManagerTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "show_in_property_view",
-                        "Show the property view of the element (specified by ID), and return the shown element information.",
-                        this::showInPropertyView,
-                        IdDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "show_in_property_view",
+                "Show the property view of the element (specified by ID), and return the shown element information.",
+                this::showInPropertyView,
+                IdDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "show_in_structure_tree",
-                        "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
-                        this::showInStructureTree,
-                        IdDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "show_in_structure_tree",
+                "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
+                this::showInStructureTree,
+                IdDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "get_selected_elements",
-                        "Get the information of the selected elements in the project view (including the structure tree (aka model browser)).",
-                        this::getSelectedElements,
-                        NoInputDTO.class,
-                        ElementListDTO.class)
+            ToolSupport.definition(
+                "get_selected_elements",
+                "Get the information of the selected elements in the project view (including the structure tree (aka model browser)).",
+                this::getSelectedElements,
+                NoInputDTO.class,
+                ElementListDTO.class)
         );
     }
 

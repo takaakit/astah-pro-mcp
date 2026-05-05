@@ -26,12 +26,12 @@ public class AstahProLogFileTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
             return List.of(
-                    ToolSupport.definition(
-                            "get_info_of_astah_log",
-                            "Return the log file information of the Astah Professional.",
-                            this::getAstahProLogFile,
-                            NoInputDTO.class,
-                            LogFileDTO.class)
+                ToolSupport.definition(
+                    "get_info_of_astah_log",
+                    "Return the log file information of the Astah Professional.",
+                    this::getAstahProLogFile,
+                    NoInputDTO.class,
+                    LogFileDTO.class)
             );
         } catch (Exception e) {
             log.error("Failed to create astah pro log file tools", e);

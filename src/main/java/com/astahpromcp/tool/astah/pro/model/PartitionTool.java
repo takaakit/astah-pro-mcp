@@ -51,12 +51,12 @@ public class PartitionTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_partition_info",
-                        "Return detailed information about the specified partition (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        PartitionDTO.class)
+            ToolSupport.definition(
+                "get_partition_info",
+                "Return detailed information about the specified partition (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                PartitionDTO.class)
         );
     }
 

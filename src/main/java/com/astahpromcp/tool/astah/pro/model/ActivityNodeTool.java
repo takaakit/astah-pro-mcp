@@ -51,12 +51,12 @@ public class ActivityNodeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_activity_node_info",
-                        "Return detailed information about the specified activity node (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ActivityNodeDTO.class)
+            ToolSupport.definition(
+                "get_activity_node_info",
+                "Return detailed information about the specified activity node (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ActivityNodeDTO.class)
         );
     }
 

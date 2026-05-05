@@ -51,12 +51,12 @@ public class TestCaseTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_test_case_info",
-                        "Return detailed information about the specified test case (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        TestCaseDTO.class)
+            ToolSupport.definition(
+                "get_test_case_info",
+                "Return detailed information about the specified test case (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                TestCaseDTO.class)
         );
     }
 

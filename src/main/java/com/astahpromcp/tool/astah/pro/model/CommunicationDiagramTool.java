@@ -54,19 +54,19 @@ public class CommunicationDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_communication_dgm_info",
-                        "Return detailed information about the specified communication diagram (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        CommunicationDiagramDTO.class),
+            ToolSupport.definition(
+                "get_communication_dgm_info",
+                "Return detailed information about the specified communication diagram (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                CommunicationDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "get_interaction_of_communication_dgm",
-                        "Return the interaction of the specified communication diagram (specified by ID).",
-                        this::getInteraction,
-                        IdDTO.class,
-                        InteractionDTO.class)
+            ToolSupport.definition(
+                "get_interaction_of_communication_dgm",
+                "Return the interaction of the specified communication diagram (specified by ID).",
+                this::getInteraction,
+                IdDTO.class,
+                InteractionDTO.class)
         );
     }
 

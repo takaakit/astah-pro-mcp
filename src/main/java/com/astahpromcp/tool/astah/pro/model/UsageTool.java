@@ -51,12 +51,12 @@ public class UsageTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_usage_info",
-                        "Return detailed information about the specified usage (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        UsageDTO.class)
+            ToolSupport.definition(
+                "get_usage_info",
+                "Return detailed information about the specified usage (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                UsageDTO.class)
         );
     }
 

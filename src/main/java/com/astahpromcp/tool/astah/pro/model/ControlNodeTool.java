@@ -49,12 +49,12 @@ public class ControlNodeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_control_node_info",
-                        "Return detailed information about the specified control node (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ControlNodeDTO.class)
+            ToolSupport.definition(
+                "get_control_node_info",
+                "Return detailed information about the specified control node (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ControlNodeDTO.class)
         );
     }
 

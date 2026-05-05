@@ -51,12 +51,12 @@ public class IncludeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_include_info",
-                        "Return detailed information about the specified include (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        IncludeDTO.class)
+            ToolSupport.definition(
+                "get_include_info",
+                "Return detailed information about the specified include (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                IncludeDTO.class)
         );
     }
 

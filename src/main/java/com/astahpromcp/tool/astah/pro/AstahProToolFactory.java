@@ -6,6 +6,7 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.editor.*;
 import com.astahpromcp.tool.astah.pro.guide.*;
 import com.astahpromcp.tool.astah.pro.image.*;
+import com.astahpromcp.tool.astah.pro.layout.*;
 import com.astahpromcp.tool.astah.pro.model.*;
 import com.astahpromcp.tool.astah.pro.presentation.*;
 import com.astahpromcp.tool.astah.pro.project.*;
@@ -82,6 +83,7 @@ public class AstahProToolFactory {
             providers.add(new ProjectInfoTool(projectAccessor, astahProToolSupport, includeEditorTools));
             providers.add(new ImageCaptureTool(astahProToolSupport, imageOutputDir));
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+            providers.add(new LayoutLintTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
 
             // Activity diagram tools
             if (categoryFlags.activityDiagramEnabled()) {

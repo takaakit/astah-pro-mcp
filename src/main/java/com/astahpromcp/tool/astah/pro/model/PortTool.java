@@ -53,30 +53,30 @@ public class PortTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_port_info",
-                        "Return detailed information about the specified port (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        PortDTO.class)
+            ToolSupport.definition(
+                "get_port_info",
+                "Return detailed information about the specified port (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                PortDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_behavior_of_port",
-                        "Set the behavior (specified by boolean) of the specified port (specified by ID), and return the port information after it is set.",
-                        this::setBehavior,
-                        PortWithBehaviorDTO.class,
-                        PortDTO.class),
+            ToolSupport.definition(
+                "set_behavior_of_port",
+                "Set the behavior (specified by boolean) of the specified port (specified by ID), and return the port information after it is set.",
+                this::setBehavior,
+                PortWithBehaviorDTO.class,
+                PortDTO.class),
 
-                ToolSupport.definition(
-                        "set_service_of_port",
-                        "Set the service (specified by boolean) of the specified port (specified by ID), and return the port information after it is set.",
-                        this::setService,
-                        PortWithServiceDTO.class,
-                        PortDTO.class)
+            ToolSupport.definition(
+                "set_service_of_port",
+                "Set the service (specified by boolean) of the specified port (specified by ID), and return the port information after it is set.",
+                this::setService,
+                PortWithServiceDTO.class,
+                PortDTO.class)
         );
     }
 

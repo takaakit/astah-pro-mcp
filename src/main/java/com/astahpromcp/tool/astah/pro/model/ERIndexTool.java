@@ -55,44 +55,44 @@ public class ERIndexTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_index_info",
-                        "Return detailed information about the specified ER index (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERIndexDTO.class)
+            ToolSupport.definition(
+                "get_er_index_info",
+                "Return detailed information about the specified ER index (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERIndexDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "add_er_attr_to_er_index",
-                        "Add the ER attribute (specified by ID) to the specified ER index (specified by ID), and return the ER index information after it is set.",
-                        this::addERAttribute,
-                        ERIndexWithERAttributeDTO.class,
-                        ERIndexDTO.class),
+            ToolSupport.definition(
+                "add_er_attr_to_er_index",
+                "Add the ER attribute (specified by ID) to the specified ER index (specified by ID), and return the ER index information after it is set.",
+                this::addERAttribute,
+                ERIndexWithERAttributeDTO.class,
+                ERIndexDTO.class),
 
-                ToolSupport.definition(
-                        "remove_er_attr_from_er_index",
-                        "Remove the ER attribute (specified by ID) from the specified ER index (specified by ID), and return the ER index information after it is set.",
-                        this::removeERAttribute,
-                        ERIndexWithERAttributeDTO.class,
-                        ERIndexDTO.class),
+            ToolSupport.definition(
+                "remove_er_attr_from_er_index",
+                "Remove the ER attribute (specified by ID) from the specified ER index (specified by ID), and return the ER index information after it is set.",
+                this::removeERAttribute,
+                ERIndexWithERAttributeDTO.class,
+                ERIndexDTO.class),
 
-                ToolSupport.definition(
-                        "set_key_of_er_index",
-                        "Set the key of the specified ER index (specified by ID), and return the ER index information after it is set.",
-                        this::setKey,
-                        ERIndexWithKeyDTO.class,
-                        ERIndexDTO.class),
+            ToolSupport.definition(
+                "set_key_of_er_index",
+                "Set the key of the specified ER index (specified by ID), and return the ER index information after it is set.",
+                this::setKey,
+                ERIndexWithKeyDTO.class,
+                ERIndexDTO.class),
 
-                ToolSupport.definition(
-                        "set_unique_of_er_index",
-                        "Set the unique of the specified ER index (specified by ID), and return the ER index information after it is set.",
-                        this::setUnique,
-                        ERIndexWithUniqueDTO.class,
-                        ERIndexDTO.class)
+            ToolSupport.definition(
+                "set_unique_of_er_index",
+                "Set the unique of the specified ER index (specified by ID), and return the ER index information after it is set.",
+                this::setUnique,
+                ERIndexWithUniqueDTO.class,
+                ERIndexDTO.class)
         );
     }
 

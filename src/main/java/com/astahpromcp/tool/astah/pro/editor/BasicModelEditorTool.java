@@ -59,250 +59,250 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "change_parent",
-                        "Change the parent named element (specified by ID) on the specified named element (specified by ID), and return the newly created package information. For example, this tool is used when you want to change the package structure.",
-                        this::changeParent,
-                        NamedElementWithParentDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "change_parent",
+                "Change the parent named element (specified by ID) on the specified named element (specified by ID), and return the newly created package information. For example, this tool is used when you want to change the package structure.",
+                this::changeParent,
+                NamedElementWithParentDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "create_artifact",
-                        "Create a new artifact under the specified parent package (specified by ID), and return the newly created artifact information.",
-                        this::createArtifact,
-                        NewArtifactInPackageDTO.class,
-                        ArtifactDTO.class),
+            ToolSupport.definition(
+                "create_artifact",
+                "Create a new artifact under the specified parent package (specified by ID), and return the newly created artifact information.",
+                this::createArtifact,
+                NewArtifactInPackageDTO.class,
+                ArtifactDTO.class),
 
-                ToolSupport.definition(
-                        "create_pkg_in_parent_pkg",
-                        "Create a new package under the specified parent package (specified by ID), and return the newly created package information. Note that this tool cannot create a root package (i.e., a project).",
-                        this::createPackageInParentPackage,
-                        NewPackageInPackageDTO.class,
-                        PackageDTO.class),
+            ToolSupport.definition(
+                "create_pkg_in_parent_pkg",
+                "Create a new package under the specified parent package (specified by ID), and return the newly created package information. Note that this tool cannot create a root package (i.e., a project).",
+                this::createPackageInParentPackage,
+                NewPackageInPackageDTO.class,
+                PackageDTO.class),
 
-                ToolSupport.definition(
-                        "create_class_in_parent_pkg",
-                        "Create a new class under the specified parent package (specified by ID), and return the newly created class information.",
-                        this::createClassInParentPackage,
-                        NewClassInPackageDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "create_class_in_parent_pkg",
+                "Create a new class under the specified parent package (specified by ID), and return the newly created class information.",
+                this::createClassInParentPackage,
+                NewClassInPackageDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "create_class_in_parent_class",
-                        "Create a new class under the specified parent class (specified by ID), and return the newly created class information.",
-                        this::createClassInParentClass,
-                        NewClassInClassDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "create_class_in_parent_class",
+                "Create a new class under the specified parent class (specified by ID), and return the newly created class information.",
+                this::createClassInParentClass,
+                NewClassInClassDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "create_enum_in_parent_pkg",
-                        "Create a new enumeration under the specified parent package (specified by ID), and return the newly created enumeration information.",
-                        this::createEnumerationInParentPackage,
-                        NewEnumerationInPackageDTO.class,
-                        EnumerationDTO.class),
+            ToolSupport.definition(
+                "create_enum_in_parent_pkg",
+                "Create a new enumeration under the specified parent package (specified by ID), and return the newly created enumeration information.",
+                this::createEnumerationInParentPackage,
+                NewEnumerationInPackageDTO.class,
+                EnumerationDTO.class),
 
-                ToolSupport.definition(
-                        "create_interface_in_parent_pkg",
-                        "Create a new interface under the specified parent package (specified by ID), and return the newly created interface information.",
-                        this::createInterfaceInParentPackage,
-                        NewInterfaceInPackageDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "create_interface_in_parent_pkg",
+                "Create a new interface under the specified parent package (specified by ID), and return the newly created interface information.",
+                this::createInterfaceInParentPackage,
+                NewInterfaceInPackageDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "create_interface_in_parent_class",
-                        "Create a new interface under the specified parent class (specified by ID), and return the newly created interface information.",
-                        this::createInterfaceInParentClass,
-                        NewInterfaceInClassDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "create_interface_in_parent_class",
+                "Create a new interface under the specified parent class (specified by ID), and return the newly created interface information.",
+                this::createInterfaceInParentClass,
+                NewInterfaceInClassDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "create_component",
-                        "Create a new component under the specified parent package (specified by ID), and return the newly created component information.",
-                        this::createComponent,
-                        NewComponentInPackageDTO.class,
-                        ComponentDTO.class),
+            ToolSupport.definition(
+                "create_component",
+                "Create a new component under the specified parent package (specified by ID), and return the newly created component information.",
+                this::createComponent,
+                NewComponentInPackageDTO.class,
+                ComponentDTO.class),
 
-                ToolSupport.definition(
-                        "create_port",
-                        "Create a new port under the specified class (specified by ID), and return the newly created port information.",
-                        this::createPort,
-                        NewPortInClassDTO.class,
-                        PortDTO.class),
+            ToolSupport.definition(
+                "create_port",
+                "Create a new port under the specified class (specified by ID), and return the newly created port information.",
+                this::createPort,
+                NewPortInClassDTO.class,
+                PortDTO.class),
 
-                ToolSupport.definition(
-                        "create_attr",
-                        "Create a new attribute under the specified class (specified by ID), and return the newly created attribute information. Since the attribute type is set as 'int', if the attribute type is not 'int', use other tool function to set the attribute type.",
-                        this::createAttribute,
-                        NewAttributeInClassDTO.class,
-                        AttributeDTO.class),
+            ToolSupport.definition(
+                "create_attr",
+                "Create a new attribute under the specified class (specified by ID), and return the newly created attribute information. Since the attribute type is set as 'int', if the attribute type is not 'int', use other tool function to set the attribute type.",
+                this::createAttribute,
+                NewAttributeInClassDTO.class,
+                AttributeDTO.class),
 
-                ToolSupport.definition(
-                        "create_enum_literal",
-                        "Create a new enumeration literal under the specified enumeration (specified by ID), and return the newly created enumeration literal information.",
-                        this::createEnumerationLiteral,
-                        NewEnumerationLiteralInEnumerationDTO.class,
-                        EnumerationLiteralDTO.class),
+            ToolSupport.definition(
+                "create_enum_literal",
+                "Create a new enumeration literal under the specified enumeration (specified by ID), and return the newly created enumeration literal information.",
+                this::createEnumerationLiteral,
+                NewEnumerationLiteralInEnumerationDTO.class,
+                EnumerationLiteralDTO.class),
 
-                ToolSupport.definition(
-                        "create_ope",
-                        "Create a new operation under the specified class (specified by ID), and return the newly created operation information. Since the operation return type is set to 'void', if the operation return type is not 'void', use other tool function to set the operation return type.",
-                        this::createOperation,
-                        NewOperationInClassDTO.class,
-                        OperationDTO.class),
+            ToolSupport.definition(
+                "create_ope",
+                "Create a new operation under the specified class (specified by ID), and return the newly created operation information. Since the operation return type is set to 'void', if the operation return type is not 'void', use other tool function to set the operation return type.",
+                this::createOperation,
+                NewOperationInClassDTO.class,
+                OperationDTO.class),
 
-                ToolSupport.definition(
-                        "create_param",
-                        "Create a new parameter to the specified operation (specified by ID), and return the newly created parameter information. Since the parameter type is set as 'int', if the parameter type is not 'int', use other tool function to set the parameter type.",
-                        this::createParameter,
-                        NewParameterToOperationDTO.class,
-                        ParameterDTO.class),
+            ToolSupport.definition(
+                "create_param",
+                "Create a new parameter to the specified operation (specified by ID), and return the newly created parameter information. Since the parameter type is set as 'int', if the parameter type is not 'int', use other tool function to set the parameter type.",
+                this::createParameter,
+                NewParameterToOperationDTO.class,
+                ParameterDTO.class),
 
-                ToolSupport.definition(
-                        "create_asso",
-                        "Create a new association between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association name and the association end A and B role names are set to empty strings.",
-                        this::createAssociation,
-                        NewAssociationDTO.class,
-                        AssociationDTO.class),
+            ToolSupport.definition(
+                "create_asso",
+                "Create a new association between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association name and the association end A and B role names are set to empty strings.",
+                this::createAssociation,
+                NewAssociationDTO.class,
+                AssociationDTO.class),
 
-                ToolSupport.definition(
-                        "create_asso_class",
-                        "Create a new association and association class between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association end A and B role names are set to empty strings.",
-                        this::createAssociationClass,
-                        NewAssociationClassDTO.class,
-                        AssociationClassDTO.class),
+            ToolSupport.definition(
+                "create_asso_class",
+                "Create a new association and association class between the specified class (specified by ID) and the another specified class (specified by ID), and return the newly created association information. The association end A and B role names are set to empty strings.",
+                this::createAssociationClass,
+                NewAssociationClassDTO.class,
+                AssociationClassDTO.class),
 
-                ToolSupport.definition(
-                        "create_dep",
-                        "Create a new dependency between the specified source named element (specified by ID) and the specified target named element (specified by ID), and return the newly created dependency information.",
-                        this::createDependency,
-                        NewDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_dep",
+                "Create a new dependency between the specified source named element (specified by ID) and the specified target named element (specified by ID), and return the newly created dependency information.",
+                this::createDependency,
+                NewDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_gen",
-                        "Create a new generalization between the specified sub class (specified by ID) and the specified super class (specified by ID), and return the newly created generalization information.",
-                        this::createGeneralization,
-                        NewGeneralizationDTO.class,
-                        GeneralizationDTO.class),
+            ToolSupport.definition(
+                "create_gen",
+                "Create a new generalization between the specified sub class (specified by ID) and the specified super class (specified by ID), and return the newly created generalization information.",
+                this::createGeneralization,
+                NewGeneralizationDTO.class,
+                GeneralizationDTO.class),
 
-                ToolSupport.definition(
-                        "create_real",
-                        "Create a new realization between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created realization information.",
-                        this::createRealization,
-                        NewRealizationDTO.class,
-                        RealizationDTO.class),
+            ToolSupport.definition(
+                "create_real",
+                "Create a new realization between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created realization information.",
+                this::createRealization,
+                NewRealizationDTO.class,
+                RealizationDTO.class),
 
-                ToolSupport.definition(
-                        "create_usage",
-                        "Create a new usage between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created usage information.",
-                        this::createUsage,
-                        NewUsageDTO.class,
-                        UsageDTO.class),
+            ToolSupport.definition(
+                "create_usage",
+                "Create a new usage between the specified client (specified by ID) and the specified supplier (specified by ID), and return the newly created usage information.",
+                this::createUsage,
+                NewUsageDTO.class,
+                UsageDTO.class),
 
-                ToolSupport.definition(
-                        "create_qualifier",
-                        "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created qualifier information. Limitation: Because an ID of the qualifier type is required, a qualifier of a primitive type cannot be created.",
-                        this::createQualifier,
-                        NewQualifierToAssociationEndDTO.class,
-                        AttributeDTO.class),
+            ToolSupport.definition(
+                "create_qualifier",
+                "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created qualifier information. Limitation: Because an ID of the qualifier type is required, a qualifier of a primitive type cannot be created.",
+                this::createQualifier,
+                NewQualifierToAssociationEndDTO.class,
+                AttributeDTO.class),
 
-                ToolSupport.definition(
-                        "create_tagged_val",
-                        "Create a new tagged value (name and value) to the specified element (specified by ID), and return the element information after it is edited.",
-                        this::createTaggedValue,
-                        NewTaggedValueToElementDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "create_tagged_val",
+                "Create a new tagged value (name and value) to the specified element (specified by ID), and return the element information after it is edited.",
+                this::createTaggedValue,
+                NewTaggedValueToElementDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "create_template_param",
-                        "Create a template parameter of the specified type (specified by ID) to the specified class (specified by ID), and return the class information after it is edited.",
-                        this::createTemplateParameter,
-                        NewTemplateParameterToClassDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "create_template_param",
+                "Create a template parameter of the specified type (specified by ID) to the specified class (specified by ID), and return the class information after it is edited.",
+                this::createTemplateParameter,
+                NewTemplateParameterToClassDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "delete_elem",
-                        "Delete the specified element (specified by ID), and return the deleted element information. Note that deleting an element also deletes all corresponding presentations.",
-                        this::deleteElement,
-                        IdDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "delete_elem",
+                "Delete the specified element (specified by ID), and return the deleted element information. Note that deleting an element also deletes all corresponding presentations.",
+                this::deleteElement,
+                IdDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "create_req_in_parent_pkg",
-                        "Create a new requirement under the specified parent package (specified by ID), and return the newly created requirement information.",
-                        this::createRequirementInParentPackage,
-                        NewRequirementInPackageDTO.class,
-                        RequirementDTO.class),
+            ToolSupport.definition(
+                "create_req_in_parent_pkg",
+                "Create a new requirement under the specified parent package (specified by ID), and return the newly created requirement information.",
+                this::createRequirementInParentPackage,
+                NewRequirementInPackageDTO.class,
+                RequirementDTO.class),
 
-                ToolSupport.definition(
-                        "create_req_in_parent_req",
-                        "Create a new requirement under the specified parent requirement (specified by ID), and return the newly created requirement information.",
-                        this::createRequirementInParentRequirement,
-                        NewRequirementInRequirementDTO.class,
-                        RequirementDTO.class),
+            ToolSupport.definition(
+                "create_req_in_parent_req",
+                "Create a new requirement under the specified parent requirement (specified by ID), and return the newly created requirement information.",
+                this::createRequirementInParentRequirement,
+                NewRequirementInRequirementDTO.class,
+                RequirementDTO.class),
 
-                ToolSupport.definition(
-                        "create_test_case_in_parent_pkg",
-                        "Create a new test case under the specified parent package (specified by ID), and return the newly created test case information.",
-                        this::createTestCaseInParentPackage,
-                        NewTestCaseInPackageDTO.class,
-                        TestCaseDTO.class),
+            ToolSupport.definition(
+                "create_test_case_in_parent_pkg",
+                "Create a new test case under the specified parent package (specified by ID), and return the newly created test case information.",
+                this::createTestCaseInParentPackage,
+                NewTestCaseInPackageDTO.class,
+                TestCaseDTO.class),
 
-                ToolSupport.definition(
-                        "create_test_case_in_parent_test_case",
-                        "Create a new test case under the specified parent test case (specified by ID), and return the newly created test case information.",
-                        this::createTestCaseInParentTestCase,
-                        NewTestCaseInTestCaseDTO.class,
-                        TestCaseDTO.class),
+            ToolSupport.definition(
+                "create_test_case_in_parent_test_case",
+                "Create a new test case under the specified parent test case (specified by ID), and return the newly created test case information.",
+                this::createTestCaseInParentTestCase,
+                NewTestCaseInTestCaseDTO.class,
+                TestCaseDTO.class),
 
-                ToolSupport.definition(
-                        "create_copy_dep",
-                        "Create a copy dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                        this::createCopyDependency,
-                        NewCopyDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_copy_dep",
+                "Create a copy dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                this::createCopyDependency,
+                NewCopyDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_derive_req_dep",
-                        "Create a DeriveReqt dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                        this::createDeriveReqtDependency,
-                        NewDeriveReqtDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_derive_req_dep",
+                "Create a DeriveReqt dependency from the specified source requirement (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                this::createDeriveReqtDependency,
+                NewDeriveReqtDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_refine_dep",
-                        "Create a refine dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                        this::createRefineDependency,
-                        NewRefineDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_refine_dep",
+                "Create a refine dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                this::createRefineDependency,
+                NewRefineDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_satisfy_dep",
-                        "Create a satisfy dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                        this::createSatisfyDependency,
-                        NewSatisfyDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_satisfy_dep",
+                "Create a satisfy dependency from the specified source named element (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                this::createSatisfyDependency,
+                NewSatisfyDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_trace_dep",
-                        "Create a trace dependency from the specified source named element (specified by ID) to the specified target named element (specified by ID), and return the newly created dependency information.",
-                        this::createTraceDependency,
-                        NewTraceDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_trace_dep",
+                "Create a trace dependency from the specified source named element (specified by ID) to the specified target named element (specified by ID), and return the newly created dependency information.",
+                this::createTraceDependency,
+                NewTraceDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_verify_dep",
-                        "Create a verify dependency from the specified source test case (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
-                        this::createVerifyDependency,
-                        NewVerifyDependencyDTO.class,
-                        DependencyDTO.class),
+            ToolSupport.definition(
+                "create_verify_dep",
+                "Create a verify dependency from the specified source test case (specified by ID) to the specified target requirement (specified by ID), and return the newly created dependency information.",
+                this::createVerifyDependency,
+                NewVerifyDependencyDTO.class,
+                DependencyDTO.class),
 
-                ToolSupport.definition(
-                        "create_constraint",
-                        "Create a constraint to the specified named element (specified by ID), and return the newly created constraint information.",
-                        this::createConstraint,
-                        NewConstraintDTO.class,
-                        ConstraintDTO.class)
+            ToolSupport.definition(
+                "create_constraint",
+                "Create a constraint to the specified named element (specified by ID), and return the newly created constraint information.",
+                this::createConstraint,
+                NewConstraintDTO.class,
+                ConstraintDTO.class)
         );
     }
 

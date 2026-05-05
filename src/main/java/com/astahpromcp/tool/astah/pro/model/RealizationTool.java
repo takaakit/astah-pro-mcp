@@ -51,12 +51,12 @@ public class RealizationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_real_info",
-                        "Return detailed information about the specified realization (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        RealizationDTO.class)
+            ToolSupport.definition(
+                "get_real_info",
+                "Return detailed information about the specified realization (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                RealizationDTO.class)
         );
     }
 

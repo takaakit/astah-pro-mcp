@@ -51,12 +51,12 @@ public class CommentTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_comment_info",
-                        "Return detailed information about the specified comment (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        CommentDTO.class)
+            ToolSupport.definition(
+                "get_comment_info",
+                "Return detailed information about the specified comment (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                CommentDTO.class)
         );
     }
 

@@ -56,30 +56,30 @@ public class LinkPresentationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_link_prst_info",
-                        "Return detailed information about the specified link presentation (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        LinkPresentationDTO.class)
+            ToolSupport.definition(
+                "get_link_prst_info",
+                "Return detailed information about the specified link presentation (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                LinkPresentationDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_points_of_link_prst",
-                        "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
-                        this::setAllPoints,
-                        LinkPresentationWithPointsDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "set_points_of_link_prst",
+                "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
+                this::setAllPoints,
+                LinkPresentationWithPointsDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "set_line_style_of_link_prst",
-                        "Set the line style of the specified link presentation (specified by ID), and return the link presentation information after it is set.",
-                        this::setLineStyle,
-                        LinkPresentationWithLineStyleDTO.class,
-                        LinkPresentationDTO.class)
+            ToolSupport.definition(
+                "set_line_style_of_link_prst",
+                "Set the line style of the specified link presentation (specified by ID), and return the link presentation information after it is set.",
+                this::setLineStyle,
+                LinkPresentationWithLineStyleDTO.class,
+                LinkPresentationDTO.class)
         );
     }
 

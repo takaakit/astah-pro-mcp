@@ -77,47 +77,47 @@ public class DiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "insert_svg_img_on_dgm",
-                        "Insert an SVG image (specified by SVG code) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image.",
-                        this::insertSvgImage,
-                        NewSvgImageWithPointDTO.class,
-                        RectangleDTO.class),
+            ToolSupport.definition(
+                "insert_svg_img_on_dgm",
+                "Insert an SVG image (specified by SVG code) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image.",
+                this::insertSvgImage,
+                NewSvgImageWithPointDTO.class,
+                RectangleDTO.class),
 
-                ToolSupport.definition(
-                        "insert_png_img_on_dgm",
-                        "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image. When specifying a local image file, use the 'file:///' protocol.",
-                        this::insertPngImage,
-                        NewPngImageWithPointDTO.class,
-                        RectangleDTO.class),
+            ToolSupport.definition(
+                "insert_png_img_on_dgm",
+                "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image. When specifying a local image file, use the 'file:///' protocol.",
+                this::insertPngImage,
+                NewPngImageWithPointDTO.class,
+                RectangleDTO.class),
 
-                ToolSupport.definition(
-                        "insert_jpg_img_on_dgm",
-                        "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image. When specifying a local image file, use the 'file:///' protocol.",
-                        this::insertJpgImage,
-                        NewJpgImageWithPointDTO.class,
-                        RectangleDTO.class),
+            ToolSupport.definition(
+                "insert_jpg_img_on_dgm",
+                "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image. When specifying a local image file, use the 'file:///' protocol.",
+                this::insertJpgImage,
+                NewJpgImageWithPointDTO.class,
+                RectangleDTO.class),
 
-                ToolSupport.definition(
-                        "insert_txt_on_dgm",
-                        "Insert a text at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the node presentation information of the newly created text.",
-                        this::insertText,
-                        NewTextWithPointDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "insert_txt_on_dgm",
+                "Insert a text at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the node presentation information of the newly created text.",
+                this::insertText,
+                NewTextWithPointDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "delete_dgm",
-                        "Delete the specified diagram (specified by ID), and return the deleted diagram information.",
-                        this::deleteDiagram,
-                        DeleteDiagramDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "delete_dgm",
+                "Delete the specified diagram (specified by ID), and return the deleted diagram information.",
+                this::deleteDiagram,
+                DeleteDiagramDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "delete_prst",
-                        "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation information. Note that deleting a presentation does not delete the corresponding element.",
-                        this::deletePresentation,
-                        DeletePresentationDTO.class,
-                        PresentationDTO.class)
+            ToolSupport.definition(
+                "delete_prst",
+                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation information. Note that deleting a presentation does not delete the corresponding element.",
+                this::deletePresentation,
+                DeletePresentationDTO.class,
+                PresentationDTO.class)
         );
     }
 

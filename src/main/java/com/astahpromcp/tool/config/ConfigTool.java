@@ -22,11 +22,11 @@ public class ConfigTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         return List.of(
             ToolSupport.definition(
-                "get_workspace_dir_path",
-                "Return the path to the workspace directory.",
-                this::getWorkspaceDirectoryPath,
-                NoInputDTO.class,
-                WorkspaceDirectoryPathDTO.class)
+            "get_workspace_dir_path",
+            "Return the path to the workspace directory.",
+            this::getWorkspaceDirectoryPath,
+            NoInputDTO.class,
+            WorkspaceDirectoryPathDTO.class)
         );
     }
 

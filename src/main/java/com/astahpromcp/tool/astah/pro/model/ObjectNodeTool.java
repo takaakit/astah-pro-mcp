@@ -51,23 +51,23 @@ public class ObjectNodeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_obj_node_info",
-                        "Return detailed information about the specified object node (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ObjectNodeDTO.class)
+            ToolSupport.definition(
+                "get_obj_node_info",
+                "Return detailed information about the specified object node (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ObjectNodeDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_base_class_of_obj_node",
-                        "Set the base class (specified by ID) of the specified object node (specified by ID), and return the object node information after it is set.",
-                        this::setBase,
-                        ObjectNodeWithBaseDTO.class,
-                        ObjectNodeDTO.class)
+            ToolSupport.definition(
+                "set_base_class_of_obj_node",
+                "Set the base class (specified by ID) of the specified object node (specified by ID), and return the object node information after it is set.",
+                this::setBase,
+                ObjectNodeWithBaseDTO.class,
+                ObjectNodeDTO.class)
         );
     }
 

@@ -51,12 +51,12 @@ public class PseudostateTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_pseudostate_info",
-                        "Return detailed information about the specified pseudostate (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        PseudostateDTO.class)
+            ToolSupport.definition(
+                "get_pseudostate_info",
+                "Return detailed information about the specified pseudostate (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                PseudostateDTO.class)
         );
     }
 

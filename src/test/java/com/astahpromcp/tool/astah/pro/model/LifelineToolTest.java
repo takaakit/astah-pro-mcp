@@ -4,11 +4,15 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LifelineWithBaseClassDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.LifelineWithLengthDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +29,7 @@ public class LifelineToolTest {
     private LifelineTool tool;
     private Method getInfo;
     private Method setBaseClass;
+    private Method setLength;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -54,6 +59,13 @@ public class LifelineToolTest {
             "setBaseClass",
             McpSyncServerExchange.class,
             LifelineWithBaseClassDTO.class);
+
+        // setLength() method
+        setLength = TestSupport.getAccessibleMethod(
+            LifelineTool.class,
+            "setLength",
+            McpSyncServerExchange.class,
+            LifelineWithLengthDTO.class);
     }
 
     @AfterEach
@@ -120,5 +132,35 @@ public class LifelineToolTest {
 
         // Check base class after setting
         assertEquals(clazz, lifeline.getBase());
+    }
+
+    @Test
+    void setLength_ok() throws Exception {
+        // Get lifeline
+        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElementByClassAndName(
+            ILifeline.class,
+            "foo");
+
+        // Create input DTO
+        LifelineWithLengthDTO inputDTO = new LifelineWithLengthDTO(
+            lifeline.getId(),
+            100);
+
+        // ----------------------------------------
+        // Call setLength()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+            setLength,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check length after setting
+        String lengthProperty = lifeline.getPresentations()[0].getProperty(Key.LIFELINE_LENGTH);
+        assertNotNull(lengthProperty);
+        assertEquals(100, (int) Double.parseDouble(lengthProperty));
     }
 }

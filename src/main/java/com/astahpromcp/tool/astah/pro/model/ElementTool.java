@@ -60,44 +60,44 @@ public class ElementTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_dgms_of_element",
-                        "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
-                        this::getDiagramsOfElement,
-                        IdDTO.class,
-                        NameIdTypeListDTO.class)
+            ToolSupport.definition(
+                "get_dgms_of_element",
+                "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
+                this::getDiagramsOfElement,
+                IdDTO.class,
+                NameIdTypeListDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "add_stereotype",
-                        "Add a stereotype (specified by string) to the specified element (specified by ID), and return the element information after it is edited.",
-                        this::addStereotype,
-                        ElementWithStereotypeDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "add_stereotype",
+                "Add a stereotype (specified by string) to the specified element (specified by ID), and return the element information after it is edited.",
+                this::addStereotype,
+                ElementWithStereotypeDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "remove_stereotype",
-                        "Remove the specified stereotype (specified by string) from the specified element (specified by ID), and return the element information after it is edited.",
-                        this::removeStereotype,
-                        ElementWithStereotypeDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "remove_stereotype",
+                "Remove the specified stereotype (specified by string) from the specified element (specified by ID), and return the element information after it is edited.",
+                this::removeStereotype,
+                ElementWithStereotypeDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "set_type_modifier",
-                        "Set a type modifier of the specified element (specified by ID), and return the element information after it is edited. The type modifier is a symbol appended to the type name, such as * (C++ pointer) and & (C++ reference).",
-                        this::setTypeModifier,
-                        ElementWithTypeModifierDTO.class,
-                        ElementDTO.class),
+            ToolSupport.definition(
+                "set_type_modifier",
+                "Set a type modifier of the specified element (specified by ID), and return the element information after it is edited. The type modifier is a symbol appended to the type name, such as * (C++ pointer) and & (C++ reference).",
+                this::setTypeModifier,
+                ElementWithTypeModifierDTO.class,
+                ElementDTO.class),
 
-                ToolSupport.definition(
-                        "change_tagged_val",
-                        "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element information after it is changed.",
-                        this::changeTaggedValue,
-                        ElementWithTaggedValueDTO.class,
-                        ElementDTO.class)
+            ToolSupport.definition(
+                "change_tagged_val",
+                "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element information after it is changed.",
+                this::changeTaggedValue,
+                ElementWithTaggedValueDTO.class,
+                ElementDTO.class)
         );
     }
 

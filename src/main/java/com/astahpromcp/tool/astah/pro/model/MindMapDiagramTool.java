@@ -51,12 +51,12 @@ public class MindMapDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_mind_map_dgm_info",
-                        "Return detailed information about the specified mind map diagram (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        MindMapDiagramDTO.class)
+            ToolSupport.definition(
+                "get_mind_map_dgm_info",
+                "Return detailed information about the specified mind map diagram (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                MindMapDiagramDTO.class)
         );
     }
 

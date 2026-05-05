@@ -54,23 +54,23 @@ public class InstanceSpecificationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_instance_spec_info",
-                        "Return detailed information about the specified instance specification (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        InstanceSpecificationDTO.class)
+            ToolSupport.definition(
+                "get_instance_spec_info",
+                "Return detailed information about the specified instance specification (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                InstanceSpecificationDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_classifier_to_instance_spec",
-                        "Set the classifier (specified by ID) to the instance specification (specified by ID), and return the instance specification information after it is edited.",
-                        this::setClassifier,
-                        InstanceSpecificationWithClassifierDTO.class,
-                        InstanceSpecificationDTO.class)
+            ToolSupport.definition(
+                "set_classifier_to_instance_spec",
+                "Set the classifier (specified by ID) to the instance specification (specified by ID), and return the instance specification information after it is edited.",
+                this::setClassifier,
+                InstanceSpecificationWithClassifierDTO.class,
+                InstanceSpecificationDTO.class)
         );
     }
 

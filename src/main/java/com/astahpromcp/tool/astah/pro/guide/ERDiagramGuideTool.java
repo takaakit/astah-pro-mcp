@@ -21,11 +21,11 @@ public class ERDiagramGuideTool implements ToolProvider {
         try {
             return List.of(
                 ToolSupport.definition(
-                    "er_dgm_guide",
-                    "MCP client (you) MUST call this tool function before referencing or editing a ER diagram to understand its usage and terminology definitions.",
-                    this::getGuide,
-                    NoInputDTO.class,
-                    GuideDTO.class)
+                "er_dgm_guide",
+                "MCP client (you) MUST call this tool function before referencing or editing a ER diagram to understand its usage and terminology definitions.",
+                this::getGuide,
+                NoInputDTO.class,
+                GuideDTO.class)
             );
 
         } catch (Exception e) {

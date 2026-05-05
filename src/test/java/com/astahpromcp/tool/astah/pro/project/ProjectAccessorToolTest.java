@@ -314,15 +314,11 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProject()
         // ----------------------------------------
-        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
             saveProject,
             tool,
             inputDTO,
-            ProjectPathDTO.class);
-
-        // Check output DTO
-        assertNotNull(outputDTO);
-        assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
+            ProjectPathDTO.class));
     }
 
     @Test

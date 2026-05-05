@@ -67,33 +67,33 @@ public class DiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_dgm_info",
-                        "Return detailed information about the specified diagram (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "get_dgm_info",
+                "Return detailed information about the specified diagram (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "get_dgm_rectangle",
-                        "Return a rectangle (x, y, width, height) representing the boundary of the specified diagram (specified by ID).",
-                        this::getDiagramBoundRect,
-                        IdDTO.class,
-                        RectangleDTO.class),
+            ToolSupport.definition(
+                "get_dgm_rectangle",
+                "Return a rectangle (x, y, width, height) representing the boundary of the specified diagram (specified by ID).",
+                this::getDiagramBoundRect,
+                IdDTO.class,
+                RectangleDTO.class),
 
-                ToolSupport.definition(
-                        "get_prsts_on_dgm",
-                        "Return the list of presentations on the specified diagram (specified by ID).",
-                        this::getPresentationsOnDiagram,
-                        IdDTO.class,
-                        PresentationListDTO.class),
+            ToolSupport.definition(
+                "get_prsts_on_dgm",
+                "Return the list of presentations on the specified diagram (specified by ID).",
+                this::getPresentationsOnDiagram,
+                IdDTO.class,
+                PresentationListDTO.class),
 
-                ToolSupport.definition(
-                        "export_dgm_png_img",
-                        "Export a PNG image of the specified diagram (specified by ID), and return the exported image file information. For example, if you need a diagram image file while creating a document, use this tool.",
-                        this::exportPngImage,
-                        IdDTO.class,
-                        ImageFileDTO.class)
+            ToolSupport.definition(
+                "export_dgm_png_img",
+                "Export a PNG image of the specified diagram (specified by ID), and return the exported image file information. For example, if you need a diagram image file while creating a document, use this tool.",
+                this::exportPngImage,
+                IdDTO.class,
+                ImageFileDTO.class)
         );
     }
 

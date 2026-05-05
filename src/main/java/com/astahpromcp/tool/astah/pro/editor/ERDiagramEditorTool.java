@@ -70,33 +70,33 @@ public class ERDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_er_dgm",
-                        "Create a new ER diagram under the specified ER package (specified by ID), and return the newly created ER diagram information.",
-                        this::createERDiagram,
-                        NewERDiagramDTO.class,
-                        ERDiagramDTO.class),
+            ToolSupport.definition(
+                "create_er_dgm",
+                "Create a new ER diagram under the specified ER package (specified by ID), and return the newly created ER diagram information.",
+                this::createERDiagram,
+                NewERDiagramDTO.class,
+                ERDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "create_node_prst_on_er_dgm",
-                        "Create a new node presentation of the specified element (specified by ID) on the specified ER diagram (specified by ID), and return the newly created node presentation information.",
-                        this::createNodePresentation,
-                        NewNodePresentationOnERDiagramDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_node_prst_on_er_dgm",
+                "Create a new node presentation of the specified element (specified by ID) on the specified ER diagram (specified by ID), and return the newly created node presentation information.",
+                this::createNodePresentation,
+                NewNodePresentationOnERDiagramDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_link_prst_on_er_dgm",
-                        "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified ER diagram (specified by ID), and return the newly created link presentation information.",
-                        this::createLinkPresentation,
-                        NewLinkPresentationOnERDiagramDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_link_prst_on_er_dgm",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified ER diagram (specified by ID), and return the newly created link presentation information.",
+                this::createLinkPresentation,
+                NewLinkPresentationOnERDiagramDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_subtype_relationship_group_on_er_dgm",
-                        "Create a new node presentation for the group of the shared subtype relationships on the specified ER diagram (specified by ID), and return the newly created node presentation information for the group of the subtype relationships.",
-                        this::createSubtypeRelationshipGroup,
-                        NewSubtypeRelationshipGroupOnERDiagramDTO.class,
-                        NodePresentationDTO.class)
+            ToolSupport.definition(
+                "create_subtype_relationship_group_on_er_dgm",
+                "Create a new node presentation for the group of the shared subtype relationships on the specified ER diagram (specified by ID), and return the newly created node presentation information for the group of the subtype relationships.",
+                this::createSubtypeRelationshipGroup,
+                NewSubtypeRelationshipGroupOnERDiagramDTO.class,
+                NodePresentationDTO.class)
         );
     }
 

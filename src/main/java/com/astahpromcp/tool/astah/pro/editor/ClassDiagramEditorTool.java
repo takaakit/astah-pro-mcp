@@ -70,33 +70,33 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_class_dgm",
-                        "Create a new class diagram (which also serves as an object diagram and package diagram) under the specified package (specified by ID), and return the newly created class diagram information.",
-                        this::createClassDiagram,
-                        NewDiagramInPackageDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "create_class_dgm",
+                "Create a new class diagram (which also serves as an object diagram and package diagram) under the specified package (specified by ID), and return the newly created class diagram information.",
+                this::createClassDiagram,
+                NewDiagramInPackageDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "create_asso_class_prst",
-                        "Create a new association class presentation of the specified class (specified by ID) between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified class diagram (specified by ID), and return the information of newly created node and linkpresentations.",
-                        this::createAssociationClassPresentation,
-                        NewAssociationClassPresentationDTO.class,
-                        PresentationListDTO.class),
+            ToolSupport.definition(
+                "create_asso_class_prst",
+                "Create a new association class presentation of the specified class (specified by ID) between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified class diagram (specified by ID), and return the information of newly created node and linkpresentations.",
+                this::createAssociationClassPresentation,
+                NewAssociationClassPresentationDTO.class,
+                PresentationListDTO.class),
 
-                ToolSupport.definition(
-                        "create_instance_spec",
-                        "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created instance specification information (node presentation information).",
-                        this::createInstanceSpecification,
-                        NewInstanceWithPointDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_instance_spec",
+                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created instance specification information (node presentation information).",
+                this::createInstanceSpecification,
+                NewInstanceWithPointDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_link_between_instance_specs",
-                        "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation information. Note that the created link has no arrowheads.",
-                        this::createInstanceSpecificationLink,
-                        NewLinkSourceAndTargetDTO.class,
-                        LinkPresentationDTO.class)
+            ToolSupport.definition(
+                "create_link_between_instance_specs",
+                "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation information. Note that the created link has no arrowheads.",
+                this::createInstanceSpecificationLink,
+                NewLinkSourceAndTargetDTO.class,
+                LinkPresentationDTO.class)
         );
     }
 

@@ -52,23 +52,23 @@ public class SlotTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_slot_info",
-                        "Return detailed information about the specified slot (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        SlotDTO.class)
+            ToolSupport.definition(
+                "get_slot_info",
+                "Return detailed information about the specified slot (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                SlotDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_val_of_slot",
-                        "Set the value of the specified slot (specified by ID), and return the slot information after it is set.",
-                        this::setValue,
-                        SlotWithValueDTO.class,
-                        SlotDTO.class)
+            ToolSupport.definition(
+                "set_val_of_slot",
+                "Set the value of the specified slot (specified by ID), and return the slot information after it is set.",
+                this::setValue,
+                SlotWithValueDTO.class,
+                SlotDTO.class)
         );
     }
 

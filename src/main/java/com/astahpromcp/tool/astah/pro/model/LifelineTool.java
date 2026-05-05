@@ -6,11 +6,17 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LifelineWithBaseClassDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.LifelineWithLengthDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LifelineDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
@@ -53,23 +59,30 @@ public class LifelineTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_lifeline_info",
-                        "Return detailed information about the specified lifeline (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        LifelineDTO.class)
+            ToolSupport.definition(
+                "get_lifeline_info",
+                "Return detailed information about the specified lifeline (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                LifelineDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_base_class_of_lifeline",
-                        "Set the base class of the specified lifeline (specified by ID), and return the lifeline information after it is set.",
-                        this::setBaseClass,
-                        LifelineWithBaseClassDTO.class,
-                        LifelineDTO.class)
+            ToolSupport.definition(
+                "set_base_class_of_lifeline",
+                "Set the base class of the specified lifeline (specified by ID), and return the lifeline information after it is set.",
+                this::setBaseClass,
+                LifelineWithBaseClassDTO.class,
+                LifelineDTO.class),
+
+            ToolSupport.definition(
+                "set_length_of_lifeline",
+                "Set the length of the specified lifeline (specified by ID), and return the node presentation information of the lifeline after it is set.",
+                this::setLength,
+                LifelineWithLengthDTO.class,
+                NodePresentationDTO.class)
         );
     }
 
@@ -93,6 +106,31 @@ public class LifelineTool implements ToolProvider {
             transactionManager.endTransaction();
 
             return LifelineDTOAssembler.toDTO(astahLifeline);
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private NodePresentationDTO setLength(McpSyncServerExchange exchange, LifelineWithLengthDTO param) throws Exception {
+        log.debug("Set length of lifeline: {}", param);
+
+        ILifeline astahLifeline = astahProToolSupport.getLifeline(param.targetLifelineId());
+
+        // Get the presentation of the target lifeline
+        IPresentation[] astahLifelinePresentations = astahLifeline.getPresentations();
+        if (astahLifelinePresentations.length != 1) {
+            throw new RuntimeException("The lifeline does not have exactly one presentation: count = " + astahLifelinePresentations.length);
+        }
+        INodePresentation astahLifelinePresentation = (INodePresentation) astahLifelinePresentations[0];
+
+        try {
+            transactionManager.beginTransaction();
+            astahLifelinePresentation.setProperty(Key.LIFELINE_LENGTH, String.valueOf(param.length()));
+            transactionManager.endTransaction();
+
+            return NodePresentationDTOAssembler.toDTO(astahLifelinePresentation);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

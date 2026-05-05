@@ -20,12 +20,12 @@ public class CompositeStructureDiagramGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	                ToolSupport.definition(
-	                        "composite_structure_dgm_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing a composite structure diagram to understand its usage and terminology definitions.",
-	                        this::getGuide,
-	                        NoInputDTO.class,
-	                        GuideDTO.class)
+	            ToolSupport.definition(
+	                "composite_structure_dgm_guide",
+	                "MCP client (you) MUST call this tool function before referencing or editing a composite structure diagram to understand its usage and terminology definitions.",
+	                this::getGuide,
+	                NoInputDTO.class,
+	                GuideDTO.class)
 	        );
 
         } catch (Exception e) {

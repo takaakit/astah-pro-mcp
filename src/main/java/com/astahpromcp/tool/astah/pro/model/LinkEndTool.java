@@ -57,26 +57,26 @@ public class LinkEndTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_aggr_of_link_end",
-                        "Set an aggregation of the specified link end (specified by ID), and return the link end information after it is set.",
-                        this::setAggregation,
-                        LinkEndWithAggregationDTO.class,
-                        LinkEndDTO.class),
+            ToolSupport.definition(
+                "set_aggr_of_link_end",
+                "Set an aggregation of the specified link end (specified by ID), and return the link end information after it is set.",
+                this::setAggregation,
+                LinkEndWithAggregationDTO.class,
+                LinkEndDTO.class),
 
-                ToolSupport.definition(
-                        "set_composition_of_link_end",
-                        "Set a composition of the specified link end (specified by ID), and return the link end information after it is set.",
-                        this::setComposition,
-                        LinkEndWithCompositionDTO.class,
-                        LinkEndDTO.class),
+            ToolSupport.definition(
+                "set_composition_of_link_end",
+                "Set a composition of the specified link end (specified by ID), and return the link end information after it is set.",
+                this::setComposition,
+                LinkEndWithCompositionDTO.class,
+                LinkEndDTO.class),
 
-                ToolSupport.definition(
-                        "set_navigation_of_link_end",
-                        "Set a navigation of the specified link end (specified by ID), and return the link end information after it is set.",
-                        this::setNavigation,
-                        LinkEndWithNavigationDTO.class,
-                        LinkEndDTO.class)
+            ToolSupport.definition(
+                "set_navigation_of_link_end",
+                "Set a navigation of the specified link end (specified by ID), and return the link end information after it is set.",
+                this::setNavigation,
+                LinkEndWithNavigationDTO.class,
+                LinkEndDTO.class)
         );
     }
 

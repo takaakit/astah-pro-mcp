@@ -51,12 +51,12 @@ public class ERSchemaTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_schema_info",
-                        "Return detailed information about the specified ER schema (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERSchemaDTO.class)
+            ToolSupport.definition(
+                "get_er_schema_info",
+                "Return detailed information about the specified ER schema (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERSchemaDTO.class)
         );
     }
 

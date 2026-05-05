@@ -58,44 +58,44 @@ public class NodePresentationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_node_info",
-                        "Return detailed information about the specified node presentation (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "get_node_info",
+                "Return detailed information about the specified node presentation (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "get_node_prst_rectangle",
-                        "Return the rectangle of the specified node presentation (specified by ID).",
-                        this::getNodePresentationRectangle,
-                        IdDTO.class,
-                        RectangleDTO.class)
+            ToolSupport.definition(
+                "get_node_prst_rectangle",
+                "Return the rectangle of the specified node presentation (specified by ID).",
+                this::getNodePresentationRectangle,
+                IdDTO.class,
+                RectangleDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_node_prst_location",
-                        "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting.",
-                        this::setNodePresentationLocation,
-                        NodePresentationWithLocationDTO.class,
-                        RectangleDTO.class),
+            ToolSupport.definition(
+                "set_node_prst_location",
+                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                this::setNodePresentationLocation,
+                NodePresentationWithLocationDTO.class,
+                RectangleDTO.class),
 
-                ToolSupport.definition(
-                        "set_node_prst_width",
-                        "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting.",
-                        this::setNodePresentationWidth,
-                        NodePresentationWithWidthDTO.class,
-                        RectangleDTO.class),
+            ToolSupport.definition(
+                "set_node_prst_width",
+                "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                this::setNodePresentationWidth,
+                NodePresentationWithWidthDTO.class,
+                RectangleDTO.class),
 
-                ToolSupport.definition(
-                        "set_node_prst_height",
-                        "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting.",
-                        this::setNodePresentationHeight,
-                        NodePresentationWithHeightDTO.class,
-                        RectangleDTO.class)
+            ToolSupport.definition(
+                "set_node_prst_height",
+                "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                this::setNodePresentationHeight,
+                NodePresentationWithHeightDTO.class,
+                RectangleDTO.class)
         );
     }
 

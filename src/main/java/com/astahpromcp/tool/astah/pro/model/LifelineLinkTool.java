@@ -52,12 +52,12 @@ public class LifelineLinkTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_lifeline_link_info",
-                        "Return detailed information about the specified lifeline link (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        LifelineLinkDTO.class)
+            ToolSupport.definition(
+                "get_lifeline_link_info",
+                "Return detailed information about the specified lifeline link (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                LifelineLinkDTO.class)
         );
     }
 

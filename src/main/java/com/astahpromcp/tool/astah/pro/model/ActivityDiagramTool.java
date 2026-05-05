@@ -53,19 +53,19 @@ public class ActivityDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_activity_dgm_info",
-                        "Return detailed information about the specified activity diagram (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ActivityDiagramDTO.class),
+            ToolSupport.definition(
+                "get_activity_dgm_info",
+                "Return detailed information about the specified activity diagram (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ActivityDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "get_activity_of_activity_dgm",
-                        "Return the activity of the specified activity diagram (specified by ID).",
-                        this::getActivity,
-                        IdDTO.class,
-                        ActivityDTO.class)
+            ToolSupport.definition(
+                "get_activity_of_activity_dgm",
+                "Return the activity of the specified activity diagram (specified by ID).",
+                this::getActivity,
+                IdDTO.class,
+                ActivityDTO.class)
         );
     }
 

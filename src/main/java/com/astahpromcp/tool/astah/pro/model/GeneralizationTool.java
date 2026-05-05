@@ -51,12 +51,12 @@ public class GeneralizationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_generalization_info",
-                        "Return detailed information about the specified generalization (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        GeneralizationDTO.class)
+            ToolSupport.definition(
+                "get_generalization_info",
+                "Return detailed information about the specified generalization (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                GeneralizationDTO.class)
         );
     }
 

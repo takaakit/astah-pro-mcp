@@ -52,23 +52,23 @@ public class ConstraintTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_constraint_info",
-                        "Return detailed information about the specified constraint (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ConstraintDTO.class)
+            ToolSupport.definition(
+                "get_constraint_info",
+                "Return detailed information about the specified constraint (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ConstraintDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
             ToolSupport.definition(
-                "set_specification_of_constraint",
-                "Set the specification (specified by string) of the specified constraint (specified by ID), and return the constraint information after it is set.",
-                this::setSpecification,
-                ConstraintWithSpecificationDTO.class,
-                ConstraintDTO.class)
+            "set_specification_of_constraint",
+            "Set the specification (specified by string) of the specified constraint (specified by ID), and return the constraint information after it is set.",
+            this::setSpecification,
+            ConstraintWithSpecificationDTO.class,
+            ConstraintDTO.class)
         );
     }
 

@@ -7,7 +7,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandIndexWithHeightDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionOperandDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
@@ -153,11 +153,11 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setHeightOfInteractionOperand()
         // ----------------------------------------
-        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
-            InteractionOperandDTO.class);
+            NodePresentationDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);
@@ -179,11 +179,11 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setHeightOfInteractionOperand()
         // ----------------------------------------
-        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
-            InteractionOperandDTO.class);
+            NodePresentationDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);
@@ -209,7 +209,7 @@ public class CombinedFragmentToolTest {
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
-            InteractionOperandDTO.class));
+            NodePresentationDTO.class));
     }
 
     @Test
@@ -232,6 +232,6 @@ public class CombinedFragmentToolTest {
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
-            InteractionOperandDTO.class));
+            NodePresentationDTO.class));
     }
 }

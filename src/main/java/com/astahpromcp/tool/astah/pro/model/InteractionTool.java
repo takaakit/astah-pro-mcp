@@ -51,12 +51,12 @@ public class InteractionTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_interaction_info",
-                        "Return detailed information about the specified interaction (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        InteractionDTO.class)
+            ToolSupport.definition(
+                "get_interaction_info",
+                "Return detailed information about the specified interaction (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                InteractionDTO.class)
         );
     }
 

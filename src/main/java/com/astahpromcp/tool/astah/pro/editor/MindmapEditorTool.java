@@ -81,96 +81,96 @@ public class MindmapEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_mind_map_dgm",
-                        "Create a new mind map diagram under the specified package (specified by ID), and return the information of newly created mind map diagram. The diagram name is also used as the root topic label.",
-                        this::createMindmapDiagram,
-                        NewDiagramInPackageDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "create_mind_map_dgm",
+                "Create a new mind map diagram under the specified package (specified by ID), and return the information of newly created mind map diagram. The diagram name is also used as the root topic label.",
+                this::createMindmapDiagram,
+                NewDiagramInPackageDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "change_to_floating_topic",
-                        "Change the specified topic (specified by ID) to a floating topic on the specified mind map diagram (specified by ID), and return the changed topic information. A floating topic is a separate topic from the root topic.",
-                        this::changeToFloatingTopic,
-                        ChangeToFloatingTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "change_to_floating_topic",
+                "Change the specified topic (specified by ID) to a floating topic on the specified mind map diagram (specified by ID), and return the changed topic information. A floating topic is a separate topic from the root topic.",
+                this::changeToFloatingTopic,
+                ChangeToFloatingTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_floating_topic",
-                        "Create a new floating topic at the specified point (specified by x and y coordinates) on the specified mind map diagram (specified by ID), and return the newly created floating topic information. A floating topic is a separate topic from the root topic.",
-                        this::createFloatingTopic,
-                        NewFloatingTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_floating_topic",
+                "Create a new floating topic at the specified point (specified by x and y coordinates) on the specified mind map diagram (specified by ID), and return the newly created floating topic information. A floating topic is a separate topic from the root topic.",
+                this::createFloatingTopic,
+                NewFloatingTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_topic",
-                        "Create a new topic under the specified parent topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created topic information.",
-                        this::createTopic,
-                        NewTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_topic",
+                "Create a new topic under the specified parent topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created topic information.",
+                this::createTopic,
+                NewTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_link_between_topics",
-                        "Create a new link between the specified source topic (specified by ID) and the specified target topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created link presentation information.",
-                        this::createTopicLink,
-                        NewLinkBetweenTopicsDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_link_between_topics",
+                "Create a new link between the specified source topic (specified by ID) and the specified target topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created link presentation information.",
+                this::createTopicLink,
+                NewLinkBetweenTopicsDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "change_parent_of_topic",
-                        "Change the parent topic (specified by ID) on the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the changed topic information.",
-                        this::changeParentOfTopic,
-                        ChangeParentOfTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "change_parent_of_topic",
+                "Change the parent topic (specified by ID) on the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the changed topic information.",
+                this::changeParentOfTopic,
+                ChangeParentOfTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "move_topic_within_sibling_order",
-                        "Move the specified topic (specified by ID) within the order of its sibling topics on the specified mind map diagram (specified by ID), and return the moved topic information.",
-                        this::moveTopicWithinSiblingOrder,
-                        MoveTopicWithinSiblingOrderDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "move_topic_within_sibling_order",
+                "Move the specified topic (specified by ID) within the order of its sibling topics on the specified mind map diagram (specified by ID), and return the moved topic information.",
+                this::moveTopicWithinSiblingOrder,
+                MoveTopicWithinSiblingOrderDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "insert_svg_img_into_topic",
-                        "Insert an SVG image (specified by SVG code) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-inserted topic information.",
-                        this::insertSvgImageIntoTopic,
-                        NewSvgImageIntoTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "insert_svg_img_into_topic",
+                "Insert an SVG image (specified by SVG code) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-inserted topic information.",
+                this::insertSvgImageIntoTopic,
+                NewSvgImageIntoTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "insert_png_img_into_topic",
-                        "Insert a PNG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-inserted topic information.",
-                        this::insertPngImageIntoTopic,
-                        NewPngImageIntoTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "insert_png_img_into_topic",
+                "Insert a PNG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-inserted topic information.",
+                this::insertPngImageIntoTopic,
+                NewPngImageIntoTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "insert_jpg_img_into_topic",
-                        "Insert a JPG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-inserted topic information.",
-                        this::insertJpgImageIntoTopic,
-                        NewJpgImageIntoTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "insert_jpg_img_into_topic",
+                "Insert a JPG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-inserted topic information.",
+                this::insertJpgImageIntoTopic,
+                NewJpgImageIntoTopicDTO.class,
+                NodePresentationDTO.class),
     
-                ToolSupport.definition(
-                        "delete_child_topics",
-                        "Delete the child topics of the specified topic (specified by ID) from the specified mind map diagram (specified by ID), and return the parent topic information of the deleted child topics.",
-                        this::deleteChildTopics,
-                        DeleteChildTopicsDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "delete_child_topics",
+                "Delete the child topics of the specified topic (specified by ID) from the specified mind map diagram (specified by ID), and return the parent topic information of the deleted child topics.",
+                this::deleteChildTopics,
+                DeleteChildTopicsDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "delete_img_from_topic",
-                        "Delete the image from the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-deleted topic information.",
-                        this::deleteImageFromTopic,
-                        DeleteImageFromTopicDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "delete_img_from_topic",
+                "Delete the image from the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the image-deleted topic information.",
+                this::deleteImageFromTopic,
+                DeleteImageFromTopicDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "set_boundary_of_topic",
-                        "Set the boundary visibility of the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the root topic information within the set boundary. A boundary is an outline that collectively encloses a specific topic and its subordinate topics. It is used to make a particular group of topics stand out or to emphasize it.",
-                        this::setBoundaryOfTopic,
-                        TopicWithBoundaryVisibilityDTO.class,
-                        NodePresentationDTO.class)
+            ToolSupport.definition(
+                "set_boundary_of_topic",
+                "Set the boundary visibility of the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the root topic information within the set boundary. A boundary is an outline that collectively encloses a specific topic and its subordinate topics. It is used to make a particular group of topics stand out or to emphasize it.",
+                this::setBoundaryOfTopic,
+                TopicWithBoundaryVisibilityDTO.class,
+                NodePresentationDTO.class)
         );
     }
 

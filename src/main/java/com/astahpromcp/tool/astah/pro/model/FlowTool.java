@@ -53,30 +53,30 @@ public class FlowTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_flow_info",
-                        "Return detailed information about the specified flow (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        FlowDTO.class)
+            ToolSupport.definition(
+                "get_flow_info",
+                "Return detailed information about the specified flow (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                FlowDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_action_of_flow",
-                        "Set the action of the specified flow (specified by ID), and return the flow information after it is set.",
-                        this::setAction,
-                        FlowWithActionDTO.class,
-                        FlowDTO.class),
+            ToolSupport.definition(
+                "set_action_of_flow",
+                "Set the action of the specified flow (specified by ID), and return the flow information after it is set.",
+                this::setAction,
+                FlowWithActionDTO.class,
+                FlowDTO.class),
 
-                ToolSupport.definition(
-                        "set_guard_of_flow",
-                        "Set the guard of the specified flow (specified by ID), and return the flow information after it is set.",
-                        this::setGuard,
-                        FlowWithGuardDTO.class,
-                        FlowDTO.class)
+            ToolSupport.definition(
+                "set_guard_of_flow",
+                "Set the guard of the specified flow (specified by ID), and return the flow information after it is set.",
+                this::setGuard,
+                FlowWithGuardDTO.class,
+                FlowDTO.class)
         );
     }
 

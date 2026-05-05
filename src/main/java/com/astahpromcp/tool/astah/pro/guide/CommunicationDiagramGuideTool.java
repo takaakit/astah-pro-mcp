@@ -20,12 +20,12 @@ public class CommunicationDiagramGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	                ToolSupport.definition(
-	                        "communication_dgm_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing a communication diagram to understand its usage and terminology definitions.",
-	                        this::getGuide,
-	                        NoInputDTO.class,
-	                        GuideDTO.class)
+	            ToolSupport.definition(
+	                "communication_dgm_guide",
+	                "MCP client (you) MUST call this tool function before referencing or editing a communication diagram to understand its usage and terminology definitions.",
+	                this::getGuide,
+	                NoInputDTO.class,
+	                GuideDTO.class)
 	        );
 
         } catch (Exception e) {

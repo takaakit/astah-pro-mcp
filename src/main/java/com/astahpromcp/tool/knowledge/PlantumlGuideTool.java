@@ -45,19 +45,19 @@ public class PlantumlGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
             return List.of(
-                    ToolSupport.definition(
-                            "get_info_of_puml_guide",
-                            "Return the total number of chunks and the data of the first chunk of PlantUML guide. If you want to know how to write PlantUML code, use this tool.",
-                            this::getPlantumlGuideInfo,
-                            NoInputDTO.class,
-                            DocumentDTO.class),
+                ToolSupport.definition(
+                    "get_info_of_puml_guide",
+                    "Return the total number of chunks and the data of the first chunk of PlantUML guide. If you want to know how to write PlantUML code, use this tool.",
+                    this::getPlantumlGuideInfo,
+                    NoInputDTO.class,
+                    DocumentDTO.class),
 
-                    ToolSupport.definition(
-                            "get_chunk_of_puml_guide",
-                            "Return the chunk data of PlantUML guide. If no chunk data exists, an empty string is set.",
-                            this::getPlantumlGuideChunk,
-                            ChunkDTO.class,
-                            DocumentChunkDTO.class)
+                ToolSupport.definition(
+                    "get_chunk_of_puml_guide",
+                    "Return the chunk data of PlantUML guide. If no chunk data exists, an empty string is set.",
+                    this::getPlantumlGuideChunk,
+                    ChunkDTO.class,
+                    DocumentChunkDTO.class)
             );
         } catch (Exception e) {
             log.error("Failed to create plantuml guide tools", e);

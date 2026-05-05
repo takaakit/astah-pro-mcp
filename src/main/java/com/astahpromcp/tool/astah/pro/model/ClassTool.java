@@ -54,37 +54,37 @@ public class ClassTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_class_info",
-                        "Return detailed information about the specified class or interface (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ClassDTO.class)
+            ToolSupport.definition(
+                "get_class_info",
+                "Return detailed information about the specified class or interface (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ClassDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_abstract_of_class",
-                        "Set the Abstract property of the specified class (specified by ID), and return the class information after it is set.",
-                        this::setAbstract,
-                        ClassWithAbstractDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "set_abstract_of_class",
+                "Set the Abstract property of the specified class (specified by ID), and return the class information after it is set.",
+                this::setAbstract,
+                ClassWithAbstractDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "set_active_of_class",
-                        "Set the Active property of the specified class (specified by ID), and return the class information after it is set.",
-                        this::setActive,
-                        ClassWithActiveDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "set_active_of_class",
+                "Set the Active property of the specified class (specified by ID), and return the class information after it is set.",
+                this::setActive,
+                ClassWithActiveDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "set_leaf_of_class",
-                        "Set the Leaf property of the specified class (specified by ID), and return the class information after it is set.",
-                        this::setLeaf,
-                        ClassWithLeafDTO.class,
-                        ClassDTO.class)
+            ToolSupport.definition(
+                "set_leaf_of_class",
+                "Set the Leaf property of the specified class (specified by ID), and return the class information after it is set.",
+                this::setLeaf,
+                ClassWithLeafDTO.class,
+                ClassDTO.class)
         );
     }
 

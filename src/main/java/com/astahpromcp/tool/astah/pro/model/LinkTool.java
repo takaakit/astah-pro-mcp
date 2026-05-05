@@ -51,12 +51,12 @@ public class LinkTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_link_info",
-                        "Return detailed information about the specified link (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        LinkDTO.class)
+            ToolSupport.definition(
+                "get_link_info",
+                "Return detailed information about the specified link (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                LinkDTO.class)
         );
     }
 

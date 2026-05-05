@@ -51,12 +51,12 @@ public class AssociationClassTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_asso_class_info",
-                        "Return detailed information about the specified association class (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        AssociationClassDTO.class)
+            ToolSupport.definition(
+                "get_asso_class_info",
+                "Return detailed information about the specified association class (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                AssociationClassDTO.class)
         );
     }
 

@@ -20,12 +20,12 @@ public class ActivityDiagramGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	                ToolSupport.definition(
-	                        "activity_dgm_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing a activity diagram to understand its usage and terminology definitions.",
-	                        this::getGuide,
-	                        NoInputDTO.class,
-	                        GuideDTO.class)
+	            ToolSupport.definition(
+	                "activity_dgm_guide",
+	                "MCP client (you) MUST call this tool function before referencing or editing a activity diagram to understand its usage and terminology definitions.",
+	                this::getGuide,
+	                NoInputDTO.class,
+	                GuideDTO.class)
 	        );
 
         } catch (Exception e) {

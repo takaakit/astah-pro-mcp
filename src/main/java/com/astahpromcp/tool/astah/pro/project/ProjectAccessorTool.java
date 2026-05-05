@@ -58,88 +58,93 @@ public class ProjectAccessorTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_proj",
-                        "Return the project (root package) information.",
-                        this::getProject,
-                        NoInputDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "get_proj",
+                "Return the project (root package) information.",
+                this::getProject,
+                NoInputDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "is_proj_opened",
-                        "Return whether a project is opened or not.",
-                        this::isProjectOpen,
-                        NoInputDTO.class,
-                        BooleanDTO.class),
+            ToolSupport.definition(
+                "is_proj_opened",
+                "Return whether a project is opened or not.",
+                this::isProjectOpen,
+                NoInputDTO.class,
+                BooleanDTO.class),
 
-                ToolSupport.definition(
-                        "is_proj_modified",
-                        "Return whether the current project is modified or not.",
-                        this::isProjectModified,
-                        NoInputDTO.class,
-                        BooleanDTO.class),
+            ToolSupport.definition(
+                "is_proj_modified",
+                "Return whether the current project is modified or not.",
+                this::isProjectModified,
+                NoInputDTO.class,
+                BooleanDTO.class),
 
-                ToolSupport.definition(
-                        "find_named_elements_by_name",
-                        "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
-                        this::findNamedElementsByName,
-                        NameDTO.class,
-                        NameIdTypeListDTO.class),
+            ToolSupport.definition(
+                "find_named_elements_by_name",
+                "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
+                this::findNamedElementsByName,
+                NameDTO.class,
+                NameIdTypeListDTO.class),
 
-                ToolSupport.definition(
-                        "get_proj_path",
-                        "Return the full path of the Astah project file (e.g., /path/to/project.asta). If the project has not been saved, return an empty string. For example, use this tool when you want to derive a relative path from an absolute path based on the Astah project file location.",
-                        this::getProjectPath,
-                        NoInputDTO.class,
-                        ProjectPathDTO.class)
+            ToolSupport.definition(
+                "get_proj_path",
+                "Return the full path of the Astah project file (e.g., /path/to/project.asta). If the project has not been saved, return an empty string. For example, use this tool when you want to derive a relative path from an absolute path based on the Astah project file location.",
+                this::getProjectPath,
+                NoInputDTO.class,
+                ProjectPathDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_proj",
-                        "Create an Astah project (root package), and return the project information. The project element is the root package.",
-                        this::createProject,
-                        NoInputDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "create_proj",
+                "Create an Astah project (root package), and return the project information. The project element is the root package.",
+                this::createProject,
+                NoInputDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "open_proj",
-                        "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
-                        this::openProject,
-                        FilePathDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "open_proj",
+                "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
+                this::openProject,
+                FilePathDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "save_proj",
-                        "Save the current project, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
-                        this::saveProject,
-                        NoInputDTO.class,
-                        ProjectPathDTO.class),
+            ToolSupport.definition(
+                "save_proj",
+                "Save the current project, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
+                this::saveProject,
+                NoInputDTO.class,
+                ProjectPathDTO.class),
 
-                ToolSupport.definition(
-                        "save_proj_as",
-                        "Save the current project with a new name, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
-                        this::saveProjectAs,
-                        FilePathDTO.class,
-                        ProjectPathDTO.class)
+            ToolSupport.definition(
+                "save_proj_as",
+                "Save the current project with a new name, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
+                this::saveProjectAs,
+                FilePathDTO.class,
+                ProjectPathDTO.class)
 
-                /* Closing the project should be performed based on the user's decision.
-                   So these tool functions are disabled.
+            /* Closing the project should be performed based on the user's decision.
+               So these tool functions are disabled.
 
-                ToolSupport.definition(
-                        "close_proj",
-                        "Close the current project, and return the current project information.",
-                        this::closeProject,
-                        NoInputDTO.class,
-                        NamedElementDTO.class)
-                */
+            ToolSupport.definition(
+                "close_proj",
+                "Close the current project, and return the current project information.",
+                this::closeProject,
+                NoInputDTO.class,
+                NamedElementDTO.class)
+            */
         );
     }
 
     private NamedElementDTO createProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Create project (root package): {}", param);
+
+        // Check if the current project is modified
+        if (projectAccessor.hasProject() && projectAccessor.isProjectModified()) {
+            throw new RuntimeException("The existing project needs to be saved before creating a new project.");
+        }
 
         try {
             projectAccessor.create();
@@ -159,6 +164,11 @@ public class ProjectAccessorTool implements ToolProvider {
 
     private NamedElementDTO openProject(McpSyncServerExchange exchange, FilePathDTO param) throws Exception {
         log.debug("Open project: {}", param);
+
+        // Check if the current project is modified
+        if (projectAccessor.hasProject() && projectAccessor.isProjectModified()) {
+            throw new RuntimeException("The existing project needs to be saved before opening a new project.");
+        }
 
         try {
             projectAccessor.open(param.filePath());
@@ -219,9 +229,14 @@ public class ProjectAccessorTool implements ToolProvider {
     private ProjectPathDTO saveProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Save project: {}", param);
 
-        // Check that the current project is created
+        // Check if the current project is created
         if (!projectAccessor.hasProject()) {
             throw new RuntimeException("The current project is not created.");
+        }
+
+        // Check if the current project is modified
+        if (!projectAccessor.isProjectModified()) {
+            throw new RuntimeException("The current project is not modified.");
         }
 
         // To prevent the save file path input dialog from appearing, check if the project has been saved.

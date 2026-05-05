@@ -9,11 +9,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandIndexWith
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.CombinedFragmentDTOAssembler;
-import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionOperandDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionOperandDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyUtil;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -62,27 +63,27 @@ public class CombinedFragmentTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "add_interaction_operand",
-                        "Add an interaction operand to the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
-                        this::addInteractionOperand,
-                        NewInteractionOperandDTO.class,
-                        CombinedFragmentDTO.class),
+            ToolSupport.definition(
+                "add_interaction_operand",
+                "Add an interaction operand to the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
+                this::addInteractionOperand,
+                NewInteractionOperandDTO.class,
+                CombinedFragmentDTO.class),
 
-                ToolSupport.definition(
-                        "set_combined_fragment_kind",
-                        "Set the kind (specified by string) of the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
-                        this::setCombinedFragmentKind,
-                        CombinedFragmentWithKindDTO.class,
-                        CombinedFragmentDTO.class),
+            ToolSupport.definition(
+                "set_combined_fragment_kind",
+                "Set the kind (specified by string) of the specified combined fragment (specified by ID), and return the combined fragment information after it is set.",
+                this::setCombinedFragmentKind,
+                CombinedFragmentWithKindDTO.class,
+                CombinedFragmentDTO.class),
 
-                // Note: To set the height of an interaction operand, the index of the operand known by the combined fragment is required. Therefore, this tool is defined as a tool for the combined fragment rather than for the interaction operand.
-                ToolSupport.definition(
-                        "set_height_of_interaction_operand",
-                        "Set the height of the specified interaction operand (specified by 1-based index), and return the interaction operand information after it is edited.",
-                        this::setHeightOfInteractionOperand,
-                        InteractionOperandIndexWithHeightDTO.class,
-                        InteractionOperandDTO.class)
+            // Note: To set the height of an interaction operand, the index of the operand known by the combined fragment is required. Therefore, this tool is defined as a tool for the combined fragment rather than for the interaction operand.
+            ToolSupport.definition(
+                "set_height_of_interaction_operand",
+                "Set the height of the specified interaction operand (specified by 1-based index), and return the node presentation information of the combined fragment after it is set. Note that, since there is no node presentation for an interaction operand, the node presentation returned is that of the combined fragment containing the interaction operand.",
+                this::setHeightOfInteractionOperand,
+                InteractionOperandIndexWithHeightDTO.class,
+                NodePresentationDTO.class)
         );
     }
 
@@ -122,7 +123,7 @@ public class CombinedFragmentTool implements ToolProvider {
         }
     }
 
-    private InteractionOperandDTO setHeightOfInteractionOperand(McpSyncServerExchange exchange, InteractionOperandIndexWithHeightDTO param) throws Exception {
+    private NodePresentationDTO setHeightOfInteractionOperand(McpSyncServerExchange exchange, InteractionOperandIndexWithHeightDTO param) throws Exception {
         log.debug("Set height of interaction operand: {}", param);
 
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
@@ -132,7 +133,7 @@ public class CombinedFragmentTool implements ToolProvider {
         if (astahCombinedFragmentPresentations.length != 1) {
             throw new RuntimeException("The combined fragment does not have exactly one presentation: count = " + astahCombinedFragmentPresentations.length);
         }
-        IPresentation astahCombinedFragmentPresentation = astahCombinedFragmentPresentations[0];
+        INodePresentation astahCombinedFragmentPresentation = (INodePresentation) astahCombinedFragmentPresentations[0];
 
         // Validate the target interaction operand index
         if (param.targetInteractionOperandIndex() < 1 || param.targetInteractionOperandIndex() > astahCombinedFragment.getInteractionOperands().length) {
@@ -148,7 +149,7 @@ public class CombinedFragmentTool implements ToolProvider {
             astahCombinedFragmentPresentation.setProperty(key, String.valueOf(param.height()));
             transactionManager.endTransaction();
 
-            return InteractionOperandDTOAssembler.toDTO(astahInteractionOperand);
+            return NodePresentationDTOAssembler.toDTO(astahCombinedFragmentPresentation);
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

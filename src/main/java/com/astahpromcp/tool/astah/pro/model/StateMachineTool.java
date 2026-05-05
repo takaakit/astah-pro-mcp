@@ -51,12 +51,12 @@ public class StateMachineTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_state_machine_info",
-                        "Return detailed information about the specified state machine (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        StateMachineDTO.class)
+            ToolSupport.definition(
+                "get_state_machine_info",
+                "Return detailed information about the specified state machine (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                StateMachineDTO.class)
         );
     }
 

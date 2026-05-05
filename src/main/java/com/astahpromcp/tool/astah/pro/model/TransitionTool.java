@@ -54,37 +54,37 @@ public class TransitionTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_transition_info",
-                        "Return detailed information about the specified transition (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        TransitionDTO.class)
+            ToolSupport.definition(
+                "get_transition_info",
+                "Return detailed information about the specified transition (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                TransitionDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_action_of_transition",
-                        "Set the action of the specified transition (specified by ID), and return the transition information after it is set.",
-                        this::setAction,
-                        TransitionWithActionDTO.class,
-                        TransitionDTO.class),
+            ToolSupport.definition(
+                "set_action_of_transition",
+                "Set the action of the specified transition (specified by ID), and return the transition information after it is set.",
+                this::setAction,
+                TransitionWithActionDTO.class,
+                TransitionDTO.class),
 
-                ToolSupport.definition(
-                        "set_event_of_transition",
-                        "Set the event of the specified transition (specified by ID), and return the transition information after it is set.",
-                        this::setEvent,
-                        TransitionWithEventDTO.class,
-                        TransitionDTO.class),
+            ToolSupport.definition(
+                "set_event_of_transition",
+                "Set the event of the specified transition (specified by ID), and return the transition information after it is set.",
+                this::setEvent,
+                TransitionWithEventDTO.class,
+                TransitionDTO.class),
 
-                ToolSupport.definition(
-                        "set_guard_of_transition",
-                        "Set the guard of the specified transition (specified by ID), and return the transition information after it is set.",
-                        this::setGuard,
-                        TransitionWithGuardDTO.class,
-                        TransitionDTO.class)
+            ToolSupport.definition(
+                "set_guard_of_transition",
+                "Set the guard of the specified transition (specified by ID), and return the transition information after it is set.",
+                this::setGuard,
+                TransitionWithGuardDTO.class,
+                TransitionDTO.class)
         );
     }
 

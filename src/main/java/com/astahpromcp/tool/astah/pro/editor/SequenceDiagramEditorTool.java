@@ -67,82 +67,82 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_seq_dgm",
-                        "Create a new sequence diagram on the specified package (specified by ID), and return the newly created sequence diagram information.",
-                        this::createSequenceDiagram,
-                        NewSequenceDiagramInPackageDTO.class,
-                        SequenceDiagramDTO.class),
+            ToolSupport.definition(
+                "create_seq_dgm",
+                "Create a new sequence diagram on the specified package (specified by ID), and return the newly created sequence diagram information.",
+                this::createSequenceDiagram,
+                NewSequenceDiagramInPackageDTO.class,
+                SequenceDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "create_combined_fragment",
-                        "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created combined fragment information.",
-                        this::createCombinedFragment,
-                        NewCombinedFragmentDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_combined_fragment",
+                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created combined fragment information.",
+                this::createCombinedFragment,
+                NewCombinedFragmentDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_msg",
-                        "Create a new message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
-                        this::createMessage,
-                        NewMessageDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_msg",
+                "Create a new message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                this::createMessage,
+                NewMessageDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_create_msg",
-                        "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
-                        this::createCreateMessage,
-                        NewCreateMessageDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_create_msg",
+                "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                this::createCreateMessage,
+                NewCreateMessageDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_destroy_msg",
-                        "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
-                        this::createDestroyMessage,
-                        NewDestroyMessageDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_destroy_msg",
+                "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                this::createDestroyMessage,
+                NewDestroyMessageDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_return_msg",
-                        "Create a new return message to the specified message (specified by ID) on the specified sequence diagram (specified by ID), and return the newly created message information.",
-                        this::createReturnMessage,
-                        NewReturnMessageDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_return_msg",
+                "Create a new return message to the specified message (specified by ID) on the specified sequence diagram (specified by ID), and return the newly created message information.",
+                this::createReturnMessage,
+                NewReturnMessageDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_lost_msg",
-                        "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
-                        this::createLostMessage,
-                        NewLostMessageDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_lost_msg",
+                "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                this::createLostMessage,
+                NewLostMessageDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_found_msg",
-                        "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name.",
-                        this::createFoundMessage,
-                        NewFoundMessageDTO.class,
-                        LinkPresentationDTO.class),
+            ToolSupport.definition(
+                "create_found_msg",
+                "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created message information. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.",
+                this::createFoundMessage,
+                NewFoundMessageDTO.class,
+                LinkPresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_interaction_use",
-                        "Create a new interaction use on the specified sequence diagram (specified by ID), and return the newly created interaction use information. Note that the InteractionUse to be created must cover at least one lifeline. In other words, attempting to create an InteractionUse in an area where no lifelines exist will result in failure.",
-                        this::createInteractionUse,
-                        NewInteractionUseDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_interaction_use",
+                "Create a new interaction use on the specified sequence diagram (specified by ID), and return the newly created interaction use information. Note that the InteractionUse to be created must cover at least one lifeline. In other words, attempting to create an InteractionUse in an area where no lifelines exist will result in failure.",
+                this::createInteractionUse,
+                NewInteractionUseDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_lifeline",
-                        "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created lifeline information.",
-                        this::createLifeline,
-                        NewLifelineDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_lifeline",
+                "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created lifeline information.",
+                this::createLifeline,
+                NewLifelineDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_termination",
-                        "Create a new termination on the specified sequence diagram (specified by ID), and return the newly created termination information.",
-                        this::createTermination,
-                        NewTerminationDTO.class,
-                        NodePresentationDTO.class)
+            ToolSupport.definition(
+                "create_termination",
+                "Create a new termination on the specified sequence diagram (specified by ID), and return the newly created termination information.",
+                this::createTermination,
+                NewTerminationDTO.class,
+                NodePresentationDTO.class)
         );
     }
 
@@ -203,7 +203,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             && senderNode.getType() != Type.LIFELINE.typeName
             && senderNode.getType() != Type.INTERACTION_USE.typeName
             && senderNode.getType() != Type.FRAME.typeName) {
-            throw new IllegalArgumentException("Message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+            throw new IllegalArgumentException("Message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
@@ -242,7 +242,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             && senderNode.getType() != Type.LIFELINE.typeName
             && senderNode.getType() != Type.INTERACTION_USE.typeName
             && senderNode.getType() != Type.FRAME.typeName) {
-            throw new IllegalArgumentException("Create message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+            throw new IllegalArgumentException("Create message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
@@ -279,7 +279,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             && senderNode.getType() != Type.LIFELINE.typeName
             && senderNode.getType() != Type.INTERACTION_USE.typeName
             && senderNode.getType() != Type.FRAME.typeName) {
-            throw new IllegalArgumentException("Destroy message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+            throw new IllegalArgumentException("Destroy message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
@@ -343,7 +343,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
             && senderNode.getType() != Type.LIFELINE.typeName
             && senderNode.getType() != Type.INTERACTION_USE.typeName
             && senderNode.getType() != Type.FRAME.typeName) {
-            throw new IllegalArgumentException("Lost message sender node must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.");
+            throw new IllegalArgumentException("Lost message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);

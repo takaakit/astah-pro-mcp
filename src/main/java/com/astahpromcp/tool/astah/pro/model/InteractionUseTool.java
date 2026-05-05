@@ -54,30 +54,30 @@ public class InteractionUseTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_interaction_use_info",
-                        "Return detailed information about the specified interaction use (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        InteractionUseDTO.class)
+            ToolSupport.definition(
+                "get_interaction_use_info",
+                "Return detailed information about the specified interaction use (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                InteractionUseDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_arg_of_interaction_use",
-                        "Set the argument of the specified interaction use (specified by ID), and return the interaction use information after it is set.",
-                        this::setArgument,
-                        InteractionUseWithArgumentDTO.class,
-                        InteractionUseDTO.class),
+            ToolSupport.definition(
+                "set_arg_of_interaction_use",
+                "Set the argument of the specified interaction use (specified by ID), and return the interaction use information after it is set.",
+                this::setArgument,
+                InteractionUseWithArgumentDTO.class,
+                InteractionUseDTO.class),
 
-                ToolSupport.definition(
-                        "set_seq_dgm_to_interaction_use",
-                        "Set the sequence diagram (specified by ID) to the specified interaction use (specified by ID), and return the interaction use information after it is set.",
-                        this::setSequenceDiagram,
-                        InteractionUseWithSequenceDiagramDTO.class,
-                        InteractionUseDTO.class)
+            ToolSupport.definition(
+                "set_seq_dgm_to_interaction_use",
+                "Set the sequence diagram (specified by ID) to the specified interaction use (specified by ID), and return the interaction use information after it is set.",
+                this::setSequenceDiagram,
+                InteractionUseWithSequenceDiagramDTO.class,
+                InteractionUseDTO.class)
         );
     }
 

@@ -52,51 +52,51 @@ public class NamedElementTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_named_element_info",
-                        "Return the named element information of the specified named element (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        NamedElementDTO.class)
+            ToolSupport.definition(
+                "get_named_element_info",
+                "Return the named element information of the specified named element (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                NamedElementDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_name",
-                        "Set the name of the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::setName,
-                        NamedElementWithNameDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "set_name",
+                "Set the name of the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::setName,
+                NamedElementWithNameDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "set_alias1",
-                        "Set the alias1 of the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::setAlias1,
-                        NamedElementWithAlias1DTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "set_alias1",
+                "Set the alias1 of the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::setAlias1,
+                NamedElementWithAlias1DTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "set_alias2",
-                        "Set the alias2 of the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::setAlias2,
-                        NamedElementWithAlias2DTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "set_alias2",
+                "Set the alias2 of the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::setAlias2,
+                NamedElementWithAlias2DTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "set_definition",
-                        "Set the definition of the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::setDefinition,
-                        NamedElementWithDefinitionDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "set_definition",
+                "Set the definition of the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::setDefinition,
+                NamedElementWithDefinitionDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "set_visibility",
-                        "Set the visibility of the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::setVisibility,
-                        NamedElementWithVisibilityDTO.class,
-                        NamedElementDTO.class)
+            ToolSupport.definition(
+                "set_visibility",
+                "Set the visibility of the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::setVisibility,
+                NamedElementWithVisibilityDTO.class,
+                NamedElementDTO.class)
         );
     }
 

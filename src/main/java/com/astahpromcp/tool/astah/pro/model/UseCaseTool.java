@@ -51,12 +51,12 @@ public class UseCaseTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_usecase_info",
-                        "Return detailed information about the specified usecase (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        UseCaseDTO.class)
+            ToolSupport.definition(
+                "get_usecase_info",
+                "Return detailed information about the specified usecase (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                UseCaseDTO.class)
         );
     }
 

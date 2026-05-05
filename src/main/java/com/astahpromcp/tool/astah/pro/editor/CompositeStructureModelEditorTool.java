@@ -52,7 +52,7 @@ public class CompositeStructureModelEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                // TODO: Address it once the CompositeStructureModelEditor API works as expected.
+            // TODO: Address it once the CompositeStructureModelEditor API works as expected.
         );
     }
 }

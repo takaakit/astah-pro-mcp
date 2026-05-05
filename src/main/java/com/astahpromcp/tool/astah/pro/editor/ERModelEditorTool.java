@@ -59,96 +59,96 @@ public class ERModelEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_er_model_in_project",
-                        "Create a new ER model in the project, and return the newly created ER model information.",
-                        this::createERModel,
-                        NewERModelDTO.class,
-                        ERModelDTO.class),
+            ToolSupport.definition(
+                "create_er_model_in_project",
+                "Create a new ER model in the project, and return the newly created ER model information.",
+                this::createERModel,
+                NewERModelDTO.class,
+                ERModelDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_pkg_in_parent_er_pkg",
-                        "Create a new ER package under the specified parent ER package (specified by ID), and return the newly created ER package information.",
-                        this::createERPackage,
-                        NewERPackageInERPackageDTO.class,
-                        ERPackageDTO.class),
+            ToolSupport.definition(
+                "create_er_pkg_in_parent_er_pkg",
+                "Create a new ER package under the specified parent ER package (specified by ID), and return the newly created ER package information.",
+                this::createERPackage,
+                NewERPackageInERPackageDTO.class,
+                ERPackageDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_entity_in_parent_er_pkg",
-                        "Create a new ER entity under the specified parent ER package (specified by ID), and return the newly created ER entity information.",
-                        this::createEREntity,
-                        NewEREntityInERPackageDTO.class,
-                        EREntityDTO.class),
+            ToolSupport.definition(
+                "create_er_entity_in_parent_er_pkg",
+                "Create a new ER entity under the specified parent ER package (specified by ID), and return the newly created ER entity information.",
+                this::createEREntity,
+                NewEREntityInERPackageDTO.class,
+                EREntityDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_attr_in_er_entity",
-                        "Create a new ER attribute under the specified ER entity (specified by ID), and return the newly created ER attribute information.",
-                        this::createERAttribute,
-                        NewERAttributeInEREntityDTO.class,
-                        ERAttributeDTO.class),
+            ToolSupport.definition(
+                "create_er_attr_in_er_entity",
+                "Create a new ER attribute under the specified ER entity (specified by ID), and return the newly created ER attribute information.",
+                this::createERAttribute,
+                NewERAttributeInEREntityDTO.class,
+                ERAttributeDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_datatype_in_er_model",
-                        "Create a new ER datatype in the ER schema of the ER model (specified by ID), and return the newly created ER datatype information.",
-                        this::createERDatatype,
-                        NewERDatatypeInERModelDTO.class,
-                        ERDatatypeDTO.class),
+            ToolSupport.definition(
+                "create_er_datatype_in_er_model",
+                "Create a new ER datatype in the ER schema of the ER model (specified by ID), and return the newly created ER datatype information.",
+                this::createERDatatype,
+                NewERDatatypeInERModelDTO.class,
+                ERDatatypeDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_domain_in_er_model",
-                        "Create a new ER domain in the ER schema of the ER model (specified by ID), and return the newly created ER domain information.",
-                        this::createERDomainInERModel,
-                        NewERDomainInERModelDTO.class,
-                        ERDomainDTO.class),
+            ToolSupport.definition(
+                "create_er_domain_in_er_model",
+                "Create a new ER domain in the ER schema of the ER model (specified by ID), and return the newly created ER domain information.",
+                this::createERDomainInERModel,
+                NewERDomainInERModelDTO.class,
+                ERDomainDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_domain_in_er_domain",
-                        "Create a new ER domain in the ER domain (specified by ID), and return the newly created ER domain information.",
-                        this::createERDomainInERDomain,
-                        NewERDomainInERDomainDTO.class,
-                        ERDomainDTO.class),
+            ToolSupport.definition(
+                "create_er_domain_in_er_domain",
+                "Create a new ER domain in the ER domain (specified by ID), and return the newly created ER domain information.",
+                this::createERDomainInERDomain,
+                NewERDomainInERDomainDTO.class,
+                ERDomainDTO.class),
 
-                ToolSupport.definition(
-                        "create_identifying_relationship",
-                        "Create a new identifying relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created identifying relationship information.",
-                        this::createIdentifyingRelationship,
-                        NewIdentifyingRelationshipDTO.class,
-                        ERRelationshipDTO.class),
+            ToolSupport.definition(
+                "create_identifying_relationship",
+                "Create a new identifying relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created identifying relationship information.",
+                this::createIdentifyingRelationship,
+                NewIdentifyingRelationshipDTO.class,
+                ERRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "create_non_identifying_relationship",
-                        "Create a new non-identifying relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created non-identifying relationship information.",
-                        this::createNonIdentifyingRelationship,
-                        NewNonIdentifyingRelationshipDTO.class,
-                        ERRelationshipDTO.class),
+            ToolSupport.definition(
+                "create_non_identifying_relationship",
+                "Create a new non-identifying relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created non-identifying relationship information.",
+                this::createNonIdentifyingRelationship,
+                NewNonIdentifyingRelationshipDTO.class,
+                ERRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "create_many_to_many_relationship",
-                        "Create a new many-to-many relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created many-to-many relationship information.",
-                        this::createManyToManyRelationship,
-                        NewManyToManyRelationshipDTO.class,
-                        ERRelationshipDTO.class),
+            ToolSupport.definition(
+                "create_many_to_many_relationship",
+                "Create a new many-to-many relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created many-to-many relationship information.",
+                this::createManyToManyRelationship,
+                NewManyToManyRelationshipDTO.class,
+                ERRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "create_subtype_relationship",
-                        "Create a new subtype relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created subtype relationship information.",
-                        this::createSubtypeRelationship,
-                        NewSubtypeRelationshipDTO.class,
-                        ERSubtypeRelationshipDTO.class),
+            ToolSupport.definition(
+                "create_subtype_relationship",
+                "Create a new subtype relationship between the specified parent ER entity (specified by ID) and child ER entity (specified by ID), and return the newly created subtype relationship information.",
+                this::createSubtypeRelationship,
+                NewSubtypeRelationshipDTO.class,
+                ERSubtypeRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "create_er_index_of_er_attr",
-                        "Create a new ER index of the specified ER attribute (specified by ID), and return the newly created ER index information.",
-                        this::createERIndex,
-                        NewERIndexDTO.class,
-                        ERIndexDTO.class),
+            ToolSupport.definition(
+                "create_er_index_of_er_attr",
+                "Create a new ER index of the specified ER attribute (specified by ID), and return the newly created ER index information.",
+                this::createERIndex,
+                NewERIndexDTO.class,
+                ERIndexDTO.class),
 
-                ToolSupport.definition(
-                        "delete_er_model_or_er_elem",
-                        "Delete the specified ER model (specified by ID) or ER element (specified by ID), and return the deleted ER model or ER element information.",
-                        this::delete,
-                        IdDTO.class,
-                        ElementDTO.class)
+            ToolSupport.definition(
+                "delete_er_model_or_er_elem",
+                "Delete the specified ER model (specified by ID) or ER element (specified by ID), and return the deleted ER model or ER element information.",
+                this::delete,
+                IdDTO.class,
+                ElementDTO.class)
         );
     }
 

@@ -9,7 +9,7 @@ public record NewDestroyMessageDTO(
     @JsonPropertyDescription("New destroy message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name.")
     String newDestroyMessageName,
     
-    @JsonPropertyDescription("Sender node presentation identifier. Must be one of the following node presentation types: Activation, Lifeline, InteractionUse, or Frame.")
+    @JsonPropertyDescription("Sender node presentation identifier. Must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.")
     String senderNodePresentationId,
     
     @JsonPropertyDescription("Receiver node presentation identifier. Must be one of the following node presentation types: Lifeline.")

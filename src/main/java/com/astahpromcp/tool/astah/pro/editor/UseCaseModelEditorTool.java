@@ -59,40 +59,40 @@ public class UseCaseModelEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_actor",
-                        "Create a new actor in the specified package (specified by ID), and return the newly created actor information.",
-                        this::createActor,
-                        NewActorDTO.class,
-                        ClassDTO.class),
+            ToolSupport.definition(
+                "create_actor",
+                "Create a new actor in the specified package (specified by ID), and return the newly created actor information.",
+                this::createActor,
+                NewActorDTO.class,
+                ClassDTO.class),
 
-                ToolSupport.definition(
-                        "create_include",
-                        "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created include information.",
-                        this::createInclude,
-                        NewIncludeDTO.class,
-                        IncludeDTO.class),
+            ToolSupport.definition(
+                "create_include",
+                "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created include information.",
+                this::createInclude,
+                NewIncludeDTO.class,
+                IncludeDTO.class),
 
-                ToolSupport.definition(
-                        "create_extend",
-                        "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extend information.",
-                        this::createExtend,
-                        NewExtendDTO.class,
-                        ExtendDTO.class),
+            ToolSupport.definition(
+                "create_extend",
+                "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extend information.",
+                this::createExtend,
+                NewExtendDTO.class,
+                ExtendDTO.class),
 
-                ToolSupport.definition(
-                        "create_extension_point",
-                        "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extension point information.",
-                        this::createExtensionPoint,
-                        NewExtensionPointDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "create_extension_point",
+                "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extension point information.",
+                this::createExtensionPoint,
+                NewExtensionPointDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "create_usecase",
-                        "Create a new usecase in the specified package (specified by ID), and return the newly created usecase information.",
-                        this::createUseCase,
-                        NewUseCaseDTO.class,
-                        UseCaseDTO.class)
+            ToolSupport.definition(
+                "create_usecase",
+                "Create a new usecase in the specified package (specified by ID), and return the newly created usecase information.",
+                this::createUseCase,
+                NewUseCaseDTO.class,
+                UseCaseDTO.class)
         );
     }
 

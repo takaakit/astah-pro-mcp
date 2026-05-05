@@ -51,12 +51,12 @@ public class ERModelTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_model_info",
-                        "Return detailed information about the specified ER model (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERModelDTO.class)
+            ToolSupport.definition(
+                "get_er_model_info",
+                "Return detailed information about the specified ER model (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERModelDTO.class)
         );
     }
 

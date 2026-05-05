@@ -55,44 +55,44 @@ public class ERDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_dgm_info",
-                        "Return detailed information about the specified ER diagram (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERDiagramDTO.class)
+            ToolSupport.definition(
+                "get_er_dgm_info",
+                "Return detailed information about the specified ER diagram (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERDiagramDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_align_er_attr_items_of_er_dgm",
-                        "Set the align attribute items of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
-                        this::setAlignAttributeItems,
-                        ERDiagramWithAlignAttributeItemsDTO.class,
-                        ERDiagramDTO.class),
+            ToolSupport.definition(
+                "set_align_er_attr_items_of_er_dgm",
+                "Set the align attribute items of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                this::setAlignAttributeItems,
+                ERDiagramWithAlignAttributeItemsDTO.class,
+                ERDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "set_initial_display_level_of_er_dgm",
-                        "Set the initial display level (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
-                        this::setInitialDisplayLevel,
-                        ERDiagramWithInitialDisplayLevelDTO.class,
-                        ERDiagramDTO.class),
+            ToolSupport.definition(
+                "set_initial_display_level_of_er_dgm",
+                "Set the initial display level (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                this::setInitialDisplayLevel,
+                ERDiagramWithInitialDisplayLevelDTO.class,
+                ERDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "set_model_type_of_er_dgm",
-                        "Set the model type (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
-                        this::setModelType,
-                        ERDiagramWithModelTypeDTO.class,
-                        ERDiagramDTO.class),
+            ToolSupport.definition(
+                "set_model_type_of_er_dgm",
+                "Set the model type (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                this::setModelType,
+                ERDiagramWithModelTypeDTO.class,
+                ERDiagramDTO.class),
 
-                ToolSupport.definition(
-                        "set_notation_of_er_dgm",
-                        "Set the notation (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
-                        this::setNotation,
-                        ERDiagramWithNotationDTO.class,
-                        ERDiagramDTO.class)
+            ToolSupport.definition(
+                "set_notation_of_er_dgm",
+                "Set the notation (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                this::setNotation,
+                ERDiagramWithNotationDTO.class,
+                ERDiagramDTO.class)
         );
     }
 

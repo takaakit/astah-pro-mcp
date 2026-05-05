@@ -52,23 +52,23 @@ public class InteractionOperandTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_interaction_operand_info",
-                        "Return detailed information about the specified interaction operand (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        InteractionOperandDTO.class)
+            ToolSupport.definition(
+                "get_interaction_operand_info",
+                "Return detailed information about the specified interaction operand (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                InteractionOperandDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_guard_of_interaction_operand",
-                        "Set the guard of the specified interaction operand (specified by ID), and return the interaction operand information after it is set.",
-                        this::setGuard,
-                        InteractionOperandWithGuardDTO.class,
-                        InteractionOperandDTO.class)
+            ToolSupport.definition(
+                "set_guard_of_interaction_operand",
+                "Set the guard of the specified interaction operand (specified by ID), and return the interaction operand information after it is set.",
+                this::setGuard,
+                InteractionOperandWithGuardDTO.class,
+                InteractionOperandDTO.class)
         );
     }
 

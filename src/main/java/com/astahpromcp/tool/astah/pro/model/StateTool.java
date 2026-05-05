@@ -55,51 +55,51 @@ public class StateTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_state_info",
-                        "Return detailed information about the specified state (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        StateDTO.class)
+            ToolSupport.definition(
+                "get_state_info",
+                "Return detailed information about the specified state (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                StateDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "add_inter_trans_of_state",
-                        "Add an internal transition to the specified state (specified by ID), and return the state information after it is edited.",
-                        this::addInternalTransition,
-                        StateWithInternalTransitionDTO.class,
-                        StateDTO.class),
+            ToolSupport.definition(
+                "add_inter_trans_of_state",
+                "Add an internal transition to the specified state (specified by ID), and return the state information after it is edited.",
+                this::addInternalTransition,
+                StateWithInternalTransitionDTO.class,
+                StateDTO.class),
 
-                ToolSupport.definition(
-                        "delete_all_inter_trans_of_state",
-                        "Delete all internal transitions from the specified state (specified by ID), and return the state information after it is edited.",
-                        this::deleteAllInternalTransitions,
-                        IdDTO.class,
-                        StateDTO.class),
+            ToolSupport.definition(
+                "delete_all_inter_trans_of_state",
+                "Delete all internal transitions from the specified state (specified by ID), and return the state information after it is edited.",
+                this::deleteAllInternalTransitions,
+                IdDTO.class,
+                StateDTO.class),
 
-                ToolSupport.definition(
-                        "set_entry_of_state",
-                        "Set the entry of the specified state (specified by ID), and return the state information after it is edited.",
-                        this::setEntry,
-                        StateWithEntryDTO.class,
-                        StateDTO.class),
+            ToolSupport.definition(
+                "set_entry_of_state",
+                "Set the entry of the specified state (specified by ID), and return the state information after it is edited.",
+                this::setEntry,
+                StateWithEntryDTO.class,
+                StateDTO.class),
 
-                ToolSupport.definition(
-                        "set_do_act_of_state",
-                        "Set the doActivity of the specified state (specified by ID), and return the state information after it is edited.",
-                        this::setDoActivity,
-                        StateWithDoActivityDTO.class,
-                        StateDTO.class),
+            ToolSupport.definition(
+                "set_do_act_of_state",
+                "Set the doActivity of the specified state (specified by ID), and return the state information after it is edited.",
+                this::setDoActivity,
+                StateWithDoActivityDTO.class,
+                StateDTO.class),
 
-                ToolSupport.definition(
-                        "set_exit_of_state",
-                        "Set the exit of the specified state (specified by ID), and return the state information after it is edited.",
-                        this::setExit,
-                        StateWithExitDTO.class,
-                        StateDTO.class)
+            ToolSupport.definition(
+                "set_exit_of_state",
+                "Set the exit of the specified state (specified by ID), and return the state information after it is edited.",
+                this::setExit,
+                StateWithExitDTO.class,
+                StateDTO.class)
         );
     }
 

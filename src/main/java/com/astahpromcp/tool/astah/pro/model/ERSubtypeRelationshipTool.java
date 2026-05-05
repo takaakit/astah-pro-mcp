@@ -56,44 +56,44 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_subtype_relationship_info",
-                        "Return detailed information about the specified ER subtype relationship (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERSubtypeRelationshipDTO.class)
+            ToolSupport.definition(
+                "get_er_subtype_relationship_info",
+                "Return detailed information about the specified ER subtype relationship (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERSubtypeRelationshipDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_conclusive_of_er_subtype_relationship",
-                        "Set the conclusive of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
-                        this::setConclusive,
-                        ERSubtypeRelationshipWithConclusiveDTO.class,
-                        ERSubtypeRelationshipDTO.class),
+            ToolSupport.definition(
+                "set_conclusive_of_er_subtype_relationship",
+                "Set the conclusive of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
+                this::setConclusive,
+                ERSubtypeRelationshipWithConclusiveDTO.class,
+                ERSubtypeRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "set_discriminator_attr_of_er_subtype_relationship",
-                        "Set the discriminator attribute of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
-                        this::setDiscriminatorAttr,
-                        ERSubtypeRelationshipWithDiscriminatorAttrDTO.class,
-                        ERSubtypeRelationshipDTO.class),
+            ToolSupport.definition(
+                "set_discriminator_attr_of_er_subtype_relationship",
+                "Set the discriminator attribute of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
+                this::setDiscriminatorAttr,
+                ERSubtypeRelationshipWithDiscriminatorAttrDTO.class,
+                ERSubtypeRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "set_logical_name_of_er_subtype_relationship",
-                        "Set the logical name of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
-                        this::setLogicalName,
-                        ERSubtypeRelationshipWithLogicalNameDTO.class,
-                        ERSubtypeRelationshipDTO.class),
+            ToolSupport.definition(
+                "set_logical_name_of_er_subtype_relationship",
+                "Set the logical name of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
+                this::setLogicalName,
+                ERSubtypeRelationshipWithLogicalNameDTO.class,
+                ERSubtypeRelationshipDTO.class),
 
-                ToolSupport.definition(
-                        "set_physical_name_of_er_subtype_relationship",
-                        "Set the physical name of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
-                        this::setPhysicalName,
-                        ERSubtypeRelationshipWithPhysicalNameDTO.class,
-                        ERSubtypeRelationshipDTO.class)
+            ToolSupport.definition(
+                "set_physical_name_of_er_subtype_relationship",
+                "Set the physical name of the specified ER subtype relationship (specified by ID), and return the ER subtype relationship information after it is set.",
+                this::setPhysicalName,
+                ERSubtypeRelationshipWithPhysicalNameDTO.class,
+                ERSubtypeRelationshipDTO.class)
         );
     }
 

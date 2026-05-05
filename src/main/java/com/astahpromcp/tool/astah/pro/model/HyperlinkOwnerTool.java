@@ -70,89 +70,89 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "add_url_hyperlink_to_named_elem",
-                        "Add a URL hyperlink (start with \"https://\") to the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::addUrlHyperlinkToNamedElement,
-                        NamedElementWithUrlHyperlinkDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "add_url_hyperlink_to_named_elem",
+                "Add a URL hyperlink (start with \"https://\") to the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::addUrlHyperlinkToNamedElement,
+                NamedElementWithUrlHyperlinkDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "add_file_path_hyperlink_to_named_elem",
-                        "Add a file path hyperlink (absolute path or relative path) to the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::addFilePathHyperlinkToNamedElement,
-                        NamedElementWithFilePathHyperlinkDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "add_file_path_hyperlink_to_named_elem",
+                "Add a file path hyperlink (absolute path or relative path) to the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::addFilePathHyperlinkToNamedElement,
+                NamedElementWithFilePathHyperlinkDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "add_named_element_hyperlink_to_named_elem",
-                        "Add a named element hyperlink to the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::addNamedElementHyperlinkToNamedElement,
-                        NamedElementWithNamedElementHyperlinkDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "add_named_element_hyperlink_to_named_elem",
+                "Add a named element hyperlink to the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::addNamedElementHyperlinkToNamedElement,
+                NamedElementWithNamedElementHyperlinkDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "remove_all_url_hyperlinks_from_named_elem",
-                        "Remove all URL hyperlinks from the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::removeAllUrlHyperlinksFromNamedElement,
-                        IdDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "remove_all_url_hyperlinks_from_named_elem",
+                "Remove all URL hyperlinks from the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::removeAllUrlHyperlinksFromNamedElement,
+                IdDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "remove_all_file_path_hyperlinks_from_named_elem",
-                        "Remove all file path hyperlinks from the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::removeAllFilePathHyperlinksFromNamedElement,
-                        IdDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "remove_all_file_path_hyperlinks_from_named_elem",
+                "Remove all file path hyperlinks from the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::removeAllFilePathHyperlinksFromNamedElement,
+                IdDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "remove_all_named_elem_hyperlinks_from_named_elem",
-                        "Remove all named element hyperlinks from the specified named element (specified by ID), and return the named element information after it is edited.",
-                        this::removeAllNamedElementHyperlinksFromNamedElement,
-                        IdDTO.class,
-                        NamedElementDTO.class),
+            ToolSupport.definition(
+                "remove_all_named_elem_hyperlinks_from_named_elem",
+                "Remove all named element hyperlinks from the specified named element (specified by ID), and return the named element information after it is edited.",
+                this::removeAllNamedElementHyperlinksFromNamedElement,
+                IdDTO.class,
+                NamedElementDTO.class),
 
-                ToolSupport.definition(
-                        "add_url_hyperlink_to_node_prst",
-                        "Add a URL hyperlink (start with \"https://\") to the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
-                        this::addUrlHyperlinkToNodePresentation,
-                        NodePresentationWithUrlHyperlinkDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "add_url_hyperlink_to_node_prst",
+                "Add a URL hyperlink (start with \"https://\") to the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
+                this::addUrlHyperlinkToNodePresentation,
+                NodePresentationWithUrlHyperlinkDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "add_file_path_hyperlink_to_node_prst",
-                        "Add a file path hyperlink (absolute path or relative path) to the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
-                        this::addFilePathHyperlinkToNodePresentation,
-                        NodePresentationWithFilePathHyperlinkDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "add_file_path_hyperlink_to_node_prst",
+                "Add a file path hyperlink (absolute path or relative path) to the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
+                this::addFilePathHyperlinkToNodePresentation,
+                NodePresentationWithFilePathHyperlinkDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "add_named_element_hyperlink_to_node_prst",
-                        "Add a named element hyperlink to the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
-                        this::addNamedElementHyperlinkToNodePresentation,
-                        NodePresentationWithNamedElementHyperlinkDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "add_named_element_hyperlink_to_node_prst",
+                "Add a named element hyperlink to the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
+                this::addNamedElementHyperlinkToNodePresentation,
+                NodePresentationWithNamedElementHyperlinkDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "remove_all_url_hyperlinks_from_node_prst",
-                        "Remove all URL hyperlinks from the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
-                        this::removeAllUrlHyperlinksFromNodePresentation,
-                        IdDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "remove_all_url_hyperlinks_from_node_prst",
+                "Remove all URL hyperlinks from the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
+                this::removeAllUrlHyperlinksFromNodePresentation,
+                IdDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "remove_all_file_path_hyperlinks_from_node_prst",
-                        "Remove all file path hyperlinks from the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
-                        this::removeAllFilePathHyperlinksFromNodePresentation,
-                        IdDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "remove_all_file_path_hyperlinks_from_node_prst",
+                "Remove all file path hyperlinks from the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
+                this::removeAllFilePathHyperlinksFromNodePresentation,
+                IdDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "remove_all_named_elem_hyperlinks_from_node_prst",
-                        "Remove all named element hyperlinks from the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
-                        this::removeAllNamedElementHyperlinksFromNodePresentation,
-                        IdDTO.class,
-                        NodePresentationDTO.class)
+            ToolSupport.definition(
+                "remove_all_named_elem_hyperlinks_from_node_prst",
+                "Remove all named element hyperlinks from the specified node presentation (specified by ID), and return the node presentation information after it is edited.",
+                this::removeAllNamedElementHyperlinksFromNodePresentation,
+                IdDTO.class,
+                NodePresentationDTO.class)
             );
     }
 
@@ -188,9 +188,9 @@ public class HyperlinkOwnerTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             astahNamedElement.createFileHyperlink(
-                p.getFileName() == null ? "" : p.getFileName().toString(),
-                p.getParent() == null ? "" : p.getParent().toString(),
-                param.hyperlinkComment());
+            p.getFileName() == null ? "" : p.getFileName().toString(),
+            p.getParent() == null ? "" : p.getParent().toString(),
+            param.hyperlinkComment());
             transactionManager.endTransaction();
 
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
@@ -210,8 +210,8 @@ public class HyperlinkOwnerTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             astahNamedElement.createElementHyperlink(
-                astahNamedElementToLink,
-                param.hyperlinkComment());
+            astahNamedElementToLink,
+            param.hyperlinkComment());
             transactionManager.endTransaction();
 
             return NamedElementDTOAssembler.toDTO(astahNamedElement);
@@ -229,15 +229,15 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isURL()) {
-                try {
-                    transactionManager.beginTransaction();
-                    astahNamedElement.deleteHyperlink(hyperlink);
-                    transactionManager.endTransaction();
+            try {
+                transactionManager.beginTransaction();
+                astahNamedElement.deleteHyperlink(hyperlink);
+                transactionManager.endTransaction();
 
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
             }
         }
 
@@ -251,15 +251,15 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isFile()) {
-                try {
-                    transactionManager.beginTransaction();
-                    astahNamedElement.deleteHyperlink(hyperlink);
-                    transactionManager.endTransaction();
+            try {
+                transactionManager.beginTransaction();
+                astahNamedElement.deleteHyperlink(hyperlink);
+                transactionManager.endTransaction();
 
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
             }
         }
 
@@ -273,15 +273,15 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isModel()) {
-                try {
-                    transactionManager.beginTransaction();
-                    astahNamedElement.deleteHyperlink(hyperlink);
-                    transactionManager.endTransaction();
+            try {
+                transactionManager.beginTransaction();
+                astahNamedElement.deleteHyperlink(hyperlink);
+                transactionManager.endTransaction();
 
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
             }
         }
 
@@ -334,9 +334,9 @@ public class HyperlinkOwnerTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             hyperlinkOwner.createFileHyperlink(
-                p.getFileName() == null ? "" : p.getFileName().toString(),
-                p.getParent() == null ? "" : p.getParent().toString(),
-                param.hyperlinkComment());
+            p.getFileName() == null ? "" : p.getFileName().toString(),
+            p.getParent() == null ? "" : p.getParent().toString(),
+            param.hyperlinkComment());
             transactionManager.endTransaction();
 
             return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
@@ -358,8 +358,8 @@ public class HyperlinkOwnerTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             hyperlinkOwner.createElementHyperlink(
-                astahNamedElementToLink,
-                param.hyperlinkComment());
+            astahNamedElementToLink,
+            param.hyperlinkComment());
             transactionManager.endTransaction();
 
             return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
@@ -378,15 +378,15 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isURL()) {
-                try {
-                    transactionManager.beginTransaction();
-                    hyperlinkOwner.deleteHyperlink(hyperlink);
-                    transactionManager.endTransaction();
+            try {
+                transactionManager.beginTransaction();
+                hyperlinkOwner.deleteHyperlink(hyperlink);
+                transactionManager.endTransaction();
 
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
             }
         }
 
@@ -401,15 +401,15 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isFile()) {
-                try {
-                    transactionManager.beginTransaction();
-                    hyperlinkOwner.deleteHyperlink(hyperlink);
-                    transactionManager.endTransaction();
+            try {
+                transactionManager.beginTransaction();
+                hyperlinkOwner.deleteHyperlink(hyperlink);
+                transactionManager.endTransaction();
 
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
             }
         }
 
@@ -424,15 +424,15 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isModel()) {
-                try {
-                    transactionManager.beginTransaction();
-                    hyperlinkOwner.deleteHyperlink(hyperlink);
-                    transactionManager.endTransaction();
+            try {
+                transactionManager.beginTransaction();
+                hyperlinkOwner.deleteHyperlink(hyperlink);
+                transactionManager.endTransaction();
 
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+            } catch (Exception e) {
+                transactionManager.abortTransaction();
+                throw e;
+            }
             }
         }
 

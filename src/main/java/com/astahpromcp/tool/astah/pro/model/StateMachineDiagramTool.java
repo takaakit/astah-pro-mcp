@@ -51,12 +51,12 @@ public class StateMachineDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_state_machine_dgm_info",
-                        "Return detailed information about the specified state machine diagram (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        StateMachineDiagramDTO.class)
+            ToolSupport.definition(
+                "get_state_machine_dgm_info",
+                "Return detailed information about the specified state machine diagram (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                StateMachineDiagramDTO.class)
         );
     }
 

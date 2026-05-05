@@ -20,12 +20,12 @@ public class SequenceDiagramGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	                ToolSupport.definition(
-	                        "seq_dgm_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing a sequence diagram to understand its usage and terminology definitions.",
-	                        this::getGuide,
-	                        NoInputDTO.class,
-	                        GuideDTO.class)
+	            ToolSupport.definition(
+	                "seq_dgm_guide",
+	                "MCP client (you) MUST call this tool function before referencing or editing a sequence diagram to understand its usage and terminology definitions.",
+	                this::getGuide,
+	                NoInputDTO.class,
+	                GuideDTO.class)
 	        );
 
         } catch (Exception e) {
@@ -39,9 +39,11 @@ public class SequenceDiagramGuideTool implements ToolProvider {
         
         String content = """
 IMPORTANT POINTS to Keep in Mind:
+* An ExecutionSpecification in the UML specification refers to the same thing as an Activation in Astah.
 * When creating a lifeline, if a corresponding base class exists, set that class as the type of the lifeline.
 * When adding a message name, if a corresponding operation exists in the base class associated with the target lifeline of the message, assign that operation to the message. Otherwise, specify an arbitrary message name, arguments, and return value.
-* When creating a message, if you want the sender lifeline's activation to remain continuous (that is, the activation segments stay connected), you need to specify the activation as the sender of the message. If, in such a case, you specify the lifeline itself as the sender of the message, the sender lifeline's activation will be split.
+* When creating a message, do not blindly specify a lifeline as the sender of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. Specifying the lifeline as the message sender instead will split the sender lifeline's activation (ExecutionSpecification).
+* It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.
 * When the height of an interaction operand in a combined fragment is changed, the drawing positions of the presentations contained within the combined fragment are also automatically changed as a result. Therefore, when newly placing node/link presentations within a combined fragment, be sure to finish adjusting the height of the interaction operand beforehand.
 
 
@@ -80,6 +82,7 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * A "coregion" is a notational shorthand for parallel combined fragments, used for the common situation where the order of event occurrences (or other nested fragments) on one Lifeline is insignificant. This means that in a given “coregion” area of a Lifeline all the directly contained fragments are considered separate operands of a parallel combined fragment.
 * The semantics of the InteractionUse is the set of traces of the semantics of the referred Interaction where the gates have been resolved as well as all generic parts having been bound such as the arguments substituting the parameters.
 * The InteractionUse is shown as a CombinedFragment symbol where the operator is called ref.
+* ExecutionSpecifications are represented as thin rectangles (gray or white) on the lifeline.
         """;
         
         return new GuideDTO(content);

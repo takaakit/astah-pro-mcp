@@ -51,12 +51,12 @@ public class DependencyTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_dep_info",
-                        "Return detailed information about the specified dependency (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        DependencyDTO.class)
+            ToolSupport.definition(
+                "get_dep_info",
+                "Return detailed information about the specified dependency (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                DependencyDTO.class)
         );
     }
 

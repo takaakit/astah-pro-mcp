@@ -53,23 +53,23 @@ public class ActionTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_action_info",
-                        "Return detailed information about the specified action (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ActionDTO.class)
+            ToolSupport.definition(
+                "get_action_info",
+                "Return detailed information about the specified action (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ActionDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_calling_activity_of_action",
-                        "Set the calling activity (specified by ID) of the specified action (specified by ID), and return the action information after it is set.",
-                        this::setCallingActivity,
-                        ActionWithCallingActivityDTO.class,
-                        ActionDTO.class)
+            ToolSupport.definition(
+                "set_calling_activity_of_action",
+                "Set the calling activity (specified by ID) of the specified action (specified by ID), and return the action information after it is set.",
+                this::setCallingActivity,
+                ActionWithCallingActivityDTO.class,
+                ActionDTO.class)
         );
     }
 

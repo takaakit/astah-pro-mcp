@@ -25,12 +25,12 @@ public class AstahProMcpGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	                ToolSupport.definition(
-	                        "astah_pro_mcp_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server. To run this tool, an Astah project must be open.",
-	                        this::getGuide,
-	                        NoInputDTO.class,
-	                        GuideDTO.class)
+	            ToolSupport.definition(
+	                "astah_pro_mcp_guide",
+	                "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server. To run this tool, an Astah project must be open.",
+	                this::getGuide,
+	                NoInputDTO.class,
+	                GuideDTO.class)
 	        );
 
         } catch (Exception e) {
@@ -59,6 +59,7 @@ This MCP server operates as a plugin for the modeling tool Astah. Using the tool
 
 
 IMPORTANT POINTS to Keep in Mind:
+* Immediately after creating a new diagram, create a note in the upper-left corner of the diagram that describes what the diagram is meant to illustrate.
 * When you place new elements on the diagram, as a final check, be sure to re-verify that the placement coordinates of the elements you placed are appropriate and properly aligned (e.g., centered alignment, top-edge alignment, etc.), and always make any necessary fine adjustments to the coordinates of the newly placed elements.  
 * When creating a presentation on a diagram that corresponds to a model, you must provide not only the diagram information but also the information of the corresponding model. In contrast, when creating a presentation that is not associated with a model (such as notes), no corresponding model information is required.  
 * Deleting a presentation does not remove the corresponding model. In contrast, deleting a model will also remove its corresponding presentation.  
@@ -67,7 +68,10 @@ IMPORTANT POINTS to Keep in Mind:
 * Object diagrams and package diagrams are substituted with class diagrams. This means that, for example, instance specifications and instance specification links are drawn on class diagrams.  
 * Save the Astah project using tools only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.
   DO NOT save the Astah project on your own initiative.
-* When a new node presentation or link presentation is placed on the diagram, adjust the layout of those presentations in accordance with the diagram layout guide.
+* When new node/link presentations are placed on diagrams, adjust the layout of those presentations in accordance with the diagram layout guide.
+* Make sure to detect any overlaps caused by newly added node/link presentations using the tool and resolve them. However, NEVER take the incorrect approach of resolving overlaps by simply hiding the node/link presentations.
+* Draw all node/link presentations related to the content intended to be represented in the diagram, without omission. In particular, be careful not to forget to draw any link presentations that should be included.
+* You can place presentations at negative X or Y coordinates on the diagram. For example, a node/link presentation can be placed at (-100, -100).
 
 
 Procedure for Editing Models and Diagrams:

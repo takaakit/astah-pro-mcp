@@ -20,12 +20,12 @@ public class MindMapGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	                ToolSupport.definition(
-	                        "mind_map_guide",
-	                        "MCP client (you) MUST call this tool function before referencing or editing a mind map to understand its usage and terminology definitions.",
-	                        this::getGuide,
-	                        NoInputDTO.class,
-	                        GuideDTO.class)
+	            ToolSupport.definition(
+	                "mind_map_guide",
+	                "MCP client (you) MUST call this tool function before referencing or editing a mind map to understand its usage and terminology definitions.",
+	                this::getGuide,
+	                NoInputDTO.class,
+	                GuideDTO.class)
 	        );
 
         } catch (Exception e) {

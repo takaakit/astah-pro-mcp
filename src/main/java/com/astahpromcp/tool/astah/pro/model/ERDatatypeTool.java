@@ -55,44 +55,44 @@ public class ERDatatypeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_datatype_info",
-                        "Return detailed information about the specified ER datatype (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERDatatypeDTO.class)
+            ToolSupport.definition(
+                "get_er_datatype_info",
+                "Return detailed information about the specified ER datatype (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERDatatypeDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_length_constraint_of_er_datatype",
-                        "Set the length constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
-                        this::setLengthConstraint,
-                        ERDatatypeWithLengthConstraintDTO.class,
-                        ERDatatypeDTO.class),
+            ToolSupport.definition(
+                "set_length_constraint_of_er_datatype",
+                "Set the length constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                this::setLengthConstraint,
+                ERDatatypeWithLengthConstraintDTO.class,
+                ERDatatypeDTO.class),
 
-                ToolSupport.definition(
-                        "set_precision_constraint_of_er_datatype",
-                        "Set the precision constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
-                        this::setPrecisionConstraint,
-                        ERDatatypeWithPrecisionConstraintDTO.class,
-                        ERDatatypeDTO.class),
+            ToolSupport.definition(
+                "set_precision_constraint_of_er_datatype",
+                "Set the precision constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                this::setPrecisionConstraint,
+                ERDatatypeWithPrecisionConstraintDTO.class,
+                ERDatatypeDTO.class),
 
-                ToolSupport.definition(
-                        "set_default_length_precision_of_er_datatype",
-                        "Set the default length/precision (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
-                        this::setDefaultLengthPrecision,
-                        ERDatatypeWithDefaultLengthPrecisionDTO.class,
-                        ERDatatypeDTO.class),
+            ToolSupport.definition(
+                "set_default_length_precision_of_er_datatype",
+                "Set the default length/precision (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                this::setDefaultLengthPrecision,
+                ERDatatypeWithDefaultLengthPrecisionDTO.class,
+                ERDatatypeDTO.class),
 
-                ToolSupport.definition(
-                        "set_description_of_er_datatype",
-                        "Set the description (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
-                        this::setDescription,
-                        ERDatatypeWithDescriptionDTO.class,
-                        ERDatatypeDTO.class)
+            ToolSupport.definition(
+                "set_description_of_er_datatype",
+                "Set the description (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                this::setDescription,
+                ERDatatypeWithDescriptionDTO.class,
+                ERDatatypeDTO.class)
         );
     }
 

@@ -51,12 +51,12 @@ public class ERPackageTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_er_package_info",
-                        "Return detailed information about the specified ER package (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        ERPackageDTO.class)
+            ToolSupport.definition(
+                "get_er_package_info",
+                "Return detailed information about the specified ER package (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                ERPackageDTO.class)
         );
     }
 

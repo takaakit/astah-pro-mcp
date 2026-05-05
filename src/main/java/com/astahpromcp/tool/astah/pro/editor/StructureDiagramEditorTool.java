@@ -67,19 +67,19 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "create_node_prst_on_dgm",
-                        "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation information.",
-                        this::createNodePresentation,
-                        NewNodePresentationDTO.class,
-                        NodePresentationDTO.class),
+            ToolSupport.definition(
+                "create_node_prst_on_dgm",
+                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation information.",
+                this::createNodePresentation,
+                NewNodePresentationDTO.class,
+                NodePresentationDTO.class),
 
-                ToolSupport.definition(
-                        "create_link_prst_on_dgm",
-                        "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation information.",
-                        this::createLinkPresentation,
-                        NewLinkPresentationDTO.class,
-                        LinkPresentationDTO.class)
+            ToolSupport.definition(
+                "create_link_prst_on_dgm",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation information.",
+                this::createLinkPresentation,
+                NewLinkPresentationDTO.class,
+                LinkPresentationDTO.class)
         );
     }
 

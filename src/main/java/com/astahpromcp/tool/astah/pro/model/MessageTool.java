@@ -53,58 +53,58 @@ public class MessageTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_msg_info",
-                        "Return detailed information about the specified message (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        MessageDTO.class)
+            ToolSupport.definition(
+                "get_msg_info",
+                "Return detailed information about the specified message (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                MessageDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                ToolSupport.definition(
-                        "set_arg_of_msg",
-                        "Set the argument of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                        this::setArgument,
-                        MessageWithArgumentDTO.class,
-                        MessageDTO.class),
+            ToolSupport.definition(
+                "set_arg_of_msg",
+                "Set the argument of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                this::setArgument,
+                MessageWithArgumentDTO.class,
+                MessageDTO.class),
 
-                ToolSupport.definition(
-                        "set_guard_of_msg",
-                        "Set the guard of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                        this::setGuard,
-                        MessageWithGuardDTO.class,
-                        MessageDTO.class),
+            ToolSupport.definition(
+                "set_guard_of_msg",
+                "Set the guard of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                this::setGuard,
+                MessageWithGuardDTO.class,
+                MessageDTO.class),
 
-                ToolSupport.definition(
-                        "set_return_val_of_msg",
-                        "Set the return value of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                        this::setReturnValue,
-                        MessageWithReturnValueDTO.class,
-                        MessageDTO.class),
+            ToolSupport.definition(
+                "set_return_val_of_msg",
+                "Set the return value of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                this::setReturnValue,
+                MessageWithReturnValueDTO.class,
+                MessageDTO.class),
 
-                ToolSupport.definition(
-                        "set_return_val_variable_of_msg",
-                        "Set the return value variable of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
-                        this::setReturnValueVariable,
-                        MessageWithReturnValueVariableDTO.class,
-                        MessageDTO.class),
+            ToolSupport.definition(
+                "set_return_val_variable_of_msg",
+                "Set the return value variable of the specified message (specified by ID), and return the message information after it is set. The message notation is as follows: 1: returnValueVariable = messageName(argument) : returnValue",
+                this::setReturnValueVariable,
+                MessageWithReturnValueVariableDTO.class,
+                MessageDTO.class),
 
-                ToolSupport.definition(
-                        "set_async_of_msg",
-                        "Set the asynchronous of the specified message (specified by ID), and return the message information after it is set.",
-                        this::setAsynchronous,
-                        MessageWithAsynchronousDTO.class,
-                        MessageDTO.class),
+            ToolSupport.definition(
+                "set_async_of_msg",
+                "Set the asynchronous of the specified message (specified by ID), and return the message information after it is set.",
+                this::setAsynchronous,
+                MessageWithAsynchronousDTO.class,
+                MessageDTO.class),
 
-                ToolSupport.definition(
-                        "set_ope_of_msg",
-                        "Set the operation of the specified message (specified by ID), and return the message information after it is set.",
-                        this::setOperation,
-                        MessageWithOperationDTO.class,
-                        MessageDTO.class)
+            ToolSupport.definition(
+                "set_ope_of_msg",
+                "Set the operation of the specified message (specified by ID), and return the message information after it is set.",
+                this::setOperation,
+                MessageWithOperationDTO.class,
+                MessageDTO.class)
         );
     }
 

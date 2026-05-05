@@ -70,116 +70,116 @@ public class DiagramViewManagerTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "open_dgm",
-                        "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the opened diagram information.",
-                        this::openDiagram,
-                        IdDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "open_dgm",
+                "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the opened diagram information.",
+                this::openDiagram,
+                IdDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "close_dgm",
-                        "Close the specified diagram (specified by ID) in Diagram Editor. And return the closed diagram information.",
-                        this::closeDiagram,
-                        IdDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "close_dgm",
+                "Close the specified diagram (specified by ID) in Diagram Editor. And return the closed diagram information.",
+                this::closeDiagram,
+                IdDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "select_prsts",
-                        "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations information.",
-                        this::selectPresentations,
-                        IdListDTO.class,
-                        PresentationListDTO.class),
+            ToolSupport.definition(
+                "select_prsts",
+                "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations information.",
+                this::selectPresentations,
+                IdListDTO.class,
+                PresentationListDTO.class),
 
-                ToolSupport.definition(
-                        "select_all_prsts",
-                        "Select all presentations in current diagram, and return the selected presentations information.",
-                        this::selectAllPresentations,
-                        NoInputDTO.class,
-                        PresentationListDTO.class),
+            ToolSupport.definition(
+                "select_all_prsts",
+                "Select all presentations in current diagram, and return the selected presentations information.",
+                this::selectAllPresentations,
+                NoInputDTO.class,
+                PresentationListDTO.class),
 
-                ToolSupport.definition(
-                        "unselect_all_prsts",
-                        "Unselect all presentations in current diagram, and return the current diagram information.",
-                        this::unselectAllPresentations,
-                        NoInputDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "unselect_all_prsts",
+                "Unselect all presentations in current diagram, and return the current diagram information.",
+                this::unselectAllPresentations,
+                NoInputDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "zoom",
-                        "Zoom in current diagram, and return the zoomed diagram information.",
-                        this::zoom,
-                        com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "zoom",
+                "Zoom in current diagram, and return the zoomed diagram information.",
+                this::zoom,
+                com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "zoom_fit",
-                        "Zoom fit in current diagram, and return the zoomed diagram information.",
-                        this::zoomFit,
-                        NoInputDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "zoom_fit",
+                "Zoom fit in current diagram, and return the zoomed diagram information.",
+                this::zoomFit,
+                NoInputDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "center_prst_in_dgm",
-                        "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
-                        this::centerPresentationInDiagram,
-                        IdDTO.class,
-                        PresentationDTO.class),
+            ToolSupport.definition(
+                "center_prst_in_dgm",
+                "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
+                this::centerPresentationInDiagram,
+                IdDTO.class,
+                PresentationDTO.class),
 
-                ToolSupport.definition(
-                        "get_current_dgm",
-                        "Return the information of the currently selected diagram in Diagram Editor.",
-                        this::getCurrentDiagram,
-                        NoInputDTO.class,
-                        DiagramDTO.class),
+            ToolSupport.definition(
+                "get_current_dgm",
+                "Return the information of the currently selected diagram in Diagram Editor.",
+                this::getCurrentDiagram,
+                NoInputDTO.class,
+                DiagramDTO.class),
 
-                ToolSupport.definition(
-                        "get_selected_prst",
-                        "Return the information of the currently selected presentations in Diagram Editor.",
-                        this::getSelectedPresentations,
-                        NoInputDTO.class,
-                        PresentationListDTO.class),
+            ToolSupport.definition(
+                "get_selected_prst",
+                "Return the information of the currently selected presentations in Diagram Editor.",
+                this::getSelectedPresentations,
+                NoInputDTO.class,
+                PresentationListDTO.class),
 
-                ToolSupport.definition(
-                        "get_zoom_factor",
-                        "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
-                        this::getZoomFactor,
-                        NoInputDTO.class,
-                        com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class),
+            ToolSupport.definition(
+                "get_zoom_factor",
+                "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
+                this::getZoomFactor,
+                NoInputDTO.class,
+                com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class),
 
-                ToolSupport.definition(
-                        "get_highlighted_prsts_within_dgm",
-                        "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information.",
-                        this::getHighlightedPresentationsWithinDiagram,
-                        IdDTO.class,
-                        PresentationListDTO.class)
+            ToolSupport.definition(
+                "get_highlighted_prsts_within_dgm",
+                "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information.",
+                this::getHighlightedPresentationsWithinDiagram,
+                IdDTO.class,
+                PresentationListDTO.class)
         );
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-                /* To leverage the AI's layout capabilities, do not register the automatic layout tool.
-                ToolSupport.definition(
-                        "auto_layout",
-                        "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
-                        this::autoLayout,
-                        NoInputDTO.class,
-                        DiagramDTO.class),
-                */
+            /* To leverage the AI's layout capabilities, do not register the automatic layout tool.
+            ToolSupport.definition(
+                "auto_layout",
+                "Layout all presentations in the currently selected diagram automatically, and return the updated diagram information. Note that the diagram to be laid out must be open in the foreground.",
+                this::autoLayout,
+                NoInputDTO.class,
+                DiagramDTO.class),
+            */
 
-                ToolSupport.definition(
-                        "highlight_prst",
-                        "Temporarily highlight the specified presentation (specified by ID) in the specified color (in the format #FFFFFF), and return the highlighted presentation information. This highlight is temporary and is rendered only while the diagram is open. When you reopen the diagram, the highlight disappears.",
-                        this::highlightPresentation,
-                        PresentationWithHighlightColorDTO.class,
-                        PresentationDTO.class),
+            ToolSupport.definition(
+                "highlight_prst",
+                "Temporarily highlight the specified presentation (specified by ID) in the specified color (in the format #FFFFFF), and return the highlighted presentation information. This highlight is temporary and is rendered only while the diagram is open. When you reopen the diagram, the highlight disappears.",
+                this::highlightPresentation,
+                PresentationWithHighlightColorDTO.class,
+                PresentationDTO.class),
 
-                ToolSupport.definition(
-                        "unhighlight_prst",
-                        "Unhighlight the specified presentation (specified by ID), and return the unhighlighted presentation information.",
-                        this::unhighlightPresentation,
-                        IdDTO.class,
-                        PresentationDTO.class)
+            ToolSupport.definition(
+                "unhighlight_prst",
+                "Unhighlight the specified presentation (specified by ID), and return the unhighlighted presentation information.",
+                this::unhighlightPresentation,
+                IdDTO.class,
+                PresentationDTO.class)
         );
     }
 
@@ -488,4 +488,5 @@ public class DiagramViewManagerTool implements ToolProvider {
 
         return new PresentationListDTO(presentationDTOs);
     }
+
 }

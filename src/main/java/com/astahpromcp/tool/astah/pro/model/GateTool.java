@@ -51,12 +51,12 @@ public class GateTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-                ToolSupport.definition(
-                        "get_gate_info",
-                        "Return detailed information about the specified gate (specified by ID).",
-                        this::getInfo,
-                        IdDTO.class,
-                        GateDTO.class)
+            ToolSupport.definition(
+                "get_gate_info",
+                "Return detailed information about the specified gate (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                GateDTO.class)
         );
     }
 

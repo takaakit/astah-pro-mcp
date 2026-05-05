@@ -27,12 +27,12 @@ public class McpServerLogFileTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
             return List.of(
-                    ToolSupport.definition(
-                            "get_info_of_mcp_server_log",
-                            "Return the log file information of the MCP server (astah-pro-mcp).",
-                            this::getMcpServerLogFile,
-                            NoInputDTO.class,
-                            LogFileDTO.class)
+                ToolSupport.definition(
+                    "get_info_of_mcp_server_log",
+                    "Return the log file information of the MCP server (astah-pro-mcp).",
+                    this::getMcpServerLogFile,
+                    NoInputDTO.class,
+                    LogFileDTO.class)
             );
         } catch (Exception e) {
             log.error("Failed to create mcp server log file tools", e);
