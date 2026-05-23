@@ -102,7 +102,7 @@ public class ERDiagramToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -130,7 +130,7 @@ public class ERDiagramToolTest {
         // ----------------------------------------
         // Call setAlignAttributeItems()
         // ----------------------------------------
-        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAlignAttributeItems,
             tool,
             inputDTO,
@@ -156,7 +156,7 @@ public class ERDiagramToolTest {
         // ----------------------------------------
         // Call setInitialDisplayLevel()
         // ----------------------------------------
-        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setInitialDisplayLevel,
             tool,
             inputDTO,
@@ -182,7 +182,7 @@ public class ERDiagramToolTest {
         // ----------------------------------------
         // Call setModelType()
         // ----------------------------------------
-        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setModelType,
             tool,
             inputDTO,
@@ -208,7 +208,7 @@ public class ERDiagramToolTest {
         // ----------------------------------------
         // Call setNotation()
         // ----------------------------------------
-        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setNotation,
             tool,
             inputDTO,

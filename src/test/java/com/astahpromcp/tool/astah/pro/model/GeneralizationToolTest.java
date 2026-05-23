@@ -66,7 +66,7 @@ public class GeneralizationToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        GeneralizationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        GeneralizationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

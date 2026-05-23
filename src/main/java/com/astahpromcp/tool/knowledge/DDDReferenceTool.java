@@ -20,7 +20,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -45,14 +44,14 @@ public class DDDReferenceTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
             return List.of(
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_info_of_ddd_reference",
                     "Return the total number of chunks and the data of the first chunk of Domain-Driven Design Reference. If you want to learn the theory of Domain-Driven Design (DDD), use this tool.",
                     this::getDDDReference,
                     NoInputDTO.class,
                     DocumentDTO.class),
 
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_ddd_reference",
                     "Return the chunk data of Domain-Driven Design Reference. If no chunk data exists, an empty string is set.",
                     this::getDDDReferenceChunk,

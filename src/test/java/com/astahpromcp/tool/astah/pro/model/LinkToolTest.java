@@ -66,7 +66,7 @@ public class LinkToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        LinkDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

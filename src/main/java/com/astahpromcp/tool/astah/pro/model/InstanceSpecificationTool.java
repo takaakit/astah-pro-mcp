@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInstanceSpecification.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInstanceSpecification.html
 @Slf4j
 public class InstanceSpecificationTool implements ToolProvider {
 
@@ -54,7 +54,7 @@ public class InstanceSpecificationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_instance_spec_info",
                 "Return detailed information about the specified instance specification (specified by ID).",
                 this::getInfo,
@@ -65,7 +65,7 @@ public class InstanceSpecificationTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_classifier_to_instance_spec",
                 "Set the classifier (specified by ID) to the instance specification (specified by ID), and return the instance specification information after it is edited.",
                 this::setClassifier,

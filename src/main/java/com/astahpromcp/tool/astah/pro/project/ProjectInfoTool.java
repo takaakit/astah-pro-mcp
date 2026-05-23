@@ -7,6 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.*;
+import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.project.inputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.assembler.*;
@@ -66,77 +67,84 @@ public class ProjectInfoTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_named_elements",
                 "Return the total number of chunks and the data of the first chunk of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
                 this::getAllNamedElements,
                 NoInputDTO.class,
                 AllNameIdTypeInfoDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_all_named_elements",
                 "Return the chunk data of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
                 this::getNamedElementsChunk,
                 ChunkDTO.class,
                 NameIdTypeListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_prsts",
                 "Return the total number of chunks and the data of the first chunk of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
                 this::getAllPresentations,
                 NoInputDTO.class,
                 AllLabelIdTypeInfoDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_all_prsts",
                 "Return the chunk data of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
                 this::getPresentationsChunk,
                 ChunkDTO.class,
                 LabelIdTypeListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_dgm_prsts",
                 "Return all presentation data on the specified diagram (specified by ID). The presentation data is a simplified information: label, identifier, and type.",
                 this::getAllPresentationsOnDiagram,
                 IdDTO.class,
                 LabelIdTypeListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
+                "get_all_constraints_and_conditions",
+                "Return all constraints and conditions (preconditions, postconditions, and body conditions) in the project. For example, use this tool to obtain the constraints when you want to verify whether constraints written in OCL are satisfied.",
+                this::getAllConstraintsAndConditions,
+                NoInputDTO.class,
+                ReportDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
                 "retrieve_classifiers_that_ref_or_be_refed_by",
                 "Return all classifiers (classes, interfaces, and enumerations) that the specified classifier (specified by ID) references or that reference it. The returned data is a simplified information: name, identifier, and type. For example, when you need to understand the scope of impact of changes to a specific element, use this tool. If you want to traverse references recursively, you'll need to use this tool repeatedly. Note that using a classifier as a type is considered a reference to that classifier.",
                 this::retrieveClassifiersThatReferenceOrBeReferencedBy,
                 IdDTO.class,
                 SourceTargetNameIdTypeListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "search_within_named_elements",
                 "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope.",
                 this::searchWithinNamedElements,
                 SearchDTO.class,
                 NameIdTypeDefinitionListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "search_within_prsts",
                 "Search for the specified string within the label of presentations using partial matching. The search is case-insensitive. Note that named elements are excluded from the search scope. For example, if you want to search for the specified string within note contents, use this tool.",
                 this::searchWithinPresentations,
                 SearchDTO.class,
                 LabelIdTypeListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "retrieve_classifiers_within_pkg",
                 "Return all classifiers (classes, interfaces, and enumerations) within the specified package (specified by ID), including those in its subpackages. The returned data is a simplified information: name, identifier, type, and namespace.",
                 this::retrieveClassifiersWithinPackage,
                 IdDTO.class,
                 NameIdTypeNamespaceListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "retrieve_pkg_structure_as_puml",
                 "Return the PlantUML code that represents the package structure of the classifiers within the project. When you need to know the package structure of classifiers across the entire project, use this tool.",
                 this::retrievePackageStructureAsPlantuml,
                 NoInputDTO.class,
                 PlantumlDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "retrieve_classifier_relationships_as_puml",
                 "Return the PlantUML code that represents the relationships between the classifiers within the project. When you need to know the relationships between classifiers across the entire project, use this tool. Note that the relationships returned by this tool include only the relationship types; for example, association role names, multiplicities, composition, aggregation, and association names are not included.",
                 this::retrieveClassifiersRelationshipsAsPlantuml,
@@ -268,6 +276,51 @@ public class ProjectInfoTool implements ToolProvider {
         }
 
         return new LabelIdTypeListDTO(labelIdTypeDTOs);
+    }
+
+    private ReportDTO getAllConstraintsAndConditions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Get all constraints and conditions: {}", param);
+
+        StringBuilder content = new StringBuilder();
+
+        for (INamedElement astahNamedElement : projectAccessor.findElements(IConstraint.class)) {
+            IConstraint astahConstraint = (IConstraint) astahNamedElement;
+            String specification = astahConstraint.getSpecification();
+            for (IElement astahConstrainedElement : astahConstraint.getConstrainedElement()) {
+                if (astahConstrainedElement instanceof INamedElement astahConstrainedNamedElement) {
+                    content.append("# ").append(astahConstrainedNamedElement.getFullName(".")).append("\n");
+                    content.append("Type: ").append(NamedElementDTO.Type.getCorrespondingType(astahConstrainedNamedElement).typeName).append("\n");
+                    content.append("ID: ").append(astahConstrainedNamedElement.getId()).append("\n");
+
+                    if (specification.startsWith("PRECONDITION:")) {
+                        content.append("Precondition:").append("\n");
+                        content.append("```").append("\n");
+                        content.append(Strings.CS.removeStart(specification, "PRECONDITION:")).append("\n");
+                        content.append("```").append("\n").append("\n");
+
+                    } else if (specification.startsWith("POSTCONDITION:")) {
+                        content.append("Postcondition:").append("\n");
+                        content.append("```").append("\n");
+                        content.append(Strings.CS.removeStart(specification, "POSTCONDITION:")).append("\n");
+                        content.append("```").append("\n").append("\n");
+
+                    } else if (specification.startsWith("BODYCONDITION:")) {
+                        content.append("Body condition:").append("\n");
+                        content.append("```").append("\n");
+                        content.append(Strings.CS.removeStart(specification, "BODYCONDITION:")).append("\n");
+                        content.append("```").append("\n").append("\n");
+
+                    } else {
+                        content.append("Constraint:").append("\n");
+                        content.append("```").append("\n");
+                        content.append(specification).append("\n");
+                        content.append("```").append("\n").append("\n");
+                    }
+                }
+            }
+        }
+
+        return new ReportDTO(content.toString());
     }
 
     private SourceTargetNameIdTypeListDTO retrieveClassifiersThatReferenceOrBeReferencedBy(McpSyncServerExchange exchange, IdDTO param) throws Exception {

@@ -4,6 +4,7 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewConnectorPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPortPresentationDTO;
@@ -11,6 +12,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.NewProvidedInterfacePresen
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewRequiredInterfacePresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewStructuredClassPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewStructuredClassPresentationUnderParentDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
@@ -28,14 +30,16 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/CompositeStructureDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/CompositeStructureDiagramEditor.html
 @Slf4j
 public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
@@ -43,13 +47,15 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final CompositeStructureDiagramEditor compositeStructureDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public CompositeStructureDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, CompositeStructureDiagramEditor compositeStructureDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public CompositeStructureDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, CompositeStructureDiagramEditor compositeStructureDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.compositeStructureDiagramEditor = compositeStructureDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
     }
 
@@ -75,51 +81,51 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "create_composite_structure_dgm",
                 "Create a new composite structure diagram under the specified package (specified by ID), and return the newly created composite structure diagram information.",
                 this::createCompositeStructureDiagram,
                 NewDiagramInPackageDTO.class,
                 DiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_connector_prst",
-                "Create a new connector presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified composite structure diagram (specified by ID), and return the newly created connector presentation information. The specified source/target node presentations are allowed to be part presentation or port presentation.",
+                "Create a new connector presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified composite structure diagram (specified by ID), and return the newly created connector presentation information along with the updated diagram image. The specified source/target node presentations are allowed to be part presentation or port presentation.",
                 this::createConnectorPresentation,
                 NewConnectorPresentationDTO.class,
                 LinkPresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_port_prst",
-                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created port presentation information.",
+                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created port presentation information along with the updated diagram image.",
                 this::createPortPresentation,
                 NewPortPresentationDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_provided_interface_prst",
-                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created provided interface presentation information.",
+                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created provided interface presentation information along with the updated diagram image.",
                 this::createProvidedInterfacePresentation,
                 NewProvidedInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_required_interface_prst",
-                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created required interface presentation information.",
+                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created required interface presentation information along with the updated diagram image.",
                 this::createRequiredInterfacePresentation,
                 NewRequiredInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_structured_class_prst",
-                "Create a new structured class presentation of the specified structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created structured class presentation information.",
+                "Create a new structured class presentation of the specified structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created structured class presentation information along with the updated diagram image.",
                 this::createStructuredClassPresentation,
                 NewStructuredClassPresentationDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_structured_class_prst_under_parent",
-                "Create a new structured class presentation of the specified structured class (specified by ID) under the specified parent node presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created structured class presentation information.",
+                "Create a new structured class presentation of the specified structured class (specified by ID) under the specified parent node presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created structured class presentation information along with the updated diagram image.",
                 this::createStructuredClassPresentationUnderParent,
                 NewStructuredClassPresentationUnderParentDTO.class,
                 NodePresentationDTO.class)
@@ -144,7 +150,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private LinkPresentationDTO createConnectorPresentation(McpSyncServerExchange exchange, NewConnectorPresentationDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createConnectorPresentation(McpSyncServerExchange exchange, NewConnectorPresentationDTO param) throws Exception {
         log.debug("Create connector presentation: {}", param);
 
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
@@ -161,7 +167,11 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                 param.newConnectorName());
             transactionManager.endTransaction();
 
-            return LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -169,7 +179,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createPortPresentation(McpSyncServerExchange exchange, NewPortPresentationDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPortPresentation(McpSyncServerExchange exchange, NewPortPresentationDTO param) throws Exception {
         log.debug("Create port presentation: {}", param);
 
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
@@ -188,7 +198,11 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -196,7 +210,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createProvidedInterfacePresentation(McpSyncServerExchange exchange, NewProvidedInterfacePresentationDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createProvidedInterfacePresentation(McpSyncServerExchange exchange, NewProvidedInterfacePresentationDTO param) throws Exception {
         log.debug("Create provided interface presentation: {}", param);
 
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
@@ -214,8 +228,12 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                     param.locationX(),
                     param.locationY()));
             transactionManager.endTransaction();
-            
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -223,7 +241,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createRequiredInterfacePresentation(McpSyncServerExchange exchange, NewRequiredInterfacePresentationDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createRequiredInterfacePresentation(McpSyncServerExchange exchange, NewRequiredInterfacePresentationDTO param) throws Exception {
         log.debug("Create required interface presentation: {}", param);
 
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
@@ -242,15 +260,19 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
             throw e;
         }
     }
-    
-    private NodePresentationDTO createStructuredClassPresentation(McpSyncServerExchange exchange, NewStructuredClassPresentationDTO param) throws Exception {
+
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createStructuredClassPresentation(McpSyncServerExchange exchange, NewStructuredClassPresentationDTO param) throws Exception {
         log.debug("Create structured class presentation: {}", param);
 
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
@@ -267,7 +289,11 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -275,7 +301,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createStructuredClassPresentationUnderParent(McpSyncServerExchange exchange, NewStructuredClassPresentationUnderParentDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createStructuredClassPresentationUnderParent(McpSyncServerExchange exchange, NewStructuredClassPresentationUnderParentDTO param) throws Exception {
         log.debug("Create structured class presentation under parent: {}", param);
 
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
@@ -294,7 +320,11 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

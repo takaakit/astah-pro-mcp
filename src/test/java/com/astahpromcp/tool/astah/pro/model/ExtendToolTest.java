@@ -66,7 +66,7 @@ public class ExtendToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ExtendDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ExtendDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

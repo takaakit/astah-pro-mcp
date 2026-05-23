@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ICommunicationDiagram.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ICommunicationDiagram.html
 @Slf4j
 public class CommunicationDiagramTool implements ToolProvider {
 
@@ -54,14 +54,14 @@ public class CommunicationDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_communication_dgm_info",
                 "Return detailed information about the specified communication diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 CommunicationDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_interaction_of_communication_dgm",
                 "Return the interaction of the specified communication diagram (specified by ID).",
                 this::getInteraction,

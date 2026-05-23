@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAction.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAction.html
 @Slf4j
 public class ActionTool implements ToolProvider {
 
@@ -53,7 +53,7 @@ public class ActionTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_action_info",
                 "Return detailed information about the specified action (specified by ID).",
                 this::getInfo,
@@ -64,7 +64,7 @@ public class ActionTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_calling_activity_of_action",
                 "Set the calling activity (specified by ID) of the specified action (specified by ID), and return the action information after it is set.",
                 this::setCallingActivity,

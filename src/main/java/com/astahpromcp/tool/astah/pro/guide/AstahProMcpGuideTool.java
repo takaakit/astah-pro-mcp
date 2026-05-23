@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.guide;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.model.INamedElement;
@@ -25,7 +25,7 @@ public class AstahProMcpGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	            ToolSupport.definition(
+	            ToolSupport.toolDefinitionReturningDto(
 	                "astah_pro_mcp_guide",
 	                "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server. To run this tool, an Astah project must be open.",
 	                this::getGuide,

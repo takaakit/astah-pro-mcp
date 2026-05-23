@@ -89,7 +89,7 @@ public class LinkEndToolTest {
         // ----------------------------------------
         // Call setAggregation()
         // ----------------------------------------
-        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAggregation,
             tool,
             inputDTO,
@@ -120,7 +120,7 @@ public class LinkEndToolTest {
         // ----------------------------------------
         // Call setComposition()
         // ----------------------------------------
-        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setComposition,
             tool,
             inputDTO,
@@ -151,7 +151,7 @@ public class LinkEndToolTest {
         // ----------------------------------------
         // Call setNavigation()
         // ----------------------------------------
-        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setNavigation,
             tool,
             inputDTO,

@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.presentation;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithColorDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithLabelDTO;
@@ -13,6 +14,7 @@ import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,10 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PresentationToolTest {
 
@@ -38,12 +44,16 @@ public class PresentationToolTest {
         ITransactionManager transactionManager = projectAccessor.getTransactionManager();
         projectAccessor.open("src/test/resources/modelfile/presentation/PresentationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new PresentationTool(
             projectAccessor,
             transactionManager,
             astahProToolSupport,
+            imageCaptureSupport,
             true);
 
         // getElement() method
@@ -102,7 +112,7 @@ public class PresentationToolTest {
         // ----------------------------------------
         // Call getElement()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getElement,
             tool,
             inputDTO,
@@ -130,7 +140,7 @@ public class PresentationToolTest {
         // ----------------------------------------
         // Call setLabel()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             setLabel,
             tool,
             inputDTO,
@@ -162,7 +172,7 @@ public class PresentationToolTest {
         // ----------------------------------------
         // Call changeFillColor()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             changeFillColor,
             tool,
             inputDTO,
@@ -191,7 +201,7 @@ public class PresentationToolTest {
         // ----------------------------------------
         // Call changeLineColor()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             changeLineColor,
             tool,
             inputDTO,
@@ -220,7 +230,7 @@ public class PresentationToolTest {
         // ----------------------------------------
         // Call changeFontColor()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             changeFontColor,
             tool,
             inputDTO,

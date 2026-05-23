@@ -4,6 +4,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -12,6 +13,7 @@ import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,10 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class StructureDiagramEditorToolTest {
 
@@ -35,6 +41,9 @@ public class StructureDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/StructureDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new StructureDiagramEditorTool(
@@ -42,6 +51,7 @@ public class StructureDiagramEditorToolTest {
             transactionManager,
             astahProToolSupport,
             diagramEditorSupport,
+            imageCaptureSupport,
             true);
 
         // createNodePresentation() method
@@ -88,7 +98,7 @@ public class StructureDiagramEditorToolTest {
         // ----------------------------------------
         // Call createNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createNodePresentation,
             tool,
             inputDTO,
@@ -130,7 +140,7 @@ public class StructureDiagramEditorToolTest {
         // ----------------------------------------
         // Call createLinkPresentation()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createLinkPresentation,
             tool,
             inputDTO,

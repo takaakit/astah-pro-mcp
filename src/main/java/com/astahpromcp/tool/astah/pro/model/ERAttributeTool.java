@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERAttribute.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERAttribute.html
 @Slf4j
 public class ERAttributeTool implements ToolProvider {
 
@@ -54,7 +54,7 @@ public class ERAttributeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_er_attr_info",
                 "Return detailed information about the specified ER attribute (specified by ID).",
                 this::getInfo,
@@ -65,56 +65,56 @@ public class ERAttributeTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_er_datatype_of_er_attr",
                 "Set the ER datatype (specified by ID) of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setDatatype,
                 ERAttributeWithERDatatypeDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_er_domain_of_er_attr",
                 "Set the ER domain (specified by ID) of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setDomain,
                 ERAttributeWithERDomainDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_default_value_of_er_attr",
                 "Set the default value (specified by string) of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setDefaultValue,
                 ERAttributeWithDefaultValueDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_length_precision_of_er_attr",
                 "Set the length/precision (specified by string) of the specified ER attribute (specified by ID), and return the ER attribute information after it is set. Whether you can specify length and precision depends on the data type. For example, when the data type is CHAR, only the length can be specified; if both length and precision are specified, an error will occur.",
                 this::setLengthPrecision,
                 ERAttributeWithLengthPrecisionDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_logical_name_of_er_attr",
                 "Set the logical name (specified by string) of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setLogicalName,
                 ERAttributeWithLogicalNameDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_physical_name_of_er_attr",
                 "Set the physical name (specified by string) of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setPhysicalName,
                 ERAttributeWithPhysicalNameDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_primary_key_of_er_attr",
                 "Set the primary key of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setPrimaryKey,
                 ERAttributeWithPrimaryKeyDTO.class,
                 ERAttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_not_null_of_er_attr",
                 "Set the NOT NULL of the specified ER attribute (specified by ID), and return the ER attribute information after it is set.",
                 this::setNotNull,

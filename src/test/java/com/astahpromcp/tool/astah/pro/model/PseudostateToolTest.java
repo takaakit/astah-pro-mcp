@@ -66,7 +66,7 @@ public class PseudostateToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        PseudostateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PseudostateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

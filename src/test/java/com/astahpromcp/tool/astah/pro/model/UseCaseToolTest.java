@@ -66,7 +66,7 @@ public class UseCaseToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        UseCaseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        UseCaseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

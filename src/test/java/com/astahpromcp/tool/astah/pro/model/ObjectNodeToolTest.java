@@ -76,7 +76,7 @@ public class ObjectNodeToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ObjectNodeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ObjectNodeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -109,7 +109,7 @@ public class ObjectNodeToolTest {
         // ----------------------------------------
         // Call setBase()
         // ----------------------------------------
-        ObjectNodeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ObjectNodeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setBase,
             tool,
             inputDTO,

@@ -32,6 +32,16 @@ public class OperationDTOAssembler {
             returnType = NameIdTypeDTO.empty();
         }
 
+        List<String> preconditions = new ArrayList<>();
+        for (String preCondition : astahOperation.getPreConditions()) {
+            preconditions.add(preCondition);
+        }
+
+        List<String> postconditions = new ArrayList<>();
+        for (String postCondition : astahOperation.getPostConditions()) {
+            postconditions.add(postCondition);
+        }
+
         return new OperationDTO(
             NamedElementDTOAssembler.toDTO(astahOperation),
             astahOperation.isAbstract(),
@@ -39,6 +49,9 @@ public class OperationDTOAssembler {
             astahOperation.isStatic(),
             parameterDTOs,
             returnType,
-            astahOperation.getReturnTypeExpression());
+            astahOperation.getReturnTypeExpression(),
+            preconditions,
+            postconditions,
+            astahOperation.getBodyCondition());
     }
 }

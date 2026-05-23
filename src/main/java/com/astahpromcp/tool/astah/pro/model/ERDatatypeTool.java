@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDatatype.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDatatype.html
 @Slf4j
 public class ERDatatypeTool implements ToolProvider {
 
@@ -55,7 +55,7 @@ public class ERDatatypeTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_er_datatype_info",
                 "Return detailed information about the specified ER datatype (specified by ID).",
                 this::getInfo,
@@ -66,28 +66,28 @@ public class ERDatatypeTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_length_constraint_of_er_datatype",
                 "Set the length constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
                 this::setLengthConstraint,
                 ERDatatypeWithLengthConstraintDTO.class,
                 ERDatatypeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_precision_constraint_of_er_datatype",
                 "Set the precision constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
                 this::setPrecisionConstraint,
                 ERDatatypeWithPrecisionConstraintDTO.class,
                 ERDatatypeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_default_length_precision_of_er_datatype",
                 "Set the default length/precision (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
                 this::setDefaultLengthPrecision,
                 ERDatatypeWithDefaultLengthPrecisionDTO.class,
                 ERDatatypeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_description_of_er_datatype",
                 "Set the description (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
                 this::setDescription,

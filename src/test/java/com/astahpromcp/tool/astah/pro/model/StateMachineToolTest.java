@@ -66,7 +66,7 @@ public class StateMachineToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        StateMachineDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateMachineDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

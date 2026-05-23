@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
 @Slf4j
 public class NamedElementTool implements ToolProvider {
 
@@ -52,7 +52,7 @@ public class NamedElementTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_named_element_info",
                 "Return the named element information of the specified named element (specified by ID).",
                 this::getInfo,
@@ -63,35 +63,35 @@ public class NamedElementTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_name",
                 "Set the name of the specified named element (specified by ID), and return the named element information after it is edited.",
                 this::setName,
                 NamedElementWithNameDTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_alias1",
                 "Set the alias1 of the specified named element (specified by ID), and return the named element information after it is edited.",
                 this::setAlias1,
                 NamedElementWithAlias1DTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_alias2",
                 "Set the alias2 of the specified named element (specified by ID), and return the named element information after it is edited.",
                 this::setAlias2,
                 NamedElementWithAlias2DTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_definition",
                 "Set the definition of the specified named element (specified by ID), and return the named element information after it is edited.",
                 this::setDefinition,
                 NamedElementWithDefinitionDTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_visibility",
                 "Set the visibility of the specified named element (specified by ID), and return the named element information after it is edited.",
                 this::setVisibility,

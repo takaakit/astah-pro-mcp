@@ -1,15 +1,18 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
 import com.astahpromcp.tool.astah.pro.TestSupport;
-import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DiagramLayoutGuideToolTest {
@@ -43,13 +46,18 @@ public class DiagramLayoutGuideToolTest {
         // ----------------------------------------
         // Call getGuide()
         // ----------------------------------------
-        GuideDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        List<McpSchema.Content> contents = TestSupport.instance().invokeToolMethodReturningContents(
             getGuide,
             tool,
-            inputDTO,
-            GuideDTO.class);
+            inputDTO);
 
-        // Check output DTO
-        assertNotNull(outputDTO);
+        // Check the contents
+        assertNotNull(contents);
+        assertEquals(5, contents.size());
+        assertInstanceOf(McpSchema.TextContent.class, contents.get(0));
+        assertInstanceOf(McpSchema.ImageContent.class, contents.get(1));
+        assertInstanceOf(McpSchema.ImageContent.class, contents.get(2));
+        assertInstanceOf(McpSchema.ImageContent.class, contents.get(3));
+        assertInstanceOf(McpSchema.ImageContent.class, contents.get(4));
     }
 }

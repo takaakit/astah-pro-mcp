@@ -26,7 +26,7 @@ import java.util.List;
 import java.io.File;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
 @Slf4j
 public class ProjectAccessorTool implements ToolProvider {
 
@@ -58,35 +58,35 @@ public class ProjectAccessorTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_proj",
                 "Return the project (root package) information.",
                 this::getProject,
                 NoInputDTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "is_proj_opened",
                 "Return whether a project is opened or not.",
                 this::isProjectOpen,
                 NoInputDTO.class,
                 BooleanDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "is_proj_modified",
                 "Return whether the current project is modified or not.",
                 this::isProjectModified,
                 NoInputDTO.class,
                 BooleanDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "find_named_elements_by_name",
                 "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
                 this::findNamedElementsByName,
                 NameDTO.class,
                 NameIdTypeListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_proj_path",
                 "Return the full path of the Astah project file (e.g., /path/to/project.asta). If the project has not been saved, return an empty string. For example, use this tool when you want to derive a relative path from an absolute path based on the Astah project file location.",
                 this::getProjectPath,
@@ -97,28 +97,28 @@ public class ProjectAccessorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "create_proj",
                 "Create an Astah project (root package), and return the project information. The project element is the root package.",
                 this::createProject,
                 NoInputDTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "open_proj",
                 "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
                 this::openProject,
                 FilePathDTO.class,
                 NamedElementDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "save_proj",
                 "Save the current project, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
                 this::saveProject,
                 NoInputDTO.class,
                 ProjectPathDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "save_proj_as",
                 "Save the current project with a new name, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
                 this::saveProjectAs,

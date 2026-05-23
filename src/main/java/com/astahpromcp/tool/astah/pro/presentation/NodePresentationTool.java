@@ -4,9 +4,11 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithHeightDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithLocationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithWidthDTO;
@@ -16,7 +18,9 @@ import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -24,19 +28,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
 @Slf4j
 public class NodePresentationTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
+    private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public NodePresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public NodePresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
+        this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
     }
 
@@ -58,14 +64,14 @@ public class NodePresentationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_node_info",
                 "Return detailed information about the specified node presentation (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_node_prst_rectangle",
                 "Return the rectangle of the specified node presentation (specified by ID).",
                 this::getNodePresentationRectangle,
@@ -76,23 +82,23 @@ public class NodePresentationTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_location",
-                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image.",
                 this::setNodePresentationLocation,
                 NodePresentationWithLocationDTO.class,
                 RectangleDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_width",
-                "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image.",
                 this::setNodePresentationWidth,
                 NodePresentationWithWidthDTO.class,
                 RectangleDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_height",
-                "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting.",
+                "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image.",
                 this::setNodePresentationHeight,
                 NodePresentationWithHeightDTO.class,
                 RectangleDTO.class)
@@ -116,7 +122,7 @@ public class NodePresentationTool implements ToolProvider {
         return RectangleDTOAssembler.toDTO(rectangle2D);
     }
 
-    private RectangleDTO setNodePresentationLocation(McpSyncServerExchange exchange, NodePresentationWithLocationDTO param) throws Exception {
+    private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationLocation(McpSyncServerExchange exchange, NodePresentationWithLocationDTO param) throws Exception {
         log.debug("Set node presentation location: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
@@ -127,7 +133,11 @@ public class NodePresentationTool implements ToolProvider {
             transactionManager.endTransaction();
 
             Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
-            return RectangleDTOAssembler.toDTO(rectangle2D);
+            RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -135,7 +145,7 @@ public class NodePresentationTool implements ToolProvider {
         }
     }
 
-    private RectangleDTO setNodePresentationWidth(McpSyncServerExchange exchange, NodePresentationWithWidthDTO param) throws Exception {
+    private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationWidth(McpSyncServerExchange exchange, NodePresentationWithWidthDTO param) throws Exception {
         log.debug("Set node presentation width: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
@@ -146,7 +156,11 @@ public class NodePresentationTool implements ToolProvider {
             transactionManager.endTransaction();
 
             Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
-            return RectangleDTOAssembler.toDTO(rectangle2D);
+            RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -154,7 +168,7 @@ public class NodePresentationTool implements ToolProvider {
         }
     }
 
-    private RectangleDTO setNodePresentationHeight(McpSyncServerExchange exchange, NodePresentationWithHeightDTO param) throws Exception {
+    private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationHeight(McpSyncServerExchange exchange, NodePresentationWithHeightDTO param) throws Exception {
         log.debug("Set node presentation height: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
@@ -165,7 +179,11 @@ public class NodePresentationTool implements ToolProvider {
             transactionManager.endTransaction();
 
             Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
-            return RectangleDTOAssembler.toDTO(rectangle2D);
+            RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

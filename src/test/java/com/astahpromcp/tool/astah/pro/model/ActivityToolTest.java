@@ -66,7 +66,7 @@ public class ActivityToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ActivityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ActivityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

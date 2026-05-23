@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.guide;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class UseCaseDiagramGuideTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
 	        return List.of(
-	            ToolSupport.definition(
+	            ToolSupport.toolDefinitionReturningDto(
 	                "usecase_dgm_guide",
 	                "MCP client (you) MUST call this tool function before referencing or editing a usecase diagram to understand its usage and terminology definitions.",
 	                this::getGuide,

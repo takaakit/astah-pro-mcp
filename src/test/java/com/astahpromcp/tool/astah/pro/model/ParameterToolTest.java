@@ -86,7 +86,7 @@ public class ParameterToolTest {
         // ----------------------------------------
         // Call setType()
         // ----------------------------------------
-        ParameterDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ParameterDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setType,
             tool,
             inputDTO,
@@ -117,7 +117,7 @@ public class ParameterToolTest {
         // ----------------------------------------
         // Call setTypeExpression()
         // ----------------------------------------
-        ParameterDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ParameterDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setTypeExpression,
             tool,
             inputDTO,

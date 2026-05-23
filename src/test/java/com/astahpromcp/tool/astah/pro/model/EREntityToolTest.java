@@ -93,7 +93,7 @@ public class EREntityToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -120,7 +120,7 @@ public class EREntityToolTest {
         // ----------------------------------------
         // Call setLogicalName()
         // ----------------------------------------
-        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLogicalName,
             tool,
             inputDTO,
@@ -146,7 +146,7 @@ public class EREntityToolTest {
         // ----------------------------------------
         // Call setPhysicalName()
         // ----------------------------------------
-        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPhysicalName,
             tool,
             inputDTO,
@@ -172,7 +172,7 @@ public class EREntityToolTest {
         // ----------------------------------------
         // Call setType()
         // ----------------------------------------
-        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setType,
             tool,
             inputDTO,

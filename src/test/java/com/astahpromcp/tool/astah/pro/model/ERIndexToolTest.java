@@ -102,7 +102,7 @@ public class ERIndexToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -134,7 +134,7 @@ public class ERIndexToolTest {
         // ----------------------------------------
         // Call addERAttribute()
         // ----------------------------------------
-        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addERAttribute,
             tool,
             inputDTO,
@@ -165,7 +165,7 @@ public class ERIndexToolTest {
         // ----------------------------------------
         // Call removeERAttribute()
         // ----------------------------------------
-        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeERAttribute,
             tool,
             inputDTO,
@@ -192,7 +192,7 @@ public class ERIndexToolTest {
         // ----------------------------------------
         // Call setKey()
         // ----------------------------------------
-        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setKey,
             tool,
             inputDTO,
@@ -219,7 +219,7 @@ public class ERIndexToolTest {
         // ----------------------------------------
         // Call setUnique()
         // ----------------------------------------
-        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setUnique,
             tool,
             inputDTO,

@@ -108,7 +108,7 @@ public class UseCaseModelEditorToolTest {
         // ----------------------------------------
         // Call createActor()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createActor,
             tool,
             inputDTO,
@@ -134,7 +134,7 @@ public class UseCaseModelEditorToolTest {
         // ----------------------------------------
         // Call createUseCase()
         // ----------------------------------------
-        UseCaseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        UseCaseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createUseCase,
             tool,
             inputDTO,
@@ -163,7 +163,7 @@ public class UseCaseModelEditorToolTest {
         // ----------------------------------------
         // Call createInclude()
         // ----------------------------------------
-        IncludeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        IncludeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createInclude,
             tool,
             inputDTO,
@@ -200,7 +200,7 @@ public class UseCaseModelEditorToolTest {
         // ----------------------------------------
         // Call createExtend()
         // ----------------------------------------
-        ExtendDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ExtendDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createExtend,
             tool,
             inputDTO,
@@ -233,7 +233,7 @@ public class UseCaseModelEditorToolTest {
         // ----------------------------------------
         // Call createExtensionPoint()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createExtensionPoint,
             tool,
             inputDTO,

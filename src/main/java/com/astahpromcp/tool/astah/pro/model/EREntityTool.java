@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IEREntity.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IEREntity.html
 @Slf4j
 public class EREntityTool implements ToolProvider {
 
@@ -54,7 +54,7 @@ public class EREntityTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_er_entity_info",
                 "Return detailed information about the specified ER entity (specified by ID).",
                 this::getInfo,
@@ -65,21 +65,21 @@ public class EREntityTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_logical_name_of_er_entity",
                 "Set the logical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
                 this::setLogicalName,
                 EREntityWithLogicalNameDTO.class,
                 EREntityDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_physical_name_of_er_entity",
                 "Set the physical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
                 this::setPhysicalName,
                 EREntityWithPhysicalNameDTO.class,
                 EREntityDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_type_of_er_entity",
                 "Set the type (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
                 this::setType,

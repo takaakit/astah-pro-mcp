@@ -1,4 +1,4 @@
-package com.astahpromcp.tool.astah.pro.layout;
+package com.astahpromcp.tool.astah.pro.verification;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
@@ -18,15 +18,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.beans.Transient;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LayoutLintToolTest {
+public class DiagramLayoutLintToolTest {
 
     private ProjectAccessor projectAccessor;
-    private LayoutLintTool tool;
+    private DiagramLayoutLintTool tool;
     private Method detectOverlap;
 
     @BeforeEach
@@ -34,11 +33,11 @@ public class LayoutLintToolTest {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
         ITransactionManager transactionManager = projectAccessor.getTransactionManager();
-        projectAccessor.open("src/test/resources/modelfile/layout/LayoutLintToolTest.asta");
+        projectAccessor.open("src/test/resources/modelfile/layout/DiagramLayoutLintToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
-        tool = new LayoutLintTool(
+        tool = new DiagramLayoutLintTool(
                 projectAccessor,
                 transactionManager,
                 astahProToolSupport,
@@ -46,7 +45,7 @@ public class LayoutLintToolTest {
 
         // detectOverlap() method
         detectOverlap = TestSupport.getAccessibleMethod(
-                LayoutLintTool.class,
+                DiagramLayoutLintTool.class,
                 "detectOverlap",
                 McpSyncServerExchange.class,
                 IdDTO.class);
@@ -72,7 +71,7 @@ public class LayoutLintToolTest {
         // ----------------------------------------
         // Call detectOverlap()
         // ----------------------------------------
-        ReportDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 detectOverlap,
                 tool,
                 inputDTO,
@@ -106,7 +105,7 @@ public class LayoutLintToolTest {
         // ----------------------------------------
         // Call detectOverlap()
         // ----------------------------------------
-        ReportDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 detectOverlap,
                 tool,
                 inputDTO,
@@ -137,7 +136,7 @@ public class LayoutLintToolTest {
         // ----------------------------------------
         // Call detectOverlap()
         // ----------------------------------------
-        ReportDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 detectOverlap,
                 tool,
                 inputDTO,
@@ -164,7 +163,7 @@ public class LayoutLintToolTest {
         // ----------------------------------------
         // Call detectOverlap()
         // ----------------------------------------
-        ReportDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 detectOverlap,
                 tool,
                 inputDTO,
@@ -198,7 +197,7 @@ public class LayoutLintToolTest {
         // ----------------------------------------
         // Call detectOverlap()
         // ----------------------------------------
-        ReportDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 detectOverlap,
                 tool,
                 inputDTO,

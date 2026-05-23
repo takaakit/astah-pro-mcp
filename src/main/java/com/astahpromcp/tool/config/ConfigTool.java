@@ -21,7 +21,7 @@ public class ConfigTool implements ToolProvider {
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
             "get_workspace_dir_path",
             "Return the path to the workspace directory.",
             this::getWorkspaceDirectoryPath,

@@ -175,7 +175,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call addUrlHyperlink()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addUrlHyperlinkToNamedElement,
             tool,
             inputDTO,
@@ -208,7 +208,7 @@ public class HyperlinkOwnerToolTest {
         // Call addUrlHyperlink()
         // ----------------------------------------
         Exception e = assertThrows(Exception.class, () ->
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 addUrlHyperlinkToNamedElement,
                 tool,
                 inputDTO,
@@ -235,7 +235,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call addFilePathHyperlink()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addFilePathHyperlinkToNamedElement,
             tool,
             inputDTO,
@@ -276,7 +276,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call addNamedElementHyperlink()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addNamedElementHyperlinkToNamedElement,
             tool,
             inputDTO,
@@ -309,7 +309,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call removeAllUrlHyperlinks()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllUrlHyperlinksFromNamedElement,
             tool,
             inputDTO,
@@ -341,7 +341,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call removeAllFilePathHyperlinks()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllFilePathHyperlinksFromNamedElement,
             tool,
             inputDTO,
@@ -373,7 +373,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call removeAllNamedElementHyperlinks()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllNamedElementHyperlinksFromNamedElement,
             tool,
             inputDTO,
@@ -411,7 +411,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call addUrlHyperlinkToNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addUrlHyperlinkToNodePresentation,
             tool,
             inputDTO,
@@ -444,7 +444,7 @@ public class HyperlinkOwnerToolTest {
         // Call addUrlHyperlinkToNodePresentation()
         // ----------------------------------------
         assertThrows(Exception.class, () ->
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 addUrlHyperlinkToNodePresentation,
                 tool,
                 inputDTO,
@@ -474,7 +474,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call addFilePathHyperlinkToNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addFilePathHyperlinkToNodePresentation,
             tool,
             inputDTO,
@@ -518,7 +518,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call addNamedElementHyperlinkToNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addNamedElementHyperlinkToNodePresentation,
             tool,
             inputDTO,
@@ -554,7 +554,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call removeAllUrlHyperlinksFromNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllUrlHyperlinksFromNodePresentation,
             tool,
             removeInputDTO,
@@ -589,7 +589,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call removeAllFilePathHyperlinksFromNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllFilePathHyperlinksFromNodePresentation,
             tool,
             removeInputDTO,
@@ -624,7 +624,7 @@ public class HyperlinkOwnerToolTest {
         // ----------------------------------------
         // Call removeAllNamedElementHyperlinksFromNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllNamedElementHyperlinksFromNodePresentation,
             tool,
             removeInputDTO,

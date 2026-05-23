@@ -1,6 +1,6 @@
 # Astah Pro MCP: Enabling AI-Powered UML Modeling
 
-A local MCP server that runs as a plugin for Astah Professional, a UML modeling tool. This MCP server enables AI agents to:
+A local MCP server plugin for Astah Professional, a UML modeling tool, that enables AI agents to:
 
 - Design systems and represent them as UML models.
 - Explain UML models.
@@ -43,7 +43,9 @@ Diagrams created in the videos above:
     With over **300** tools exposed in this version, use the AI agents listed below. Other AI agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
     - **Claude Code**
     - **Codex CLI**
-    - **Gemini CLI**
+    - **Antigravity CLI**
+    
+    > *Note:* *Antigravity CLI* may have some teething problems with MCP connections after its recent release.
 
   - For the query-only tool version:
 
@@ -51,7 +53,7 @@ Diagrams created in the videos above:
 
   <br>
 
-  > *Note*: This MCP server only connects to AI agents running on the same machine as Astah Professional.
+  > *Note:* This MCP server only connects to AI agents running on the same machine as Astah Professional.
   According to Astah's terms of use, using Astah via an AI agent is permitted only if you hold a valid license and access it exclusively for your own use with your licensed Astah. Allowing a non-licensed third party to operate Astah via such an agent is strictly prohibited.  
   For details, please refer to the FAQ ([English](https://astah.net/support/cv-members-guide/#ai-external-access) / [Japanese](https://astah.change-vision.com/ja/faq/faq-license/ai-external-access.html)) or [contact Change Vision (the developer of Astah)](https://astah.net/about/contact/) directly.
 
@@ -114,17 +116,28 @@ startup_timeout_sec = 10
 
 > *Note:* If you are using *Codex CLI* on *WSL2* in Windows, you need to allow WSL to access Windows' 127.0.0.1. So, see [here](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking) and consider enabling Mirrored mode.
 
-#### Gemini CLI
 
-Run this command for project scope in your project directory:
-```bash
-gemini mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8888/mcp
+#### Antigravity CLI
+
+Create `.agents/mcp_config.json` under your project directory, or create `~/.gemini/antigravity-cli/mcp_config.json` for user scope.
+
+```json
+{
+  "mcpServers": {
+    "astah-pro-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "http://127.0.0.1:8888/mcp",
+        "--allow-http"
+      ]
+    }
+  }
+}
 ```
 
-Or run this command for user scope:
-```bash
-gemini mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888/mcp
-```
+> *Note:* As of May 21, 2026, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Antigravity CLI*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
 
 <br>
 
@@ -138,6 +151,8 @@ gemini mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888
 
    On the first connection to the Astah Pro MCP server, you will be asked to confirm. Review the details and click **'Connect'**.  
   ![Connection Request](img/mcp-connection-request.png)
+   
+   > *Note:* For *Antigravity CLI*, run the `/mcp` command to connect to MCP servers.
 
 3. Send prompts to the AI agents
 

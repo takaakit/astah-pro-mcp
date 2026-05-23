@@ -66,7 +66,7 @@ public class IncludeToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        IncludeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        IncludeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

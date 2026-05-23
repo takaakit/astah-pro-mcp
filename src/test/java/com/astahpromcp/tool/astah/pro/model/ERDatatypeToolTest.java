@@ -102,7 +102,7 @@ public class ERDatatypeToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -129,7 +129,7 @@ public class ERDatatypeToolTest {
         // ----------------------------------------
         // Call setLengthConstraint()
         // ----------------------------------------
-        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLengthConstraint,
             tool,
             inputDTO,
@@ -155,7 +155,7 @@ public class ERDatatypeToolTest {
         // ----------------------------------------
         // Call setPrecisionConstraint()
         // ----------------------------------------
-        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPrecisionConstraint,
             tool,
             inputDTO,
@@ -181,7 +181,7 @@ public class ERDatatypeToolTest {
         // ----------------------------------------
         // Call setDefaultLengthPrecision()
         // ----------------------------------------
-        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDefaultLengthPrecision,
             tool,
             inputDTO,
@@ -207,7 +207,7 @@ public class ERDatatypeToolTest {
         // ----------------------------------------
         // Call setDescription()
         // ----------------------------------------
-        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDescription,
             tool,
             inputDTO,

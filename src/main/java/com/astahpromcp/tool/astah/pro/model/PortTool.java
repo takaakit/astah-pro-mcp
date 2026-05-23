@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IPort.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IPort.html
 @Slf4j
 public class PortTool implements ToolProvider {
 
@@ -53,7 +53,7 @@ public class PortTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_port_info",
                 "Return detailed information about the specified port (specified by ID).",
                 this::getInfo,
@@ -64,14 +64,14 @@ public class PortTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_behavior_of_port",
                 "Set the behavior (specified by boolean) of the specified port (specified by ID), and return the port information after it is set.",
                 this::setBehavior,
                 PortWithBehaviorDTO.class,
                 PortDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_service_of_port",
                 "Set the service (specified by boolean) of the specified port (specified by ID), and return the port information after it is set.",
                 this::setService,

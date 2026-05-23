@@ -75,7 +75,7 @@ public class CommunicationDiagramToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        CommunicationDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        CommunicationDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -98,7 +98,7 @@ public class CommunicationDiagramToolTest {
         // ----------------------------------------
         // Call getInteraction()
         // ----------------------------------------
-        InteractionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInteraction,
             tool,
             inputDTO,

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDependency.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDependency.html
 @Slf4j
 public class DependencyTool implements ToolProvider {
 
@@ -51,7 +51,7 @@ public class DependencyTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_dep_info",
                 "Return detailed information about the specified dependency (specified by ID).",
                 this::getInfo,

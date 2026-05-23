@@ -25,6 +25,15 @@ public record OperationDTO(
     NameIdTypeDTO returnType,
 
     @JsonPropertyDescription("Return type expression: The string representation of a return type, consisting of the return type name and its modifiers.")
-    String returnTypeExpression
+    String returnTypeExpression,
+
+    @JsonPropertyDescription("Preconditions")
+    List<String> preconditions,
+
+    @JsonPropertyDescription("Postconditions")
+    List<String> postconditions,
+
+    @JsonPropertyDescription("Body condition")
+    String bodyCondition
 ) {
 }

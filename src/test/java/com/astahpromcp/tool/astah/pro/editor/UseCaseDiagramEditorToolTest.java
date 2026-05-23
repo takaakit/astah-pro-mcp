@@ -72,7 +72,7 @@ public class UseCaseDiagramEditorToolTest {
         // ----------------------------------------
         // Call createUseCaseDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createUseCaseDiagram,
             tool,
             inputDTO,

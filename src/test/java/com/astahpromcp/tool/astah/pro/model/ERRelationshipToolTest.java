@@ -130,7 +130,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -157,7 +157,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setCardinality()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setCardinality,
             tool,
             inputDTO,
@@ -188,7 +188,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setERIndex()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setERIndex,
             tool,
             inputDTO,
@@ -214,7 +214,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setLogicalName()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLogicalName,
             tool,
             inputDTO,
@@ -240,7 +240,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setPhysicalName()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPhysicalName,
             tool,
             inputDTO,
@@ -267,7 +267,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setParentRequired()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setParentRequired,
             tool,
             inputDTO,
@@ -293,7 +293,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setVerbPhraseParent()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setVerbPhraseParent,
             tool,
             inputDTO,
@@ -319,7 +319,7 @@ public class ERRelationshipToolTest {
         // ----------------------------------------
         // Call setVerbPhraseChild()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setVerbPhraseChild,
             tool,
             inputDTO,

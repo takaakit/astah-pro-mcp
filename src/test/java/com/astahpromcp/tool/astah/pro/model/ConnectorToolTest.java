@@ -66,7 +66,7 @@ public class ConnectorToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ConnectorDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ConnectorDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

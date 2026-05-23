@@ -108,7 +108,7 @@ public class NamedElementToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -141,7 +141,7 @@ public class NamedElementToolTest {
         // ----------------------------------------
         // Call setName()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setName,
             tool,
             inputDTO,
@@ -172,7 +172,7 @@ public class NamedElementToolTest {
         // ----------------------------------------
         // Call setAlias1()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAlias1,
             tool,
             inputDTO,
@@ -203,7 +203,7 @@ public class NamedElementToolTest {
         // ----------------------------------------
         // Call setAlias2()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAlias2,
             tool,
             inputDTO,
@@ -234,7 +234,7 @@ public class NamedElementToolTest {
         // ----------------------------------------
         // Call setDefinition()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDefinition,
             tool,
             inputDTO,
@@ -265,7 +265,7 @@ public class NamedElementToolTest {
         // ----------------------------------------
         // Call setVisibility()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setVisibility,
             tool,
             inputDTO,

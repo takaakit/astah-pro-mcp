@@ -1,4 +1,4 @@
-package com.astahpromcp.tool.astah.pro.layout;
+package com.astahpromcp.tool.astah.pro.verification;
 
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class LayoutLintTool implements ToolProvider {
+public class DiagramLayoutLintTool implements ToolProvider {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
@@ -41,7 +41,7 @@ public class LayoutLintTool implements ToolProvider {
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public LayoutLintTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public DiagramLayoutLintTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
@@ -59,23 +59,23 @@ public class LayoutLintTool implements ToolProvider {
             return List.copyOf(tools);
 
         } catch (Exception e) {
-            log.error("Failed to create layout tools", e);
+            log.error("Failed to create diagram layout lint tools", e);
             return List.of();
         }
     }
 
     private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "detect_overlap",
                 "Detect overlap of presentations in the specified diagram (specified by ID) and return the overlap information. Use this tool when you need to adjust the layout of a diagram.",
                 this::detectOverlap,
                 IdDTO.class,
                 ReportDTO.class));
+    }
+
+    private List<ToolDefinition> createEditTools() {
+        return List.of();
     }
 
     private ReportDTO detectOverlap(McpSyncServerExchange exchange, IdDTO param) throws Exception {

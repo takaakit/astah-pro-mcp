@@ -66,7 +66,7 @@ public class ControlNodeToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ControlNodeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ControlNodeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

@@ -6,6 +6,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.NewAssociationClassPresent
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewInstanceWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkSourceAndTargetDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
@@ -24,6 +25,7 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,10 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ClassDiagramEditorToolTest {
 
@@ -49,6 +55,9 @@ public class ClassDiagramEditorToolTest {
         ClassDiagramEditor classDiagramEditor = projectAccessor.getDiagramEditorFactory().getClassDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ClassDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new ClassDiagramEditorTool(
@@ -56,6 +65,7 @@ public class ClassDiagramEditorToolTest {
             transactionManager,
             classDiagramEditor,
             astahProToolSupport,
+            imageCaptureSupport,
             true);
 
         // createClassDiagram() method
@@ -114,7 +124,7 @@ public class ClassDiagramEditorToolTest {
         // ----------------------------------------
         // Call createClassDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createClassDiagram,
             tool,
             inputDTO,
@@ -162,7 +172,7 @@ public class ClassDiagramEditorToolTest {
         // ----------------------------------------
         // Call createAssociationClassPresentation()
         // ----------------------------------------
-        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createAssociationClassPresentation,
             tool,
             inputDTO,
@@ -195,7 +205,7 @@ public class ClassDiagramEditorToolTest {
         // ----------------------------------------
         // Call createInstanceSpecification()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createInstanceSpecification,
             tool,
             inputDTO,
@@ -231,7 +241,7 @@ public class ClassDiagramEditorToolTest {
         // ----------------------------------------
         // Call createInstanceSpecificationLink()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createInstanceSpecificationLink,
             tool,
             inputDTO,

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IActivityDiagram.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IActivityDiagram.html
 @Slf4j
 public class ActivityDiagramTool implements ToolProvider {
 
@@ -53,14 +53,14 @@ public class ActivityDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_activity_dgm_info",
                 "Return detailed information about the specified activity diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ActivityDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_activity_of_activity_dgm",
                 "Return the activity of the specified activity diagram (specified by ID).",
                 this::getActivity,

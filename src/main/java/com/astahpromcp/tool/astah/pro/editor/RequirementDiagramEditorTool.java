@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/RequirementDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/RequirementDiagramEditor.html
 @Slf4j
 public class RequirementDiagramEditorTool implements ToolProvider {
 
@@ -59,7 +59,7 @@ public class RequirementDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "create_req_dgm",
                 "Create a new requirement diagram under the specified package (specified by ID), and return the newly created requirement diagram information.",
                 this::createRequirementDiagram,

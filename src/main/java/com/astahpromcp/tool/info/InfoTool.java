@@ -21,7 +21,7 @@ public class InfoTool implements ToolProvider {
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
             "get_astah_pro_mcp_version",
             "Return the version of the Astah Pro MCP server.",
             this::getAstahProMcpVersion,

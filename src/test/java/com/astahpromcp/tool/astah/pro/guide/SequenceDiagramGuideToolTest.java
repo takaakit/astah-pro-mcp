@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
 import com.astahpromcp.tool.astah.pro.TestSupport;
-import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -43,7 +43,7 @@ public class SequenceDiagramGuideToolTest {
         // ----------------------------------------
         // Call getGuide()
         // ----------------------------------------
-        GuideDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        GuideDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getGuide,
             tool,
             inputDTO,

@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
 import com.astahpromcp.tool.astah.pro.TestSupport;
-import com.astahpromcp.tool.astah.pro.guide.outputdto.GuideDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -52,7 +52,7 @@ public class AstahProMcpGuideToolTest {
         // ----------------------------------------
         // Call getGuide()
         // ----------------------------------------
-        GuideDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        GuideDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getGuide,
             tool,
             inputDTO,

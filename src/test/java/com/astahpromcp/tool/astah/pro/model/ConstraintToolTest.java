@@ -79,7 +79,7 @@ public class ConstraintToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ConstraintDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ConstraintDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -112,7 +112,7 @@ public class ConstraintToolTest {
         // ----------------------------------------
         // Call setSpecification()
         // ----------------------------------------
-        ConstraintDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ConstraintDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setSpecification,
             tool,
             inputDTO,

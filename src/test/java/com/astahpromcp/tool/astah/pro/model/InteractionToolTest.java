@@ -66,7 +66,7 @@ public class InteractionToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        InteractionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

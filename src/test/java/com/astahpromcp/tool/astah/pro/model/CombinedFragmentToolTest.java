@@ -92,7 +92,7 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call addInteractionOperand()
         // ----------------------------------------
-        CombinedFragmentDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        CombinedFragmentDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addInteractionOperand,
             tool,
             inputDTO,
@@ -124,7 +124,7 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setCombinedFragmentKind()
         // ----------------------------------------
-        CombinedFragmentDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        CombinedFragmentDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setCombinedFragmentKind,
             tool,
             inputDTO,
@@ -153,7 +153,7 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setHeightOfInteractionOperand()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
@@ -179,7 +179,7 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setHeightOfInteractionOperand()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
@@ -205,7 +205,7 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setHeightOfInteractionOperand()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             setHeightOfInteractionOperand,
             tool,
             inputDTO,
@@ -228,7 +228,7 @@ public class CombinedFragmentToolTest {
         // ----------------------------------------
         // Call setHeightOfInteractionOperand()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             setHeightOfInteractionOperand,
             tool,
             inputDTO,

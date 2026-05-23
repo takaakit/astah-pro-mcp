@@ -116,7 +116,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -144,7 +144,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call setArgument()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setArgument,
             tool,
             inputDTO,
@@ -175,7 +175,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call setGuard()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setGuard,
             tool,
             inputDTO,
@@ -206,7 +206,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call setReturnValue()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setReturnValue,
             tool,
             inputDTO,
@@ -237,7 +237,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call setReturnValueVariable()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setReturnValueVariable,
             tool,
             inputDTO,
@@ -268,7 +268,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call setAsynchronous()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAsynchronous,
             tool,
             inputDTO,
@@ -304,7 +304,7 @@ public class MessageToolTest {
         // ----------------------------------------
         // Call setOperation()
         // ----------------------------------------
-        MessageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MessageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setOperation,
             tool,
             inputDTO,

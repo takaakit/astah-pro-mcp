@@ -75,7 +75,7 @@ public class ActivityDiagramToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ActivityDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ActivityDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -98,7 +98,7 @@ public class ActivityDiagramToolTest {
         // ----------------------------------------
         // Call getActivity()
         // ----------------------------------------
-        ActivityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ActivityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getActivity,
             tool,
             inputDTO,

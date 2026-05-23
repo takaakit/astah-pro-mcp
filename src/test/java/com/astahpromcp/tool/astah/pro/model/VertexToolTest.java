@@ -66,7 +66,7 @@ public class VertexToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        VertexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        VertexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

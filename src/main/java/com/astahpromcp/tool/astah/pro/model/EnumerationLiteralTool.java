@@ -53,7 +53,7 @@ public class EnumerationLiteralTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_val_of_enum_literal",
                 "Set the value of the specified enumeration literal (specified by ID), and return the enumeration literal information after it is set.",
                 this::setValue,

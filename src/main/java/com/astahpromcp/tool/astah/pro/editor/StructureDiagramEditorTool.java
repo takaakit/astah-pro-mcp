@@ -4,8 +4,10 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
@@ -20,14 +22,16 @@ import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Value;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StructureDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StructureDiagramEditor.html
 @Slf4j
 public class StructureDiagramEditorTool implements ToolProvider {
 
@@ -35,13 +39,15 @@ public class StructureDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
+    private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public StructureDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, boolean includeEditTools) {
+    public StructureDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.astahProToolSupport = astahProToolSupport;
         this.diagramEditorSupport = diagramEditorSupport;
+        this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
     }
 
@@ -67,23 +73,23 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_node_prst_on_dgm",
-                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation information.",
+                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation information along with the updated diagram image.",
                 this::createNodePresentation,
                 NewNodePresentationDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_prst_on_dgm",
-                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation information.",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation information along with the updated diagram image.",
                 this::createLinkPresentation,
                 NewLinkPresentationDTO.class,
                 LinkPresentationDTO.class)
         );
     }
 
-    private NodePresentationDTO createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationDTO param) throws Exception {
         log.debug("Create node presentation on diagram: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
@@ -112,7 +118,11 @@ public class StructureDiagramEditorTool implements ToolProvider {
                 Value.NOTATION_TYPE_NORMAL);
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -120,7 +130,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private LinkPresentationDTO createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationDTO param) throws Exception {
         log.debug("Create link presentation on diagram: {}", param);
 
         IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -142,7 +152,11 @@ public class StructureDiagramEditorTool implements ToolProvider {
             ILinkPresentation astahLinkPresentation = structureDiagramEditor.createLinkPresentation(astahElement, astahSourceNode, astahTargetNode);
             transactionManager.endTransaction();
 
-            return LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+            
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

@@ -45,14 +45,14 @@ public class ConceptualModelConventionTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
             return List.of(
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_info_of_conceptual_model_conventions",
                     "Return the total number of chunks and the data of the first chunk of Conceptual Model Conventions. When creating or editing a conceptual model, use this tool to consult the conventions.",
                     this::getConceptualModelConventionInfo,
                     NoInputDTO.class,
                     DocumentDTO.class),
 
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_conceptual_model_conventions",
                     "Return the chunk data of Conceptual Model Conventions. If no chunk data exists, an empty string is set.",
                     this::getConceptualModelConventionChunk,

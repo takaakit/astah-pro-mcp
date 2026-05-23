@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDiagram.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDiagram.html
 @Slf4j
 public class ERDiagramTool implements ToolProvider {
 
@@ -55,7 +55,7 @@ public class ERDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_er_dgm_info",
                 "Return detailed information about the specified ER diagram (specified by ID).",
                 this::getInfo,
@@ -66,28 +66,28 @@ public class ERDiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_align_er_attr_items_of_er_dgm",
                 "Set the align attribute items of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
                 this::setAlignAttributeItems,
                 ERDiagramWithAlignAttributeItemsDTO.class,
                 ERDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_initial_display_level_of_er_dgm",
                 "Set the initial display level (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
                 this::setInitialDisplayLevel,
                 ERDiagramWithInitialDisplayLevelDTO.class,
                 ERDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_model_type_of_er_dgm",
                 "Set the model type (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
                 this::setModelType,
                 ERDiagramWithModelTypeDTO.class,
                 ERDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_notation_of_er_dgm",
                 "Set the notation (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
                 this::setNotation,

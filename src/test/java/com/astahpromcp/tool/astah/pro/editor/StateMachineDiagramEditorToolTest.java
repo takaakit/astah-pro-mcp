@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
@@ -16,6 +17,7 @@ import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,10 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class StateMachineDiagramEditorToolTest {
 
@@ -53,6 +59,9 @@ public class StateMachineDiagramEditorToolTest {
         StateMachineDiagramEditor stateMachineDiagramEditor = projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/StateMachineDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new StateMachineDiagramEditorTool(
@@ -60,6 +69,7 @@ public class StateMachineDiagramEditorToolTest {
             transactionManager,
             stateMachineDiagramEditor,
             astahProToolSupport,
+            imageCaptureSupport,
             true);
 
         // Methods
@@ -182,7 +192,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call addRegion()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             addRegion,
             tool,
             inputDTO,
@@ -213,7 +223,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call deleteRegion()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             deleteRegion,
             tool,
             inputDTO,
@@ -249,7 +259,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call changeParentOfState()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             changeParentOfState,
             tool,
             inputDTO,
@@ -281,7 +291,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createChoicePseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createChoicePseudostate,
             tool,
             inputDTO,
@@ -313,7 +323,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createDeepHistoryPseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createDeepHistoryPseudostate,
             tool,
             inputDTO,
@@ -345,7 +355,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createShallowHistoryPseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createShallowHistoryPseudostate,
             tool,
             inputDTO,
@@ -377,7 +387,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createFinalState()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createFinalState,
             tool,
             inputDTO,
@@ -411,7 +421,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createForkPseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createForkPseudostate,
             tool,
             inputDTO,
@@ -443,7 +453,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createInitialPseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createInitialPseudostate,
             tool,
             inputDTO,
@@ -477,7 +487,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createJoinPseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createJoinPseudostate,
             tool,
             inputDTO,
@@ -509,7 +519,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createJunctionPseudostate()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createJunctionPseudostate,
             tool,
             inputDTO,
@@ -542,7 +552,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createState()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createState,
             tool,
             inputDTO,
@@ -567,7 +577,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createStateMachineDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createStateMachineDiagram,
             tool,
             inputDTO,
@@ -606,7 +616,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createSubMachineState()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createSubMachineState,
             tool,
             inputDTO,
@@ -642,7 +652,7 @@ public class StateMachineDiagramEditorToolTest {
         // ----------------------------------------
         // Call createTransition()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createTransition,
             tool,
             inputDTO,

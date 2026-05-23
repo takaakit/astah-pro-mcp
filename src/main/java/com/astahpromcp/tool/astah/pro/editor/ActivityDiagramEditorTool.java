@@ -4,7 +4,9 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActivityDiagramDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
@@ -20,14 +22,16 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
 @Slf4j
 public class ActivityDiagramEditorTool implements ToolProvider {
 
@@ -35,13 +39,15 @@ public class ActivityDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final ActivityDiagramEditor activityDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.activityDiagramEditor = activityDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
     }
 
@@ -67,149 +73,149 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_accept_event_act",
-                "Create a new accept event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept event action information. An empty string is not allowed as an action name.",
+                "Create a new accept event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept event action information along with the updated diagram image. An empty string is not allowed as an action name.",
                 this::createAcceptEventAction,
                 NewAcceptEventActionDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_accept_time_event_act",
-                "Create a new accept time event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept time event action information. An empty string is not allowed as an action name.",
+                "Create a new accept time event action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created accept time event action information along with the updated diagram image. An empty string is not allowed as an action name.",
                 this::createAcceptTimeEventAction,
                 NewAcceptTimeEventActionDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_act",
-                "Create a new action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created action information. An empty string is not allowed as an action name.",
+                "Create a new action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created action information along with the updated diagram image. An empty string is not allowed as an action name.",
                 this::createAction,
                 NewActionDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "create_activity_dgm",
                 "Create a new activity diagram under the specified package (specified by ID), and return the newly created activity diagram information.",
                 this::createActivityDiagram,
                 NewActivityDiagramDTO.class,
                 ActivityDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_activity_param_node",
-                "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created activity parameter node information. An empty string is not allowed as a node name.",
+                "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created activity parameter node information along with the updated diagram image. An empty string is not allowed as a node name.",
                 this::createActivityParameterNode,
                 NewActivityParameterNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_call_behavior_act",
-                "Create a new call behavior action of the specified activity diagram (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created call behavior action information. An empty string is not allowed as an action name.",
+                "Create a new call behavior action of the specified activity diagram (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created call behavior action information along with the updated diagram image. An empty string is not allowed as an action name.",
                 this::createCallBehaviorAction,
                 NewCallBehaviorActionDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_connector",
-                "Create a new connector at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created connector information. An empty string is not allowed as a connector name.",
+                "Create a new connector at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created connector information along with the updated diagram image. An empty string is not allowed as a connector name.",
                 this::createConnector,
                 NewConnectorDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_decision_merge_node",
-                "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified package (specified by ID) of the specified activity diagram (specified by ID), and return the newly created decision merge node information.",
+                "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified package (specified by ID) of the specified activity diagram (specified by ID), and return the newly created decision merge node information along with the updated diagram image.",
                 this::createDecisionMergeNode,
                 NewDecisionMergeNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_dep_between_nodes",
-                "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created dependency information.",
+                "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created dependency information along with the updated diagram image.",
                 this::createDependency,
                 NewDependencyDTO.class,
                 LinkPresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_final_node",
-                "Create a new final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created final node information. An empty string is not allowed as a node name.",
+                "Create a new final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created final node information along with the updated diagram image. An empty string is not allowed as a node name.",
                 this::createFinalNode,
                 NewFinalNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_flow",
-                "Create a new flow between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created flow information.",
+                "Create a new flow between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created flow information along with the updated diagram image.",
                 this::createFlow,
                 NewFlowDTO.class,
                 LinkPresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_flow_final_node",
-                "Create a new flow final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created flow final node information. An empty string is not allowed as a node name.",
+                "Create a new flow final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created flow final node information along with the updated diagram image. An empty string is not allowed as a node name.",
                 this::createFlowFinalNode,
                 NewFlowFinalNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_fork_node",
-                "Create a new fork node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created fork node information.",
+                "Create a new fork node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created fork node information along with the updated diagram image.",
                 this::createForkNode,
                 NewForkNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_init_node",
-                "Create a new initial node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created initial node information. An empty string is not allowed as a node name. An empty string is not allowed as a node name.",
+                "Create a new initial node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created initial node information along with the updated diagram image. An empty string is not allowed as a node name. An empty string is not allowed as a node name.",
                 this::createInitialNode,
                 NewInitialNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_join_node",
-                "Create a new join node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created join node information.",
+                "Create a new join node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created join node information along with the updated diagram image.",
                 this::createJoinNode,
                 NewJoinNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_obj_node",
-                "Create a new object node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created object node information. An empty string is not allowed as a node name.",
+                "Create a new object node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created object node information along with the updated diagram image. An empty string is not allowed as a node name.",
                 this::createObjectNode,
                 NewObjectNodeDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_partition",
-                "Create a new partition by specifying the super partition (specified by ID) and the previous partition (specified by ID) on the specified activity diagram (specified by ID), and return the newly created partition information. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
+                "Create a new partition by specifying the super partition (specified by ID) and the previous partition (specified by ID) on the specified activity diagram (specified by ID), and return the newly created partition information along with the updated diagram image. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
                 this::createPartition,
                 NewPartitionDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_in_or_out_pin",
-                "Create a new input/output pin of the base class (specified by ID) on the specified parent action (specified by ID) on the specified activity diagram (specified by ID), and return the newly created pin information. An empty string is not allowed as a pin name.",
+                "Create a new input/output pin of the base class (specified by ID) on the specified parent action (specified by ID) on the specified activity diagram (specified by ID), and return the newly created pin information along with the updated diagram image. An empty string is not allowed as a pin name.",
                 this::createPin,
                 NewPinWithBaseClassAndParentActionDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_process",
-                "Create a new process at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created process information. An empty string is not allowed as a process name.",
+                "Create a new process at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created process information along with the updated diagram image. An empty string is not allowed as a process name.",
                 this::createProcess,
                 NewProcessDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_send_signal_act",
-                "Create a new send signal action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created send signal action information. An empty string is not allowed as an action name.",
+                "Create a new send signal action at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created send signal action information along with the updated diagram image. An empty string is not allowed as an action name.",
                 this::createSendSignalAction,
                 NewSendSignalActionDTO.class,
                 NodePresentationDTO.class)
         );
     }
 
-    private NodePresentationDTO createAcceptEventAction(McpSyncServerExchange exchange, NewAcceptEventActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptEventAction(McpSyncServerExchange exchange, NewAcceptEventActionDTO param) throws Exception {
         log.debug("Create accept event action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -225,7 +231,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -233,7 +243,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createAcceptTimeEventAction(McpSyncServerExchange exchange, NewAcceptTimeEventActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptTimeEventAction(McpSyncServerExchange exchange, NewAcceptTimeEventActionDTO param) throws Exception {
         log.debug("Create accept time event action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -249,7 +259,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -257,7 +271,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createAction(McpSyncServerExchange exchange, NewActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAction(McpSyncServerExchange exchange, NewActionDTO param) throws Exception {
         log.debug("Create action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -273,7 +287,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -301,7 +319,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createActivityParameterNode(McpSyncServerExchange exchange, NewActivityParameterNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createActivityParameterNode(McpSyncServerExchange exchange, NewActivityParameterNodeDTO param) throws Exception {
         log.debug("Create activity parameter node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -319,7 +337,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -327,7 +349,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createCallBehaviorAction(McpSyncServerExchange exchange, NewCallBehaviorActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createCallBehaviorAction(McpSyncServerExchange exchange, NewCallBehaviorActionDTO param) throws Exception {
         log.debug("Create call behavior action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -345,7 +367,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -353,7 +379,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createConnector(McpSyncServerExchange exchange, NewConnectorDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createConnector(McpSyncServerExchange exchange, NewConnectorDTO param) throws Exception {
         log.debug("Create connector: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -369,7 +395,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -377,7 +407,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createDecisionMergeNode(McpSyncServerExchange exchange, NewDecisionMergeNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createDecisionMergeNode(McpSyncServerExchange exchange, NewDecisionMergeNodeDTO param) throws Exception {
         log.debug("Create decision merge node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -393,7 +423,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -401,7 +435,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private LinkPresentationDTO createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
         log.debug("Create dependency: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -418,7 +452,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                 astahSupplierNodePresentation);
             transactionManager.endTransaction();
 
-            return LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -426,7 +464,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createFinalNode(McpSyncServerExchange exchange, NewFinalNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalNode(McpSyncServerExchange exchange, NewFinalNodeDTO param) throws Exception {
         log.debug("Create final node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -442,7 +480,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -450,7 +492,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private LinkPresentationDTO createFlow(McpSyncServerExchange exchange, NewFlowDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFlow(McpSyncServerExchange exchange, NewFlowDTO param) throws Exception {
         log.debug("Create flow: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -466,7 +508,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                 astahTargetNodePresentation);
             transactionManager.endTransaction();
 
-            return LinkPresentationDTOAssembler.toDTO(astahNodePresentation);
+            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -474,7 +520,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createFlowFinalNode(McpSyncServerExchange exchange, NewFlowFinalNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFlowFinalNode(McpSyncServerExchange exchange, NewFlowFinalNodeDTO param) throws Exception {
         log.debug("Create flow final node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -490,7 +536,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -498,7 +548,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createForkNode(McpSyncServerExchange exchange, NewForkNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkNode(McpSyncServerExchange exchange, NewForkNodeDTO param) throws Exception {
         log.debug("Create fork node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -514,7 +564,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -522,7 +576,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createInitialNode(McpSyncServerExchange exchange, NewInitialNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialNode(McpSyncServerExchange exchange, NewInitialNodeDTO param) throws Exception {
         log.debug("Create initial node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -538,7 +592,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -546,7 +604,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createJoinNode(McpSyncServerExchange exchange, NewJoinNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinNode(McpSyncServerExchange exchange, NewJoinNodeDTO param) throws Exception {
         log.debug("Create join node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -562,7 +620,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -570,7 +632,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createObjectNode(McpSyncServerExchange exchange, NewObjectNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createObjectNode(McpSyncServerExchange exchange, NewObjectNodeDTO param) throws Exception {
         log.debug("Create object node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -588,7 +650,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -596,7 +662,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createPartition(McpSyncServerExchange exchange, NewPartitionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartition(McpSyncServerExchange exchange, NewPartitionDTO param) throws Exception {
         log.debug("Create partition: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -618,7 +684,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                 param.isHorizontal());
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -626,7 +696,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createPin(McpSyncServerExchange exchange, NewPinWithBaseClassAndParentActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(McpSyncServerExchange exchange, NewPinWithBaseClassAndParentActionDTO param) throws Exception {
         log.debug("Create pin: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -647,7 +717,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -655,7 +729,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createProcess(McpSyncServerExchange exchange, NewProcessDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createProcess(McpSyncServerExchange exchange, NewProcessDTO param) throws Exception {
         log.debug("Create process: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -671,7 +745,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -679,7 +757,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createSendSignalAction(McpSyncServerExchange exchange, NewSendSignalActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSendSignalAction(McpSyncServerExchange exchange, NewSendSignalActionDTO param) throws Exception {
         log.debug("Create send signal action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -695,7 +773,11 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

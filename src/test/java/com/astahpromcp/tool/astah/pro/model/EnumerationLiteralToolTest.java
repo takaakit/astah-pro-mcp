@@ -71,7 +71,7 @@ public class EnumerationLiteralToolTest {
         // ----------------------------------------
         // Call setValue()
         // ----------------------------------------
-        EnumerationLiteralDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EnumerationLiteralDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setValue,
             tool,
             inputDTO,

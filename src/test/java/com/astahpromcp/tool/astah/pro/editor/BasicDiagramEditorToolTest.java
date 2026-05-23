@@ -4,6 +4,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNoteAnchorDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNoteDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -12,6 +13,7 @@ import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,10 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BasicDiagramEditorToolTest {
 
@@ -36,6 +42,9 @@ public class BasicDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/BasicDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new BasicDiagramEditorTool(
@@ -43,6 +52,7 @@ public class BasicDiagramEditorToolTest {
             transactionManager,
             astahProToolSupport,
             diagramEditorSupport,
+            imageCaptureSupport,
             true);
 
         // createNote() method
@@ -84,7 +94,7 @@ public class BasicDiagramEditorToolTest {
         // ----------------------------------------
         // Call createNote()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createNote,
             tool,
             inputDTO,
@@ -111,7 +121,7 @@ public class BasicDiagramEditorToolTest {
         // ----------------------------------------
         // Call createNote()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createNote,
             tool,
             inputDTO,
@@ -156,7 +166,7 @@ public class BasicDiagramEditorToolTest {
         // ----------------------------------------
         // Call createNoteAnchor()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createNoteAnchor,
             tool,
             inputDTO,

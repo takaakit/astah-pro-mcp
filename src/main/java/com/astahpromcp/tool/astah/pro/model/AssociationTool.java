@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAssociation.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAssociation.html
 @Slf4j
 public class AssociationTool implements ToolProvider {
 
@@ -55,21 +55,21 @@ public class AssociationTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_asso_info",
                 "Return detailed information about the specified association (specified by ID).",
                 this::getAssociationInfo,
                 IdDTO.class,
                 AssociationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_asso_end_a_info",
                 "Return detailed information about the specified association end A (specified by ID). Note that the input to this tool function is the association-end ID, not the association ID.",
                 this::getAssociationEndAInfo,
                 IdDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_asso_end_b_info",
                 "Return detailed information about the specified association end B (specified by ID). Note that the input to this tool function is the association-end ID, not the association ID.",
                 this::getAssociationEndBInfo,
@@ -80,70 +80,70 @@ public class AssociationTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_init_val_of_asso_end_a",
                 "Set the initial value of the specified association end A (specified by ID), and return the association end information after it is set.",
                 this::setInitialValueOfAssociationEndA,
                 AttributeWithInitialValueDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_init_val_of_asso_end_b",
                 "Set the initial value of the specified association end B (specified by ID), and return the association end information after it is set.",
                 this::setInitialValueOfAssociationEndB,
                 AttributeWithInitialValueDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_static_of_asso_end_a",
                 "Set the Static of the specified association end A (specified by ID), and return the association end information after it is set.",
                 this::setStaticOfAssociationEndA,
                 AttributeWithStaticDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_static_of_asso_end_b",
                 "Set the Static of the specified association end A (specified by ID), and return the association end information after it is set.",
                 this::setStaticOfAssociationEndB,
                 AttributeWithStaticDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_multiplicity_of_asso_end_a",
                 "Set the upper and lower multiplicity (specified by string) of the specified association end A (specified by ID), and return the association end information after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
                 this::setMultiplicityOfAssociationEndA,
                 AttributeWithMultiplicityDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_multiplicity_of_asso_end_b",
                 "Set the upper and lower multiplicity (specified by string) of the specified association end B (specified by ID), and return the association end information after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
                 this::setMultiplicityOfAssociationEndB,
                 AttributeWithMultiplicityDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_aggregation_kind_of_asso_end_a",
                 "Set the aggregation kind of the specified association end A (specified by ID), and return the association end information after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end A. When 'composite' is specified, a filled (black) diamond is placed on association end A.",
                 this::setAggregationKindOfAssociationEndA,
                 AssociationEndWithAggregationKindDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_aggregation_kind_of_asso_end_b",
                 "Set the aggregation kind of the specified association end B (specified by ID), and return the association end information after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end B. When 'composite' is specified, a filled (black) diamond is placed on association end B.",
                 this::setAggregationKindOfAssociationEndB,
                 AssociationEndWithAggregationKindDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_navigability_of_asso_end_a",
                 "Set the navigability of the specified association end A (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end A to 'navigable', the arrowhead appears on the association end A side.",
                 this::setNavigabilityOfAssociationEndA,
                 AssociationEndWithNavigabilityDTO.class,
                 AttributeDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_navigability_of_asso_end_b",
                 "Set the navigability of the specified association end B (specified by ID), and return the association end information after it is set. Note that when you set the navigability of association end B to 'navigable', the arrowhead appears on the association end B side.",
                 this::setNavigabilityOfAssociationEndB,

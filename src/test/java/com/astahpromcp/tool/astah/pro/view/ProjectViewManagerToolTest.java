@@ -85,7 +85,7 @@ public class ProjectViewManagerToolTest {
         // ----------------------------------------
         // Call getSelectedElements()
         // ----------------------------------------
-        ElementListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getSelectedElements,
             tool,
             inputDTO,
@@ -108,7 +108,7 @@ public class ProjectViewManagerToolTest {
         // ----------------------------------------
         // Call showInPropertyView()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             showInPropertyView,
             tool,
             inputDTO,
@@ -131,7 +131,7 @@ public class ProjectViewManagerToolTest {
         // ----------------------------------------
         // Call showInStructureTree()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             showInStructureTree,
             tool,
             inputDTO,

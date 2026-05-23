@@ -66,7 +66,7 @@ public class GateToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        GateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        GateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

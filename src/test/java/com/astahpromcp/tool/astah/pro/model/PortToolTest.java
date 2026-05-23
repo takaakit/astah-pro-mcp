@@ -84,7 +84,7 @@ public class PortToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        PortDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PortDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -113,7 +113,7 @@ public class PortToolTest {
         // ----------------------------------------
         // Call setBehavior()
         // ----------------------------------------
-        PortDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PortDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setBehavior,
             tool,
             inputDTO,
@@ -145,7 +145,7 @@ public class PortToolTest {
         // ----------------------------------------
         // Call setService()
         // ----------------------------------------
-        PortDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PortDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setService,
             tool,
             inputDTO,

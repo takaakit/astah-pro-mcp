@@ -67,7 +67,7 @@ public class AssociationClassToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        AssociationClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AssociationClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

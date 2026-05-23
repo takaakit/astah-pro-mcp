@@ -163,7 +163,7 @@ public class ERModelEditorToolTest {
             "ER Model");
 
         IdDTO deleteDTO = new IdDTO(existingERModel.getId());
-        TestSupport.instance().invokeToolMethod(
+        TestSupport.instance().invokeToolMethodReturningDto(
             delete,
             tool,
             deleteDTO,
@@ -175,7 +175,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERModel()
         // ----------------------------------------
-        ERModelDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERModelDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERModel,
             tool,
             inputDTO,
@@ -201,7 +201,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERPackage()
         // ----------------------------------------
-        ERPackageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERPackageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERPackage,
             tool,
             inputDTO,
@@ -228,7 +228,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createEREntity()
         // ----------------------------------------
-        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EREntityDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createEREntity,
             tool,
             inputDTO,
@@ -261,7 +261,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERAttribute()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERAttribute,
             tool,
             inputDTO,
@@ -287,7 +287,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERDatatype()
         // ----------------------------------------
-        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDatatypeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERDatatype,
             tool,
             inputDTO,
@@ -319,7 +319,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERDomainInERModel()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERDomainInERModel,
             tool,
             inputDTO,
@@ -353,7 +353,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERDomainInERDomain()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERDomainInERDomain,
             tool,
             inputDTO,
@@ -386,7 +386,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createIdentifyingRelationship()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createIdentifyingRelationship,
             tool,
             inputDTO,
@@ -428,7 +428,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createNonIdentifyingRelationship()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createNonIdentifyingRelationship,
             tool,
             inputDTO,
@@ -469,7 +469,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createManyToManyRelationship()
         // ----------------------------------------
-        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createManyToManyRelationship,
             tool,
             inputDTO,
@@ -510,7 +510,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createSubtypeRelationship()
         // ----------------------------------------
-        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createSubtypeRelationship,
             tool,
             inputDTO,
@@ -560,7 +560,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call createERIndex()
         // ----------------------------------------
-        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERIndexDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERIndex,
             tool,
             inputDTO,
@@ -591,7 +591,7 @@ public class ERModelEditorToolTest {
         // ----------------------------------------
         // Call delete()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             delete,
             tool,
             inputDTO,

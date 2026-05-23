@@ -66,7 +66,7 @@ public class DependencyToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

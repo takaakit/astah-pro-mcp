@@ -140,7 +140,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -172,7 +172,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setDatatype()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDatatype,
             tool,
             inputDTO,
@@ -203,7 +203,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setDomain()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDomain,
             tool,
             inputDTO,
@@ -229,7 +229,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setDefaultValue()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDefaultValue,
             tool,
             inputDTO,
@@ -255,7 +255,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setLengthPrecision()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLengthPrecision,
             tool,
             inputDTO,
@@ -281,7 +281,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setLogicalName()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLogicalName,
             tool,
             inputDTO,
@@ -307,7 +307,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setPhysicalName()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPhysicalName,
             tool,
             inputDTO,
@@ -334,7 +334,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setPrimaryKey()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPrimaryKey,
             tool,
             inputDTO,
@@ -361,7 +361,7 @@ public class ERAttributeToolTest {
         // ----------------------------------------
         // Call setNotNull()
         // ----------------------------------------
-        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERAttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setNotNull,
             tool,
             inputDTO,

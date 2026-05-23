@@ -84,7 +84,7 @@ public class FlowToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        FlowDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        FlowDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -112,7 +112,7 @@ public class FlowToolTest {
         // ----------------------------------------
         // Call setAction()
         // ----------------------------------------
-        FlowDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        FlowDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAction,
             tool,
             inputDTO,
@@ -143,7 +143,7 @@ public class FlowToolTest {
         // ----------------------------------------
         // Call setGuard()
         // ----------------------------------------
-        FlowDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        FlowDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setGuard,
             tool,
             inputDTO,

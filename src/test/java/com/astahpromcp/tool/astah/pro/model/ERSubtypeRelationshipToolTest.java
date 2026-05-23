@@ -103,7 +103,7 @@ public class ERSubtypeRelationshipToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -131,7 +131,7 @@ public class ERSubtypeRelationshipToolTest {
         // ----------------------------------------
         // Call setConclusive()
         // ----------------------------------------
-        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setConclusive,
             tool,
             inputDTO,
@@ -161,7 +161,7 @@ public class ERSubtypeRelationshipToolTest {
         // ----------------------------------------
         // Call setDiscriminatorAttr()
         // ----------------------------------------
-        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDiscriminatorAttr,
             tool,
             inputDTO,
@@ -188,7 +188,7 @@ public class ERSubtypeRelationshipToolTest {
         // ----------------------------------------
         // Call setLogicalName()
         // ----------------------------------------
-        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLogicalName,
             tool,
             inputDTO,
@@ -214,7 +214,7 @@ public class ERSubtypeRelationshipToolTest {
         // ----------------------------------------
         // Call setPhysicalName()
         // ----------------------------------------
-        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERSubtypeRelationshipDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPhysicalName,
             tool,
             inputDTO,

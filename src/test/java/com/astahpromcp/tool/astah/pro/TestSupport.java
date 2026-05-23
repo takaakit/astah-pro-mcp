@@ -7,7 +7,10 @@ import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ModelFinder;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Assertions;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -148,11 +151,29 @@ public class TestSupport {
         }
     }
 
-    public <T> T invokeToolMethod(Method method, Object tool, Object inputDTO, Class<T> resultType) throws Exception {
+    @SuppressWarnings("unchecked")
+    public <T> T invokeToolMethodReturningDto(Method method, Object tool, Object inputDTO, Class<T> resultType) throws Exception {
         return (T) method.invoke(
             tool,
             mock(McpSyncServerExchange.class),
             inputDTO);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<McpSchema.Content> invokeToolMethodReturningContents(Method method, Object tool, Object inputDTO) throws Exception {
+        return (List<McpSchema.Content>) method.invoke(
+            tool,
+            mock(McpSyncServerExchange.class),
+            inputDTO);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T invokeToolMethodReturningDtoAndContents(Method method, Object tool, Object inputDTO, Class<T> resultType) throws Exception {
+        Pair<T, ?> pair = (Pair<T, ?>) method.invoke(
+            tool,
+            mock(McpSyncServerExchange.class),
+            inputDTO);
+        return pair.getLeft();
     }
 
     public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) 

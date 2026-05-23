@@ -4,10 +4,12 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationOnERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationOnERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSubtypeRelationshipGroupOnERDiagramDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDiagramDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
@@ -23,14 +25,16 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERDiagramEditor.html
 @Slf4j
 public class ERDiagramEditorTool implements ToolProvider {
 
@@ -38,13 +42,15 @@ public class ERDiagramEditorTool implements ToolProvider {
     private final ITransactionManager transactionManager;
     private final ERDiagramEditor erDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
+    private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public ERDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ERDiagramEditor erDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ERDiagramEditor erDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.transactionManager = transactionManager;
         this.erDiagramEditor = erDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
+        this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
     }
 
@@ -63,37 +69,37 @@ public class ERDiagramEditorTool implements ToolProvider {
             return List.of();
         }
     }
-    
+
     private List<ToolDefinition> createQueryTools() {
         return List.of();
     }
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "create_er_dgm",
                 "Create a new ER diagram under the specified ER package (specified by ID), and return the newly created ER diagram information.",
                 this::createERDiagram,
                 NewERDiagramDTO.class,
                 ERDiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_node_prst_on_er_dgm",
-                "Create a new node presentation of the specified element (specified by ID) on the specified ER diagram (specified by ID), and return the newly created node presentation information.",
+                "Create a new node presentation of the specified element (specified by ID) on the specified ER diagram (specified by ID), and return the newly created node presentation information along with the updated diagram image.",
                 this::createNodePresentation,
                 NewNodePresentationOnERDiagramDTO.class,
                 NodePresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_prst_on_er_dgm",
-                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified ER diagram (specified by ID), and return the newly created link presentation information.",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified ER diagram (specified by ID), and return the newly created link presentation information along with the updated diagram image.",
                 this::createLinkPresentation,
                 NewLinkPresentationOnERDiagramDTO.class,
                 LinkPresentationDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_subtype_relationship_group_on_er_dgm",
-                "Create a new node presentation for the group of the shared subtype relationships on the specified ER diagram (specified by ID), and return the newly created node presentation information for the group of the subtype relationships.",
+                "Create a new node presentation for the group of the shared subtype relationships on the specified ER diagram (specified by ID), and return the newly created node presentation information for the group of the subtype relationships along with the updated diagram image.",
                 this::createSubtypeRelationshipGroup,
                 NewSubtypeRelationshipGroupOnERDiagramDTO.class,
                 NodePresentationDTO.class)
@@ -120,7 +126,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationOnERDiagramDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationOnERDiagramDTO param) throws Exception {
         log.debug("Create node presentation on ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -137,7 +143,11 @@ public class ERDiagramEditorTool implements ToolProvider {
                     param.locationY()));
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -145,7 +155,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private LinkPresentationDTO createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationOnERDiagramDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationOnERDiagramDTO param) throws Exception {
         log.debug("Create link presentation on ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -163,7 +173,11 @@ public class ERDiagramEditorTool implements ToolProvider {
                 astahTargetNodePresentation);
             transactionManager.endTransaction();
 
-            return LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();
@@ -171,7 +185,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         }
     }
 
-    private NodePresentationDTO createSubtypeRelationshipGroup(McpSyncServerExchange exchange, NewSubtypeRelationshipGroupOnERDiagramDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubtypeRelationshipGroup(McpSyncServerExchange exchange, NewSubtypeRelationshipGroupOnERDiagramDTO param) throws Exception {
         log.debug("Create subtype relationship group on ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -190,7 +204,11 @@ public class ERDiagramEditorTool implements ToolProvider {
                 param.direction());
             transactionManager.endTransaction();
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

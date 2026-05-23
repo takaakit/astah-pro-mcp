@@ -88,7 +88,7 @@ public class LifelineToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        LifelineDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LifelineDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -121,7 +121,7 @@ public class LifelineToolTest {
         // ----------------------------------------
         // Call setBaseClass()
         // ----------------------------------------
-        LifelineDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LifelineDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setBaseClass,
             tool,
             inputDTO,
@@ -149,7 +149,7 @@ public class LifelineToolTest {
         // ----------------------------------------
         // Call setLength()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLength,
             tool,
             inputDTO,

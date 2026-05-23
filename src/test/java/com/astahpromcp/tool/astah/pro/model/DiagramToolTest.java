@@ -110,7 +110,7 @@ public class DiagramToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -133,7 +133,7 @@ public class DiagramToolTest {
         // ----------------------------------------
         // Call getDiagramBoundRect()
         // ----------------------------------------
-        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getDiagramBoundRect,
             tool,
             inputDTO,
@@ -158,7 +158,7 @@ public class DiagramToolTest {
         // ----------------------------------------
         // Call getPresentationsOnDiagram()
         // ----------------------------------------
-        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getPresentationsOnDiagram,
             tool,
             inputDTO,
@@ -183,7 +183,7 @@ public class DiagramToolTest {
         // ----------------------------------------
         // Call exportPngImage()
         // ----------------------------------------
-        ImageFileDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ImageFileDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             exportPngImage,
             tool,
             inputDTO,

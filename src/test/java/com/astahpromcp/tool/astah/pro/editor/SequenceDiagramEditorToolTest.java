@@ -4,6 +4,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.CombinedFragmentKind;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.SequenceDiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
@@ -16,6 +17,7 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,10 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SequenceDiagramEditorToolTest {
 
@@ -48,6 +54,9 @@ public class SequenceDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/SequenceDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new SequenceDiagramEditorTool(
@@ -55,6 +64,7 @@ public class SequenceDiagramEditorToolTest {
             transactionManager,
             sequenceDiagramEditor,
             astahProToolSupport,
+            imageCaptureSupport,
             true);
 
         // createSequenceDiagram() method
@@ -158,7 +168,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createSequenceDiagram()
         // ----------------------------------------
-        SequenceDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        SequenceDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createSequenceDiagram,
             tool,
             inputDTO,
@@ -189,7 +199,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createCombinedFragment()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createCombinedFragment,
             tool,
             inputDTO,
@@ -226,7 +236,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createMessage()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createMessage,
             tool,
             inputDTO,
@@ -263,7 +273,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createCreateMessage()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createCreateMessage,
             tool,
             inputDTO,
@@ -300,7 +310,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createDestroyMessage()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createDestroyMessage,
             tool,
             inputDTO,
@@ -331,7 +341,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createReturnMessage()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createReturnMessage,
             tool,
             inputDTO,
@@ -365,7 +375,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createLostMessage()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createLostMessage,
             tool,
             inputDTO,
@@ -399,7 +409,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createFoundMessage()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createFoundMessage,
             tool,
             inputDTO,
@@ -429,7 +439,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createInteractionUse()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createInteractionUse,
             tool,
             inputDTO,
@@ -456,7 +466,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createLifeline()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createLifeline,
             tool,
             inputDTO,
@@ -487,7 +497,7 @@ public class SequenceDiagramEditorToolTest {
         // ----------------------------------------
         // Call createTermination()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createTermination,
             tool,
             inputDTO,

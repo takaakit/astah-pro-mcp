@@ -66,7 +66,7 @@ public class PackageToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        PackageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PackageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

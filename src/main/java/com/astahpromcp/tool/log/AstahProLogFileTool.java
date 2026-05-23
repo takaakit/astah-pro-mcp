@@ -26,7 +26,7 @@ public class AstahProLogFileTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         try {
             return List.of(
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_info_of_astah_log",
                     "Return the log file information of the Astah Professional.",
                     this::getAstahProLogFile,

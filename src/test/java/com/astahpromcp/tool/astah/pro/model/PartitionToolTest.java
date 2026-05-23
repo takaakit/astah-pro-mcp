@@ -66,7 +66,7 @@ public class PartitionToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        PartitionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PartitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

@@ -105,7 +105,7 @@ public class StateToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        StateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -132,7 +132,7 @@ public class StateToolTest {
         // ----------------------------------------
         // Call addInternalTransition()
         // ----------------------------------------
-        StateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addInternalTransition,
             tool,
             inputDTO,
@@ -155,7 +155,7 @@ public class StateToolTest {
         // ----------------------------------------
         // Call deleteAllInternalTransitions()
         // ----------------------------------------
-        StateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             deleteAllInternalTransitions,
             tool,
             inputDTO,
@@ -180,7 +180,7 @@ public class StateToolTest {
         // ----------------------------------------
         // Call setEntry()
         // ----------------------------------------
-        StateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setEntry,
             tool,
             inputDTO,
@@ -205,7 +205,7 @@ public class StateToolTest {
         // ----------------------------------------
         // Call setDoActivity()
         // ----------------------------------------
-        StateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDoActivity,
             tool,
             inputDTO,
@@ -230,7 +230,7 @@ public class StateToolTest {
         // ----------------------------------------
         // Call setExit()
         // ----------------------------------------
-        StateDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setExit,
             tool,
             inputDTO,

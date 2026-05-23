@@ -130,7 +130,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -162,7 +162,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setDatatype()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDatatype,
             tool,
             inputDTO,
@@ -188,7 +188,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setDefaultValue()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setDefaultValue,
             tool,
             inputDTO,
@@ -214,7 +214,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setLengthPrecision()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLengthPrecision,
             tool,
             inputDTO,
@@ -240,7 +240,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setLogicalName()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLogicalName,
             tool,
             inputDTO,
@@ -266,7 +266,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setPhysicalName()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setPhysicalName,
             tool,
             inputDTO,
@@ -293,7 +293,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setNotNull()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setNotNull,
             tool,
             inputDTO,
@@ -324,7 +324,7 @@ public class ERDomainToolTest {
         // ----------------------------------------
         // Call setParentERDomain()
         // ----------------------------------------
-        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDomainDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setParentERDomain,
             tool,
             inputDTO,

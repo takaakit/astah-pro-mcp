@@ -85,7 +85,7 @@ public class InteractionUseToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        InteractionUseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionUseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -113,7 +113,7 @@ public class InteractionUseToolTest {
         // ----------------------------------------
         // Call setArgument()
         // ----------------------------------------
-        InteractionUseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionUseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setArgument,
             tool,
             inputDTO,
@@ -149,7 +149,7 @@ public class InteractionUseToolTest {
         // ----------------------------------------
         // Call setSequenceDiagram()
         // ----------------------------------------
-        InteractionUseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionUseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setSequenceDiagram,
             tool,
             inputDTO,

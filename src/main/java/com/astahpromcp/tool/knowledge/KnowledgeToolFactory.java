@@ -38,6 +38,7 @@ public class KnowledgeToolFactory {
 
             return List.of(
                     new DDDReferenceTool(workspaceDir, projectAccessor),
+                    new OCLSpecificationTool(workspaceDir, projectAccessor),
                     new AstahManualTool(workspaceDir, projectAccessor),
                     new ConceptualModelConventionTool(workspaceDir, httpClient),
                     new PlantumlGuideTool(workspaceDir, httpClient),

@@ -71,7 +71,7 @@ public class RequirementDiagramEditorToolTest {
         // ----------------------------------------
         // Call createRequirementDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createRequirementDiagram,
             tool,
             inputDTO,

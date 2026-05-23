@@ -66,7 +66,7 @@ public class RealizationToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        RealizationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RealizationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

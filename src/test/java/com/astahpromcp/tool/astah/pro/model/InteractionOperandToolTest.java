@@ -75,7 +75,7 @@ public class InteractionOperandToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -103,7 +103,7 @@ public class InteractionOperandToolTest {
         // ----------------------------------------
         // Call setGuard()
         // ----------------------------------------
-        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InteractionOperandDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setGuard,
             tool,
             inputDTO,

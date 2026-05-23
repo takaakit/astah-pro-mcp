@@ -5,11 +5,14 @@ import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithAbstractDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithActiveDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithInvariantDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithLeafDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -28,17 +31,21 @@ public class ClassToolTest {
     private Method setAbstract;
     private Method setActive;
     private Method setLeaf;
+    private Method addInvariant;
+    private Method removeInvariant;
 
     @BeforeEach
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
         ITransactionManager transactionManager = projectAccessor.getTransactionManager();
         projectAccessor.open("src/test/resources/modelfile/model/ClassToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new ClassTool(
+            basicModelEditor,
             projectAccessor,
             transactionManager,
             astahProToolSupport,
@@ -71,6 +78,20 @@ public class ClassToolTest {
             "setLeaf",
             McpSyncServerExchange.class,
             ClassWithLeafDTO.class);
+
+        // addInvariant() method
+        addInvariant = TestSupport.getAccessibleMethod(
+            ClassTool.class,
+            "addInvariant",
+            McpSyncServerExchange.class,
+            ClassWithInvariantDTO.class);
+
+        // removeInvariant() method
+        removeInvariant = TestSupport.getAccessibleMethod(
+            ClassTool.class,
+            "removeInvariant",
+            McpSyncServerExchange.class,
+            ClassWithInvariantDTO.class);
     }
 
     @AfterEach
@@ -93,7 +114,7 @@ public class ClassToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -121,7 +142,7 @@ public class ClassToolTest {
         // ----------------------------------------
         // Call setAbstract()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAbstract,
             tool,
             inputDTO,
@@ -152,7 +173,7 @@ public class ClassToolTest {
         // ----------------------------------------
         // Call setActive()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setActive,
             tool,
             inputDTO,
@@ -183,7 +204,7 @@ public class ClassToolTest {
         // ----------------------------------------
         // Call setLeaf()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLeaf,
             tool,
             inputDTO,
@@ -194,5 +215,84 @@ public class ClassToolTest {
 
         // Check leaf after setting
         assertTrue(clazz.isLeaf());
+    }
+
+    @Test
+    void addInvariant_ok() throws Exception {
+        // Get class
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+
+        // Create input DTO
+        ClassWithInvariantDTO inputDTO = new ClassWithInvariantDTO(
+            clazz.getId(),
+            "x > 0");
+
+        // Check invariants before adding
+        int beforeCount = clazz.getConstraints().length;
+
+        // ----------------------------------------
+        // Call addInvariant()
+        // ----------------------------------------
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            addInvariant,
+            tool,
+            inputDTO,
+            ClassDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check invariants after adding
+        IConstraint[] constraints = clazz.getConstraints();
+        assertEquals(beforeCount + 1, constraints.length);
+        assertEquals("x > 0", constraints[constraints.length - 1].getName());
+    }
+
+    @Test
+    void removeInvariant_ok() throws Exception {
+        // Get class
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+
+        // Add an invariant first
+        ClassWithInvariantDTO addDTO = new ClassWithInvariantDTO(
+            clazz.getId(),
+            "x > 0");
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addInvariant,
+            tool,
+            addDTO,
+            ClassDTO.class);
+
+        // Check invariants before removing
+        int beforeCount = clazz.getConstraints().length;
+        assertTrue(beforeCount > 0);
+
+        // Create input DTO
+        ClassWithInvariantDTO inputDTO = new ClassWithInvariantDTO(
+            clazz.getId(),
+            "x > 0");
+
+        // ----------------------------------------
+        // Call removeInvariant()
+        // ----------------------------------------
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeInvariant,
+            tool,
+            inputDTO,
+            ClassDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check invariants after removing
+        IConstraint[] constraints = clazz.getConstraints();
+        assertEquals(beforeCount - 1, constraints.length);
+        for (IConstraint constraint : constraints) {
+            assertNotEquals("x > 0", constraint.getName());
+        }
     }
 }

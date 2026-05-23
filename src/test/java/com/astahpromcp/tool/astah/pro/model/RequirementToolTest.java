@@ -84,7 +84,7 @@ public class RequirementToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -112,7 +112,7 @@ public class RequirementToolTest {
         // ----------------------------------------
         // Call setRequirementId()
         // ----------------------------------------
-        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setRequirementId,
             tool,
             inputDTO,
@@ -143,7 +143,7 @@ public class RequirementToolTest {
         // ----------------------------------------
         // Call setRequirementText()
         // ----------------------------------------
-        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setRequirementText,
             tool,
             inputDTO,

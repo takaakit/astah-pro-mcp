@@ -97,7 +97,7 @@ public class PlantumlTool implements ToolProvider {
     }
 
     private ToolDefinition getRelationshipsAsPlantumlCodeTool() {
-        return ToolSupport.definition(
+        return ToolSupport.toolDefinitionReturningDto(
             "get_relationships_as_puml_code",
             "Return the PlantUML code for a class diagram that shows only the relationships among NamedElements in the Astah project. However, do not include the role names, multiplicities, or composition types of the relationships. If you need that information, retrieve the detail information for each individual relationship. This tool is recommended when you want to understand the overall element relationships in the Astah project.",
             this::getRelationshipsAsPlantumlCode,

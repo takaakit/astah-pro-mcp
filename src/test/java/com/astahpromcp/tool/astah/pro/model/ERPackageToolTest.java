@@ -66,7 +66,7 @@ public class ERPackageToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERPackageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERPackageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

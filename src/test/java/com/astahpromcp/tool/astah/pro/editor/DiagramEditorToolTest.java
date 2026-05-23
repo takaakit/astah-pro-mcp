@@ -9,6 +9,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTextWithPointDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
@@ -18,6 +19,7 @@ import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,10 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DiagramEditorToolTest {
 
@@ -50,6 +56,9 @@ public class DiagramEditorToolTest {
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new DiagramEditorTool(
@@ -58,6 +67,7 @@ public class DiagramEditorToolTest {
             astahProToolSupport,
             diagramEditorSupport,
             imageConvertSupport,
+            imageCaptureSupport,
             true);
 
         // insertSvgImage() method
@@ -133,7 +143,7 @@ public class DiagramEditorToolTest {
         // ----------------------------------------
         // Call insertSvgImage()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertSvgImage,
             tool,
             inputDTO,
@@ -165,7 +175,7 @@ public class DiagramEditorToolTest {
         // ----------------------------------------
         // Call insertPngImage()
         // ----------------------------------------
-        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertPngImage,
             tool,
             inputDTO,
@@ -197,7 +207,7 @@ public class DiagramEditorToolTest {
         // ----------------------------------------
         // Call insertJpgImage()
         // ----------------------------------------
-        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertJpgImage,
             tool,
             inputDTO,
@@ -224,7 +234,7 @@ public class DiagramEditorToolTest {
         // ----------------------------------------
         // Call insertText()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertText,
             tool,
             inputDTO,
@@ -248,7 +258,7 @@ public class DiagramEditorToolTest {
         // ----------------------------------------
         // Call deleteDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             deleteDiagram,
             tool,
             inputDTO,
@@ -283,7 +293,7 @@ public class DiagramEditorToolTest {
         // ----------------------------------------
         // Call deletePresentation()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             deletePresentation,
             tool,
             inputDTO,

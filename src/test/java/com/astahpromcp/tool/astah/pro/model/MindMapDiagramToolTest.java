@@ -68,7 +68,7 @@ public class MindMapDiagramToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        MindMapDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        MindMapDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

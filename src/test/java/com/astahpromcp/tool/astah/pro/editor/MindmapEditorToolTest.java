@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
@@ -14,6 +15,7 @@ import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,10 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MindmapEditorToolTest {
 
@@ -51,6 +57,9 @@ public class MindmapEditorToolTest {
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         MindmapEditor mindmapEditor = projectAccessor.getDiagramEditorFactory().getMindmapEditor();
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new MindmapEditorTool(
@@ -59,6 +68,7 @@ public class MindmapEditorToolTest {
             mindmapEditor,
             astahProToolSupport,
             imageConvertSupport,
+            imageCaptureSupport,
             true);
 
         // createMindmapDiagram() method
@@ -175,7 +185,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call createMindmapDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createMindmapDiagram,
             tool,
             inputDTO,
@@ -202,7 +212,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call createFloatingTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createFloatingTopic,
             tool,
             inputDTO,
@@ -229,7 +239,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call createTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createTopic,
             tool,
             inputDTO,
@@ -260,7 +270,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call createTopicLink()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createTopicLink,
             tool,
             inputDTO,
@@ -290,7 +300,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call changeToFloatingTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             changeToFloatingTopic,
             tool,
             inputDTO,
@@ -322,7 +332,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call changeParentOfTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             changeParentOfTopic,
             tool,
             inputDTO,
@@ -353,7 +363,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call moveTopicWithinSiblingOrder()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             moveTopicWithinSiblingOrder,
             tool,
             inputDTO,
@@ -382,7 +392,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call insertSvgImageIntoTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertSvgImageIntoTopic,
             tool,
             inputDTO,
@@ -413,7 +423,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call insertPngImageIntoTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertPngImageIntoTopic,
             tool,
             inputDTO,
@@ -444,7 +454,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call insertJpgImageIntoTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             insertJpgImageIntoTopic,
             tool,
             inputDTO,
@@ -470,7 +480,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call deleteChildTopics()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             deleteChildTopics,
             tool,
             inputDTO,
@@ -497,7 +507,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call deleteImageFromTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             deleteImageFromTopic,
             tool,
             inputDTO,
@@ -524,7 +534,7 @@ public class MindmapEditorToolTest {
         // ----------------------------------------
         // Call setBoundaryOfTopic()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             setBoundaryOfTopic,
             tool,
             inputDTO,

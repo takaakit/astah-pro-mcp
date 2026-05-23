@@ -66,7 +66,7 @@ public class CommentToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        CommentDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        CommentDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

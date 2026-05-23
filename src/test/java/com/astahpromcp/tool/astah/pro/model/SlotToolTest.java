@@ -75,7 +75,7 @@ public class SlotToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        SlotDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        SlotDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -103,7 +103,7 @@ public class SlotToolTest {
         // ----------------------------------------
         // Call setValue()
         // ----------------------------------------
-        SlotDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        SlotDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setValue,
             tool,
             inputDTO,

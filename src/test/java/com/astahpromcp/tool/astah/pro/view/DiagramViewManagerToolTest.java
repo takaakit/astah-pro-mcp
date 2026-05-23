@@ -191,7 +191,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call openDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             openDiagram,
             tool,
             inputDTO,
@@ -223,7 +223,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call closeDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             closeDiagram,
             tool,
             inputDTO,
@@ -252,7 +252,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call getCurrentDiagram()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getCurrentDiagram,
             tool,
             inputDTO,
@@ -285,7 +285,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call getSelectedPresentations()
         // ----------------------------------------
-        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getSelectedPresentations,
             tool,
             inputDTO,
@@ -316,7 +316,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call selectAllPresentations()
         // ----------------------------------------
-        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             selectAllPresentations,
             tool,
             inputDTO,
@@ -349,7 +349,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call unselectAllPresentations()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             unselectAllPresentations,
             tool,
             inputDTO,
@@ -378,7 +378,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call autoLayout()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             autoLayout,
             tool,
             inputDTO,
@@ -407,7 +407,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call zoom()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             zoom,
             tool,
             inputDTO,
@@ -436,7 +436,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call zoomFit()
         // ----------------------------------------
-        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             zoomFit,
             tool,
             inputDTO,
@@ -470,7 +470,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call highlightPresentation()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             highlightPresentation,
             tool,
             inputDTO,
@@ -504,7 +504,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call highlightPresentation()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             highlightPresentation,
             tool,
             inputDTO,
@@ -534,7 +534,7 @@ public class DiagramViewManagerToolTest {
         PresentationWithHighlightColorDTO highlightInputDTO = new PresentationWithHighlightColorDTO(
             nodePresentation.getID(),
             "#FF0000");
-        TestSupport.instance().invokeToolMethod(
+        TestSupport.instance().invokeToolMethodReturningDto(
             highlightPresentation,
             tool,
             highlightInputDTO,
@@ -549,7 +549,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call unhighlightPresentation()
         // ----------------------------------------
-        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             unhighlightPresentation,
             tool,
             inputDTO,
@@ -585,7 +585,7 @@ public class DiagramViewManagerToolTest {
         PresentationWithHighlightColorDTO highlightInputDTO1 = new PresentationWithHighlightColorDTO(
             nodePresentation1.getID(),
             "#FF0000");
-        TestSupport.instance().invokeToolMethod(
+        TestSupport.instance().invokeToolMethodReturningDto(
             highlightPresentation,
             tool,
             highlightInputDTO1,
@@ -594,7 +594,7 @@ public class DiagramViewManagerToolTest {
         PresentationWithHighlightColorDTO highlightInputDTO2 = new PresentationWithHighlightColorDTO(
             nodePresentation2.getID(),
             "#00FF00");
-        TestSupport.instance().invokeToolMethod(
+        TestSupport.instance().invokeToolMethodReturningDto(
             highlightPresentation,
             tool,
             highlightInputDTO2,
@@ -606,7 +606,7 @@ public class DiagramViewManagerToolTest {
         // ----------------------------------------
         // Call getHighlightedPresentationsWithinDiagram()
         // ----------------------------------------
-        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PresentationListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getHighlightedPresentationsWithinDiagram,
             tool,
             inputDTO,

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseDiagramEditor.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseDiagramEditor.html
 @Slf4j
 public class UseCaseDiagramEditorTool implements ToolProvider {
 
@@ -60,7 +60,7 @@ public class UseCaseDiagramEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "create_usecase_dgm",
                 "Create a new usecase diagram on the specified package (specified by ID), and return the newly created usecase diagram information.",
                 this::createUseCaseDiagram,

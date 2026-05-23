@@ -76,7 +76,7 @@ public class InstanceSpecificationToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        InstanceSpecificationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InstanceSpecificationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -106,7 +106,7 @@ public class InstanceSpecificationToolTest {
         // ----------------------------------------
         // Call setClassifier()
         // ----------------------------------------
-        InstanceSpecificationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        InstanceSpecificationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setClassifier,
             tool,
             inputDTO,

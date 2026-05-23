@@ -6,6 +6,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.NewERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationOnERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationOnERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSubtypeRelationshipGroupOnERDiagramDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
@@ -22,6 +23,7 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ERDiagramEditorToolTest {
 
@@ -49,6 +55,9 @@ public class ERDiagramEditorToolTest {
         ERDiagramEditor erDiagramEditor = projectAccessor.getDiagramEditorFactory().getERDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ERDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new ERDiagramEditorTool(
@@ -56,6 +65,7 @@ public class ERDiagramEditorToolTest {
             transactionManager,
             erDiagramEditor,
             astahProToolSupport,
+            imageCaptureSupport,
             true);
 
         // createERDiagram() method
@@ -109,7 +119,7 @@ public class ERDiagramEditorToolTest {
         // ----------------------------------------
         // Call createERDiagram()
         // ----------------------------------------
-        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createERDiagram,
             tool,
             inputDTO,
@@ -142,7 +152,7 @@ public class ERDiagramEditorToolTest {
         // ----------------------------------------
         // Call createNodePresentation()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createNodePresentation,
             tool,
             inputDTO,
@@ -184,7 +194,7 @@ public class ERDiagramEditorToolTest {
         // ----------------------------------------
         // Call createLinkPresentation()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createLinkPresentation,
             tool,
             inputDTO,
@@ -223,7 +233,7 @@ public class ERDiagramEditorToolTest {
         // ----------------------------------------
         // Call createSubtypeRelationshipGroup()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createSubtypeRelationshipGroup,
             tool,
             inputDTO,

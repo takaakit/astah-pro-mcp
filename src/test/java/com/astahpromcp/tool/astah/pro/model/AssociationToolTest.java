@@ -164,7 +164,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call getAssociationInfo()
         // ----------------------------------------
-        AssociationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AssociationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getAssociationInfo,
             tool,
             inputDTO,
@@ -190,7 +190,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call getAssociationEndAInfo()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getAssociationEndAInfo,
             tool,
             inputDTO,
@@ -216,7 +216,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call getAssociationEndBInfo()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getAssociationEndBInfo,
             tool,
             inputDTO,
@@ -247,7 +247,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setInitialValueOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setInitialValueOfAssociationEndA,
             tool,
             inputDTO,
@@ -281,7 +281,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setInitialValueOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setInitialValueOfAssociationEndB,
             tool,
             inputDTO,
@@ -315,7 +315,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setStaticOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setStaticOfAssociationEndA,
             tool,
             inputDTO,
@@ -349,7 +349,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setStaticOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setStaticOfAssociationEndB,
             tool,
             inputDTO,
@@ -384,7 +384,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -419,7 +419,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -454,7 +454,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -489,7 +489,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -524,7 +524,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -559,7 +559,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -594,7 +594,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -629,7 +629,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -664,7 +664,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -699,7 +699,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndA,
             tool,
             inputDTO,
@@ -734,7 +734,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -769,7 +769,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -804,7 +804,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -839,7 +839,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -874,7 +874,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -909,7 +909,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -944,7 +944,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -979,7 +979,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -1014,7 +1014,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -1049,7 +1049,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setMultiplicityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicityOfAssociationEndB,
             tool,
             inputDTO,
@@ -1083,7 +1083,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setAggregationKindOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAggregationKindOfAssociationEndA,
             tool,
             inputDTO,
@@ -1120,7 +1120,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setAggregationKindOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAggregationKindOfAssociationEndB,
             tool,
             inputDTO,
@@ -1157,7 +1157,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setNavigabilityOfAssociationEndA()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setNavigabilityOfAssociationEndA,
             tool,
             inputDTO,
@@ -1192,7 +1192,7 @@ public class AssociationToolTest {
         // ----------------------------------------
         // Call setNavigabilityOfAssociationEndB()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setNavigabilityOfAssociationEndB,
             tool,
             inputDTO,

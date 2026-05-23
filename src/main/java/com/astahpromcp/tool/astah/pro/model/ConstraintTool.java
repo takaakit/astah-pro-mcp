@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IConstraint.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IConstraint.html
 @Slf4j
 public class ConstraintTool implements ToolProvider {
     
@@ -52,7 +52,7 @@ public class ConstraintTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_constraint_info",
                 "Return detailed information about the specified constraint (specified by ID).",
                 this::getInfo,
@@ -63,7 +63,7 @@ public class ConstraintTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
             "set_specification_of_constraint",
             "Set the specification (specified by string) of the specified constraint (specified by ID), and return the constraint information after it is set.",
             this::setSpecification,

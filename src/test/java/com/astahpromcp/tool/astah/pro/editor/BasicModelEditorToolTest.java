@@ -316,7 +316,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call changeParent()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             changeParent,
             tool,
             inputDTO,
@@ -341,7 +341,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createPackageInParentPackage()
         // ----------------------------------------
-        PackageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PackageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createPackageInParentPackage,
             tool,
             inputDTO,
@@ -366,7 +366,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createClassInParentPackage()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createClassInParentPackage,
             tool,
             inputDTO,
@@ -391,7 +391,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createClassInParentClass()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createClassInParentClass,
             tool,
             inputDTO,
@@ -416,7 +416,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createEnumerationInParentPackage()
         // ----------------------------------------
-        EnumerationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EnumerationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createEnumerationInParentPackage,
             tool,
             inputDTO,
@@ -441,7 +441,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createInterfaceInParentPackage()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createInterfaceInParentPackage,
             tool,
             inputDTO,
@@ -466,7 +466,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createInterfaceInParentClass()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createInterfaceInParentClass,
             tool,
             inputDTO,
@@ -491,7 +491,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createAttribute()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createAttribute,
             tool,
             inputDTO,
@@ -516,7 +516,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createEnumerationLiteral()
         // ----------------------------------------
-        EnumerationLiteralDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EnumerationLiteralDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createEnumerationLiteral,
             tool,
             inputDTO,
@@ -541,7 +541,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createOperation()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createOperation,
             tool,
             inputDTO,
@@ -566,7 +566,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createParameter()
         // ----------------------------------------
-        ParameterDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ParameterDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createParameter,
             tool,
             inputDTO,
@@ -598,7 +598,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createAssociation()
         // ----------------------------------------
-        AssociationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AssociationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createAssociation,
             tool,
             inputDTO,
@@ -643,7 +643,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createAssociationClass()
         // ----------------------------------------
-        AssociationClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AssociationClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createAssociationClass,
             tool,
             inputDTO,
@@ -671,7 +671,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createDependency,
             tool,
             inputDTO,
@@ -707,7 +707,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createGeneralization()
         // ----------------------------------------
-        GeneralizationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        GeneralizationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createGeneralization,
             tool,
             inputDTO,
@@ -743,7 +743,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createRealization()
         // ----------------------------------------
-        RealizationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RealizationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createRealization,
             tool,
             inputDTO,
@@ -779,7 +779,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createUsage()
         // ----------------------------------------
-        UsageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        UsageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createUsage,
             tool,
             inputDTO,
@@ -818,7 +818,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createQualifier()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createQualifier,
             tool,
             inputDTO,
@@ -847,7 +847,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createTaggedValue()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createTaggedValue,
             tool,
             inputDTO,
@@ -881,7 +881,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createTemplateParameter()
         // ----------------------------------------
-        ClassDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ClassDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createTemplateParameter,
             tool,
             inputDTO,
@@ -904,7 +904,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call deleteElement()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             deleteElement,
             tool,
             inputDTO,
@@ -929,7 +929,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createRequirementInParentPackage()
         // ----------------------------------------
-        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createRequirementInParentPackage,
             tool,
             inputDTO,
@@ -954,7 +954,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createRequirementInParentRequirement()
         // ----------------------------------------
-        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        RequirementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createRequirementInParentRequirement,
             tool,
             inputDTO,
@@ -979,7 +979,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createTestCaseInParentPackage()
         // ----------------------------------------
-        TestCaseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        TestCaseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createTestCaseInParentPackage,
             tool,
             inputDTO,
@@ -1004,7 +1004,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createTestCaseInParentTestCase()
         // ----------------------------------------
-        TestCaseDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        TestCaseDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createTestCaseInParentTestCase,
             tool,
             inputDTO,
@@ -1032,7 +1032,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createCopyDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createCopyDependency,
             tool,
             inputDTO,
@@ -1070,7 +1070,7 @@ public class BasicModelEditorToolTest {
         // Call createCopyDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createCopyDependency,
                 tool,
                 inputDTO,
@@ -1097,7 +1097,7 @@ public class BasicModelEditorToolTest {
         // Call createCopyDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createCopyDependency,
                 tool,
                 inputDTO,
@@ -1123,7 +1123,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createDeriveReqtDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createDeriveReqtDependency,
             tool,
             inputDTO,
@@ -1161,7 +1161,7 @@ public class BasicModelEditorToolTest {
         // Call createDeriveReqtDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createDeriveReqtDependency,
                 tool,
                 inputDTO,
@@ -1188,7 +1188,7 @@ public class BasicModelEditorToolTest {
         // Call createDeriveReqtDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createDeriveReqtDependency,
                 tool,
                 inputDTO,
@@ -1214,7 +1214,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createRefineDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createRefineDependency,
             tool,
             inputDTO,
@@ -1252,7 +1252,7 @@ public class BasicModelEditorToolTest {
         // Call createRefineDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createRefineDependency,
                 tool,
                 inputDTO,
@@ -1278,7 +1278,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createSatisfyDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createSatisfyDependency,
             tool,
             inputDTO,
@@ -1316,7 +1316,7 @@ public class BasicModelEditorToolTest {
         // Call createSatisfyDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createSatisfyDependency,
                 tool,
                 inputDTO,
@@ -1342,7 +1342,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createTraceDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createTraceDependency,
             tool,
             inputDTO,
@@ -1379,7 +1379,7 @@ public class BasicModelEditorToolTest {
         // ----------------------------------------
         // Call createVerifyDependency()
         // ----------------------------------------
-        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        DependencyDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createVerifyDependency,
             tool,
             inputDTO,
@@ -1417,7 +1417,7 @@ public class BasicModelEditorToolTest {
         // Call createVerifyDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createVerifyDependency,
                 tool,
                 inputDTO,
@@ -1444,7 +1444,7 @@ public class BasicModelEditorToolTest {
         // Call createVerifyDependency()
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 createVerifyDependency,
                 tool,
                 inputDTO,

@@ -66,7 +66,7 @@ public class EnumerationToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        EnumerationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        EnumerationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

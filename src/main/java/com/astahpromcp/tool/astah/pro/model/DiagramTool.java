@@ -31,7 +31,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDiagram.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDiagram.html
 @Slf4j
 public class DiagramTool implements ToolProvider {
 
@@ -67,28 +67,28 @@ public class DiagramTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_dgm_info",
                 "Return detailed information about the specified diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 DiagramDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_dgm_rectangle",
                 "Return a rectangle (x, y, width, height) representing the boundary of the specified diagram (specified by ID).",
                 this::getDiagramBoundRect,
                 IdDTO.class,
                 RectangleDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_prsts_on_dgm",
                 "Return the list of presentations on the specified diagram (specified by ID).",
                 this::getPresentationsOnDiagram,
                 IdDTO.class,
                 PresentationListDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "export_dgm_png_img",
                 "Export a PNG image of the specified diagram (specified by ID), and return the exported image file information. For example, if you need a diagram image file while creating a document, use this tool.",
                 this::exportPngImage,

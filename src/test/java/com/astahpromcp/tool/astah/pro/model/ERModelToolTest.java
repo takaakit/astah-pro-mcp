@@ -66,7 +66,7 @@ public class ERModelToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        ERModelDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ERModelDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

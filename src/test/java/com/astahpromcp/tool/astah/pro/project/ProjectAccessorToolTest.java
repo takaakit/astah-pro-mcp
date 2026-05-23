@@ -137,7 +137,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call createProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createProject,
             tool,
             inputDTO,
@@ -159,7 +159,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call openProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             openProject,
             tool,
             inputDTO,
@@ -183,7 +183,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call openProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             openProject,
             tool,
             inputDTO,
@@ -205,7 +205,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call getProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getProject,
             tool,
             inputDTO,
@@ -224,7 +224,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call isProjectOpen()
         // ----------------------------------------
-        BooleanDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        BooleanDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             isProjectOpen,
             tool,
             inputDTO,
@@ -240,7 +240,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call isProjectOpen()
         // ----------------------------------------
-        outputDTO = TestSupport.instance().invokeToolMethod(
+        outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             isProjectOpen,
             tool,
             inputDTO,
@@ -259,7 +259,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call isProjectModified()
         // ----------------------------------------
-        BooleanDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        BooleanDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             isProjectModified,
             tool,
             inputDTO,
@@ -275,7 +275,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call isProjectModified()
         // ----------------------------------------
-        outputDTO = TestSupport.instance().invokeToolMethod(
+        outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             isProjectModified,
             tool,
             inputDTO,
@@ -294,7 +294,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call findNamedElementsByName()
         // ----------------------------------------
-        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             findNamedElementsByName,
             tool,
             inputDTO,
@@ -314,7 +314,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProject()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProject,
             tool,
             inputDTO,
@@ -332,7 +332,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProject()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProject,
             tool,
             inputDTO,
@@ -350,7 +350,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProject()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProject,
             tool,
             inputDTO,
@@ -372,7 +372,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
@@ -405,7 +405,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
@@ -431,7 +431,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
@@ -447,7 +447,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
@@ -466,7 +466,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethod(
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
@@ -487,7 +487,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call closeProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             closeProject,
             tool,
             inputDTO,
@@ -509,7 +509,7 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call getProjectPath()
         // ----------------------------------------
-        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getProjectPath,
             tool,
             inputDTO,

@@ -54,14 +54,14 @@ public class AstahManualTool implements ToolProvider {
             }
     
             return List.of(
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_info_of_astah_manual",
                     "Return the total number of chunks and the data of the first chunk of Astah Professional Reference Manual. If you want to learn how to use Astah, use this tool.",
                     this::getAstahManual,
                     NoInputDTO.class,
                     DocumentDTO.class),
 
-                ToolSupport.definition(
+                ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_astah_manual",
                     "Return the chunk data of Astah Professional Reference Manual. If no chunk data exists, an empty string is set.",
                     this::getAstahManualChunk,

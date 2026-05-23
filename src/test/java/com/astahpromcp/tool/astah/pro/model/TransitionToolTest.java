@@ -93,7 +93,7 @@ public class TransitionToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -121,7 +121,7 @@ public class TransitionToolTest {
         // ----------------------------------------
         // Call setAction()
         // ----------------------------------------
-        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAction,
             tool,
             inputDTO,
@@ -152,7 +152,7 @@ public class TransitionToolTest {
         // ----------------------------------------
         // Call setEvent()
         // ----------------------------------------
-        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setEvent,
             tool,
             inputDTO,
@@ -183,7 +183,7 @@ public class TransitionToolTest {
         // ----------------------------------------
         // Call setGuard()
         // ----------------------------------------
-        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setGuard,
             tool,
             inputDTO,

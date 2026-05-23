@@ -110,7 +110,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -140,7 +140,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setInitialValue()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setInitialValue,
             tool,
             inputDTO,
@@ -171,7 +171,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setStatic()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setStatic,
             tool,
             inputDTO,
@@ -207,7 +207,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setType()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setType,
             tool,
             inputDTO,
@@ -238,7 +238,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setTypeExpression()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setTypeExpression,
             tool,
             inputDTO,
@@ -270,7 +270,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -302,7 +302,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -334,7 +334,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -366,7 +366,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -398,7 +398,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -430,7 +430,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -462,7 +462,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -494,7 +494,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -526,7 +526,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,
@@ -558,7 +558,7 @@ public class AttributeToolTest {
         // ----------------------------------------
         // Call setMultiplicity()
         // ----------------------------------------
-        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AttributeDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setMultiplicity,
             tool,
             inputDTO,

@@ -109,7 +109,7 @@ public class ElementToolTest {
         // ----------------------------------------
         // Call addStereotype()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addStereotype,
             tool,
             inputDTO,
@@ -140,7 +140,7 @@ public class ElementToolTest {
         // ----------------------------------------
         // Call removeStereotype()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeStereotype,
             tool,
             inputDTO,
@@ -171,7 +171,7 @@ public class ElementToolTest {
         // ----------------------------------------
         // Call setTypeModifier()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setTypeModifier,
             tool,
             inputDTO,
@@ -203,7 +203,7 @@ public class ElementToolTest {
         // ----------------------------------------
         // Call changeTaggedValue()
         // ----------------------------------------
-        ElementDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             changeTaggedValue,
             tool,
             inputDTO,
@@ -228,7 +228,7 @@ public class ElementToolTest {
         // ----------------------------------------
         // Call getDiagramsOfElement()
         // ----------------------------------------
-        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getDiagramsOfElement,
             tool,
             inputDTO,

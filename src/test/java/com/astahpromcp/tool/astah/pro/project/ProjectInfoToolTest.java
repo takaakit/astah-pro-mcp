@@ -37,6 +37,7 @@ public class ProjectInfoToolTest {
     private Method getNamedElementsChunk;
     private Method getAllPresentations;
     private Method getPresentationsChunk;
+    private Method getAllConstraintsAndConditions;
     private Method retrieveClassifiersThatReferenceOrBeReferencedBy;
     private Method searchWithinNamedElements;
     private Method searchWithinPresentations;
@@ -87,6 +88,13 @@ public class ProjectInfoToolTest {
             McpSyncServerExchange.class,
             ChunkDTO.class);
         
+        // getAllConstraintsAndConditions() method
+        getAllConstraintsAndConditions = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "getAllConstraintsAndConditions",
+            McpSyncServerExchange.class,
+            NoInputDTO.class);
+
         // retrieveClassifiersThatReferenceOrBeReferencedBy() method
         retrieveClassifiersThatReferenceOrBeReferencedBy = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
@@ -155,7 +163,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call getAllNamedElements()
         // ----------------------------------------
-        AllNameIdTypeInfoDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AllNameIdTypeInfoDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getAllNamedElements,
             tool,
             inputDTO,
@@ -181,7 +189,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call getNamedElementsChunk()
         // ----------------------------------------
-        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getNamedElementsChunk,
             tool,
             inputDTO,
@@ -199,7 +207,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call getAllPresentations()
         // ----------------------------------------
-        AllLabelIdTypeInfoDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        AllLabelIdTypeInfoDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getAllPresentations,
             tool,
             inputDTO,
@@ -225,7 +233,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call getPresentationsChunk()
         // ----------------------------------------
-        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getPresentationsChunk,
             tool,
             inputDTO,
@@ -233,6 +241,25 @@ public class ProjectInfoToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void getAllConstraintsAndConditions_ok() throws Exception {
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call getAllConstraintsAndConditions()
+        // ----------------------------------------
+        ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getAllConstraintsAndConditions,
+            tool,
+            inputDTO,
+            ReportDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.content());
     }
 
     @Test
@@ -248,7 +275,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call retrieveClassifiersThatReferenceOrBeReferencedBy()
         // ----------------------------------------
-        SourceTargetNameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        SourceTargetNameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             retrieveClassifiersThatReferenceOrBeReferencedBy,
             tool,
             inputDTO,
@@ -444,7 +471,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call searchWithinNamedElements()
         // ----------------------------------------
-        NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             searchWithinNamedElements,
             tool,
             inputDTO,
@@ -464,7 +491,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call searchWithinNamedElements()
         // ----------------------------------------
-        NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 searchWithinNamedElements,
                 tool,
                 inputDTO,
@@ -485,7 +512,7 @@ public class ProjectInfoToolTest {
         // Call searchWithinNamedElements() and expect exception
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 searchWithinNamedElements,
                 tool,
                 inputDTO,
@@ -501,7 +528,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call searchWithinPresentations()
         // ----------------------------------------
-        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             searchWithinPresentations,
             tool,
             inputDTO,
@@ -521,7 +548,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call searchWithinPresentations()
         // ----------------------------------------
-        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
                 searchWithinPresentations,
                 tool,
                 inputDTO,
@@ -542,7 +569,7 @@ public class ProjectInfoToolTest {
         // Call searchWithinPresentations() and expect exception
         // ----------------------------------------
         assertThrows(Exception.class, () -> {
-            TestSupport.instance().invokeToolMethod(
+            TestSupport.instance().invokeToolMethodReturningDto(
                 searchWithinPresentations,
                 tool,
                 inputDTO,
@@ -563,7 +590,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call retrieveClassifiersWithinPackage()
         // ----------------------------------------
-        NameIdTypeNamespaceListDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NameIdTypeNamespaceListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             retrieveClassifiersWithinPackage,
             tool,
             inputDTO,
@@ -583,7 +610,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call retrievePackageStructureAsPlantuml()
         // ----------------------------------------
-        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             retrievePackageStructureAsPlantuml,
             tool,
             inputDTO,
@@ -602,7 +629,7 @@ public class ProjectInfoToolTest {
         // ----------------------------------------
         // Call retrieveClassifiersRelationshipsAsPlantuml()
         // ----------------------------------------
-        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             retrieveClassifiersRelationshipsAsPlantuml,
             tool,
             inputDTO,

@@ -66,7 +66,7 @@ public class UsageToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        UsageDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        UsageDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,

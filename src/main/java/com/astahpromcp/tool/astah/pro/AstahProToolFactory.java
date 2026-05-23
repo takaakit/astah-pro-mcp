@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.editor.*;
 import com.astahpromcp.tool.astah.pro.guide.*;
 import com.astahpromcp.tool.astah.pro.image.*;
-import com.astahpromcp.tool.astah.pro.layout.*;
+import com.astahpromcp.tool.astah.pro.verification.*;
 import com.astahpromcp.tool.astah.pro.model.*;
 import com.astahpromcp.tool.astah.pro.presentation.*;
 import com.astahpromcp.tool.astah.pro.project.*;
@@ -54,12 +54,13 @@ public class AstahProToolFactory {
             UseCaseDiagramEditor useCaseDiagramEditor = diagramEditorFactory.getUseCaseDiagramEditor();
             CompositeStructureDiagramEditor compositeStructureDiagramEditor = diagramEditorFactory.getCompositeStructureDiagramEditor();
             UseCaseModelEditor useCaseModelEditor = modelEditorFactory.getUseCaseModelEditor();
-            AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
-            DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
-            ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
             ERModelEditor erModelEditor = modelEditorFactory.getERModelEditor();
             ERDiagramEditor erDiagramEditor = diagramEditorFactory.getERDiagramEditor();
             MindmapEditor mindmapEditor = diagramEditorFactory.getMindmapEditor();
+            AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
+            DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
+            ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
+            ImageCaptureSupport imageCaptureSupport = new ImageCaptureSupport(astahProToolSupport, imageOutputDir);
 
             List<ToolProvider> providers = new ArrayList<>();
             
@@ -68,27 +69,27 @@ public class AstahProToolFactory {
             providers.add(new DiagramLayoutGuideTool());
             providers.add(new DiagramViewManagerTool(projectAccessor, diagramViewManager, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new ProjectViewManagerTool(projectAccessor, projectViewManager, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new BasicDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));
+            providers.add(new BasicDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new BasicModelEditorTool(basicModelEditor, projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new DiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, imageConvertSupport, includeEditorTools));
-            providers.add(new StructureDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, includeEditorTools));
+            providers.add(new DiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, imageConvertSupport, imageCaptureSupport, includeEditorTools));
+            providers.add(new StructureDiagramEditorTool(projectAccessor, transactionManager, astahProToolSupport, diagramEditorSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new CommentTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramTool(projectAccessor, transactionManager, astahProToolSupport, imageOutputDir, includeEditorTools));
             providers.add(new ElementTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new ConstraintTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new LinkPresentationTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new NodePresentationTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new PresentationTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+            providers.add(new LinkPresentationTool(projectAccessor, transactionManager, astahProToolSupport, imageCaptureSupport, includeEditorTools));
+            providers.add(new NodePresentationTool(projectAccessor, transactionManager, astahProToolSupport, imageCaptureSupport, includeEditorTools));
+            providers.add(new PresentationTool(projectAccessor, transactionManager, astahProToolSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new ProjectAccessorTool(projectAccessor, astahProToolSupport, includeEditorTools));
             providers.add(new ProjectInfoTool(projectAccessor, astahProToolSupport, includeEditorTools));
-            providers.add(new ImageCaptureTool(astahProToolSupport, imageOutputDir));
+            providers.add(new ImageCaptureTool(imageCaptureSupport));
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-            providers.add(new LayoutLintTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+            providers.add(new DiagramLayoutLintTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
 
             // Activity diagram tools
             if (categoryFlags.activityDiagramEnabled()) {
                 providers.add(new ActivityDiagramGuideTool());
-                providers.add(new ActivityDiagramEditorTool(projectAccessor, transactionManager, activityDiagramEditor, astahProToolSupport, includeEditorTools));
+                providers.add(new ActivityDiagramEditorTool(projectAccessor, transactionManager, activityDiagramEditor, astahProToolSupport, imageCaptureSupport, includeEditorTools));
                 providers.add(new ActionTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new ActivityDiagramTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new ActivityNodeTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
@@ -102,11 +103,11 @@ public class AstahProToolFactory {
             // Class diagram tools
             if (categoryFlags.classDiagramEnabled()) {
                 providers.add(new ClassDiagramGuideTool());
-                providers.add(new ClassDiagramEditorTool(projectAccessor, transactionManager, classDiagramEditor, astahProToolSupport, includeEditorTools));
+                providers.add(new ClassDiagramEditorTool(projectAccessor, transactionManager, classDiagramEditor, astahProToolSupport, imageCaptureSupport, includeEditorTools));
                 providers.add(new AssociationClassTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new AssociationTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new AttributeTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
-                providers.add(new ClassTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+                providers.add(new ClassTool(basicModelEditor, projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new DependencyTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new EnumerationLiteralTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new EnumerationTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
@@ -124,7 +125,7 @@ public class AstahProToolFactory {
             // Sequence diagram tools
             if (categoryFlags.sequenceDiagramEnabled()) {
                 providers.add(new SequenceDiagramGuideTool());
-                providers.add(new SequenceDiagramEditorTool(projectAccessor, transactionManager, sequenceDiagramEditor, astahProToolSupport, includeEditorTools));
+                providers.add(new SequenceDiagramEditorTool(projectAccessor, transactionManager, sequenceDiagramEditor, astahProToolSupport, imageCaptureSupport, includeEditorTools));
                 providers.add(new CombinedFragmentTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new GateTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new InteractionOperandTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
@@ -139,7 +140,7 @@ public class AstahProToolFactory {
             // State machine diagram tools
             if (categoryFlags.stateMachineDiagramEnabled()) {
                 providers.add(new StateMachineDiagramGuideTool());
-                providers.add(new StateMachineDiagramEditorTool(projectAccessor, transactionManager, stateMachineDiagramEditor, astahProToolSupport, includeEditorTools));
+                providers.add(new StateMachineDiagramEditorTool(projectAccessor, transactionManager, stateMachineDiagramEditor, astahProToolSupport, imageCaptureSupport, includeEditorTools));
                 providers.add(new StateMachineDiagramTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new StateMachineTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
                 providers.add(new StateTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
@@ -179,7 +180,7 @@ public class AstahProToolFactory {
 
                 // Note: The editing APIs for the Composite Structure Diagram don't work as expected right now, so specify that no editing tools should be included.
                 providers.add(new CompositeStructureModelEditorTool(basicModelEditor, projectAccessor, transactionManager, astahProToolSupport, false));
-                providers.add(new CompositeStructureDiagramEditorTool(projectAccessor, transactionManager, compositeStructureDiagramEditor, astahProToolSupport, false));
+                providers.add(new CompositeStructureDiagramEditorTool(projectAccessor, transactionManager, compositeStructureDiagramEditor, astahProToolSupport, imageCaptureSupport, false));
                 providers.add(new ConnectorTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new PortTool(projectAccessor, transactionManager, astahProToolSupport, false));
             }
@@ -190,7 +191,7 @@ public class AstahProToolFactory {
 
                 // Note: Only expose the query tools for ER diagrams, because there are too many editing tools and exposing them may affect existing tools.
                 providers.add(new ERModelEditorTool(erModelEditor, projectAccessor, transactionManager, astahProToolSupport, false));
-                providers.add(new ERDiagramEditorTool(projectAccessor, transactionManager, erDiagramEditor, astahProToolSupport, false));
+                providers.add(new ERDiagramEditorTool(projectAccessor, transactionManager, erDiagramEditor, astahProToolSupport, imageCaptureSupport, false));
                 providers.add(new ERDiagramTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERModelTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERSchemaTool(projectAccessor, transactionManager, astahProToolSupport, false));
@@ -206,7 +207,7 @@ public class AstahProToolFactory {
             // Mind map diagram tools
             if (categoryFlags.mindMapDiagramEnabled()) {
                 providers.add(new MindMapGuideTool());
-                providers.add(new MindmapEditorTool(projectAccessor, transactionManager, mindmapEditor, astahProToolSupport, imageConvertSupport, includeEditorTools));
+                providers.add(new MindmapEditorTool(projectAccessor, transactionManager, mindmapEditor, astahProToolSupport, imageConvertSupport, imageCaptureSupport, includeEditorTools));
                 providers.add(new MindMapDiagramTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             }
 

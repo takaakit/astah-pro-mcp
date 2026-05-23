@@ -29,6 +29,12 @@ public class OperationToolTest {
     private Method setStatic;
     private Method setReturnType;
     private Method setReturnTypeExpression;
+    private Method addPrecondition;
+    private Method addPostcondition;
+    private Method setBodyCondition;
+    private Method removePrecondition;
+    private Method removePostcondition;
+    private Method removeBodyCondition;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -86,6 +92,48 @@ public class OperationToolTest {
             "setReturnTypeExpression",
             McpSyncServerExchange.class,
             OperationWithReturnTypeExpressionDTO.class);
+
+        // addPrecondition() method
+        addPrecondition = TestSupport.getAccessibleMethod(
+            OperationTool.class,
+            "addPrecondition",
+            McpSyncServerExchange.class,
+            OperationWithPreconditionDTO.class);
+
+        // addPostcondition() method
+        addPostcondition = TestSupport.getAccessibleMethod(
+            OperationTool.class,
+            "addPostcondition",
+            McpSyncServerExchange.class,
+            OperationWithPostconditionDTO.class);
+
+        // setBodyCondition() method
+        setBodyCondition = TestSupport.getAccessibleMethod(
+            OperationTool.class,
+            "setBodyCondition",
+            McpSyncServerExchange.class,
+            OperationWithBodyConditionDTO.class);
+
+        // removePrecondition() method
+        removePrecondition = TestSupport.getAccessibleMethod(
+            OperationTool.class,
+            "removePrecondition",
+            McpSyncServerExchange.class,
+            OperationWithPreconditionDTO.class);
+
+        // removePostcondition() method
+        removePostcondition = TestSupport.getAccessibleMethod(
+            OperationTool.class,
+            "removePostcondition",
+            McpSyncServerExchange.class,
+            OperationWithPostconditionDTO.class);
+
+        // removeBodyCondition() method
+        removeBodyCondition = TestSupport.getAccessibleMethod(
+            OperationTool.class,
+            "removeBodyCondition",
+            McpSyncServerExchange.class,
+            IdDTO.class);
     }
 
     @AfterEach
@@ -108,7 +156,7 @@ public class OperationToolTest {
         // ----------------------------------------
         // Call getInfo()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             getInfo,
             tool,
             inputDTO,
@@ -136,7 +184,7 @@ public class OperationToolTest {
         // ----------------------------------------
         // Call setAbstract()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setAbstract,
             tool,
             inputDTO,
@@ -167,7 +215,7 @@ public class OperationToolTest {
         // ----------------------------------------
         // Call setLeaf()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setLeaf,
             tool,
             inputDTO,
@@ -198,7 +246,7 @@ public class OperationToolTest {
         // ----------------------------------------
         // Call setStatic()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setStatic,
             tool,
             inputDTO,
@@ -234,7 +282,7 @@ public class OperationToolTest {
         // ----------------------------------------
         // Call setReturnType()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setReturnType,
             tool,
             inputDTO,
@@ -264,7 +312,7 @@ public class OperationToolTest {
         // ----------------------------------------
         // Call setReturnTypeExpression()
         // ----------------------------------------
-        OperationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             setReturnTypeExpression,
             tool,
             inputDTO,
@@ -275,5 +323,231 @@ public class OperationToolTest {
 
         // Check return type expression after setting
         assertEquals("long", operation.getReturnTypeExpression());
+    }
+
+    @Test
+    void addPrecondition_ok() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Create input DTO
+        OperationWithPreconditionDTO inputDTO = new OperationWithPreconditionDTO(
+            operation.getId(),
+            "x > 0");
+
+        // Check preconditions before adding
+        int beforeCount = operation.getPreConditions().length;
+
+        // ----------------------------------------
+        // Call addPrecondition()
+        // ----------------------------------------
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            addPrecondition,
+            tool,
+            inputDTO,
+            OperationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check preconditions after adding
+        String[] preconditions = operation.getPreConditions();
+        assertEquals(beforeCount + 1, preconditions.length);
+        assertEquals("x > 0", preconditions[preconditions.length - 1]);
+    }
+
+    @Test
+    void addPostcondition_ok() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Create input DTO
+        OperationWithPostconditionDTO inputDTO = new OperationWithPostconditionDTO(
+            operation.getId(),
+            "result > 0");
+
+        // Check postconditions before adding
+        int beforeCount = operation.getPostConditions().length;
+
+        // ----------------------------------------
+        // Call addPostcondition()
+        // ----------------------------------------
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            addPostcondition,
+            tool,
+            inputDTO,
+            OperationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check postconditions after adding
+        String[] postconditions = operation.getPostConditions();
+        assertEquals(beforeCount + 1, postconditions.length);
+        assertEquals("result > 0", postconditions[postconditions.length - 1]);
+    }
+
+    @Test
+    void setBodyCondition_ok() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Create input DTO
+        OperationWithBodyConditionDTO inputDTO = new OperationWithBodyConditionDTO(
+            operation.getId(),
+            "result = x * 2");
+
+        // Check body condition before setting
+        assertNotEquals("result = x * 2", operation.getBodyCondition());
+
+        // ----------------------------------------
+        // Call setBodyCondition()
+        // ----------------------------------------
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setBodyCondition,
+            tool,
+            inputDTO,
+            OperationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check body condition after setting
+        assertEquals("result = x * 2", operation.getBodyCondition());
+    }
+
+    @Test
+    void removePrecondition_ok() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Add a precondition first
+        OperationWithPreconditionDTO addDTO = new OperationWithPreconditionDTO(
+            operation.getId(),
+            "x > 0");
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addPrecondition,
+            tool,
+            addDTO,
+            OperationDTO.class);
+
+        // Check preconditions before removing
+        int beforeCount = operation.getPreConditions().length;
+        assertTrue(beforeCount > 0);
+
+        // Create input DTO
+        OperationWithPreconditionDTO inputDTO = new OperationWithPreconditionDTO(
+            operation.getId(),
+            "x > 0");
+
+        // ----------------------------------------
+        // Call removePrecondition()
+        // ----------------------------------------
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removePrecondition,
+            tool,
+            inputDTO,
+            OperationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check preconditions after removing
+        String[] preconditions = operation.getPreConditions();
+        assertEquals(beforeCount - 1, preconditions.length);
+        for (String precondition : preconditions) {
+            assertNotEquals("x > 0", precondition);
+        }
+    }
+
+    @Test
+    void removePostcondition_ok() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Add a postcondition first
+        OperationWithPostconditionDTO addDTO = new OperationWithPostconditionDTO(
+            operation.getId(),
+            "result > 0");
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addPostcondition,
+            tool,
+            addDTO,
+            OperationDTO.class);
+
+        // Check postconditions before removing
+        int beforeCount = operation.getPostConditions().length;
+        assertTrue(beforeCount > 0);
+
+        // Create input DTO
+        OperationWithPostconditionDTO inputDTO = new OperationWithPostconditionDTO(
+            operation.getId(),
+            "result > 0");
+
+        // ----------------------------------------
+        // Call removePostcondition()
+        // ----------------------------------------
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removePostcondition,
+            tool,
+            inputDTO,
+            OperationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check postconditions after removing
+        String[] postconditions = operation.getPostConditions();
+        assertEquals(beforeCount - 1, postconditions.length);
+        for (String postcondition : postconditions) {
+            assertNotEquals("result > 0", postcondition);
+        }
+    }
+
+    @Test
+    void removeBodyCondition_ok() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Set a body condition first
+        OperationWithBodyConditionDTO setDTO = new OperationWithBodyConditionDTO(
+            operation.getId(),
+            "result = x * 2");
+        TestSupport.instance().invokeToolMethodReturningDto(
+            setBodyCondition,
+            tool,
+            setDTO,
+            OperationDTO.class);
+        assertEquals("result = x * 2", operation.getBodyCondition());
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(operation.getId());
+
+        // ----------------------------------------
+        // Call removeBodyCondition()
+        // ----------------------------------------
+        OperationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeBodyCondition,
+            tool,
+            inputDTO,
+            OperationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check body condition after removing
+        assertEquals("", operation.getBodyCondition());
     }
 }

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Tools definition for the following Astah API.
-//   https://members.change-vision.com/javadoc/astah-api/11_0_0/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IState.html
+//   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IState.html
 @Slf4j
 public class StateTool implements ToolProvider {
 
@@ -55,7 +55,7 @@ public class StateTool implements ToolProvider {
 
     private List<ToolDefinition> createQueryTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "get_state_info",
                 "Return detailed information about the specified state (specified by ID).",
                 this::getInfo,
@@ -66,35 +66,35 @@ public class StateTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "add_inter_trans_of_state",
                 "Add an internal transition to the specified state (specified by ID), and return the state information after it is edited.",
                 this::addInternalTransition,
                 StateWithInternalTransitionDTO.class,
                 StateDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "delete_all_inter_trans_of_state",
                 "Delete all internal transitions from the specified state (specified by ID), and return the state information after it is edited.",
                 this::deleteAllInternalTransitions,
                 IdDTO.class,
                 StateDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_entry_of_state",
                 "Set the entry of the specified state (specified by ID), and return the state information after it is edited.",
                 this::setEntry,
                 StateWithEntryDTO.class,
                 StateDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_do_act_of_state",
                 "Set the doActivity of the specified state (specified by ID), and return the state information after it is edited.",
                 this::setDoActivity,
                 StateWithDoActivityDTO.class,
                 StateDTO.class),
 
-            ToolSupport.definition(
+            ToolSupport.toolDefinitionReturningDto(
                 "set_exit_of_state",
                 "Set the exit of the specified state (specified by ID), and return the state information after it is edited.",
                 this::setExit,

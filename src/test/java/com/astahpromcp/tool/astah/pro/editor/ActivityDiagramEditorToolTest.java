@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
@@ -19,6 +20,7 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -28,6 +30,10 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ActivityDiagramEditorToolTest {
 
@@ -62,6 +68,9 @@ public class ActivityDiagramEditorToolTest {
         ActivityDiagramEditor activityDiagramEditor = projectAccessor.getDiagramEditorFactory().getActivityDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ActivityDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
+        ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
+        when(imageCaptureSupport.createImageContent(anyString(), any()))
+            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
 
         // Tool
         tool = new ActivityDiagramEditorTool(
@@ -69,6 +78,7 @@ public class ActivityDiagramEditorToolTest {
             transactionManager,
             activityDiagramEditor,
             astahProToolSupport,
+            imageCaptureSupport,
             true);
 
         // createAcceptEventAction() method
@@ -236,7 +246,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createAcceptEventAction()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createAcceptEventAction,
             tool,
             inputDTO,
@@ -263,7 +273,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createAcceptTimeEventAction()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createAcceptTimeEventAction,
             tool,
             inputDTO,
@@ -290,7 +300,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createAction()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createAction,
             tool,
             inputDTO,
@@ -315,7 +325,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createActivityDiagram()
         // ----------------------------------------
-        ActivityDiagramDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        ActivityDiagramDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             createActivityDiagram,
             tool,
             inputDTO,
@@ -348,7 +358,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createActivityParameterNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createActivityParameterNode,
             tool,
             inputDTO,
@@ -381,7 +391,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createCallBehaviorAction()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createCallBehaviorAction,
             tool,
             inputDTO,
@@ -408,7 +418,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createConnector()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createConnector,
             tool,
             inputDTO,
@@ -434,7 +444,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createDecisionMergeNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createDecisionMergeNode,
             tool,
             inputDTO,
@@ -471,7 +481,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createDependency()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createDependency,
             tool,
             inputDTO,
@@ -506,7 +516,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createFinalNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createFinalNode,
             tool,
             inputDTO,
@@ -542,7 +552,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createFlow()
         // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createFlow,
             tool,
             inputDTO,
@@ -577,7 +587,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createFlowFinalNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createFlowFinalNode,
             tool,
             inputDTO,
@@ -603,7 +613,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createForkNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createForkNode,
             tool,
             inputDTO,
@@ -630,7 +640,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createInitialNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createInitialNode,
             tool,
             inputDTO,
@@ -656,7 +666,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createJoinNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createJoinNode,
             tool,
             inputDTO,
@@ -689,7 +699,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createObjectNode()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createObjectNode,
             tool,
             inputDTO,
@@ -728,7 +738,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createPartition()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createPartition,
             tool,
             inputDTO,
@@ -768,7 +778,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createPin()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createPin,
             tool,
             inputDTO,
@@ -795,7 +805,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createProcess()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createProcess,
             tool,
             inputDTO,
@@ -822,7 +832,7 @@ public class ActivityDiagramEditorToolTest {
         // ----------------------------------------
         // Call createSendSignalAction()
         // ----------------------------------------
-        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethod(
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             createSendSignalAction,
             tool,
             inputDTO,
