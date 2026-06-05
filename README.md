@@ -12,16 +12,16 @@ A local MCP server plugin for Astah Professional, a UML modeling tool, that enab
 These videos show Claude Code (Opus 4.8) designing a simple library management system and drawing diagrams. They are played at 20× speed.
 
 Prompt: *Design a simple library management system and draw a class diagram in Astah to illustrate its structure.*  
-<video src="./video/class-diagram.mp4" controls autoplay loop muted width="800"></video>
+![class-diagram.gif](video/class-diagram.gif)
 
 Prompt: *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of borrowing a book.*  
-<video src="./video/sequence-diagram.mp4" controls autoplay loop muted width="800"></video>
+![sequence-diagram.gif](video/sequence-diagram.gif)
 
 Prompt: *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of returning a book.*  
-<video src="./video/activity-diagram.mp4" controls autoplay loop muted width="800"></video>
+![activity-diagram.gif](video/activity-diagram.gif)
 
 Prompt: *Based on the contents of the Astah model, draw a state machine diagram to illustrate the state transitions of a book.*  
-<video src="./video/state-machine-diagram.mp4" controls autoplay loop muted width="800"></video>
+![state-machine-diagram.gif](video/state-machine-diagram.gif)
 
 <br>
 
