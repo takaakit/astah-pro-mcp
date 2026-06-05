@@ -1,0 +1,6 @@
+https://agiledata.org/essays/impedancemismatch.html
+https://agiledata.org/essays/mappingobjects.html
+https://agiledata.org/essays/culturalImpedanceMismatch.html
+https://agiledata.org/essays/drivingforces.html
+https://martinfowler.com/bliki/OrmHate.html
+https://martinfowler.com/eaaCatalog/classTableInheritance.html

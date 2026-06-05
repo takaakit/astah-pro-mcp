@@ -55,7 +55,7 @@ public class AttributeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_attr_info",
-                "Return detailed information about the specified attribute (specified by ID).",
+                "Return model element information about the specified attribute (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 AttributeDTO.class)
@@ -66,35 +66,35 @@ public class AttributeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_init_val_of_attr",
-                "Set the initial value of the specified attribute (specified by ID), and return the attribute information after it is set.",
+                "Set the initial value of the specified attribute (specified by ID), and return the model element of the attribute after it is set.",
                 this::setInitialValue,
                 AttributeWithInitialValueDTO.class,
                 AttributeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_static_of_attr",
-                "Set the Static of the specified attribute (specified by ID), and return the attribute information after it is set.",
+                "Set the Static of the specified attribute (specified by ID), and return the model element of the attribute after it is set.",
                 this::setStatic,
                 AttributeWithStaticDTO.class,
                 AttributeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_type_of_attr",
-                "Set the type (specified by ID) of the specified attribute (specified by ID), and return the attribute information after it is set. Before using this tool function, obtain or create the type to assign to the attribute type. If you want to set a primitive type, use a different tool function.",
+                "Set the type (specified by ID) of the specified attribute (specified by ID), and return the model element of the attribute after it is set. Before using this tool function, obtain or create the type to assign to the attribute type. If you want to set a primitive type, use a different tool function.",
                 this::setType,
                 AttributeWithTypeDTO.class,
                 AttributeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_type_expression_of_attr",
-                "Set the type expression (specified by string) of the specified attribute (specified by ID), and return the attribute information after it is set. Use this tool function to set a primitive type for an attribute only when you want to set a Java or C++ primitive type. If it is not a primitive type, obtain or create the type and then set it to the attribute type. For example, 'int' and 'string' are primitive types, whereas 'Integer' and 'String' require creating a type before they can be used.",
+                "Set the type expression (specified by string) of the specified attribute (specified by ID), and return the model element of the attribute after it is set. Use this tool function to set a primitive type for an attribute only when you want to set a Java or C++ primitive type. If it is not a primitive type, obtain or create the type and then set it to the attribute type. For example, 'int' and 'string' are primitive types, whereas 'Integer' and 'String' require creating a type before they can be used.",
                 this::setTypeExpression,
                 AttributeWithTypeExpressionDTO.class,
                 AttributeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_multiplicity_of_attr",
-                "Set the upper and lower multiplicity (specified by string) of the specified attribute (specified by ID), and return the attribute information after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
+                "Set the upper and lower multiplicity (specified by string) of the specified attribute (specified by ID), and return the model element of the attribute after it is set. If there is only one multiplicity, set either the upper or the lower multiplicity, and set the other to an empty string.",
                 this::setMultiplicity,
                 AttributeWithMultiplicityDTO.class,
                 AttributeDTO.class)

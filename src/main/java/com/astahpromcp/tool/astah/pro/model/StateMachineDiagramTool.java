@@ -53,7 +53,7 @@ public class StateMachineDiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_state_machine_dgm_info",
-                "Return detailed information about the specified state machine diagram (specified by ID).",
+                "Return model element information about the specified state machine diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 StateMachineDiagramDTO.class)

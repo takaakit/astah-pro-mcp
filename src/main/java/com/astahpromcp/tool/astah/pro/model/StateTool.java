@@ -57,7 +57,7 @@ public class StateTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_state_info",
-                "Return detailed information about the specified state (specified by ID).",
+                "Return model element information about the specified state (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 StateDTO.class)
@@ -68,35 +68,35 @@ public class StateTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "add_inter_trans_of_state",
-                "Add an internal transition to the specified state (specified by ID), and return the state information after it is edited.",
+                "Add an internal transition to the specified state (specified by ID), and return the model element of the state after it is edited.",
                 this::addInternalTransition,
                 StateWithInternalTransitionDTO.class,
                 StateDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "delete_all_inter_trans_of_state",
-                "Delete all internal transitions from the specified state (specified by ID), and return the state information after it is edited.",
+                "Delete all internal transitions from the specified state (specified by ID), and return the model element of the state after it is edited.",
                 this::deleteAllInternalTransitions,
                 IdDTO.class,
                 StateDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_entry_of_state",
-                "Set the entry of the specified state (specified by ID), and return the state information after it is edited.",
+                "Set the entry of the specified state (specified by ID), and return the model element of the state after it is edited.",
                 this::setEntry,
                 StateWithEntryDTO.class,
                 StateDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_do_act_of_state",
-                "Set the doActivity of the specified state (specified by ID), and return the state information after it is edited.",
+                "Set the doActivity of the specified state (specified by ID), and return the model element of the state after it is edited.",
                 this::setDoActivity,
                 StateWithDoActivityDTO.class,
                 StateDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_exit_of_state",
-                "Set the exit of the specified state (specified by ID), and return the state information after it is edited.",
+                "Set the exit of the specified state (specified by ID), and return the model element of the state after it is edited.",
                 this::setExit,
                 StateWithExitDTO.class,
                 StateDTO.class)

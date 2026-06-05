@@ -61,7 +61,7 @@ public class ERRelationshipTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_relationship_info",
-                "Return detailed information about the specified ER relationship (specified by ID).",
+                "Return model element information about the specified ER relationship (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERRelationshipDTO.class)
@@ -72,49 +72,49 @@ public class ERRelationshipTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_cardinality_of_er_relationship",
-                "Set the cardinality (specified by string) of the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the cardinality (specified by string) of the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setCardinality,
                 ERRelationshipWithCardinalityDTO.class,
                 ERRelationshipDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_er_index_of_er_relationship",
-                "Set the ER index (specified by ID) to the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the ER index (specified by ID) to the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setERIndex,
                 ERRelationshipWithERIndexDTO.class,
                 ERRelationshipDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_logical_name_of_er_relationship",
-                "Set the logical name (specified by string) to the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the logical name (specified by string) to the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setLogicalName,
                 ERRelationshipWithLogicalNameDTO.class,
                 ERRelationshipDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_physical_name_of_er_relationship",
-                "Set the physical name (specified by string) to the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the physical name (specified by string) to the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setPhysicalName,
                 ERRelationshipWithPhysicalNameDTO.class,
                 ERRelationshipDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_parent_required_of_er_relationship",
-                "Set the parent required (specified by boolean) to the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the parent required (specified by boolean) to the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setParentRequired,
                 ERRelationshipWithParentRequiredDTO.class,
                 ERRelationshipDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_parent_verb_phrase_of_er_relationship",
-                "Set the parent verb phrase (specified by string) to the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the parent verb phrase (specified by string) to the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setVerbPhraseParent,
                 ERRelationshipWithParentVerbPhraseDTO.class,
                 ERRelationshipDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_child_verb_phrase_of_er_relationship",
-                "Set the child verb phrase (specified by string) to the specified ER relationship (specified by ID), and return the ER relationship information after it is set.",
+                "Set the child verb phrase (specified by string) to the specified ER relationship (specified by ID), and return the model element of the ER relationship after it is set.",
                 this::setVerbPhraseChild,
                 ERRelationshipWithChildVerbPhraseDTO.class,
                 ERRelationshipDTO.class)

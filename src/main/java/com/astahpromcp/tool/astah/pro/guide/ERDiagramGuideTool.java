@@ -38,6 +38,10 @@ public class ERDiagramGuideTool implements ToolProvider {
         log.debug("Get ER diagram guide: {}", param);
 
         String content = """
+IMPORTANT POINTS to Keep in Mind:
+* Before you refer to or edit an ER diagram, use the available tools to develop a thorough understanding of Object-Relational Impedance Mismatch.
+
+
 Terminology Definitions (quoted from FIPS PUB 184, Integration Definition for Information Modeling (IDEF1X)):
 * Attribute: A property or characteristic that is common to some or all of the instances of an entity. An attribute represents the use of a domain in the context of an entity.
 * Constraint: A rule that specifies a valid condition of data.

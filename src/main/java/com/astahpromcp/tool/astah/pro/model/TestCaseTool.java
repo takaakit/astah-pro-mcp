@@ -53,7 +53,7 @@ public class TestCaseTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_test_case_info",
-                "Return detailed information about the specified test case (specified by ID).",
+                "Return model element information about the specified test case (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 TestCaseDTO.class)

@@ -83,49 +83,49 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_composite_structure_dgm",
-                "Create a new composite structure diagram under the specified package (specified by ID), and return the newly created composite structure diagram information.",
+                "Create a new composite structure diagram under the specified package (specified by ID), and return the newly created model element of the composite structure diagram.",
                 this::createCompositeStructureDiagram,
                 NewDiagramInPackageDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_connector_prst",
-                "Create a new connector presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified composite structure diagram (specified by ID), and return the newly created connector presentation information along with the updated diagram image. The specified source/target node presentations are allowed to be part presentation or port presentation.",
+                "Create a new connector presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified composite structure diagram (specified by ID), and return the newly created link presentation of the connector along with the updated diagram image. The specified source/target node presentations are allowed to be part presentation or port presentation.",
                 this::createConnectorPresentation,
                 NewConnectorPresentationDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_port_prst",
-                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created port presentation information along with the updated diagram image.",
+                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the port along with the updated diagram image.",
                 this::createPortPresentation,
                 NewPortPresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_provided_interface_prst",
-                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created provided interface presentation information along with the updated diagram image.",
+                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the provided interface along with the updated diagram image.",
                 this::createProvidedInterfacePresentation,
                 NewProvidedInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_required_interface_prst",
-                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created required interface presentation information along with the updated diagram image.",
+                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the required interface along with the updated diagram image.",
                 this::createRequiredInterfacePresentation,
                 NewRequiredInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_structured_class_prst",
-                "Create a new structured class presentation of the specified structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created structured class presentation information along with the updated diagram image.",
+                "Create a new structured class presentation of the specified structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the structured class along with the updated diagram image.",
                 this::createStructuredClassPresentation,
                 NewStructuredClassPresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_structured_class_prst_under_parent",
-                "Create a new structured class presentation of the specified structured class (specified by ID) under the specified parent node presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created structured class presentation information along with the updated diagram image.",
+                "Create a new structured class presentation of the specified structured class (specified by ID) under the specified parent node presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the structured class along with the updated diagram image.",
                 this::createStructuredClassPresentationUnderParent,
                 NewStructuredClassPresentationUnderParentDTO.class,
                 NodePresentationDTO.class)

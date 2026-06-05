@@ -61,7 +61,7 @@ public class RequirementDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_req_dgm",
-                "Create a new requirement diagram under the specified package (specified by ID), and return the newly created requirement diagram information.",
+                "Create a new requirement diagram under the specified package (specified by ID), and return the newly created model element of the requirement diagram.",
                 this::createRequirementDiagram,
                 NewDiagramInPackageDTO.class,
                 DiagramDTO.class)

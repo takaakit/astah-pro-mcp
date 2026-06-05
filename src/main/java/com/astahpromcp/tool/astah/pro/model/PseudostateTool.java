@@ -53,7 +53,7 @@ public class PseudostateTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_pseudostate_info",
-                "Return detailed information about the specified pseudostate (specified by ID).",
+                "Return model element information about the specified pseudostate (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 PseudostateDTO.class)

@@ -66,7 +66,7 @@ public class NodePresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_node_info",
-                "Return detailed information about the specified node presentation (specified by ID).",
+                "Return information about the specified node presentation (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 NodePresentationDTO.class),

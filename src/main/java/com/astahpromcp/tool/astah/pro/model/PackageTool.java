@@ -53,7 +53,7 @@ public class PackageTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_pkg_info",
-                "Return detailed information about the specified package (specified by ID).",
+                "Return model element information about the specified package (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 PackageDTO.class)

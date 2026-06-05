@@ -53,7 +53,7 @@ public class VertexTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_vertex_info",
-                "Return detailed information about the specified vertex (specified by ID).",
+                "Return model element information about the specified vertex (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 VertexDTO.class

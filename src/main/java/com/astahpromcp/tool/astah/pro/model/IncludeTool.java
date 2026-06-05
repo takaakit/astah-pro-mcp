@@ -53,7 +53,7 @@ public class IncludeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_include_info",
-                "Return detailed information about the specified include (specified by ID).",
+                "Return model element information about the specified include (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 IncludeDTO.class)

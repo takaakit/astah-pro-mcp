@@ -62,7 +62,7 @@ public class UseCaseDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_usecase_dgm",
-                "Create a new usecase diagram on the specified package (specified by ID), and return the newly created usecase diagram information.",
+                "Create a new usecase diagram on the specified package (specified by ID), and return the newly created model element of the usecase diagram.",
                 this::createUseCaseDiagram,
                 NewUseCaseDiagramDTO.class,
                 DiagramDTO.class)

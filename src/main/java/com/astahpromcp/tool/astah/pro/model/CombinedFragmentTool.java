@@ -65,14 +65,14 @@ public class CombinedFragmentTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "add_interaction_operand",
-                "Add an interaction operand to the specified combined fragment (specified by ID), and return the combined fragment information after it is edited.",
+                "Add an interaction operand to the specified combined fragment (specified by ID), and return the model element of the combined fragment after it is edited.",
                 this::addInteractionOperand,
                 NewInteractionOperandDTO.class,
                 CombinedFragmentDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_combined_fragment_kind",
-                "Set the kind (specified by string) of the specified combined fragment (specified by ID), and return the combined fragment information after it is set.",
+                "Set the kind (specified by string) of the specified combined fragment (specified by ID), and return the model element of the combined fragment after it is set.",
                 this::setCombinedFragmentKind,
                 CombinedFragmentWithKindDTO.class,
                 CombinedFragmentDTO.class),
@@ -80,7 +80,7 @@ public class CombinedFragmentTool implements ToolProvider {
             // Note: To set the height of an interaction operand, the index of the operand known by the combined fragment is required. Therefore, this tool is defined as a tool for the combined fragment rather than for the interaction operand.
             ToolSupport.toolDefinitionReturningDto(
                 "set_height_of_interaction_operand",
-                "Set the height of the specified interaction operand (specified by 1-based index), and return the node presentation information of the combined fragment after it is set. Note that, since there is no node presentation for an interaction operand, the node presentation returned is that of the combined fragment containing the interaction operand.",
+                "Set the height of the specified interaction operand (specified by 1-based index), and return the node presentation of the combined fragment after it is set. Note that, since there is no node presentation for an interaction operand, the node presentation returned is that of the combined fragment containing the interaction operand.",
                 this::setHeightOfInteractionOperand,
                 InteractionOperandIndexWithHeightDTO.class,
                 NodePresentationDTO.class)

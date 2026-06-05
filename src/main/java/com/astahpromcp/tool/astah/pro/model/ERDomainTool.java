@@ -61,7 +61,7 @@ public class ERDomainTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_domain_info",
-                "Return detailed information about the specified ER domain (specified by ID).",
+                "Return model element information about the specified ER domain (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERDomainDTO.class)
@@ -72,49 +72,49 @@ public class ERDomainTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_er_datatype_of_er_domain",
-                "Set the ER datatype (specified by ID) of the specified ER domain (specified by ID), and return the ER domain information after it is set.",
+                "Set the ER datatype (specified by ID) of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set.",
                 this::setDatatype,
                 ERDomainWithERDatatypeDTO.class,
                 ERDomainDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_default_value_of_er_domain",
-                "Set the default value (specified by string) of the specified ER domain (specified by ID), and return the ER domain information after it is set.",
+                "Set the default value (specified by string) of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set.",
                 this::setDefaultValue,
                 ERDomainWithDefaultValueDTO.class,
                 ERDomainDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_length_precision_of_er_domain",
-                "Set the length/precision (specified by string) of the specified ER domain (specified by ID), and return the ER domain information after it is set. Whether you can specify length and precision depends on the data type. For example, when the data type is CHAR, only the length can be specified; if both length and precision are specified, an error will occur.",
+                "Set the length/precision (specified by string) of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set. Whether you can specify length and precision depends on the data type. For example, when the data type is CHAR, only the length can be specified; if both length and precision are specified, an error will occur.",
                 this::setLengthPrecision,
                 ERDomainWithLengthPrecisionDTO.class,
                 ERDomainDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_logical_name_of_er_domain",
-                "Set the logical name (specified by string) of the specified ER domain (specified by ID), and return the ER domain information after it is set.",
+                "Set the logical name (specified by string) of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set.",
                 this::setLogicalName,
                 ERDomainWithLogicalNameDTO.class,
                 ERDomainDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_physical_name_of_er_domain",
-                "Set the physical name (specified by string) of the specified ER domain (specified by ID), and return the ER domain information after it is set.",
+                "Set the physical name (specified by string) of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set.",
                 this::setPhysicalName,
                 ERDomainWithPhysicalNameDTO.class,
                 ERDomainDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_not_null_of_er_domain",
-                "Set the NOT NULL of the specified ER domain (specified by ID), and return the ER domain information after it is set.",
+                "Set the NOT NULL of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set.",
                 this::setNotNull,
                 ERDomainWithNotNullDTO.class,
                 ERDomainDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_parent_er_domain_of_er_domain",
-                "Set the parent ER domain (specified by ID) of the specified ER domain (specified by ID), and return the ER domain information after it is set.",
+                "Set the parent ER domain (specified by ID) of the specified ER domain (specified by ID), and return the model element of the ER domain after it is set.",
                 this::setParentERDomain,
                 ERDomainWithParentERDomainDTO.class,
                 ERDomainDTO.class)

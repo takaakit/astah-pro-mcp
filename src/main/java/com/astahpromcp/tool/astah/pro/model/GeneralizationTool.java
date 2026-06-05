@@ -53,7 +53,7 @@ public class GeneralizationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_generalization_info",
-                "Return detailed information about the specified generalization (specified by ID).",
+                "Return model element information about the specified generalization (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 GeneralizationDTO.class)

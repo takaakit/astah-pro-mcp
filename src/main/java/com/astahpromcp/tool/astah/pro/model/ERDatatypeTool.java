@@ -57,7 +57,7 @@ public class ERDatatypeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_datatype_info",
-                "Return detailed information about the specified ER datatype (specified by ID).",
+                "Return model element information about the specified ER datatype (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERDatatypeDTO.class)
@@ -68,28 +68,28 @@ public class ERDatatypeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_length_constraint_of_er_datatype",
-                "Set the length constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                "Set the length constraint (specified by string) of the specified ER datatype (specified by ID), and return the model element of the ER datatype after it is set.",
                 this::setLengthConstraint,
                 ERDatatypeWithLengthConstraintDTO.class,
                 ERDatatypeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_precision_constraint_of_er_datatype",
-                "Set the precision constraint (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                "Set the precision constraint (specified by string) of the specified ER datatype (specified by ID), and return the model element of the ER datatype after it is set.",
                 this::setPrecisionConstraint,
                 ERDatatypeWithPrecisionConstraintDTO.class,
                 ERDatatypeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_default_length_precision_of_er_datatype",
-                "Set the default length/precision (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                "Set the default length/precision (specified by string) of the specified ER datatype (specified by ID), and return the model element of the ER datatype after it is set.",
                 this::setDefaultLengthPrecision,
                 ERDatatypeWithDefaultLengthPrecisionDTO.class,
                 ERDatatypeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_description_of_er_datatype",
-                "Set the description (specified by string) of the specified ER datatype (specified by ID), and return the ER datatype information after it is set.",
+                "Set the description (specified by string) of the specified ER datatype (specified by ID), and return the model element of the ER datatype after it is set.",
                 this::setDescription,
                 ERDatatypeWithDescriptionDTO.class,
                 ERDatatypeDTO.class)

@@ -4,20 +4,27 @@ import com.change_vision.jude.api.inf.model.IHyperlink;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
+import com.change_vision.jude.api.inf.model.INamedElement;
 
 public class PresentationDTOAssembler {
     public static PresentationDTO toDTO(@NonNull IPresentation astahPresentation) throws Exception {
 
-        String correspondingElementId;
-        if (astahPresentation.getModel() != null) {
-            correspondingElementId = astahPresentation.getModel().getId();
+        NameIdTypeDTO renderedInDiagram;
+        if (astahPresentation.getDiagram() != null && astahPresentation.getDiagram() instanceof INamedElement) {
+            renderedInDiagram = NameIdTypeDTOAssembler.toDTO((INamedElement)astahPresentation.getDiagram());
         } else {
-            correspondingElementId = "";
+            renderedInDiagram = NameIdTypeDTO.empty();
+        }
+
+        NameIdTypeDTO correspondingModelElement;
+        if (astahPresentation.getModel() != null && astahPresentation.getModel() instanceof INamedElement) {
+            correspondingModelElement = NameIdTypeDTOAssembler.toDTO((INamedElement)astahPresentation.getModel());
+        } else {
+            correspondingModelElement = NameIdTypeDTO.empty();
         }
 
         String fillColor;
@@ -44,8 +51,8 @@ public class PresentationDTOAssembler {
         return  new PresentationDTO(
             astahPresentation.getID(),
             astahPresentation.getLabel(),
-            astahPresentation.getDiagram().getId(),
-            correspondingElementId,
+            renderedInDiagram,
+            correspondingModelElement,
             astahPresentation.getType(),
             fillColor,
             lineColor,

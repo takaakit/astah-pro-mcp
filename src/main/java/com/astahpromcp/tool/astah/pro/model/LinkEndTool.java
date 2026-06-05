@@ -59,21 +59,21 @@ public class LinkEndTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_aggr_of_link_end",
-                "Set an aggregation of the specified link end (specified by ID), and return the link end information after it is set.",
+                "Set an aggregation of the specified link end (specified by ID), and return the model element of the link end after it is set.",
                 this::setAggregation,
                 LinkEndWithAggregationDTO.class,
                 LinkEndDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_composition_of_link_end",
-                "Set a composition of the specified link end (specified by ID), and return the link end information after it is set.",
+                "Set a composition of the specified link end (specified by ID), and return the model element of the link end after it is set.",
                 this::setComposition,
                 LinkEndWithCompositionDTO.class,
                 LinkEndDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_navigation_of_link_end",
-                "Set a navigation of the specified link end (specified by ID), and return the link end information after it is set.",
+                "Set a navigation of the specified link end (specified by ID), and return the model element of the link end after it is set.",
                 this::setNavigation,
                 LinkEndWithNavigationDTO.class,
                 LinkEndDTO.class)

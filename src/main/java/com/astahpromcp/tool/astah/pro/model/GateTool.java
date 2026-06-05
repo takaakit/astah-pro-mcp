@@ -53,7 +53,7 @@ public class GateTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_gate_info",
-                "Return detailed information about the specified gate (specified by ID).",
+                "Return model element information about the specified gate (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 GateDTO.class)

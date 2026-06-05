@@ -57,7 +57,7 @@ public class ERIndexTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_index_info",
-                "Return detailed information about the specified ER index (specified by ID).",
+                "Return model element information about the specified ER index (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERIndexDTO.class)
@@ -68,28 +68,28 @@ public class ERIndexTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "add_er_attr_to_er_index",
-                "Add the ER attribute (specified by ID) to the specified ER index (specified by ID), and return the ER index information after it is set.",
+                "Add the ER attribute (specified by ID) to the specified ER index (specified by ID), and return the model element of the ER index after it is set.",
                 this::addERAttribute,
                 ERIndexWithERAttributeDTO.class,
                 ERIndexDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "remove_er_attr_from_er_index",
-                "Remove the ER attribute (specified by ID) from the specified ER index (specified by ID), and return the ER index information after it is set.",
+                "Remove the ER attribute (specified by ID) from the specified ER index (specified by ID), and return the model element of the ER index after it is set.",
                 this::removeERAttribute,
                 ERIndexWithERAttributeDTO.class,
                 ERIndexDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_key_of_er_index",
-                "Set the key of the specified ER index (specified by ID), and return the ER index information after it is set.",
+                "Set the key of the specified ER index (specified by ID), and return the model element of the ER index after it is set.",
                 this::setKey,
                 ERIndexWithKeyDTO.class,
                 ERIndexDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_unique_of_er_index",
-                "Set the unique of the specified ER index (specified by ID), and return the ER index information after it is set.",
+                "Set the unique of the specified ER index (specified by ID), and return the model element of the ER index after it is set.",
                 this::setUnique,
                 ERIndexWithUniqueDTO.class,
                 ERIndexDTO.class)

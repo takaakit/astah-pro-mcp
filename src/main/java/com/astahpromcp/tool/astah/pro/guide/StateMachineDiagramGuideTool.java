@@ -38,6 +38,10 @@ public class StateMachineDiagramGuideTool implements ToolProvider {
         log.debug("Get state machine diagram guide: {}", param);
         
         String content = """
+IMPORTANT POINTS to Keep in Mind:
+* To move a state to a different region within the same parent state, enlarge the destination region enough to accommodate the state being moved, and then change the coordinates of the state so that it is positioned within the destination region.
+
+
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * Due to its event-driven nature, a StateMachine execution is either in transit or in state, alternating between the two. It is in transit when an event is dispatched that matches at least one of its associated Triggers. While in transit, it may execute a number of Behaviors associated with the paths it is taking.
 * A Region denotes a behavior fragment that may execute concurrently with its orthogonal Regions. Two or more Regions are orthogonal to each other if they are either owned by the same State or, at the topmost level, by the same StateMachine.

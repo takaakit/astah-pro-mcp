@@ -85,42 +85,42 @@ public class DiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_svg_img_on_dgm",
-                "Insert an SVG image (specified by SVG code) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image along with the updated diagram image.",
+                "Insert an SVG image (specified by SVG code) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image.",
                 this::insertSvgImage,
                 NewSvgImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_png_img_on_dgm",
-                "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image along with the updated diagram image. When specifying a local image file, use the 'file:///' protocol.",
+                "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image. When specifying a local image file, use the 'file:///' protocol.",
                 this::insertPngImage,
                 NewPngImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_jpg_img_on_dgm",
-                "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image along with the updated diagram image. When specifying a local image file, use the 'file:///' protocol.",
+                "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image. When specifying a local image file, use the 'file:///' protocol.",
                 this::insertJpgImage,
                 NewJpgImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_txt_on_dgm",
-                "Insert a text at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the node presentation information of the newly created text along with the updated diagram image.",
+                "Insert a text at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created node presentation of the text along with the updated diagram image.",
                 this::insertText,
                 NewTextWithPointDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "delete_dgm",
-                "Delete the specified diagram (specified by ID), and return the deleted diagram information.",
+                "Delete the specified diagram (specified by ID), and return the deleted diagram.",
                 this::deleteDiagram,
                 DeleteDiagramDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_prst",
-                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation information along with the updated diagram image. Note that deleting a presentation does not delete the corresponding element.",
+                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation along with the updated diagram image. Note that deleting a presentation does not delete the corresponding element.",
                 this::deletePresentation,
                 DeletePresentationDTO.class,
                 PresentationDTO.class)

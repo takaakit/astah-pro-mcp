@@ -55,7 +55,7 @@ public class RequirementTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_req_info",
-                "Return detailed information about the specified requirement (specified by ID).",
+                "Return model element information about the specified requirement (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 RequirementDTO.class)
@@ -66,14 +66,14 @@ public class RequirementTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_req_id",
-                "Set the requirement identifier (specified by string) of the specified requirement (specified by ID), and return the requirement information after it is set.",
+                "Set the requirement identifier (specified by string) of the specified requirement (specified by ID), and return the model element of the requirement after it is set.",
                 this::setRequirementId,
                 RequirementWithIdDTO.class,
                 RequirementDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_req_text",
-                "Set the requirement text (specified by string) of the specified requirement (specified by ID), and return the requirement information after it is set.",
+                "Set the requirement text (specified by string) of the specified requirement (specified by ID), and return the model element of the requirement after it is set.",
                 this::setRequirementText,
                 RequirementWithTextDTO.class,
                 RequirementDTO.class)

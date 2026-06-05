@@ -53,7 +53,7 @@ public class UsageTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_usage_info",
-                "Return detailed information about the specified usage (specified by ID).",
+                "Return model element information about the specified usage (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 UsageDTO.class)

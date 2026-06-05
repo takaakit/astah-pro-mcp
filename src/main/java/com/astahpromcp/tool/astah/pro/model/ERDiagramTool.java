@@ -57,7 +57,7 @@ public class ERDiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_dgm_info",
-                "Return detailed information about the specified ER diagram (specified by ID).",
+                "Return model element information about the specified ER diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERDiagramDTO.class)
@@ -68,28 +68,28 @@ public class ERDiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_align_er_attr_items_of_er_dgm",
-                "Set the align attribute items of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                "Set the align attribute items of the specified ER diagram (specified by ID), and return the model element of the ER diagram after it is set.",
                 this::setAlignAttributeItems,
                 ERDiagramWithAlignAttributeItemsDTO.class,
                 ERDiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_initial_display_level_of_er_dgm",
-                "Set the initial display level (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                "Set the initial display level (specified by string) of the specified ER diagram (specified by ID), and return the model element of the ER diagram after it is set.",
                 this::setInitialDisplayLevel,
                 ERDiagramWithInitialDisplayLevelDTO.class,
                 ERDiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_model_type_of_er_dgm",
-                "Set the model type (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                "Set the model type (specified by string) of the specified ER diagram (specified by ID), and return the model element of the ER diagram after it is set.",
                 this::setModelType,
                 ERDiagramWithModelTypeDTO.class,
                 ERDiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_notation_of_er_dgm",
-                "Set the notation (specified by string) of the specified ER diagram (specified by ID), and return the ER diagram information after it is set.",
+                "Set the notation (specified by string) of the specified ER diagram (specified by ID), and return the model element of the ER diagram after it is set.",
                 this::setNotation,
                 ERDiagramWithNotationDTO.class,
                 ERDiagramDTO.class)

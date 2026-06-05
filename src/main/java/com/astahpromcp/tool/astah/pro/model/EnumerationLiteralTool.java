@@ -55,7 +55,7 @@ public class EnumerationLiteralTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_val_of_enum_literal",
-                "Set the value of the specified enumeration literal (specified by ID), and return the enumeration literal information after it is set.",
+                "Set the value of the specified enumeration literal (specified by ID), and return the model element of the enumeration literal after it is set.",
                 this::setValue,
                 EnumerationLiteralWithValueDTO.class,
                 EnumerationLiteralDTO.class)

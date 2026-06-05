@@ -51,7 +51,7 @@ public class ControlNodeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_control_node_info",
-                "Return detailed information about the specified control node (specified by ID).",
+                "Return model element information about the specified control node (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ControlNodeDTO.class)

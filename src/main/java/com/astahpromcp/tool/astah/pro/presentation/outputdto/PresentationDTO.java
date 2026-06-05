@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto;
 
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import java.util.List;
@@ -11,11 +12,11 @@ public record PresentationDTO(
         @JsonPropertyDescription("Label text")
         String label,
 
-        @JsonPropertyDescription("Diagram identifier where this presentation is rendered")
-        String renderedInDiagramId,
+        @JsonPropertyDescription("Diagram where this presentation is rendered")
+        NameIdTypeDTO renderedInDiagram,
 
-        @JsonPropertyDescription("Corresponding model element identifier")
-        String correspondingElementId,
+        @JsonPropertyDescription("Corresponding model element (named element)")
+        NameIdTypeDTO correspondingModelElement,
         
         @JsonPropertyDescription("Presentation type name")
         String type,

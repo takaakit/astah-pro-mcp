@@ -61,7 +61,7 @@ public class LifelineTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_lifeline_info",
-                "Return detailed information about the specified lifeline (specified by ID).",
+                "Return model element information about the specified lifeline (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 LifelineDTO.class)
@@ -72,14 +72,14 @@ public class LifelineTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_base_class_of_lifeline",
-                "Set the base class of the specified lifeline (specified by ID), and return the lifeline information after it is set.",
+                "Set the base class of the specified lifeline (specified by ID), and return the model element of the lifeline after it is set.",
                 this::setBaseClass,
                 LifelineWithBaseClassDTO.class,
                 LifelineDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_length_of_lifeline",
-                "Set the length of the specified lifeline (specified by ID), and return the node presentation information of the lifeline after it is set.",
+                "Set the length of the specified lifeline (specified by ID), and return the node presentation of the lifeline after it is set.",
                 this::setLength,
                 LifelineWithLengthDTO.class,
                 NodePresentationDTO.class)

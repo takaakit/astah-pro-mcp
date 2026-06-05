@@ -53,7 +53,7 @@ public class ExtendTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_extend_info",
-                "Return detailed information about the specified extend (specified by ID).",
+                "Return model element information about the specified extend (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ExtendDTO.class)

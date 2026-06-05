@@ -231,7 +231,7 @@ public final class McpServerApp {
             true,       // is ActivityDiagramEnabled
             true,       // is StateMachineDiagramEnabled
             true,       // is UseCaseDiagramEnabled
-            false,      // is RequirementDiagramEnabled
+            true,       // is RequirementDiagramEnabled
             true,       // is CommunicationDiagramEnabled
             true,       // is CompositeStructureDiagramEnabled
             true,       // is ErDiagramEnabled

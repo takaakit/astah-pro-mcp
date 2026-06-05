@@ -9,25 +9,29 @@ A local MCP server plugin for Astah Professional, a UML modeling tool, that enab
 
 <br>
 
-These videos show Claude Code (Opus 4.6) designing a simple library management system and drawing a class diagram, a sequence diagram, and an activity diagram. They are played at 10× speed.
+These videos show Claude Code (Opus 4.8) designing a simple library management system and drawing diagrams. They are played at 20× speed.
 
 Prompt: *Design a simple library management system and draw a class diagram in Astah to illustrate its structure.*  
-![class-diagram.gif](img/class-diagram.gif)
+<video src="./video/class-diagram.mp4" controls autoplay loop muted width="800"></video>
 
 Prompt: *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of borrowing a book.*  
-![sequence-diagram.gif](img/sequence-diagram.gif)
+<video src="./video/sequence-diagram.mp4" controls autoplay loop muted width="800"></video>
 
 Prompt: *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of returning a book.*  
-![activity-diagram.gif](img/activity-diagram.gif)
+<video src="./video/activity-diagram.mp4" controls autoplay loop muted width="800"></video>
+
+Prompt: *Based on the contents of the Astah model, draw a state machine diagram to illustrate the state transitions of a book.*  
+<video src="./video/state-machine-diagram.mp4" controls autoplay loop muted width="800"></video>
 
 <br>
 
-Diagrams created in the videos above:
+Diagrams created in the videos above: The diagram layouts were manually adjusted.
 <table>
   <tr>
     <td><a href="img/class-diagram.png"><img src="img/class-diagram.png"></a></td>
     <td><a href="img/sequence-diagram.png"><img src="img/sequence-diagram.png"></a></td>
     <td><a href="img/activity-diagram.png"><img src="img/activity-diagram.png"></a></td>
+    <td><a href="img/state-machine-diagram.png"><img src="img/state-machine-diagram.png"></a></td>
   </tr>
 </table>
 
@@ -68,10 +72,11 @@ This MCP server can view and edit the following diagrams:
 - **Activity Diagram**
 - **State Machine Diagram**
 - **Usecase Diagram**
+- **Mind Map**
+- **Requirement Diagram**
 - **Communication Diagram** (query-only)
 - **Composite Structure Diagram** (query-only)
 - **ER Diagram** (query-only)
-- **Mind Map**
 
 <br>
 
@@ -151,8 +156,6 @@ Create `.agents/mcp_config.json` under your project directory, or create `~/.gem
 
    On the first connection to the Astah Pro MCP server, you will be asked to confirm. Review the details and click **'Connect'**.  
   ![Connection Request](img/mcp-connection-request.png)
-   
-   > *Note:* For *Antigravity CLI*, run the `/mcp` command to connect to MCP servers.
 
 3. Send prompts to the AI agents
 
@@ -213,6 +216,12 @@ Some tool functions provided by this MCP server return excerpts from the [OMG UM
 
 All other works, including source code, are copyrighted by **Takaaki Teshima** and released under the **MIT-0** license.  
 [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue.svg)](https://opensource.org/licenses/MIT-0)
+
+<br>
+
+## Disclaimer
+
+This project is developed independently by the authors in their personal capacities and is not affiliated with any university, institution, or employer.
 
 <br>
 

@@ -53,7 +53,7 @@ public class DependencyTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_dep_info",
-                "Return detailed information about the specified dependency (specified by ID).",
+                "Return model element information about the specified dependency (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 DependencyDTO.class)

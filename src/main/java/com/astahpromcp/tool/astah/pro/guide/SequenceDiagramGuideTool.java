@@ -45,6 +45,7 @@ IMPORTANT POINTS to Keep in Mind:
 * When creating a message, do not blindly specify a lifeline as the sender of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. Specifying the lifeline as the message sender instead will split the sender lifeline's activation (ExecutionSpecification).
 * It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.
 * When the height of an interaction operand in a combined fragment is changed, the drawing positions of the presentations contained within the combined fragment are also automatically changed as a result. Therefore, when newly placing node/link presentations within a combined fragment, be sure to finish adjusting the height of the interaction operand beforehand.
+* To change the drawing position (Y-coordinate) of a message or a group of messages, delete the target message or group of messages, and then create the message or group of messages at the changed Y-coordinate. Note that this cannot be achieved by changing the coordinates of the message link presentation.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):

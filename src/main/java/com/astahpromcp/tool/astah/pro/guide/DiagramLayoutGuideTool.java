@@ -20,6 +20,7 @@ public class DiagramLayoutGuideTool implements ToolProvider {
     private static final String SEQUENCE_IMAGE_RESOURCE = "/diagram-layout-rules/sequence-diagram-layout-rules.png";
     private static final String ACTIVITY_IMAGE_RESOURCE = "/diagram-layout-rules/activity-diagram-layout-rules.png";
     private static final String STATE_MACHINE_IMAGE_RESOURCE = "/diagram-layout-rules/state-machine-diagram-layout-rules.png";
+    private static final String REQUIREMENT_IMAGE_RESOURCE = "/diagram-layout-rules/requirement-diagram-layout-rules.png";
 
     public DiagramLayoutGuideTool() {
     }
@@ -41,6 +42,7 @@ public class DiagramLayoutGuideTool implements ToolProvider {
         String content = """
 Common Layout Rules:
 * Adjust the layout of any newly placed node/link presentations so that they always conform to the rules below. On the other hand, for node/link presentations that have already been placed, adjust the layout so that they conform to the rules below only when the user has explicitly instructed you to make layout adjustments.
+* After creating or editing presentations on a diagram, the tool output data includes an image of the edited diagram. Therefore, you must review the contents of that diagram image each time and self-check whether the presentations you created or edited comply with this diagram layout guide. If they do not comply, immediately revise them. You must also feed the findings back into the subsequent drawing plan and revise that plan accordingly.
 
 
 Class Diagram Layout Rules:
@@ -59,15 +61,18 @@ Sequence Diagram Layout Rules:
 * Lifeline rectangles never overlap with other lifeline rectangles. If lifeline rectangles would overlap, the lifeline X coordinates are adjusted to avoid the overlap.
 * Messages never overlap with other messages. If messages would overlap, the message Y coordinates are adjusted to avoid the overlap.
 * For each sequence diagram, repeat the cycle of "checking compliance with the above rules -> adjusting the layout" up to three times so that the above rules are satisfied simultaneously.
+* The position and size of each operand rectangle are adjusted so that it is large enough to contain the presentations that should be placed inside it.
+* Tip: When the position or size of an operand is changed, the positions of the presentations placed inside it also move accordingly. Therefore, it is usually easier to achieve the expected layout by first adjusting the positions and sizes of the operands, and then placing the presentations inside them.
 
 
 Activity Diagram Layout Rules:
 * The node-presentation positions are adjusted so that the axes of the initial node, action node, and finish node in the same flow are aligned in a straight line either vertically or horizontally, making it easier to recognize that those nodes belong to the same flow.
 * The positions of the node presentations are adjusted so that, whenever possible, the arrow direction of link presentations goes from top to bottom or from left to right.
 * The positions are adjusted so that node presentations inside a partition do not touch the partition edges and have some margin around them.
-* The positions of node presentations inside a partition are adjusted so that the flow is centered within the partition, except when there are multiple parallel flows inside the same partition.
 * The positions are adjusted so that node presentation rectangles never overlap, except when one node presentation contains the other. For example, it is acceptable for the rectangle of a partition to overlap with the rectangle of an action contained within that partition, but it is not acceptable for rectangles of actions contained within the same partition to overlap.
 * For each activity diagram, repeat the cycle of "checking compliance with the above rules -> adjusting the layout" up to three times so that the above rules are satisfied simultaneously.
+* The size of each partition rectangle are adjusted so that it is large enough to contain the presentations that should be placed inside it.
+* Tip: When the size of a partition is changed, the positions of the presentations placed inside it also move accordingly. Therefore, it is usually easier to achieve the expected layout by first adjusting the sizes of the partitions, and then placing the presentations inside them.
 
 
 State Machine Diagram Layout Rules:
@@ -75,6 +80,17 @@ State Machine Diagram Layout Rules:
 * The positions are adjusted so that node presentation rectangles never overlap, except when one node presentation contains the other. For example, it is acceptable for the rectangle of a super state to overlap with the rectangle of a sub state contained within that super state, but it is not acceptable for rectangles of sub states contained within the same super state to overlap.
 * If there are multiple link presentations between two node presentations, the paths of those link presentations do not overlap.
 * For each state machine diagram, repeat the cycle of "checking compliance with the above rules -> adjusting the layout" up to three times so that the above rules are satisfied simultaneously.
+* The size of each region rectangle are adjusted so that it is large enough to contain the presentations that should be placed inside it.
+* Tip: When the size of a region is changed, the positions of the presentations placed inside it also move accordingly. Therefore, it is usually easier to achieve the expected layout by first adjusting the sizes of the regions, and then placing the presentations inside them.
+
+
+Requirement Diagram Layout Rules:
+* When requirements have a parent-child relationship, the positions of the requirement node presentations are adjusted so that the parent requirement is placed above the child requirement.
+* The positions of element node presentations, such as requirements, classes, and use cases, are adjusted so that the arrow direction of the relationship link presentations listed below goes from bottom to top.
+  * <<deriveReqt>>
+  * <<satisfy>>
+  * <<verify>>
+  * <<refine>>
 
 
 Required adjustments after layout:
@@ -87,6 +103,7 @@ Required adjustments after layout:
         contents.add(loadImageContent(SEQUENCE_IMAGE_RESOURCE));
         contents.add(loadImageContent(ACTIVITY_IMAGE_RESOURCE));
         contents.add(loadImageContent(STATE_MACHINE_IMAGE_RESOURCE));
+        contents.add(loadImageContent(REQUIREMENT_IMAGE_RESOURCE));
 
         return contents;
     }

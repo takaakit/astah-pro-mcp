@@ -8,7 +8,6 @@ import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -19,6 +18,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 
 // Tool that fetches Color Palette guide content and returns it in chunks
 @Slf4j

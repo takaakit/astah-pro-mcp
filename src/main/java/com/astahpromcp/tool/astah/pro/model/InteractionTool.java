@@ -53,7 +53,7 @@ public class InteractionTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_interaction_info",
-                "Return detailed information about the specified interaction (specified by ID).",
+                "Return model element information about the specified interaction (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 InteractionDTO.class)

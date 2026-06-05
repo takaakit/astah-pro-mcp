@@ -54,7 +54,7 @@ public class LifelineLinkTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_lifeline_link_info",
-                "Return detailed information about the specified lifeline link (specified by ID).",
+                "Return model element information about the specified lifeline link (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 LifelineLinkDTO.class)

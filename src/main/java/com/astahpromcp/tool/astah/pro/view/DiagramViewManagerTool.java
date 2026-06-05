@@ -72,70 +72,70 @@ public class DiagramViewManagerTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "open_dgm",
-                "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the opened diagram information.",
+                "Open the specified diagram (specified by ID) in Diagram Editor. The diagram is shown in the front if the diagram has already been open. And return the model element of the opened diagram.",
                 this::openDiagram,
                 IdDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "close_dgm",
-                "Close the specified diagram (specified by ID) in Diagram Editor. And return the closed diagram information.",
+                "Close the specified diagram (specified by ID) in Diagram Editor. And return the model element of the closed diagram.",
                 this::closeDiagram,
                 IdDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "select_prsts",
-                "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations information.",
+                "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations.",
                 this::selectPresentations,
                 IdListDTO.class,
                 PresentationListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "select_all_prsts",
-                "Select all presentations in current diagram, and return the selected presentations information.",
+                "Select all presentations in current diagram, and return the selected presentations.",
                 this::selectAllPresentations,
                 NoInputDTO.class,
                 PresentationListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "unselect_all_prsts",
-                "Unselect all presentations in current diagram, and return the current diagram information.",
+                "Unselect all presentations in current diagram, and return the model element of the current diagram.",
                 this::unselectAllPresentations,
                 NoInputDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "zoom",
-                "Zoom in current diagram, and return the zoomed diagram information.",
+                "Zoom in current diagram, and return the model element of the zoomed diagram.",
                 this::zoom,
                 com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "zoom_fit",
-                "Zoom fit in current diagram, and return the zoomed diagram information.",
+                "Zoom fit in current diagram, and return the model element of the zoomed diagram.",
                 this::zoomFit,
                 NoInputDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "center_prst_in_dgm",
-                "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation information.",
+                "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation.",
                 this::centerPresentationInDiagram,
                 IdDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_current_dgm",
-                "Return the information of the currently selected diagram in Diagram Editor.",
+                "Return the model element of the currently selected diagram in Diagram Editor.",
                 this::getCurrentDiagram,
                 NoInputDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_selected_prst",
-                "Return the information of the currently selected presentations in Diagram Editor.",
+                "Return the currently selected presentations in Diagram Editor.",
                 this::getSelectedPresentations,
                 NoInputDTO.class,
                 PresentationListDTO.class),
@@ -169,14 +169,14 @@ public class DiagramViewManagerTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "highlight_prst",
-                "Temporarily highlight the specified presentation (specified by ID) in the specified color (in the format #FFFFFF), and return the highlighted presentation information. This highlight is temporary and is rendered only while the diagram is open. When you reopen the diagram, the highlight disappears.",
+                "Temporarily highlight the specified presentation (specified by ID) in the specified color (in the format #FFFFFF), and return the highlighted presentation. This highlight is temporary and is rendered only while the diagram is open. When you reopen the diagram, the highlight disappears.",
                 this::highlightPresentation,
                 PresentationWithHighlightColorDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "unhighlight_prst",
-                "Unhighlight the specified presentation (specified by ID), and return the unhighlighted presentation information.",
+                "Unhighlight the specified presentation (specified by ID), and return the unhighlighted presentation.",
                 this::unhighlightPresentation,
                 IdDTO.class,
                 PresentationDTO.class)

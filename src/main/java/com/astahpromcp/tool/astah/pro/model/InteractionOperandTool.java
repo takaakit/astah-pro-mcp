@@ -54,7 +54,7 @@ public class InteractionOperandTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_interaction_operand_info",
-                "Return detailed information about the specified interaction operand (specified by ID).",
+                "Return model element information about the specified interaction operand (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 InteractionOperandDTO.class)
@@ -65,7 +65,7 @@ public class InteractionOperandTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_guard_of_interaction_operand",
-                "Set the guard of the specified interaction operand (specified by ID), and return the interaction operand information after it is set.",
+                "Set the guard of the specified interaction operand (specified by ID), and return the model element of the interaction operand after it is set.",
                 this::setGuard,
                 InteractionOperandWithGuardDTO.class,
                 InteractionOperandDTO.class)

@@ -36,7 +36,6 @@ public class UseCaseModelEditorTool implements ToolProvider {
         this.includeEditTools = includeEditTools;
     }
 
-
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
@@ -59,39 +58,39 @@ public class UseCaseModelEditorTool implements ToolProvider {
 
     private List<ToolDefinition> createEditTools() {
         return List.of(
-            ToolSupport.toolDefinitionReturningDto(
-                "create_actor",
-                "Create a new actor in the specified package (specified by ID), and return the newly created actor information.",
-                this::createActor,
-                NewActorDTO.class,
-                ClassDTO.class),
+                ToolSupport.toolDefinitionReturningDto(
+                        "create_actor",
+                        "Create a new actor in the specified package (specified by ID), and return the newly created model element of the actor.",
+                        this::createActor,
+                        NewActorDTO.class,
+                        ClassDTO.class),
 
-            ToolSupport.toolDefinitionReturningDto(
-                "create_include",
-                "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created include information.",
-                this::createInclude,
-                NewIncludeDTO.class,
-                IncludeDTO.class),
+                ToolSupport.toolDefinitionReturningDto(
+                        "create_include",
+                        "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created model element of the include.",
+                        this::createInclude,
+                        NewIncludeDTO.class,
+                        IncludeDTO.class),
 
-            ToolSupport.toolDefinitionReturningDto(
-                "create_extend",
-                "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extend information.",
-                this::createExtend,
-                NewExtendDTO.class,
-                ExtendDTO.class),
+                ToolSupport.toolDefinitionReturningDto(
+                        "create_extend",
+                        "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created model element of the extend.",
+                        this::createExtend,
+                        NewExtendDTO.class,
+                        ExtendDTO.class),
 
-            ToolSupport.toolDefinitionReturningDto(
-                "create_extension_point",
-                "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created extension point information.",
-                this::createExtensionPoint,
-                NewExtensionPointDTO.class,
-                NamedElementDTO.class),
+                ToolSupport.toolDefinitionReturningDto(
+                        "create_extension_point",
+                        "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created model element of the extension point.",
+                        this::createExtensionPoint,
+                        NewExtensionPointDTO.class,
+                        NamedElementDTO.class),
 
-            ToolSupport.toolDefinitionReturningDto(
-                "create_usecase",
-                "Create a new usecase in the specified package (specified by ID), and return the newly created usecase information.",
-                this::createUseCase,
-                NewUseCaseDTO.class,
+                ToolSupport.toolDefinitionReturningDto(
+                        "create_usecase",
+                        "Create a new usecase in the specified package (specified by ID), and return the newly created model element of the usecase.",
+                        this::createUseCase,
+                        NewUseCaseDTO.class,
                 UseCaseDTO.class)
         );
     }
@@ -104,8 +103,8 @@ public class UseCaseModelEditorTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             IClass astahActor = useCaseModelEditor.createActor(
-                astahPackage,
-                param.newActorName());
+                    astahPackage,
+                    param.newActorName());
             transactionManager.endTransaction();
 
             return ClassDTOAssembler.toDTO(astahActor);
@@ -119,15 +118,15 @@ public class UseCaseModelEditorTool implements ToolProvider {
     private IncludeDTO createInclude(McpSyncServerExchange exchange, NewIncludeDTO param) throws Exception {
         log.debug("Create include: {}", param);
 
-        IUseCase astahUsecase = astahProToolSupport.getUseCase(param.usecaseId());
+        IUseCase astahUsecase = astahProToolSupport.getUseCase(param.includingUsecaseId());
         IUseCase astahIncludedUsecase = astahProToolSupport.getUseCase(param.includedUsecaseId());
 
         try {
             transactionManager.beginTransaction();
             IInclude astahInclude = useCaseModelEditor.createInclude(
-                astahUsecase,
-                astahIncludedUsecase,
-                param.newIncludeName());
+                    astahUsecase,
+                    astahIncludedUsecase,
+                    param.newIncludeName());
             transactionManager.endTransaction();
 
             return IncludeDTOAssembler.toDTO(astahInclude);
@@ -141,15 +140,15 @@ public class UseCaseModelEditorTool implements ToolProvider {
     private ExtendDTO createExtend(McpSyncServerExchange exchange, NewExtendDTO param) throws Exception {
         log.debug("Create extend: {}", param);
 
-        IUseCase astahUsecase = astahProToolSupport.getUseCase(param.usecaseId());
+        IUseCase astahUsecase = astahProToolSupport.getUseCase(param.extendingUsecaseId());
         IUseCase astahExtendedUsecase = astahProToolSupport.getUseCase(param.extendedUsecaseId());
 
         try {
             transactionManager.beginTransaction();
             IExtend astahExtend = useCaseModelEditor.createExtend(
-                astahUsecase,
-                astahExtendedUsecase,
-                param.newExtendName());
+                    astahUsecase,
+                    astahExtendedUsecase,
+                    param.newExtendName());
             transactionManager.endTransaction();
 
             return ExtendDTOAssembler.toDTO(astahExtend);
@@ -168,8 +167,8 @@ public class UseCaseModelEditorTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             IExtentionPoint astahExtensionPoint = useCaseModelEditor.createExtensionPoint(
-                astahUsecase,
-                param.newExtensionPointName());
+                    astahUsecase,
+                    param.newExtensionPointName());
             transactionManager.endTransaction();
 
             return NamedElementDTOAssembler.toDTO(astahExtensionPoint);
@@ -188,8 +187,8 @@ public class UseCaseModelEditorTool implements ToolProvider {
         try {
             transactionManager.beginTransaction();
             IUseCase astahUseCase = useCaseModelEditor.createUseCase(
-                astahPackage,
-                param.newUsecaseName());
+                    astahPackage,
+                    param.newUsecaseName());
             transactionManager.endTransaction();
 
             return UseCaseDTOAssembler.toDTO(astahUseCase);

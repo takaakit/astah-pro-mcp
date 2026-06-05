@@ -10,6 +10,7 @@ import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.model.IRequirementDiagram;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
@@ -155,6 +156,24 @@ public class DiagramLayoutLintTool implements ToolProvider {
 
             targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
                 "Transition"));
+
+        } else if (diagram instanceof IRequirementDiagram) {
+            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
+                "Requirement",
+                "TestCase",
+                "Class",
+                "UseCase",
+                "Note"));
+
+            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
+                "Containment",
+                "DeriveReqt",
+                "Copy",
+                "Satisfy",
+                "Verify",
+                "Refine",
+                "Trace",
+                "Dependency"));
 
         } else {
             throw new IllegalArgumentException("The type of this diagram is excluded from overlap detection: " + diagram.getName() + "(" + diagram.getId() + ")");

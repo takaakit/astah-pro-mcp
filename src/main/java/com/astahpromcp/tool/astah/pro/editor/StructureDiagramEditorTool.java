@@ -6,6 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNestingLinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
@@ -75,16 +76,23 @@ public class StructureDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_node_prst_on_dgm",
-                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation information along with the updated diagram image.",
+                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation along with the updated diagram image.",
                 this::createNodePresentation,
                 NewNodePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_prst_on_dgm",
-                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation information along with the updated diagram image.",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation along with the updated diagram image.",
                 this::createLinkPresentation,
                 NewLinkPresentationDTO.class,
+                LinkPresentationDTO.class),
+
+            ToolSupport.toolDefinitionReturningDtoAndContents(
+                "create_nesting_link_prst_on_dgm",
+                "Create a new link presentation that indicates nesting (\"circle-plus\" notation) between the specified parent node presentation (specified by ID) and the specified child node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation along with the updated diagram image. For example, use this tool to draw nested relationships between requirements in a requirements diagram.",
+                this::createNestingLinkPresentation,
+                NewNestingLinkPresentationDTO.class,
                 LinkPresentationDTO.class)
         );
     }
@@ -155,7 +163,40 @@ public class StructureDiagramEditorTool implements ToolProvider {
             LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
             McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
-            
+
+            return Pair.of(dto, List.of(image));
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNestingLinkPresentation(McpSyncServerExchange exchange, NewNestingLinkPresentationDTO param) throws Exception {
+        log.debug("Create nesting link presentation on diagram: {}", param);
+
+        IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
+        INodePresentation astahParentNode = astahProToolSupport.getNodePresentation(param.parentNodePresentationId());
+        INodePresentation astahChildNode = astahProToolSupport.getNodePresentation(param.childNodePresentationId());
+
+        StructureDiagramEditor structureDiagramEditor;
+        try {
+            structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get structure diagram editor.");
+        }
+
+        structureDiagramEditor.setDiagram(astahStructureDiagram);
+
+        try {
+            transactionManager.beginTransaction();
+            ILinkPresentation astahLinkPresentation = structureDiagramEditor.createContainmentLinkPresentation(astahParentNode, astahChildNode);
+            transactionManager.endTransaction();
+
+            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+
             return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {

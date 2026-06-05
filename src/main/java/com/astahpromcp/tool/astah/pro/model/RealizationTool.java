@@ -53,7 +53,7 @@ public class RealizationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_real_info",
-                "Return detailed information about the specified realization (specified by ID).",
+                "Return model element information about the specified realization (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 RealizationDTO.class)

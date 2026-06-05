@@ -64,7 +64,7 @@ public class LinkPresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_link_prst_info",
-                "Return detailed information about the specified link presentation (specified by ID).",
+                "Return information about the specified link presentation (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 LinkPresentationDTO.class)
@@ -75,14 +75,14 @@ public class LinkPresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_points_of_link_prst",
-                "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation information after it is set along with the updated diagram image. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
+                "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation after it is set along with the updated diagram image. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
                 this::setAllPoints,
                 LinkPresentationWithPointsDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_line_style_of_link_prst",
-                "Set the line style of the specified link presentation (specified by ID), and return the link presentation information after it is set along with the updated diagram image.",
+                "Set the line style of the specified link presentation (specified by ID), and return the link presentation after it is set along with the updated diagram image.",
                 this::setLineStyle,
                 LinkPresentationWithLineStyleDTO.class,
                 LinkPresentationDTO.class)

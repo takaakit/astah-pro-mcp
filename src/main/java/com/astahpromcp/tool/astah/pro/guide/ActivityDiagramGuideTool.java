@@ -40,6 +40,7 @@ public class ActivityDiagramGuideTool implements ToolProvider {
         String content = """
 IMPORTANT POINTS to Keep in Mind:
 * When the size of a partition is changed, the drawing positions of the presentations contained within that partition are also automatically changed as a result. Therefore, when newly placing node/link presentations within the partition, be sure to finish adjusting the partition size beforehand.
+* To move an action to a different lane, enlarge the destination lane enough to accommodate the action being moved, and then change the coordinates of the action so that it is positioned within the destination lane.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):

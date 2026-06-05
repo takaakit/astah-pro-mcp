@@ -59,21 +59,21 @@ public class ProjectViewManagerTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "show_in_property_view",
-                "Show the property view of the element (specified by ID), and return the shown element information.",
+                "Show the property view of the element (specified by ID), and return the model element of the target element.",
                 this::showInPropertyView,
                 IdDTO.class,
                 ElementDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "show_in_structure_tree",
-                "Show the element (specified by ID) in the structure tree (aka model browser), and return the shown element information.",
+                "Show the element (specified by ID) in the structure tree (aka model browser), and return the model element of the target element.",
                 this::showInStructureTree,
                 IdDTO.class,
                 ElementDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_selected_elements",
-                "Get the information of the selected elements in the project view (including the structure tree (aka model browser)).",
+                "Get the model elements of the selected elements in the project view (including the structure tree (aka model browser)).",
                 this::getSelectedElements,
                 NoInputDTO.class,
                 ElementListDTO.class)

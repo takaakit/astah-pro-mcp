@@ -65,7 +65,7 @@ public class PresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_element_of_prst",
-                "Return the element information that corresponds to the specified presentation (specified by ID).",
+                "Return the element that corresponds to the specified presentation (specified by ID).",
                 this::getElement,
                 IdDTO.class,
                 ElementDTO.class)
@@ -76,28 +76,28 @@ public class PresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_label",
-                "Set the label of the specified presentation (specified by ID), and return the presentation information after it is set along with the updated diagram image. Note that newline characters (\\n) cannot be used in labels.",
+                "Set the label of the specified presentation (specified by ID), and return the presentation after it is set along with the updated diagram image. Note that escape sequences such as \\n cannot be used in labels, but actual newline characters (Unicode U+000A, embedded directly in the string) are supported.",
                 this::setLabel,
                 PresentationWithLabelDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_fill_color",
-                "Change the fill color of the specified presentation (specified by ID), and return the presentation information after it is changed along with the updated diagram image.",
+                "Change the fill color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image.",
                 this::changeFillColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_line_color",
-                "Change the line color of the specified presentation (specified by ID), and return the presentation information after it is changed along with the updated diagram image.",
+                "Change the line color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image.",
                 this::changeLineColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_font_color",
-                "Change the font color of the specified presentation (specified by ID), and return the presentation information after it is changed along with the updated diagram image.",
+                "Change the font color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image.",
                 this::changeFontColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class)

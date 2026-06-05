@@ -69,7 +69,7 @@ public class DiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_dgm_info",
-                "Return detailed information about the specified diagram (specified by ID).",
+                "Return model element information about the specified diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 DiagramDTO.class),

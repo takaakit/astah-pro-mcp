@@ -60,7 +60,7 @@ public class ProjectAccessorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_proj",
-                "Return the project (root package) information.",
+                "Return model element information of the named element for the project (root package).",
                 this::getProject,
                 NoInputDTO.class,
                 NamedElementDTO.class),
@@ -99,14 +99,14 @@ public class ProjectAccessorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_proj",
-                "Create an Astah project (root package), and return the project information. The project element is the root package.",
+                "Create an Astah project (root package), and return the model element of the named element for the project. The project element is the root package.",
                 this::createProject,
                 NoInputDTO.class,
                 NamedElementDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "open_proj",
-                "Open the specified project (specified by the full path of the Astah project file), and return the project information.",
+                "Open the specified project (specified by the full path of the Astah project file), and return the model element of the named element for the project. The project element is the root package.",
                 this::openProject,
                 FilePathDTO.class,
                 NamedElementDTO.class),

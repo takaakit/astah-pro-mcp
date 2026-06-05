@@ -53,7 +53,7 @@ public class ActivityTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_activity_info",
-                "Return detailed information about the specified activity (specified by ID).",
+                "Return the model element information about the specified activity (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ActivityDTO.class)

@@ -55,7 +55,7 @@ public class FlowTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_flow_info",
-                "Return detailed information about the specified flow (specified by ID).",
+                "Return model element information about the specified flow (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 FlowDTO.class)
@@ -66,14 +66,14 @@ public class FlowTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_action_of_flow",
-                "Set the action of the specified flow (specified by ID), and return the flow information after it is set.",
+                "Set the action of the specified flow (specified by ID), and return the model element of the flow after it is set.",
                 this::setAction,
                 FlowWithActionDTO.class,
                 FlowDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_guard_of_flow",
-                "Set the guard of the specified flow (specified by ID), and return the flow information after it is set.",
+                "Set the guard of the specified flow (specified by ID), and return the model element of the flow after it is set.",
                 this::setGuard,
                 FlowWithGuardDTO.class,
                 FlowDTO.class)

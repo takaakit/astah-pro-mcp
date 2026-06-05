@@ -42,9 +42,13 @@ public class AstahProMcpGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get Astah Pro MCP Guide: {}", param);
 
-        // If the Astah project is not open, throw an exception.
+        // If the Astah project is not open, create a new one.
         if (!projectAccessor.hasProject()) {
-            throw new RuntimeException("The Astah project is not open. Open an Astah project or create a new one, then run this tool again.");
+            try {
+                projectAccessor.create();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create project (root package).");
+            }
         }
 
         String primitiveTypes = "";
@@ -60,6 +64,7 @@ This MCP server operates as a plugin for the modeling tool Astah. Using the tool
 
 IMPORTANT POINTS to Keep in Mind:
 * Immediately after creating a new diagram, create a note in the upper-left corner of the diagram that describes what the diagram is meant to illustrate.
+* Immediately after creating a new diagram, insert an SVG illustrative graphic in the upper-right corner of the diagram that represents the content of the diagram.
 * When you place new elements on the diagram, as a final check, be sure to re-verify that the placement coordinates of the elements you placed are appropriate and properly aligned (e.g., centered alignment, top-edge alignment, etc.), and always make any necessary fine adjustments to the coordinates of the newly placed elements.  
 * When creating a presentation on a diagram that corresponds to a model, you must provide not only the diagram information but also the information of the corresponding model. In contrast, when creating a presentation that is not associated with a model (such as notes), no corresponding model information is required.  
 * Deleting a presentation does not remove the corresponding model. In contrast, deleting a model will also remove its corresponding presentation.  

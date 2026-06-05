@@ -53,7 +53,7 @@ public class ERPackageTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_package_info",
-                "Return detailed information about the specified ER package (specified by ID).",
+                "Return model element information about the specified ER package (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERPackageDTO.class)

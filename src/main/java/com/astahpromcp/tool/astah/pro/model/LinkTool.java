@@ -53,7 +53,7 @@ public class LinkTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_link_info",
-                "Return detailed information about the specified link (specified by ID).",
+                "Return model element information about the specified link (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 LinkDTO.class)

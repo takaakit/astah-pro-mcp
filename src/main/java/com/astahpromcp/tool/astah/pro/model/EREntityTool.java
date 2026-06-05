@@ -56,7 +56,7 @@ public class EREntityTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_entity_info",
-                "Return detailed information about the specified ER entity (specified by ID).",
+                "Return model element information about the specified ER entity (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 EREntityDTO.class)
@@ -67,21 +67,21 @@ public class EREntityTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_logical_name_of_er_entity",
-                "Set the logical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
+                "Set the logical name (specified by string) of the specified ER entity (specified by ID), and return the model element of the ER entity after it is set.",
                 this::setLogicalName,
                 EREntityWithLogicalNameDTO.class,
                 EREntityDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_physical_name_of_er_entity",
-                "Set the physical name (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
+                "Set the physical name (specified by string) of the specified ER entity (specified by ID), and return the model element of the ER entity after it is set.",
                 this::setPhysicalName,
                 EREntityWithPhysicalNameDTO.class,
                 EREntityDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_type_of_er_entity",
-                "Set the type (specified by string) of the specified ER entity (specified by ID), and return the ER entity information after it is set.",
+                "Set the type (specified by string) of the specified ER entity (specified by ID), and return the model element of the ER entity after it is set.",
                 this::setType,
                 EREntityWithTypeDTO.class,
                 EREntityDTO.class)

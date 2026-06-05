@@ -53,7 +53,7 @@ public class CommentTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_comment_info",
-                "Return detailed information about the specified comment (specified by ID).",
+                "Return model element information about the specified comment (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 CommentDTO.class)

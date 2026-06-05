@@ -13,11 +13,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<lombok.version>1.18.46</lombok.version>
+		<astah.argLine>-Duser.language=en</astah.argLine>  <!-- launch Astah in English -->
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.astahpromcp</groupId>
 	<artifactId>astah-pro-mcp</artifactId>
-	<version>0.2.3</version>
+	<version>0.2.4</version>
 	<packaging>bundle</packaging>
 	<name>Astah Pro MCP</name>
 	<description>MCP server for Astah professional</description>

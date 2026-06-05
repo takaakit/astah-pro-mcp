@@ -53,7 +53,7 @@ public class AssociationClassTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_asso_class_info",
-                "Return detailed information about the specified association class (specified by ID).",
+                "Return the model element information about the specified association class (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 AssociationClassDTO.class)

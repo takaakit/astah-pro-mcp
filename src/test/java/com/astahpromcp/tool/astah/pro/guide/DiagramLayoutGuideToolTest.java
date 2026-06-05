@@ -53,11 +53,12 @@ public class DiagramLayoutGuideToolTest {
 
         // Check the contents
         assertNotNull(contents);
-        assertEquals(5, contents.size());
+        assertEquals(6, contents.size());
         assertInstanceOf(McpSchema.TextContent.class, contents.get(0));
         assertInstanceOf(McpSchema.ImageContent.class, contents.get(1));
         assertInstanceOf(McpSchema.ImageContent.class, contents.get(2));
         assertInstanceOf(McpSchema.ImageContent.class, contents.get(3));
         assertInstanceOf(McpSchema.ImageContent.class, contents.get(4));
+        assertInstanceOf(McpSchema.ImageContent.class, contents.get(5));
     }
 }

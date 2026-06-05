@@ -53,7 +53,7 @@ public class MindMapDiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_mind_map_dgm_info",
-                "Return detailed information about the specified mind map diagram (specified by ID).",
+                "Return model element information about the specified mind map diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 MindMapDiagramDTO.class)

@@ -53,7 +53,7 @@ public class UseCaseTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_usecase_info",
-                "Return detailed information about the specified usecase (specified by ID).",
+                "Return model element information about the specified usecase (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 UseCaseDTO.class)

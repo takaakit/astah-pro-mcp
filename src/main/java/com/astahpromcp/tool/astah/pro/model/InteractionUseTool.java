@@ -56,7 +56,7 @@ public class InteractionUseTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_interaction_use_info",
-                "Return detailed information about the specified interaction use (specified by ID).",
+                "Return model element information about the specified interaction use (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 InteractionUseDTO.class)
@@ -67,14 +67,14 @@ public class InteractionUseTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_arg_of_interaction_use",
-                "Set the argument of the specified interaction use (specified by ID), and return the interaction use information after it is set.",
+                "Set the argument of the specified interaction use (specified by ID), and return the model element of the interaction use after it is set.",
                 this::setArgument,
                 InteractionUseWithArgumentDTO.class,
                 InteractionUseDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_seq_dgm_to_interaction_use",
-                "Set the sequence diagram (specified by ID) to the specified interaction use (specified by ID), and return the interaction use information after it is set.",
+                "Set the sequence diagram (specified by ID) to the specified interaction use (specified by ID), and return the model element of the interaction use after it is set.",
                 this::setSequenceDiagram,
                 InteractionUseWithSequenceDiagramDTO.class,
                 InteractionUseDTO.class)

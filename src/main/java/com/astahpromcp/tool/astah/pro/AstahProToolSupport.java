@@ -17,18 +17,18 @@ public class AstahProToolSupport {
     }
 
     private <T> T getEntity(String id, Class<T> clazz, String typeName) {
-        T entity;
-        try {
-            entity = clazz.cast(projectAccessor.getEntity(id));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get " + typeName + " due to an incorrect ID.");
+        
+        IEntity astahEntity = projectAccessor.getEntity(id);
+
+        if (astahEntity == null) {
+            throw new NullPointerException(String.format("Failed to get %s (ID: %s) due to an incorrect ID.", typeName, id));
         }
 
-        if (entity == null) {
-            throw new NullPointerException("Failed to get " + typeName + " due to an incorrect ID.");
+        if (!clazz.isInstance(astahEntity)) {
+            throw new RuntimeException(String.format("Failed to get %s (ID: %s) due to an incorrect type.", typeName, id));
         }
         
-        return entity;
+        return clazz.cast(astahEntity);
     }
 
     public IDiagram getDiagram(String id) {

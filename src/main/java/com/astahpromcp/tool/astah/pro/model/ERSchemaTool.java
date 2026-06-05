@@ -53,7 +53,7 @@ public class ERSchemaTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_er_schema_info",
-                "Return detailed information about the specified ER schema (specified by ID).",
+                "Return model element information about the specified ER schema (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ERSchemaDTO.class)

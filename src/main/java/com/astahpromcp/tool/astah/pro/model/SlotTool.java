@@ -54,7 +54,7 @@ public class SlotTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_slot_info",
-                "Return detailed information about the specified slot (specified by ID).",
+                "Return model element information about the specified slot (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 SlotDTO.class)
@@ -65,7 +65,7 @@ public class SlotTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_val_of_slot",
-                "Set the value of the specified slot (specified by ID), and return the slot information after it is set.",
+                "Set the value of the specified slot (specified by ID), and return the model element of the slot after it is set.",
                 this::setValue,
                 SlotWithValueDTO.class,
                 SlotDTO.class)

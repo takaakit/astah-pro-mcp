@@ -53,7 +53,7 @@ public class ObjectNodeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_obj_node_info",
-                "Return detailed information about the specified object node (specified by ID).",
+                "Return model element information about the specified object node (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ObjectNodeDTO.class)
@@ -64,7 +64,7 @@ public class ObjectNodeTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_base_class_of_obj_node",
-                "Set the base class (specified by ID) of the specified object node (specified by ID), and return the object node information after it is set.",
+                "Set the base class (specified by ID) of the specified object node (specified by ID), and return the model element of the object node after it is set.",
                 this::setBase,
                 ObjectNodeWithBaseDTO.class,
                 ObjectNodeDTO.class)

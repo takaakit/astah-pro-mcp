@@ -78,28 +78,28 @@ public class ClassDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_class_dgm",
-                "Create a new class diagram (which also serves as an object diagram and package diagram) under the specified package (specified by ID), and return the newly created class diagram information.",
+                "Create a new class diagram (which also serves as an object diagram and package diagram) under the specified package (specified by ID), and return the newly created model element of the class diagram.",
                 this::createClassDiagram,
                 NewDiagramInPackageDTO.class,
                 DiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_asso_class_prst",
-                "Create a new association class presentation of the specified class (specified by ID) between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified class diagram (specified by ID), and return the information of newly created node and linkpresentations along with the updated diagram image.",
+                "Create a new association class presentation of the specified class (specified by ID) between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified class diagram (specified by ID), and return the newly created node and link presentations along with the updated diagram image.",
                 this::createAssociationClassPresentation,
                 NewAssociationClassPresentationDTO.class,
                 PresentationListDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_instance_spec",
-                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created instance specification information (node presentation information) along with the updated diagram image.",
+                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created node presentation of the instance specification along with the updated diagram image.",
                 this::createInstanceSpecification,
                 NewInstanceWithPointDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_between_instance_specs",
-                "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation information along with the updated diagram image. Note that the created link has no arrowheads.",
+                "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation along with the updated diagram image. Note that the created link has no arrowheads.",
                 this::createInstanceSpecificationLink,
                 NewLinkSourceAndTargetDTO.class,
                 LinkPresentationDTO.class)

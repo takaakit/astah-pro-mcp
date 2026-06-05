@@ -6,7 +6,7 @@ public record PresentationWithLabelDTO(
         @JsonPropertyDescription("Target presentation identifier")
         String presentationId,
 
-        @JsonPropertyDescription("Label text. Note that newline characters (\\n) cannot be used in labels.")
+        @JsonPropertyDescription("Label text. Note that escape sequences such as \\n cannot be used in labels, but actual newline characters (Unicode U+000A, embedded directly in the string) are supported.")
         String label
 ) {
 }

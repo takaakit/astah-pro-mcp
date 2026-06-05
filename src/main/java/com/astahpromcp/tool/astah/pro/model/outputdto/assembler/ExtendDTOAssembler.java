@@ -30,7 +30,7 @@ public class ExtendDTOAssembler {
         
         return new ExtendDTO(
             namedElement,
-            extendedUseCase,
-            extendingUseCase);
+            extendingUseCase,
+            extendedUseCase);
     }
 }

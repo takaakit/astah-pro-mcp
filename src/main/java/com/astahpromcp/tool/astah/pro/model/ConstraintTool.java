@@ -54,7 +54,7 @@ public class ConstraintTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_constraint_info",
-                "Return detailed information about the specified constraint (specified by ID).",
+                "Return model element information about the specified constraint (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ConstraintDTO.class)
@@ -65,7 +65,7 @@ public class ConstraintTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
             "set_specification_of_constraint",
-            "Set the specification (specified by string) of the specified constraint (specified by ID), and return the constraint information after it is set.",
+            "Set the specification (specified by string) of the specified constraint (specified by ID), and return the model element of the constraint after it is set.",
             this::setSpecification,
             ConstraintWithSpecificationDTO.class,
             ConstraintDTO.class)

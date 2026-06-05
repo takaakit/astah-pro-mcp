@@ -56,7 +56,7 @@ public class TransitionTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_transition_info",
-                "Return detailed information about the specified transition (specified by ID).",
+                "Return model element information about the specified transition (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 TransitionDTO.class)
@@ -67,21 +67,21 @@ public class TransitionTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_action_of_transition",
-                "Set the action of the specified transition (specified by ID), and return the transition information after it is set.",
+                "Set the action of the specified transition (specified by ID), and return the model element of the transition after it is set.",
                 this::setAction,
                 TransitionWithActionDTO.class,
                 TransitionDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_event_of_transition",
-                "Set the event of the specified transition (specified by ID), and return the transition information after it is set.",
+                "Set the event of the specified transition (specified by ID), and return the model element of the transition after it is set.",
                 this::setEvent,
                 TransitionWithEventDTO.class,
                 TransitionDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_guard_of_transition",
-                "Set the guard of the specified transition (specified by ID), and return the transition information after it is set.",
+                "Set the guard of the specified transition (specified by ID), and return the model element of the transition after it is set.",
                 this::setGuard,
                 TransitionWithGuardDTO.class,
                 TransitionDTO.class)

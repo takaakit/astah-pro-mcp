@@ -55,7 +55,7 @@ public class ActionTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_action_info",
-                "Return detailed information about the specified action (specified by ID).",
+                "Return the model element information about the specified action (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ActionDTO.class)
@@ -66,7 +66,7 @@ public class ActionTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_calling_activity_of_action",
-                "Set the calling activity (specified by ID) of the specified action (specified by ID), and return the action information after it is set.",
+                "Set the calling activity (specified by ID) of the specified action (specified by ID), and return the model element of the action after it is set.",
                 this::setCallingActivity,
                 ActionWithCallingActivityDTO.class,
                 ActionDTO.class)

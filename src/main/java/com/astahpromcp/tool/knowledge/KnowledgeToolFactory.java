@@ -39,10 +39,12 @@ public class KnowledgeToolFactory {
             return List.of(
                     new DDDReferenceTool(workspaceDir, projectAccessor),
                     new OCLSpecificationTool(workspaceDir, projectAccessor),
+                    new SystemsEngineeringKnowledgeTool(workspaceDir, projectAccessor),
                     new AstahManualTool(workspaceDir, projectAccessor),
                     new ConceptualModelConventionTool(workspaceDir, httpClient),
                     new PlantumlGuideTool(workspaceDir, httpClient),
-                    new ColorPaletteGuideTool(workspaceDir, httpClient)
+                    new ColorPaletteGuideTool(workspaceDir, httpClient),
+                    new ORImpedanceMismatchKnowledgeTool(workspaceDir, httpClient)
             );
         } catch (Exception e) {
             log.warn("Error creating knowledge tools", e);

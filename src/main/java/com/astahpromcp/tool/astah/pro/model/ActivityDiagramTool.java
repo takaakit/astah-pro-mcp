@@ -55,14 +55,14 @@ public class ActivityDiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_activity_dgm_info",
-                "Return detailed information about the specified activity diagram (specified by ID).",
+                "Return the model element information about the specified activity diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ActivityDiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_activity_of_activity_dgm",
-                "Return the activity of the specified activity diagram (specified by ID).",
+                "Return the model element of the activity for the specified activity diagram (specified by ID).",
                 this::getActivity,
                 IdDTO.class,
                 ActivityDTO.class)

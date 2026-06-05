@@ -61,7 +61,7 @@ public class ClassTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_class_info",
-                "Return detailed information about the specified class or interface (specified by ID).",
+                "Return model element information about the specified class or interface (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ClassDTO.class)
@@ -72,35 +72,35 @@ public class ClassTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "set_abstract_of_class",
-                "Set the Abstract property of the specified class (specified by ID), and return the class information after it is set.",
+                "Set the Abstract property of the specified class (specified by ID), and return the model element of the class after it is set.",
                 this::setAbstract,
                 ClassWithAbstractDTO.class,
                 ClassDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_active_of_class",
-                "Set the Active property of the specified class (specified by ID), and return the class information after it is set.",
+                "Set the Active property of the specified class (specified by ID), and return the model element of the class after it is set.",
                 this::setActive,
                 ClassWithActiveDTO.class,
                 ClassDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_leaf_of_class",
-                "Set the Leaf property of the specified class (specified by ID), and return the class information after it is set.",
+                "Set the Leaf property of the specified class (specified by ID), and return the model element of the class after it is set.",
                 this::setLeaf,
                 ClassWithLeafDTO.class,
                 ClassDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "add_invariant_to_class",
-                "Add an invariant to the specified class (specified by ID), and return the class information after it is added. Invariants are set as constraints.",
+                "Add an invariant to the specified class (specified by ID), and return the model element of the class after it is added. Invariants are set as constraints.",
                 this::addInvariant,
                 ClassWithInvariantDTO.class,
                 ClassDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "remove_invariant_from_class",
-                "Remove the specified invariant from the specified class (specified by ID), and return the class information after it is removed. Invariants are set as constraints.",
+                "Remove the specified invariant from the specified class (specified by ID), and return the model element of the class after it is removed. Invariants are set as constraints.",
                 this::removeInvariant,
                 ClassWithInvariantDTO.class,
                 ClassDTO.class)

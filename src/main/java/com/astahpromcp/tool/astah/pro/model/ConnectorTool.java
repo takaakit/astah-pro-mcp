@@ -53,7 +53,7 @@ public class ConnectorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_connector_info",
-                "Return detailed information about the specified connector (specified by ID).",
+                "Return model element information about the specified connector (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 ConnectorDTO.class)

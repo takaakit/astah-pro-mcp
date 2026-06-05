@@ -56,14 +56,14 @@ public class CommunicationDiagramTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_communication_dgm_info",
-                "Return detailed information about the specified communication diagram (specified by ID).",
+                "Return model element information about the specified communication diagram (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
                 CommunicationDiagramDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_interaction_of_communication_dgm",
-                "Return the interaction of the specified communication diagram (specified by ID).",
+                "Return model element information about the interaction of the specified communication diagram (specified by ID).",
                 this::getInteraction,
                 IdDTO.class,
                 InteractionDTO.class)

@@ -74,14 +74,14 @@ public class BasicDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_note",
-                "Create a new note at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created note information (node presentation information) along with the updated diagram image.",
+                "Create a new note at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created node presentation of the note along with the updated diagram image.",
                 this::createNote,
                 NewNoteDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_note_anchor",
-                "Create a new note anchor between the specified note (specified by ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created note anchor information (link presentation information) along with the updated diagram image.",
+                "Create a new note anchor between the specified note (specified by ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation of the note anchor along with the updated diagram image.",
                 this::createNoteAnchor,
                 NewNoteAnchorDTO.class,
                 LinkPresentationDTO.class)
