@@ -100,13 +100,16 @@ To use the full tool version, specify port `8888`; to use the query-only tool ve
 
 Run this command for project scope in your project directory:
 ```bash
-claude mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8888/mcp
+claude mcp add --scope project astah-pro-mcp -- npx -y mcp-remote@latest http://127.0.0.1:8888/mcp --allow-http
 ```
 
 Or run this command for user scope:
 ```bash
-claude mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888/mcp
+claude mcp add --scope user astah-pro-mcp -- npx -y mcp-remote@latest http://127.0.0.1:8888/mcp --allow-http
 ```
+
+> *Note:* As of June 12, 2026, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Claude Code*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
+
 
 #### Codex CLI
 
