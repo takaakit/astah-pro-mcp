@@ -34,17 +34,18 @@ public class PlantumlTool implements ToolProvider {
     }
 
     private ToolDefinition generateDiagramImageFromPlantumlTool() {
-        McpSchema.Tool schema = McpSchema.Tool.builder()
-                .name("generate_dgm_img_from_puml")
+        McpSchema.Tool schema = McpSchema.Tool.builder(
+                        "generate_dgm_img_from_puml",
+                        JsonSupport.MCP_JSON_MAPPER,
+                        SchemaSupport.generateSchema(PlantumlDTO.class))
                 .description("Generate a diagram image based on the provided PlantUML code. Make use of this tool when the MCP client (you) wants to visually understand the structure and behavior of architectures and algorithms.")
-                .inputSchema(JsonSupport.MCP_JSON_MAPPER, SchemaSupport.generateSchema(PlantumlDTO.class))
                 .build();
 
         return new ToolDefinition(schema, this::generateDiagramImageFromPlantuml);
     }
 
     private McpSchema.CallToolResult generateDiagramImageFromPlantuml(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) {
-        ValidationSupport.ValidationResult<PlantumlDTO> parsed = ValidationSupport.parse(request.arguments(), PlantumlDTO.class);
+        DtoBinder.BindResult<PlantumlDTO> parsed = DtoBinder.bind(request.arguments(), PlantumlDTO.class);
         if (parsed.error() != null) return parsed.error();
 
         try {
@@ -87,7 +88,7 @@ public class PlantumlTool implements ToolProvider {
                     pngBytes.length, description);
 
             String encoded = Base64.getEncoder().encodeToString(pngBytes);
-            return new McpSchema.ImageContent(null, encoded, "image/png");
+            return McpSchema.ImageContent.builder(encoded, "image/png").build();
 
         } catch (OutOfMemoryError e) {
             throw new RuntimeException("Insufficient memory to process PlantUML diagram", e);

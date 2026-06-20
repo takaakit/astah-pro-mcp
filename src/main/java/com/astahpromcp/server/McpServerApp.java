@@ -45,18 +45,15 @@ public final class McpServerApp {
     private static final class ServerInstance {
         private final ServerProfileConfig profile;
         private final HttpServletStreamableServerTransportProvider transport;
-        private final McpClientApprovalServlet approvalServlet;
         private final McpSyncServer mcpServer;
         private final Server jettyServer;
 
         private ServerInstance(ServerProfileConfig profile,
                                HttpServletStreamableServerTransportProvider transport,
-                               McpClientApprovalServlet approvalServlet,
                                McpSyncServer mcpServer,
                                Server jettyServer) {
             this.profile = profile;
             this.transport = transport;
-            this.approvalServlet = approvalServlet;
             this.mcpServer = mcpServer;
             this.jettyServer = jettyServer;
         }
@@ -215,7 +212,6 @@ public final class McpServerApp {
         log.info("Started MCP profile '{}' on port {}", profile.name(), profile.port());
         return new ServerInstance(profile,
                 transport,
-                approvalServlet,
                 mcpSyncServer,
                 jettyServer);
     }
@@ -250,7 +246,7 @@ public final class McpServerApp {
         log.info("Total tool providers: {}", toolProviders.size());
         log.info("Tool providers:");
         for (ToolProvider toolProvider : toolProviders) {
-            log.info("- {}", toolProvider.getClass().getSimpleName());
+            log.info("- {}", toolProvider.name());
         }
 
         return toolProviders;
@@ -267,8 +263,10 @@ public final class McpServerApp {
                 .build();
 
         McpServer.SyncSpecification<?> serverBuilder = McpServer.sync(transport)
-                .serverInfo(new McpSchema.Implementation(getArtifactId(), getVersion()))
-                .instructions("This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server.")
+                .serverInfo(McpSchema.Implementation.builder(getArtifactId(), getVersion())
+                        .title("Astah Pro MCP")
+                        .build())
+                .instructions("This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call 'uml_and_modeling_insights' tool function before creating, editing, or reviewing a UML model to recall insights on UML and modeling.")
                 .capabilities(capabilities);
 
         log.info("Register all tools");
@@ -479,16 +477,6 @@ public final class McpServerApp {
                     
                 } catch (Exception e) {
                     log.warn("Failed to close transport for profile '{}': {}", instance.profile.name(), e.getMessage());
-                }
-            }
-            
-            if (instance.approvalServlet != null) {
-                try {
-                    log.debug("Resetting approval state for profile '{}'", instance.profile.name());
-                    instance.approvalServlet.resetApproval();
-                    
-                } catch (Exception e) {
-                    log.warn("Failed to reset approval state for profile '{}': {}", instance.profile.name(), e.getMessage());
                 }
             }
             

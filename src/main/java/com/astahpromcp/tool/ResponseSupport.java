@@ -1,15 +1,10 @@
 package com.astahpromcp.tool;
 
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public final class ResponseSupport {
@@ -20,28 +15,16 @@ public final class ResponseSupport {
     // Success method is used to return a success response with DTO
     public static McpSchema.CallToolResult success(Object dto) {
         try {
-            ObjectMapper mapper = JsonSupport.OBJ_MAPPER;
-            JsonNode jsonNode = mapper.valueToTree(dto);
-            String jsonContent = mapper.writeValueAsString(jsonNode);
-            Map<String, Object> structuredContent = mapper.convertValue(
-                    jsonNode,
-                    new TypeReference<Map<String, Object>>() {});
+            String jsonContent = JsonSupport.OBJ_MAPPER.writeValueAsString(dto);
 
             return McpSchema.CallToolResult.builder()
-                    .content(List.of(new McpSchema.TextContent(jsonContent)))
+                    .addTextContent(jsonContent)
                     .isError(false)
-                    .structuredContent(structuredContent)
+                    .structuredContent(JsonSupport.MCP_JSON_MAPPER, jsonContent)
                     .build();
-            
+
         } catch (JacksonException | IllegalArgumentException e) {
-            String dtoType = dto == null ? "null" : dto.getClass().getName();
-            log.error("Failed to serialize DTO of type {}", dtoType, e);
-            String message = e.getMessage();
-            if (message == null || message.isBlank()) {
-                message = e.getClass().getSimpleName();
-            }
-            
-            return error("Failed to serialize DTO: " + message);
+            return error(serializationErrorMessage(dto, e));
         }
     }
 
@@ -56,38 +39,40 @@ public final class ResponseSupport {
     // Success method is used to return a success response with DTO and contents
     public static McpSchema.CallToolResult success(Object dto, List<McpSchema.Content> contents) {
         try {
-            ObjectMapper mapper = JsonSupport.OBJ_MAPPER;
-            String jsonContent = mapper.writeValueAsString(mapper.valueToTree(dto));
+            String jsonContent = JsonSupport.OBJ_MAPPER.writeValueAsString(dto);
 
-            List<McpSchema.Content> mergedContents = new ArrayList<>();
-            mergedContents.add(new McpSchema.TextContent(jsonContent));
+            McpSchema.CallToolResult.Builder builder = McpSchema.CallToolResult.builder()
+                    .addTextContent(jsonContent)
+                    .isError(false);
             if (contents != null) {
-                mergedContents.addAll(contents);
+                contents.forEach(builder::addContent);
             }
 
-            return McpSchema.CallToolResult.builder()
-                    .content(mergedContents)
-                    .isError(false)
-                    .build();
+            return builder.build();
 
         } catch (JacksonException | IllegalArgumentException e) {
-            String dtoType = dto == null ? "null" : dto.getClass().getName();
-            log.error("Failed to serialize DTO of type {}", dtoType, e);
-            String message = e.getMessage();
-            if (message == null || message.isBlank()) {
-                message = e.getClass().getSimpleName();
-            }
-
-            return error("Failed to serialize DTO: " + message);
+            return error(serializationErrorMessage(dto, e));
         }
     }
 
     // Error method is used to return an error response
     public static McpSchema.CallToolResult error(String message) {
         return McpSchema.CallToolResult.builder()
-                .content(List.of(new McpSchema.TextContent(message)))
+                .addTextContent(message)
                 .isError(true)
                 .build();
+    }
+
+    // Build a log-friendly error message for a DTO serialization failure
+    private static String serializationErrorMessage(Object dto, Exception e) {
+        String dtoType = dto == null ? "null" : dto.getClass().getName();
+        log.error("Failed to serialize DTO of type {}", dtoType, e);
+        String message = e.getMessage();
+        if (message == null || message.isBlank()) {
+            message = e.getClass().getSimpleName();
+        }
+
+        return "Failed to serialize DTO: " + message;
     }
 
 }

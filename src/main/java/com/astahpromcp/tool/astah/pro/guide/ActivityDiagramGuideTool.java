@@ -37,7 +37,7 @@ public class ActivityDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get activity diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * When the size of a partition is changed, the drawing positions of the presentations contained within that partition are also automatically changed as a result. Therefore, when newly placing node/link presentations within the partition, be sure to finish adjusting the partition size beforehand.
 * To move an action to a different lane, enlarge the destination lane enough to accommodate the action being moved, and then change the coordinates of the action so that it is positioned within the destination lane.
@@ -69,6 +69,6 @@ ActivityParameterNode (as discussed further below), the tokens held by an Object
 * A SendSignalAction is notated as a convex pentagon with the name of the Signal placed inside it.
         """;
         
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

@@ -18,22 +18,22 @@ public final class ToolRegistrar {
         
         int totalTools = 0;
         for (ToolProvider provider : providers) {
-            log.info("Tool provider: {}", provider.getClass().getSimpleName());
+            log.info("Tool provider: {}", provider.name());
             try {
                 List<ToolDefinition> definitions = provider.createToolDefinitions();
-                
+
                 if (definitions == null || definitions.isEmpty()) {
-                    log.warn("Tool provider {} returned no tool definitions", provider.getClass().getSimpleName());
+                    log.warn("Tool provider {} returned no tool definitions", provider.name());
                     continue;
                 }
-                
+
                 for (ToolDefinition definition : definitions) {
                     log.info("Registering tool: {}", definition.toolSchema().name());
                     builder.toolCall(definition.toolSchema(), definition.toolHandler());
                     totalTools++;
                 }
             } catch (Exception e) {
-                log.error("Error registering tools from provider: {}", provider.getClass().getSimpleName(), e);
+                log.error("Error registering tools from provider: {}", provider.name(), e);
             }
         }
         log.info("Total tool count: {}", totalTools);

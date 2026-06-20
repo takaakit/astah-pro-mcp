@@ -28,11 +28,14 @@ class McpClientApprovalServletTest {
     @Mock
     private HttpServletResponse response;
 
+    @Mock
+    private McpServerApp.ClientDisconnectHandler disconnectHandler;
+
     private McpClientApprovalServlet servlet;
 
     @BeforeEach
     void setUp() {
-        servlet = new McpClientApprovalServlet(delegate, null, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
+        servlet = new McpClientApprovalServlet(delegate, disconnectHandler, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
     }
 
     @Test
@@ -81,6 +84,40 @@ class McpClientApprovalServletTest {
 
         verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Origin not allowed");
         verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_terminatesOnlyTargetSessionOnDelete() throws Exception {
+        when(request.getHeader("Origin")).thenReturn(null);
+        when(request.getHeader("Mcp-Session-Id")).thenReturn("session-123");
+        when(request.getMethod()).thenReturn("DELETE");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(request.getRemotePort()).thenReturn(8080);
+        when(request.getRemoteHost()).thenReturn("localhost");
+        when(request.getHeader("User-Agent")).thenReturn("Test-Agent");
+
+        servlet.service(request, response);
+
+        verify(delegate).service(eq(request), ArgumentMatchers.any(HttpServletResponse.class));
+        verify(disconnectHandler).handleClientDisconnect("session-123", "client_disconnect");
+        verify(disconnectHandler, never()).registerClientSession(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void service_passesThroughSessionRequestWithoutApproval() throws Exception {
+        when(request.getHeader("Origin")).thenReturn(null);
+        when(request.getHeader("Mcp-Session-Id")).thenReturn("session-123");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(request.getRemotePort()).thenReturn(8080);
+        when(request.getRemoteHost()).thenReturn("localhost");
+        when(request.getHeader("User-Agent")).thenReturn("Test-Agent");
+
+        servlet.service(request, response);
+
+        verify(delegate).service(eq(request), ArgumentMatchers.any(HttpServletResponse.class));
+        verify(response, never()).sendError(anyInt(), anyString());
+        verify(disconnectHandler, never()).handleClientDisconnect(anyString(), anyString());
     }
 
     @Test

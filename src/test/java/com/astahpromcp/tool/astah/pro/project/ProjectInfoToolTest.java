@@ -259,7 +259,7 @@ public class ProjectInfoToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertNotNull(outputDTO.content());
+        assertNotNull(outputDTO.contents());
     }
 
     @Test

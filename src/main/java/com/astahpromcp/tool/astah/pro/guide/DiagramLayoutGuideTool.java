@@ -22,6 +22,11 @@ public class DiagramLayoutGuideTool implements ToolProvider {
     private static final String STATE_MACHINE_IMAGE_RESOURCE = "/diagram-layout-rules/state-machine-diagram-layout-rules.png";
     private static final String REQUIREMENT_IMAGE_RESOURCE = "/diagram-layout-rules/requirement-diagram-layout-rules.png";
 
+    private static final String CLASS_ANTI_PATTERNS_IMAGE_RESOURCE = "/diagram-layout-anti-patterns/class-diagram-layout-anti-patterns.png";
+    private static final String SEQUENCE_ANTI_PATTERNS_IMAGE_RESOURCE = "/diagram-layout-anti-patterns/sequence-diagram-layout-anti-patterns.png";
+    private static final String ACTIVITY_ANTI_PATTERNS_IMAGE_RESOURCE = "/diagram-layout-anti-patterns/activity-diagram-layout-anti-patterns.png";
+    private static final String STATE_MACHINE_ANTI_PATTERNS_IMAGE_RESOURCE = "/diagram-layout-anti-patterns/state-machine-diagram-layout-anti-patterns.png";
+
     public DiagramLayoutGuideTool() {
     }
 
@@ -32,6 +37,12 @@ public class DiagramLayoutGuideTool implements ToolProvider {
                 "dgm_layout_guide",
                 "MCP client (you) MUST call this tool function before aligning diagram layout, and then lay out the diagram in strict accordance with this layout guide.",
                 this::getGuide,
+                NoInputDTO.class),
+                
+            ToolSupport.toolDefinitionReturningContents(
+                "dgm_layout_anti_patterns",
+                "MCP client (you) MUST call this tool function before aligning diagram layout to learn the layout anti-patterns, and then lay out the diagram so as to avoid these anti-patterns.",
+                this::getAntiPatterns,
                 NoInputDTO.class)
         );
     }
@@ -43,6 +54,7 @@ public class DiagramLayoutGuideTool implements ToolProvider {
 Common Layout Rules:
 * Adjust the layout of any newly placed node/link presentations so that they always conform to the rules below. On the other hand, for node/link presentations that have already been placed, adjust the layout so that they conform to the rules below only when the user has explicitly instructed you to make layout adjustments.
 * After creating or editing presentations on a diagram, the tool output data includes an image of the edited diagram. Therefore, you must review the contents of that diagram image each time and self-check whether the presentations you created or edited comply with this diagram layout guide. If they do not comply, immediately revise them. You must also feed the findings back into the subsequent drawing plan and revise that plan accordingly.
+* When node/link presentations are created on a diagram, presentations created later are displayed in front of earlier ones. Depending on the creation order, one presentation may be hidden behind another. Therefore, after creating presentations on a diagram, check the diagram image for any hidden presentations. If any are found, move them to the front so they are not hidden.
 
 
 Class Diagram Layout Rules:
@@ -98,12 +110,24 @@ Required adjustments after layout:
         """;
 
         List<McpSchema.Content> contents = new ArrayList<>();
-        contents.add(new McpSchema.TextContent(content));
+        contents.add(McpSchema.TextContent.builder(content).build());
         contents.add(loadImageContent(CLASS_IMAGE_RESOURCE));
         contents.add(loadImageContent(SEQUENCE_IMAGE_RESOURCE));
         contents.add(loadImageContent(ACTIVITY_IMAGE_RESOURCE));
         contents.add(loadImageContent(STATE_MACHINE_IMAGE_RESOURCE));
         contents.add(loadImageContent(REQUIREMENT_IMAGE_RESOURCE));
+
+        return contents;
+    }
+
+    private List<McpSchema.Content> getAntiPatterns(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Get diagram layout anti-patterns: {}", param);
+
+        List<McpSchema.Content> contents = new ArrayList<>();
+        contents.add(loadImageContent(CLASS_ANTI_PATTERNS_IMAGE_RESOURCE));
+        contents.add(loadImageContent(SEQUENCE_ANTI_PATTERNS_IMAGE_RESOURCE));
+        contents.add(loadImageContent(ACTIVITY_ANTI_PATTERNS_IMAGE_RESOURCE));
+        contents.add(loadImageContent(STATE_MACHINE_ANTI_PATTERNS_IMAGE_RESOURCE));
 
         return contents;
     }
@@ -115,7 +139,7 @@ Required adjustments after layout:
             }
             byte[] bytes = stream.readAllBytes();
             String encoded = Base64.getEncoder().encodeToString(bytes);
-            return new McpSchema.ImageContent(null, encoded, "image/png");
+            return McpSchema.ImageContent.builder(encoded, "image/png").build();
         }
     }
 }

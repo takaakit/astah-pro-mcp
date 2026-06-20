@@ -37,7 +37,7 @@ public class CompositeStructureDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get composite structure diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * In the definition below, StructuredClassifier and EncapsulatedClassifier correspond to the Class element in Astah. Therefore, understand StructuredClassifier as Class.
 
@@ -68,6 +68,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * A Component may be realized (or implemented) by a number of Classifiers. In that case, a Component owns a set of ComponentRealizations to these Classifiers.
         """;
 
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

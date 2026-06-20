@@ -37,7 +37,7 @@ public class SequenceDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get sequence diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * An ExecutionSpecification in the UML specification refers to the same thing as an Activation in Astah.
 * When creating a lifeline, if a corresponding base class exists, set that class as the type of the lifeline.
@@ -86,6 +86,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * ExecutionSpecifications are represented as thin rectangles (gray or white) on the lifeline.
         """;
         
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

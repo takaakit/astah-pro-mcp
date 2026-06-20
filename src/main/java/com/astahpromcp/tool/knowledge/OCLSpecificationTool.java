@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -30,13 +29,11 @@ public class OCLSpecificationTool implements ToolProvider {
     private final List<String> contentCache;
 
     private final Path outputDirectory;
-    private final ProjectAccessor projectAccessor;
 
     private final String oclSpecificationUrl = "https://www.omg.org/spec/OCL/2.4/PDF";
 
-    public OCLSpecificationTool(Path outputDirectory, ProjectAccessor projectAccessor) {
+    public OCLSpecificationTool(Path outputDirectory) {
         this.outputDirectory = outputDirectory;
-        this.projectAccessor = projectAccessor;
         this.contentCache = new CopyOnWriteArrayList<>();
     }
 

@@ -25,10 +25,8 @@ public class McpServerAppTest {
     private McpServerApp app;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         app = new McpServerApp();
-        app.start();
-        waitForServerReady();
     }
 
     @AfterEach
@@ -38,8 +36,16 @@ public class McpServerAppTest {
         }
     }
 
+    // Starts the Jetty server; only tests that exercise the network layer need this.
+    private void startServer() throws Exception {
+        app.start();
+        waitForServerReady();
+    }
+
     @Test
     void rejectsConnectionsFromNonLoopbackAddresses() throws Exception {
+        startServer();
+
         InetAddress loopback = InetAddress.getByName("127.0.0.1");
         InetAddress nonLoopback = findNonLoopbackAddress();
         for (int port : SERVER_PORTS) {
@@ -60,7 +66,9 @@ public class McpServerAppTest {
     }
 
     @Test
-    void jettyConnectorBindsOnlyToLoopbackHost() {
+    void jettyConnectorBindsOnlyToLoopbackHost() throws Exception {
+        startServer();
+
         Server jettyServer = app.getJettyServer();
         assertNotNull(jettyServer, "Jetty server should be initialized after start");
 
@@ -76,6 +84,30 @@ public class McpServerAppTest {
         assertNotNull(boundHost, "ServerConnector host should be explicitly set");
         assertEquals("127.0.0.1", boundHost, "ServerConnector must bind to 127.0.0.1");
         assertNotEquals("0.0.0.0", boundHost, "ServerConnector must not bind to 0.0.0.0");
+    }
+
+    @Test
+    void registersEachAgentSessionIndependently() {
+        app.registerClientSession("session-A", "127.0.0.1:50001", "Agent-A");
+        app.registerClientSession("session-B", "127.0.0.1:50002", "Agent-B");
+
+        assertEquals(2, app.getActiveSessionCount(), "Both agent sessions should be registered");
+    }
+
+    @Test
+    void terminatingOneSessionLeavesOtherSessionsActive() {
+        app.registerClientSession("session-A", "127.0.0.1:50001", "Agent-A");
+        app.registerClientSession("session-B", "127.0.0.1:50002", "Agent-B");
+
+        app.terminateClientSession("session-A", "client_disconnect");
+
+        assertEquals(1, app.getActiveSessionCount(), "Only the terminated session should be removed");
+        assertTrue(app.getActiveSessions().stream()
+                        .anyMatch(s -> s.getSessionId().equals("session-B")),
+                "The other agent's session must remain active after terminating a different session");
+        assertFalse(app.getActiveSessions().stream()
+                        .anyMatch(s -> s.getSessionId().equals("session-A")),
+                "The terminated session must no longer be active");
     }
 
     private void waitForServerReady() throws InterruptedException, UnknownHostException {

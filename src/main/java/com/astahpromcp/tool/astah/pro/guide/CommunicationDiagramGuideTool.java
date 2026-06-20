@@ -37,7 +37,7 @@ public class CommunicationDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get communication diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * For communication-diagram-related tool functions, only read-only (viewing) operations are provided; editing operations are not available.
 
@@ -48,6 +48,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * The sequencing of Messages is given through a sequence numbering scheme.
         """;
         
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 // Servlet that prompts the user before accepting an MCP client connection
@@ -29,8 +30,16 @@ public class McpClientApprovalServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final HttpServletStreamableServerTransportProvider delegate;
-    private final Object approvalLock = new Object();
-    private boolean userApproved;
+    
+    // Serializes approval dialogs; initialize requests arriving while a dialog
+    // is open are rejected immediately to prevent dialog flooding.
+    private final ReentrantLock dialogLock = new ReentrantLock();
+    
+    // Last user approval, used for the approval grace period (guarded by graceLock)
+    private final Object graceLock = new Object();
+    
+    private long lastApprovalAtMillis;
+    private String lastApprovedUserAgent;
     private final McpServerApp.ClientDisconnectHandler disconnectHandler;
     private final Set<String> originHostAllowlist;
 
@@ -58,12 +67,6 @@ public class McpClientApprovalServlet extends HttpServlet {
         }
     }
 
-    public void resetApproval() {
-        synchronized (approvalLock) {
-            userApproved = false;
-        }
-    }
-
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         RequestContext context = RequestContext.from(req);
@@ -76,9 +79,9 @@ public class McpClientApprovalServlet extends HttpServlet {
             return;
         }
 
-        // If the request is an initialize attempt and the user has not approved the connection, request approval
+        // If the request is an initialize attempt, request approval from the user
         if (context.isInitializeAttempt()) {
-            boolean approved = ensureUserApproval(context);
+            boolean approved = requestUserApproval(context);
             if (!approved) {
                 log.info("Rejected MCP connection from {}", context.clientAddress());
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Connection rejected by user");
@@ -87,79 +90,90 @@ public class McpClientApprovalServlet extends HttpServlet {
             log.info("Approved MCP connection from {}", context.clientAddress());
         }
 
-        // Create a response wrapper to track the status of the request
+        // Create a response wrapper to track the status and the issued session ID
         SessionTrackingResponseWrapper responseWrapper = new SessionTrackingResponseWrapper(resp);
-        try {
-            // Service the request
-            delegate.service(req, responseWrapper);
-            
-            // Register the session only after initialization succeeds
-            if (context.isInitializeAttempt()
-                    && responseWrapper.isSuccessful()
-                    && context.sessionId().isPresent()) {
-                // Handle the start of the client connection
-                if (disconnectHandler != null) {
-                    disconnectHandler.registerClientSession(
-                            context.sessionId().get(),
-                            context.clientAddress(),
-                            context.userAgent());
-                }        
-            }
-            
-        } finally {
-            // If the request is an initialize attempt and the initialization failed, reset the approval flag
-            if (context.isInitializeAttempt() && !responseWrapper.isSuccessful()) {
-                log.warn("Initialization failed with status {}. Resetting approval flag.", responseWrapper.getStatus());
-                resetApproval();
-            }
 
-            // If the request is a delete attempt and the request is successful, reset the approval flag
-            if (context.isDeleteRequest() && responseWrapper.isSuccessful()) {
-                log.info("Connection closed by MCP client. Resetting approval flag.");
+        // Service the request
+        delegate.service(req, responseWrapper);
 
-                // Handle the client disconnect event
-                if (disconnectHandler != null && context.sessionId().isPresent()) {
-                    disconnectHandler.handleClientDisconnect(context.sessionId().get(), "client_disconnect");
-                }
-        
-                resetApproval();
+        // Register the session issued by the transport after a successful initialization
+        if (context.isInitializeAttempt() && responseWrapper.isSuccessful()) {
+            Optional<String> issuedSessionId = responseWrapper.issuedSessionId();
+            if (issuedSessionId.isPresent() && disconnectHandler != null) {
+                disconnectHandler.registerClientSession(
+                        issuedSessionId.get(),
+                        context.clientAddress(),
+                        context.userAgent());
+            }
+        }
+
+        // If the request is a delete attempt and the request is successful, terminate only that session
+        if (context.isDeleteRequest() && responseWrapper.isSuccessful() && context.sessionId().isPresent()) {
+            log.info("Connection closed by MCP client (session '{}').", context.sessionId().get());
+            if (disconnectHandler != null) {
+                disconnectHandler.handleClientDisconnect(context.sessionId().get(), "client_disconnect");
             }
         }
     }
 
     // Request approval from the user
-    private boolean ensureUserApproval(RequestContext context) {
-        synchronized (approvalLock) {
-            // If the user has already approved the connection, return true
-            if (userApproved) {
-                return true;
-            }
+    private boolean requestUserApproval(RequestContext context) {
+        // Auto-approve follow-up initializes from the same client right after a user approval
+        if (isWithinApprovalGracePeriod(context)) {
+            log.info("Auto-approved MCP connection from {} within the approval grace period (User-Agent: {}).",
+                    context.clientAddress(), context.userAgent());
+            return true;
+        }
 
-            // If the environment is headless, reject the connection
-            if (GraphicsEnvironment.isHeadless()) {
-                log.warn("Headless environment detected. Rejecting connection from {}:{}.",
-                        context.remoteAddress(), context.remotePort());
-                return false;
-            }
+        // If the environment is headless, reject the connection
+        if (GraphicsEnvironment.isHeadless()) {
+            log.warn("Headless environment detected. Rejecting connection from {}:{}.",
+                    context.remoteAddress(), context.remotePort());
+            return false;
+        }
 
+        // If another approval dialog is already open, reject immediately (the client may retry)
+        if (!dialogLock.tryLock()) {
+            log.warn("Another approval dialog is in progress. Rejecting connection from {}.",
+                    context.clientAddress());
+            return false;
+        }
+
+        try {
             AtomicBoolean approved = new AtomicBoolean(false);
             String message = buildDialogMessage(context);
             Object[] options = {"Connect", "Cancel"};
-            try {
-                runOnEdtBlocking(() -> showApprovalDialog(message, options, approved));
-
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return false;
-            } catch (InvocationTargetException e) {
-                log.error("Failed to display approval dialog", e.getCause());
-                return false;
-            }
-
+            runOnEdtBlocking(() -> showApprovalDialog(message, options, approved));
             if (approved.get()) {
-                userApproved = true;
+                recordApproval(context);
             }
             return approved.get();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        } catch (InvocationTargetException e) {
+            log.error("Failed to display approval dialog", e.getCause());
+            return false;
+        } finally {
+            dialogLock.unlock();
+        }
+    }
+
+    // Check whether the request falls within the grace period of the last user approval.
+    // The window starts at the explicit user approval and is not extended by auto-approvals.
+    private boolean isWithinApprovalGracePeriod(RequestContext context) {
+        synchronized (graceLock) {
+            return lastApprovedUserAgent != null
+                    && lastApprovedUserAgent.equals(context.userAgent())
+                    && System.currentTimeMillis() - lastApprovalAtMillis <= McpServerConfig.APPROVAL_GRACE_PERIOD_MS;
+        }
+    }
+
+    private void recordApproval(RequestContext context) {
+        synchronized (graceLock) {
+            lastApprovalAtMillis = System.currentTimeMillis();
+            lastApprovedUserAgent = context.userAgent();
         }
     }
 
@@ -269,10 +283,11 @@ public class McpClientApprovalServlet extends HttpServlet {
         }
     }
 
-    // Session tracking response wrapper
+    // Response wrapper that tracks the status and the session ID issued by the transport
     private static final class SessionTrackingResponseWrapper extends HttpServletResponseWrapper {
 
         private int status;
+        private String issuedSessionId;
 
         SessionTrackingResponseWrapper(HttpServletResponse response) {
             super(response);
@@ -283,6 +298,28 @@ public class McpClientApprovalServlet extends HttpServlet {
         public void setStatus(int sc) {
             super.setStatus(sc);
             this.status = sc;
+        }
+
+        @Override
+        public void setHeader(String name, String value) {
+            super.setHeader(name, value);
+            captureSessionId(name, value);
+        }
+
+        @Override
+        public void addHeader(String name, String value) {
+            super.addHeader(name, value);
+            captureSessionId(name, value);
+        }
+
+        private void captureSessionId(String name, String value) {
+            if (HttpHeaders.MCP_SESSION_ID.equalsIgnoreCase(name)) {
+                this.issuedSessionId = value;
+            }
+        }
+
+        public Optional<String> issuedSessionId() {
+            return Optional.ofNullable(issuedSessionId);
         }
 
         @Override

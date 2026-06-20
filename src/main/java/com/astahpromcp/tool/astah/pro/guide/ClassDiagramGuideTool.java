@@ -37,7 +37,7 @@ public class ClassDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get class diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * An arrowhead is attached to the end of an association or link on the side that is set to be navigable. The end without an arrowhead shall have its navigability set to unspecified. Non-navigable shall be set only when explicitly specified by the user.
 
@@ -91,6 +91,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * A Package is a namespace for its members, which comprise those elements associated via packagedElement (which are said to be owned or contained), and those imported.
         """;
 
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

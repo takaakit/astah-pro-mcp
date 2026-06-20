@@ -29,6 +29,7 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IDiagramViewManager.html
@@ -37,6 +38,9 @@ public class DiagramViewManagerTool implements ToolProvider {
 
     private static final String FIT_WINDOW_TOOLBAR_BUTTON_NAME = "managementview.tool_button.drop_down_fit_window";
     private static final String FIT_WINDOW_ACTION_COMMAND = "FitWindow%both";
+
+    private static final String BRING_TO_FRONT_MENU_ITEM_NAME = "managementview.menu.edit.arrange_depth.front";
+    private static final String SEND_TO_BACK_MENU_ITEM_NAME = "managementview.menu.edit.arrange_depth.back";
 
     private final ProjectAccessor projectAccessor;
     private final IDiagramViewManager diagramViewManager;
@@ -179,7 +183,21 @@ public class DiagramViewManagerTool implements ToolProvider {
                 "Unhighlight the specified presentation (specified by ID), and return the unhighlighted presentation.",
                 this::unhighlightPresentation,
                 IdDTO.class,
-                PresentationDTO.class)
+                PresentationDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "bring_prsts_to_front",
+                "Bring the specified node/link presentations (specified by ID) to front in current diagram, and return the presentations. If a presentation is hidden behind another presentation and cannot be seen, use this tool to adjust the Z-order and resolve the issue.",
+                this::bringPresentationsToFront,
+                IdListDTO.class,
+                PresentationListDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "send_prsts_to_back",
+                "Send the specified node/link presentations (specified by ID) to back in current diagram, and return the presentations. If a presentation is hidden behind another presentation and cannot be seen, use this tool to adjust the Z-order and resolve the issue.",
+                this::sendPresentationsToBack,
+                IdListDTO.class,
+                PresentationListDTO.class)
         );
     }
 
@@ -352,7 +370,7 @@ public class DiagramViewManagerTool implements ToolProvider {
             throw new RuntimeException("Failed to get the current diagram.");
         }
 
-        JFrame mainFrame = AstahAPI.getAstahAPI().getProjectAccessor().getViewManager().getMainFrame();
+        JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();
         if (mainFrame == null) {
             throw new RuntimeException("Main window is unavailable.");
         }
@@ -363,7 +381,13 @@ public class DiagramViewManagerTool implements ToolProvider {
         }
 
         AbstractButton button = resolveClickableFitButton(fitControl);
-        Runnable click = () -> button.doClick();
+        clickButtonOnEdt(button);
+
+        return DiagramDTOAssembler.toDTO(currentDiagram);
+    }
+
+    private static void clickButtonOnEdt(AbstractButton button) throws Exception {
+        Runnable click = button::doClick;
         try {
             if (SwingUtilities.isEventDispatchThread()) {
                 click.run();
@@ -373,14 +397,12 @@ public class DiagramViewManagerTool implements ToolProvider {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while clicking fit window.", e);
-            
+            throw new RuntimeException("Interrupted while clicking button.", e);
+
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            throw new RuntimeException("Failed to click fit window button.", cause != null ? cause : e);
+            throw new RuntimeException("Failed to click button.", cause != null ? cause : e);
         }
-
-        return DiagramDTOAssembler.toDTO(currentDiagram);
     }
 
     private static AbstractButton resolveClickableFitButton(Component fitControl) {
@@ -401,9 +423,18 @@ public class DiagramViewManagerTool implements ToolProvider {
         if (root == null || name == null) {
             return null;
         }
+        
         if (name.equals(root.getName())) {
             return root;
         }
+        
+        if (root instanceof JMenu menu) {
+            Component found = findComponentByName(menu.getPopupMenu(), name);
+            if (found != null) {
+                return found;
+            }
+        }
+        
         if (root instanceof Container container) {
             for (Component child : container.getComponents()) {
                 Component found = findComponentByName(child, name);
@@ -412,6 +443,7 @@ public class DiagramViewManagerTool implements ToolProvider {
                 }
             }
         }
+        
         return null;
     }
 
@@ -419,6 +451,14 @@ public class DiagramViewManagerTool implements ToolProvider {
         if (root instanceof AbstractButton ab && actionCommand.equals(ab.getActionCommand())) {
             return ab;
         }
+        
+        if (root instanceof JMenu menu) {
+            AbstractButton found = findAbstractButtonByActionCommand(menu.getPopupMenu(), actionCommand);
+            if (found != null) {
+                return found;
+            }
+        }
+        
         if (root instanceof Container container) {
             for (Component child : container.getComponents()) {
                 AbstractButton found = findAbstractButtonByActionCommand(child, actionCommand);
@@ -427,6 +467,7 @@ public class DiagramViewManagerTool implements ToolProvider {
                 }
             }
         }
+        
         return null;
     }
 
@@ -487,6 +528,90 @@ public class DiagramViewManagerTool implements ToolProvider {
         }
 
         return new PresentationListDTO(presentationDTOs);
+    }
+
+    private PresentationListDTO bringPresentationsToFront(McpSyncServerExchange exchange, IdListDTO param) throws Exception {
+        log.debug("Bring presentations to front: {}", param);
+
+        return arrangeDepthOfPresentations(param, BRING_TO_FRONT_MENU_ITEM_NAME);
+    }
+
+    private PresentationListDTO sendPresentationsToBack(McpSyncServerExchange exchange, IdListDTO param) throws Exception {
+        log.debug("Send presentations to back: {}", param);
+
+        return arrangeDepthOfPresentations(param, SEND_TO_BACK_MENU_ITEM_NAME);
+    }
+
+    private PresentationListDTO arrangeDepthOfPresentations(IdListDTO param, String menuItemName) throws Exception {
+        List<IPresentation> presentations = new ArrayList<>();
+        for (String id : param.value().stream().map(IdDTO::id).toList()) {
+            presentations.add(astahProToolSupport.getPresentation(id));
+        }
+
+        // Sort Z-order
+        if (BRING_TO_FRONT_MENU_ITEM_NAME.equals(menuItemName)) {
+            presentations.sort((a, b) -> Integer.compare(b.getDepth(), a.getDepth()));
+        } else {
+            presentations.sort((a, b) -> Integer.compare(a.getDepth(), b.getDepth()));
+        }
+
+        for (IPresentation presentation : presentations) {
+            try {
+                diagramViewManager.unselectAll();
+                diagramViewManager.select(new IPresentation[]{presentation});
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to select presentation: " + presentation.getLabel());
+            }
+            clickArrangeDepthMenuItem(menuItemName);
+        }
+
+        List<PresentationDTO> presentationDTOs = new ArrayList<>();
+        for (IPresentation presentation : presentations) {
+            presentationDTOs.add(PresentationDTOAssembler.toDTO(presentation));
+        }
+
+        return new PresentationListDTO(presentationDTOs);
+    }
+
+    private void clickArrangeDepthMenuItem(String menuItemName) throws Exception {
+        JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();
+        if (mainFrame == null) {
+            throw new RuntimeException("Main window is unavailable.");
+        }
+
+        // The Edit menu-bar item is stable and always present (unlike the toolbar dropdown,
+        // whose lazily-built popup items are not reachable until shown).
+        Component component = findComponentByName(mainFrame, menuItemName);
+        if (!(component instanceof AbstractButton item)) {
+            throw new RuntimeException("Arrange depth menu item not found (name=" + menuItemName + ").");
+        }
+
+        // Check isEnabled() and click together on the EDT so that any pending EDT events
+        // from diagramViewManager.select() are flushed before reading the enabled state.
+        AtomicReference<Exception> error = new AtomicReference<>();
+        Runnable action = () -> {
+            if (!item.isEnabled()) {
+                error.set(new RuntimeException("Arrange depth menu item is disabled (name=" + menuItemName + ")."));
+                return;
+            }
+            item.doClick();
+        };
+        try {
+            if (SwingUtilities.isEventDispatchThread()) {
+                action.run();
+            } else {
+                SwingUtilities.invokeAndWait(action);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while clicking menu item.", e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw (cause instanceof Exception ex) ? ex : new RuntimeException("Unexpected error", cause);
+        }
+        if (error.get() != null) {
+            throw error.get();
+        }
     }
 
 }

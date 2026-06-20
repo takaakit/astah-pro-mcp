@@ -101,7 +101,7 @@ public class MessageTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_ope_of_msg",
-                "Set the operation of the specified message (specified by ID), and return the model element of the message after it is set.",
+                "Set the operation of the specified message (specified by ID), and return the model element of the message after it is set. Note that, in order to set an operation to a message, the base class of the receiver lifeline must be set.",
                 this::setOperation,
                 MessageWithOperationDTO.class,
                 MessageDTO.class)

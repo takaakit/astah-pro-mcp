@@ -37,7 +37,7 @@ public class ERDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get ER diagram guide: {}", param);
 
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * Before you refer to or edit an ER diagram, use the available tools to develop a thorough understanding of Object-Relational Impedance Mismatch.
 
@@ -129,6 +129,6 @@ ERSubtypeRelationship ---> "foreign keys" ERAttribute
 ```
         """;
 
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

@@ -7,6 +7,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageWithPointDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewRectDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTextWithPointDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
@@ -29,8 +30,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -43,6 +43,7 @@ public class DiagramEditorToolTest {
     private Method insertSvgImage;
     private Method insertPngImage;
     private Method insertJpgImage;
+    private Method insertRect;
     private Method insertText;
     private Method deleteDiagram;
     private Method deletePresentation;
@@ -58,7 +59,7 @@ public class DiagramEditorToolTest {
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
         when(imageCaptureSupport.createImageContent(anyString(), any()))
-            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
+            .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
         tool = new DiagramEditorTool(
@@ -90,6 +91,13 @@ public class DiagramEditorToolTest {
             "insertJpgImage",
             McpSyncServerExchange.class,
             NewJpgImageWithPointDTO.class);
+
+        // insertRect() method
+        insertRect = TestSupport.getAccessibleMethod(
+            DiagramEditorTool.class,
+            "insertRect",
+            McpSyncServerExchange.class,
+            NewRectDTO.class);
 
         // insertText() method
         insertText = TestSupport.getAccessibleMethod(
@@ -215,6 +223,40 @@ public class DiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void insertRect_ok() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+
+        // Create input DTO
+        NewRectDTO inputDTO = new NewRectDTO(
+            classDiagram.getId(),
+            10,
+            20,
+            100,
+            50);
+
+        // ----------------------------------------
+        // Call insertRect()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            insertRect,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check the inserted rectangle
+        assertEquals(inputDTO.locationX(), (int) outputDTO.drawnRectangle().x());
+        assertEquals(inputDTO.locationY(), (int) outputDTO.drawnRectangle().y());
+        assertEquals(inputDTO.width(), (int) outputDTO.drawnRectangle().width());
+        assertEquals(inputDTO.height(), (int) outputDTO.drawnRectangle().height());
     }
 
     @Test

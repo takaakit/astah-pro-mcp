@@ -20,16 +20,20 @@ public final class McpServerConfig {
     public static final int PORT_FOR_QUERY_ONLY_TOOL = 8889;
 
     // Allowlist of host addresses
-    public static final Set<String> ORIGIN_HOST_ALLOWLIST =
-            Set.of("127.0.0.1", "::1");
+    public static final Set<String> ORIGIN_HOST_ALLOWLIST = Set.of("127.0.0.1", "::1");
+
+    // Grace period after a user approval during which further initialize requests
+    // from the same User-Agent are approved automatically without a dialog.
+    public static final long APPROVAL_GRACE_PERIOD_MS = 30_000;
+
+    // Maximum time a tool call waits to acquire exclusive access to the Astah API
+    public static final long ASTAH_API_LOCK_TIMEOUT_SECONDS = 30;
 
     // Root directory where generated output is stored.
-    public static final Path ROOT_OUTPUT_DIR =
-            Paths.get(System.getProperty("user.home"), ".astah-pro-mcp");
+    public static final Path ROOT_OUTPUT_DIR = Paths.get(System.getProperty("user.home"), ".astah-pro-mcp");
 
     // Temporary workspace directory
-    public static final Path WORKSPACE_DIR =
-            ROOT_OUTPUT_DIR.resolve("workspace");
+    public static final Path WORKSPACE_DIR = ROOT_OUTPUT_DIR.resolve("workspace");
 
     // Jetty server idle timeout
     public static final int JETTY_IDLE_TIMEOUT_MS = 300000; // 5min

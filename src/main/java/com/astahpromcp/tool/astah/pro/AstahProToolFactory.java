@@ -6,7 +6,7 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.editor.*;
 import com.astahpromcp.tool.astah.pro.guide.*;
 import com.astahpromcp.tool.astah.pro.image.*;
-import com.astahpromcp.tool.astah.pro.verification.*;
+import com.astahpromcp.tool.astah.pro.review.*;
 import com.astahpromcp.tool.astah.pro.model.*;
 import com.astahpromcp.tool.astah.pro.presentation.*;
 import com.astahpromcp.tool.astah.pro.project.*;
@@ -85,6 +85,7 @@ public class AstahProToolFactory {
             providers.add(new ImageCaptureTool(imageCaptureSupport));
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramLayoutLintTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
+            providers.add(new TerminologyConsistencyTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
 
             // Activity diagram tools
             if (categoryFlags.activityDiagramEnabled()) {
@@ -193,6 +194,7 @@ public class AstahProToolFactory {
                 providers.add(new ERModelEditorTool(erModelEditor, projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERDiagramEditorTool(projectAccessor, transactionManager, erDiagramEditor, astahProToolSupport, imageCaptureSupport, false));
                 providers.add(new ERDiagramTool(projectAccessor, transactionManager, astahProToolSupport, false));
+                providers.add(new ERDomainTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERModelTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERSchemaTool(projectAccessor, transactionManager, astahProToolSupport, false));
                 providers.add(new ERPackageTool(projectAccessor, transactionManager, astahProToolSupport, false));
@@ -211,8 +213,14 @@ public class AstahProToolFactory {
                 providers.add(new MindMapDiagramTool(projectAccessor, transactionManager, astahProToolSupport, includeEditorTools));
             }
 
-            return providers;
-        
+            // Wrap every provider so that each tool call holds the process-wide Astah API lock,
+            // serializing Astah API access across concurrently connected AI agents.
+            List<ToolProvider> exclusiveProviders = providers.stream()
+                    .map(provider -> (ToolProvider) new ExclusiveToolProvider(provider))
+                    .toList();
+            
+            return exclusiveProviders;
+
         } catch (ClassNotFoundException e) {
             log.error("Failed to get Astah Pro API classes: {}", e.getMessage());
             return List.of();

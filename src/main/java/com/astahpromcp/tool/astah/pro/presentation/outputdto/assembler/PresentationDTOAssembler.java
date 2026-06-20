@@ -48,9 +48,12 @@ public class PresentationDTOAssembler {
             fontColor = "";
         }
 
+        // If the presentation has a null label (such as an image, rectangle, or line), use an empty string.
+        String label = astahPresentation.getLabel() != null ? astahPresentation.getLabel() : "";
+
         return  new PresentationDTO(
             astahPresentation.getID(),
-            astahPresentation.getLabel(),
+            label,
             renderedInDiagram,
             correspondingModelElement,
             astahPresentation.getType(),

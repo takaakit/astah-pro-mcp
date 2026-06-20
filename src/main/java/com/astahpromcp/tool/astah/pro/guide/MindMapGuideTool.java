@@ -37,12 +37,12 @@ public class MindMapGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get mind map guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * For newly created topics, create and insert a 32px x 32px SVG icon that visually represents the topic.
 * The topic label may contain not only a title but also a description.
         """;
 
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

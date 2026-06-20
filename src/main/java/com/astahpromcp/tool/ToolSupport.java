@@ -62,10 +62,8 @@ public final class ToolSupport {
         log.debug("inputSchema: {}", inputSchema);
         log.debug("outputSchema: {}", outputSchema);
 
-        return McpSchema.Tool.builder()
-                .name(toolName)
+        return McpSchema.Tool.builder(toolName, JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .description(toolDescription)
-                .inputSchema(JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .outputSchema(JsonSupport.MCP_JSON_MAPPER, outputSchema)
                 .build();
     }
@@ -78,7 +76,7 @@ public final class ToolSupport {
             ToolFunctionReturningDto<INPUT_DTO, OUTPUT_DTO> function,
             Class<INPUT_DTO> inputDtoType) {
 
-        ValidationSupport.ValidationResult<INPUT_DTO> parsed = ValidationSupport.parse(request.arguments(), inputDtoType);
+        DtoBinder.BindResult<INPUT_DTO> parsed = DtoBinder.bind(request.arguments(), inputDtoType);
         if (parsed.error() != null) {
             return parsed.error();
         }
@@ -145,10 +143,8 @@ public final class ToolSupport {
 
         log.debug("inputSchema: {}", inputSchema);
 
-        return McpSchema.Tool.builder()
-                .name(toolName)
+        return McpSchema.Tool.builder(toolName, JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .description(toolDescription)
-                .inputSchema(JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .build();
     }
 
@@ -160,7 +156,7 @@ public final class ToolSupport {
             ToolFunctionReturningContents<INPUT_DTO> function,
             Class<INPUT_DTO> inputDtoType) {
 
-        ValidationSupport.ValidationResult<INPUT_DTO> parsed = ValidationSupport.parse(request.arguments(), inputDtoType);
+        DtoBinder.BindResult<INPUT_DTO> parsed = DtoBinder.bind(request.arguments(), inputDtoType);
         if (parsed.error() != null) {
             return parsed.error();
         }
@@ -228,10 +224,8 @@ public final class ToolSupport {
 
         log.debug("inputSchema: {}", inputSchema);
 
-        return McpSchema.Tool.builder()
-                .name(toolName)
+        return McpSchema.Tool.builder(toolName, JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .description(toolDescription)
-                .inputSchema(JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .build();
     }
 
@@ -243,7 +237,7 @@ public final class ToolSupport {
             ToolFunctionReturningDtoAndContents<INPUT_DTO, OUTPUT_DTO> function,
             Class<INPUT_DTO> inputDtoType) {
 
-        ValidationSupport.ValidationResult<INPUT_DTO> parsed = ValidationSupport.parse(request.arguments(), inputDtoType);
+        DtoBinder.BindResult<INPUT_DTO> parsed = DtoBinder.bind(request.arguments(), inputDtoType);
         if (parsed.error() != null) {
             return parsed.error();
         }

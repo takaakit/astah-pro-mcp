@@ -1,4 +1,4 @@
-package com.astahpromcp.tool.astah.pro.verification;
+package com.astahpromcp.tool.astah.pro.review;
 
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
@@ -66,6 +66,10 @@ public class DiagramLayoutLintTool implements ToolProvider {
     }
 
     private List<ToolDefinition> createQueryTools() {
+        return List.of();
+    }
+
+    private List<ToolDefinition> createEditTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "detect_overlap",
@@ -75,15 +79,11 @@ public class DiagramLayoutLintTool implements ToolProvider {
                 ReportDTO.class));
     }
 
-    private List<ToolDefinition> createEditTools() {
-        return List.of();
-    }
-
     private ReportDTO detectOverlap(McpSyncServerExchange exchange, IdDTO param) throws Exception {
         log.debug("Detect overlap: {}", param);
 
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
-        StringBuilder sbContent = new StringBuilder();
+        StringBuilder sbContents = new StringBuilder();
 
         // Retrieve the node/link presentations to be checked for overlap detection
         List<INodePresentation> targetNodePresentations;
@@ -180,11 +180,11 @@ public class DiagramLayoutLintTool implements ToolProvider {
         }
 
         // Detect overlaps
-        sbContent.append(detectOverlapsBetweenRectangles(targetNodePresentations));
-        sbContent.append(detectOverlapsBetweenLines(targetLinkPresentations));
-        sbContent.append(detectOverlapsBetweenRectangleAndLine(targetNodePresentations, targetLinkPresentations));
+        sbContents.append(detectOverlapsBetweenRectangles(targetNodePresentations));
+        sbContents.append(detectOverlapsBetweenLines(targetLinkPresentations));
+        sbContents.append(detectOverlapsBetweenRectangleAndLine(targetNodePresentations, targetLinkPresentations));
 
-        return new ReportDTO(sbContent.toString());
+        return new ReportDTO(sbContents.toString());
     }
 
     // Retrieve node presentations with the specified type names

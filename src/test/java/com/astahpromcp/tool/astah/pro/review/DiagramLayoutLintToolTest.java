@@ -1,4 +1,4 @@
-package com.astahpromcp.tool.astah.pro.verification;
+package com.astahpromcp.tool.astah.pro.review;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
@@ -79,17 +79,17 @@ public class DiagramLayoutLintToolTest {
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
-        assertEquals(10, outputDTO.content().lines().count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Class0") && line.contains("Class1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("asso1") && line.contains("dep0")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Class7") && line.contains("asso2")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("gen2") && line.contains("gen3")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("gen3") && line.contains("Class11")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("asso4") && line.contains("asso8")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("dep1") && line.contains("dep2")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("asso9") && line.contains("asso10")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("asso14") && line.contains("asso15")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Class4") && line.contains("Note0")).count());
+        assertEquals(10, outputDTO.contents().lines().count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Class0") && line.contains("Class1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("asso1") && line.contains("dep0")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Class7") && line.contains("asso2")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("gen2") && line.contains("gen3")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("gen3") && line.contains("Class11")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("asso4") && line.contains("asso8")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("dep1") && line.contains("dep2")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("asso9") && line.contains("asso10")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("asso14") && line.contains("asso15")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Class4") && line.contains("Note0")).count());
     }
 
     @Test
@@ -113,14 +113,14 @@ public class DiagramLayoutLintToolTest {
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
-        assertEquals(7, outputDTO.content().lines().count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("UseCase0") && line.contains("UseCase1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("gen0") && line.contains("gen1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("gen1") && line.contains("Actor1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("asso2") && line.contains("asso5")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("inc0") && line.contains("ext0")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("asso6") && line.contains("dep0")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("UseCase3") && line.contains("Note1")).count());
+        assertEquals(7, outputDTO.contents().lines().count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("UseCase0") && line.contains("UseCase1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("gen0") && line.contains("gen1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("gen1") && line.contains("Actor1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("asso2") && line.contains("asso5")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("inc0") && line.contains("ext0")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("asso6") && line.contains("dep0")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("UseCase3") && line.contains("Note1")).count());
     }
 
     @Test
@@ -144,10 +144,10 @@ public class DiagramLayoutLintToolTest {
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
-        assertEquals(3, outputDTO.content().lines().count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Message0") && line.contains("Message1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Lifeline2") && line.contains("Lifeline3")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Lifeline3") && line.contains("Note2")).count());
+        assertEquals(3, outputDTO.contents().lines().count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Message0") && line.contains("Message1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Lifeline2") && line.contains("Lifeline3")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Lifeline3") && line.contains("Note2")).count());
     }
 
     @Test
@@ -171,17 +171,17 @@ public class DiagramLayoutLintToolTest {
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
-        assertEquals(11, outputDTO.content().lines().count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Action0") && line.contains("Action1") && !line.contains("CallBehaviorAction0") && !line.contains("CallBehaviorAction1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("CallBehaviorAction0") && line.contains("CallBehaviorAction1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Decision Node & Merge Node0") && line.contains("Decision Node & Merge Node1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Object0") && line.contains("Object1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("InitialNode0") && line.contains("Note3")).count());
-        assertEquals(2, outputDTO.content().lines().filter(line -> line.matches(".*ControlFlow/ObjectFlow.*ControlFlow/ObjectFlow.*")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Decision Node & Merge Node0") && line.contains("ControlFlow/ObjectFlow")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("SendSignalAction") && line.contains("AcceptEventAction")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("AcceptEventAction") && line.contains("Process")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("ForkNode0") && line.contains("JoinNode0")).count());
+        assertEquals(11, outputDTO.contents().lines().count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Action0") && line.contains("Action1") && !line.contains("CallBehaviorAction0") && !line.contains("CallBehaviorAction1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("CallBehaviorAction0") && line.contains("CallBehaviorAction1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Decision Node & Merge Node0") && line.contains("Decision Node & Merge Node1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Object0") && line.contains("Object1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("InitialNode0") && line.contains("Note3")).count());
+        assertEquals(2, outputDTO.contents().lines().filter(line -> line.matches(".*ControlFlow/ObjectFlow.*ControlFlow/ObjectFlow.*")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Decision Node & Merge Node0") && line.contains("ControlFlow/ObjectFlow")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("SendSignalAction") && line.contains("AcceptEventAction")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("AcceptEventAction") && line.contains("Process")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("ForkNode0") && line.contains("JoinNode0")).count());
     }
 
     @Test
@@ -205,10 +205,10 @@ public class DiagramLayoutLintToolTest {
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
-        assertEquals(5, outputDTO.content().lines().count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("Choice0") && line.contains("Choice1")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("ForkPseudostate0") && line.contains("JoinPseudostate0")).count());
-        assertEquals(1, outputDTO.content().lines().filter(line -> line.contains("InitialPseudostate0") && line.contains("Note4")).count());
-        assertEquals(2, outputDTO.content().lines().filter(line -> line.matches(".*Transition.*Transition.*")).count());
+        assertEquals(5, outputDTO.contents().lines().count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("Choice0") && line.contains("Choice1")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("ForkPseudostate0") && line.contains("JoinPseudostate0")).count());
+        assertEquals(1, outputDTO.contents().lines().filter(line -> line.contains("InitialPseudostate0") && line.contains("Note4")).count());
+        assertEquals(2, outputDTO.contents().lines().filter(line -> line.matches(".*Transition.*Transition.*")).count());
     }
 }

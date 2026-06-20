@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -30,13 +29,11 @@ public class DDDReferenceTool implements ToolProvider {
     private final List<String> contentCache;
     
     private final Path outputDirectory;
-    private final ProjectAccessor projectAccessor;
 
     private final String dddReferenceUrl = "https://www.domainlanguage.com/wp-content/uploads/2016/05/DDD_Reference_2015-03.pdf";
 
-    public DDDReferenceTool(Path outputDirectory, ProjectAccessor projectAccessor) {
+    public DDDReferenceTool(Path outputDirectory) {
         this.outputDirectory = outputDirectory;
-        this.projectAccessor = projectAccessor;
         this.contentCache = new CopyOnWriteArrayList<>();
     }
 

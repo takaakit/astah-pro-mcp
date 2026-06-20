@@ -27,7 +27,7 @@ public class AstahProMcpGuideTool implements ToolProvider {
 	        return List.of(
 	            ToolSupport.toolDefinitionReturningDto(
 	                "astah_pro_mcp_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server. To run this tool, an Astah project must be open.",
+	                "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server.",
 	                this::getGuide,
 	                NoInputDTO.class,
 	                GuideDTO.class)
@@ -56,7 +56,7 @@ public class AstahProMcpGuideTool implements ToolProvider {
             primitiveTypes += primitiveType.getName() + System.lineSeparator();
         }
         
-        String content = """
+        String contents = """
 This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, you can reference and edit an Astah project.
 
 "Astah projects consist of Models and Presentations. Presentation is visual information to notate the model elements in Astah. For example, if you want to get color information of a specific Class, you access presentation. If you want to edit attributes of a specific Class, you access model. Just remember, you use presentations for anything visual. The correspondence between the model and presentation is not necessarily 1:1. Some model elements have presentations and some don't (Astah API User Guide)."
@@ -73,7 +73,8 @@ IMPORTANT POINTS to Keep in Mind:
 * Object diagrams and package diagrams are substituted with class diagrams. This means that, for example, instance specifications and instance specification links are drawn on class diagrams.  
 * Save the Astah project using tools only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.
   DO NOT save the Astah project on your own initiative.
-* When new node/link presentations are placed on diagrams, adjust the layout of those presentations in accordance with the diagram layout guide.
+* When new node/link presentations are placed on diagrams, adjust the layout of those presentations in accordance with the diagram layout guide and to avoid diagram layout anti-patterns.
+* After you have finished editing the model elements and diagrams, and immediately before performing the final diagram layout check and adjustment, you MUST maintain terminology consistency across the names, labels, and definitions of model elements and diagrams.
 * Make sure to detect any overlaps caused by newly added node/link presentations using the tool and resolve them. However, NEVER take the incorrect approach of resolving overlaps by simply hiding the node/link presentations.
 * Draw all node/link presentations related to the content intended to be represented in the diagram, without omission. In particular, be careful not to forget to draw any link presentations that should be included.
 * You can place presentations at negative X or Y coordinates on the diagram. For example, a node/link presentation can be placed at (-100, -100).
@@ -257,6 +258,6 @@ The following types are defined by default in the Astah project, so you can use 
 %s
 """.formatted(primitiveTypes);
 
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

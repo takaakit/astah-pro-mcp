@@ -17,6 +17,8 @@ import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.StructureDiagramEditor;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IElement;
+import com.change_vision.jude.api.inf.model.ISequenceDiagram;
+import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -120,10 +122,17 @@ public class StructureDiagramEditorTool implements ToolProvider {
                         param.locationX(),
                         param.locationY()));
             
-            // Set the notation type to normal. This causes interfaces, for example, to be displayed as rectangles rather than as lollipops.
-            astahNodePresentation.setProperty(
-                Key.NOTATION_TYPE,
-                Value.NOTATION_TYPE_NORMAL);
+            // Use normal notation (e.g., interfaces as rectangles), except for actors on Use Case or Sequence diagrams.
+            if (astahElement.hasStereotype("actor")
+                && (astahStructureDiagram instanceof IUseCaseDiagram || astahStructureDiagram instanceof ISequenceDiagram)) {
+                astahNodePresentation.setProperty(
+                    Key.NOTATION_TYPE,
+                    Value.NOTATION_TYPE_ICON);
+            } else {
+                astahNodePresentation.setProperty(
+                    Key.NOTATION_TYPE,
+                    Value.NOTATION_TYPE_NORMAL);
+            }
             transactionManager.endTransaction();
 
             NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);

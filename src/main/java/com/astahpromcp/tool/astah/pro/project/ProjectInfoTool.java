@@ -37,8 +37,10 @@ public class ProjectInfoTool implements ToolProvider {
     private final AstahProToolSupport astahProToolSupport;
     private final List<List<NameIdTypeDTO>> nameIdTypeDTOChunksCache;
     private final List<List<LabelIdTypeDTO>> labelIdTypeDTOChunksCache;
+    private final List<List<DefinitionIdTypeDTO>> definitionIdTypeDTOChunksCache;
     private final Object nameCacheLock = new Object();
     private final Object labelCacheLock = new Object();
+    private final Object definitionCacheLock = new Object();
     private final boolean includeEditTools;
 
     public ProjectInfoTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
@@ -46,6 +48,7 @@ public class ProjectInfoTool implements ToolProvider {
         this.astahProToolSupport = astahProToolSupport;
         this.nameIdTypeDTOChunksCache = new ArrayList<>();
         this.labelIdTypeDTOChunksCache = new ArrayList<>();
+        this.definitionIdTypeDTOChunksCache = new ArrayList<>();
         this.includeEditTools = includeEditTools;
     }
 
@@ -94,6 +97,20 @@ public class ProjectInfoTool implements ToolProvider {
                 this::getPresentationsChunk,
                 ChunkDTO.class,
                 LabelIdTypeListDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "get_info_of_all_definitions",
+                "Return the total number of chunks and the data of the first chunk of all definitions in the project. The chunk data is a simplified information: definition, identifier, and type.",
+                this::getAllDefinitions,
+                NoInputDTO.class,
+                AllDefinitionIdTypeDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "get_chunk_of_all_definitions",
+                "Return the chunk data of all definitions in the project. The chunk data is a simplified information: definition, identifier, and type.",
+                this::getDefinitionsChunk,
+                ChunkDTO.class,
+                DefinitionIdTypeListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_dgm_prsts",
@@ -206,6 +223,55 @@ public class ProjectInfoTool implements ToolProvider {
         return new NameIdTypeListDTO(chunk);
     }
 
+    private AllDefinitionIdTypeDTO getAllDefinitions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Get information of all definitions: {}", param);
+
+        INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
+        List<DefinitionIdTypeDTO> definitionIdTypeDTOs = new ArrayList<>();
+        for (INamedElement astahNamedElement : astahNamedElements) {
+            try {
+                definitionIdTypeDTOs.add(DefinitionIdTypeDTOAssembler.toDTO(astahNamedElement));
+            } catch (Exception e) {
+                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to DefinitionIdTypeDTO: " + e.getMessage());
+            }
+        }
+
+        List<List<DefinitionIdTypeDTO>> newCache = new ArrayList<>();
+        if (definitionIdTypeDTOs.isEmpty()) {
+            newCache.add(new ArrayList<>());
+        } else {
+            for (int i = 0; i < definitionIdTypeDTOs.size(); i += CHUNK_SIZE) {
+                newCache.add(new ArrayList<>(definitionIdTypeDTOs.subList(i, Math.min(definitionIdTypeDTOs.size(), i + CHUNK_SIZE))));
+            }
+        }
+
+        List<DefinitionIdTypeDTO> firstChunk;
+        int totalChunks;
+        synchronized (definitionCacheLock) {
+            definitionIdTypeDTOChunksCache.clear();
+            definitionIdTypeDTOChunksCache.addAll(newCache);
+            totalChunks = definitionIdTypeDTOChunksCache.size();
+            firstChunk = definitionIdTypeDTOChunksCache.get(0);
+        }
+
+        return new AllDefinitionIdTypeDTO(totalChunks, firstChunk);
+    }
+
+    private DefinitionIdTypeListDTO getDefinitionsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
+        log.debug("Get definitions chunk: {}", param);
+
+        int chunkIndex = param.chunkIndex();
+        List<DefinitionIdTypeDTO> chunk;
+        synchronized (definitionCacheLock) {
+            if (chunkIndex < 0 || chunkIndex >= definitionIdTypeDTOChunksCache.size()) {
+                throw new RuntimeException("Invalid chunk index: " + chunkIndex);
+            }
+            chunk = definitionIdTypeDTOChunksCache.get(chunkIndex);
+        }
+
+        return new DefinitionIdTypeListDTO(chunk);
+    }
+
     private AllLabelIdTypeInfoDTO getAllPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get information of all presentations: {}", param);
 
@@ -281,46 +347,46 @@ public class ProjectInfoTool implements ToolProvider {
     private ReportDTO getAllConstraintsAndConditions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get all constraints and conditions: {}", param);
 
-        StringBuilder content = new StringBuilder();
+        StringBuilder contents = new StringBuilder();
 
         for (INamedElement astahNamedElement : projectAccessor.findElements(IConstraint.class)) {
             IConstraint astahConstraint = (IConstraint) astahNamedElement;
             String specification = astahConstraint.getSpecification();
             for (IElement astahConstrainedElement : astahConstraint.getConstrainedElement()) {
                 if (astahConstrainedElement instanceof INamedElement astahConstrainedNamedElement) {
-                    content.append("# ").append(astahConstrainedNamedElement.getFullName(".")).append("\n");
-                    content.append("Type: ").append(NamedElementDTO.Type.getCorrespondingType(astahConstrainedNamedElement).typeName).append("\n");
-                    content.append("ID: ").append(astahConstrainedNamedElement.getId()).append("\n");
+                    contents.append("# ").append(astahConstrainedNamedElement.getFullName(".")).append("\n");
+                    contents.append("Type: ").append(NamedElementDTO.Type.getCorrespondingType(astahConstrainedNamedElement).typeName).append("\n");
+                    contents.append("ID: ").append(astahConstrainedNamedElement.getId()).append("\n");
 
                     if (specification.startsWith("PRECONDITION:")) {
-                        content.append("Precondition:").append("\n");
-                        content.append("```").append("\n");
-                        content.append(Strings.CS.removeStart(specification, "PRECONDITION:")).append("\n");
-                        content.append("```").append("\n").append("\n");
+                        contents.append("Precondition:").append("\n");
+                        contents.append("```").append("\n");
+                        contents.append(Strings.CS.removeStart(specification, "PRECONDITION:")).append("\n");
+                        contents.append("```").append("\n").append("\n");
 
                     } else if (specification.startsWith("POSTCONDITION:")) {
-                        content.append("Postcondition:").append("\n");
-                        content.append("```").append("\n");
-                        content.append(Strings.CS.removeStart(specification, "POSTCONDITION:")).append("\n");
-                        content.append("```").append("\n").append("\n");
+                        contents.append("Postcondition:").append("\n");
+                        contents.append("```").append("\n");
+                        contents.append(Strings.CS.removeStart(specification, "POSTCONDITION:")).append("\n");
+                        contents.append("```").append("\n").append("\n");
 
                     } else if (specification.startsWith("BODYCONDITION:")) {
-                        content.append("Body condition:").append("\n");
-                        content.append("```").append("\n");
-                        content.append(Strings.CS.removeStart(specification, "BODYCONDITION:")).append("\n");
-                        content.append("```").append("\n").append("\n");
+                        contents.append("Body condition:").append("\n");
+                        contents.append("```").append("\n");
+                        contents.append(Strings.CS.removeStart(specification, "BODYCONDITION:")).append("\n");
+                        contents.append("```").append("\n").append("\n");
 
                     } else {
-                        content.append("Constraint:").append("\n");
-                        content.append("```").append("\n");
-                        content.append(specification).append("\n");
-                        content.append("```").append("\n").append("\n");
+                        contents.append("Constraint:").append("\n");
+                        contents.append("```").append("\n");
+                        contents.append(specification).append("\n");
+                        contents.append("```").append("\n").append("\n");
                     }
                 }
             }
         }
 
-        return new ReportDTO(content.toString());
+        return new ReportDTO(contents.toString());
     }
 
     private SourceTargetNameIdTypeListDTO retrieveClassifiersThatReferenceOrBeReferencedBy(McpSyncServerExchange exchange, IdDTO param) throws Exception {

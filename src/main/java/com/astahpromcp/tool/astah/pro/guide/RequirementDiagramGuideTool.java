@@ -37,7 +37,7 @@ public class RequirementDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get requirement diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 Terminology Definitions (quoted from OMG SysML Specification v.1.7):
 * A requirement specifies a capability or condition that must (or should) be satisfied. A requirement may specify a function that a system must perform or a performance condition a system must achieve.
 * A standard requirement includes properties to specify its unique identifier and text requirement. Additional properties such as verification status, can be specified by the user.
@@ -59,6 +59,6 @@ Terminology Definitions (quoted from OMG SysML Specification v.1.7):
 * A Verify relationship is a dependency between a requirement and a test case or other model element that can determine whether a system fulfills the requirement.
         """;
         
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

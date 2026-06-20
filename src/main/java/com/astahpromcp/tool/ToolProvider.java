@@ -6,4 +6,9 @@ import java.util.List;
 public interface ToolProvider {
 
     List<ToolDefinition> createToolDefinitions();
+
+    // Display name used in logs
+    default String name() {
+        return getClass().getSimpleName();
+    }
 }

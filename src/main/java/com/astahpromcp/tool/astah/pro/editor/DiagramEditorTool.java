@@ -11,6 +11,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageWithPointDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewRectDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTextWithPointDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
@@ -103,6 +104,13 @@ public class DiagramEditorTool implements ToolProvider {
                 this::insertJpgImage,
                 NewJpgImageWithPointDTO.class,
                 RectangleDTO.class),
+
+            ToolSupport.toolDefinitionReturningDtoAndContents(
+                "insert_rect_on_dgm",
+                "Insert a rectangle on the specified diagram (specified by ID), and return the newly created rectangle presentation along with the updated diagram image. For example, use this tool when you want to draw a system boundary on a use case diagram.",
+                this::insertRect,
+                NewRectDTO.class,
+                NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_txt_on_dgm",
@@ -246,6 +254,42 @@ public class DiagramEditorTool implements ToolProvider {
             McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
             return Pair.of(dto, List.of(diagramImage));
+
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertRect(McpSyncServerExchange exchange, NewRectDTO param) throws Exception {
+        log.debug("Insert rectangle: {}", param);
+
+        IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
+
+        DiagramEditor diagramEditor;
+        try {
+            diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get diagram editor.");
+        }
+
+        diagramEditor.setDiagram(astahDiagram);
+
+        try {
+            transactionManager.beginTransaction();
+            INodePresentation astahNodePresentation = diagramEditor.createRect(
+                new Point2D.Double(
+                        param.locationX(),
+                        param.locationY()),
+                param.width(),
+                param.height());
+            transactionManager.endTransaction();
+
+            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+
+            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+
+            return Pair.of(dto, List.of(image));
 
         } catch (Exception e) {
             transactionManager.abortTransaction();

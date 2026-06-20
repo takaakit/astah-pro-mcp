@@ -43,7 +43,7 @@ public class StructureDiagramEditorToolTest {
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
         when(imageCaptureSupport.createImageContent(anyString(), any()))
-            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
+            .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
         tool = new StructureDiagramEditorTool(

@@ -3,9 +3,19 @@ package com.astahpromcp;
 import com.astahpromcp.config.LogbackConfig;
 import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.server.McpServerApp;
+import com.astahpromcp.server.PortAvailabilityChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.Window;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class Activator implements BundleActivator {
@@ -14,6 +24,16 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
+        // Check port availability
+        List<Integer> portsInUse = PortAvailabilityChecker.findPortsInUse(
+                McpServerConfig.HOST,
+                List.of(McpServerConfig.PORT_FOR_FULL_TOOL, McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL));
+
+        if (!portsInUse.isEmpty()) {
+            showPluginDisabledDialog(portsInUse);
+            throw new IllegalStateException("Port is already in use: " + portsInUse.get(0));
+        }
+
         // Configure Logback
         LogbackConfig.configure(McpServerConfig.ROOT_OUTPUT_DIR);
         
@@ -45,6 +65,47 @@ public class Activator implements BundleActivator {
             currentThread.setContextClassLoader(originalClassLoader);
             log.debug("Context class loader restored");
         }
+    }
+
+    // Notify the user that the plugin has been disabled
+    private void showPluginDisabledDialog(List<Integer> portsInUse) {
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+
+        String ports = portsInUse.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+        String message = "The astah-pro-mcp plugin is disabled because the port(s) are already in use:" + ports;
+
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
+
+            Frame tempOwner = null;
+            JDialog dialog = null;
+            try {
+                tempOwner = new Frame();
+                tempOwner.setUndecorated(true);
+                tempOwner.setType(Window.Type.UTILITY);
+                tempOwner.setAlwaysOnTop(true);
+                tempOwner.setLocationRelativeTo(null);
+                tempOwner.setVisible(true);
+
+                dialog = optionPane.createDialog(tempOwner, "astah-pro-mcp");
+                dialog.setAlwaysOnTop(true);
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+                dialog.setVisible(true);
+
+            } finally {
+                if (dialog != null) {
+                    dialog.dispose();
+                }
+                if (tempOwner != null) {
+                    tempOwner.dispose();
+                }
+            }
+        });
     }
 
     @Override

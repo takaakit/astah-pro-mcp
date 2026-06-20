@@ -59,7 +59,7 @@ public class MindmapEditorToolTest {
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
         when(imageCaptureSupport.createImageContent(anyString(), any()))
-            .thenReturn(new McpSchema.ImageContent(null, "", "image/png"));
+            .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
         tool = new MindmapEditorTool(

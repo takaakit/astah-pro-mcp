@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -30,13 +29,11 @@ public class SystemsEngineeringKnowledgeTool implements ToolProvider {
     private final List<String> contentCache;
 
     private final Path outputDirectory;
-    private final ProjectAccessor projectAccessor;
 
     private final String systemsEngineeringHandbookUrl = "https://www.nasa.gov/wp-content/uploads/2018/09/nasa_systems_engineering_handbook_0.pdf";
 
-    public SystemsEngineeringKnowledgeTool(Path outputDirectory, ProjectAccessor projectAccessor) {
+    public SystemsEngineeringKnowledgeTool(Path outputDirectory) {
         this.outputDirectory = outputDirectory;
-        this.projectAccessor = projectAccessor;
         this.contentCache = new CopyOnWriteArrayList<>();
     }
 

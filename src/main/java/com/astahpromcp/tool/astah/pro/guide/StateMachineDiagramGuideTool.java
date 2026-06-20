@@ -37,7 +37,7 @@ public class StateMachineDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get state machine diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * To move a state to a different region within the same parent state, enlarge the destination region enough to accommodate the state being moved, and then change the coordinates of the state so that it is positioned within the destination region.
 
@@ -86,6 +86,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * This represents the special action of sending a signal and maps directly to a SendSignalAction that is part of the Activity that describes the effect Behavior of the corresponding Transition.
         """;
         
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }

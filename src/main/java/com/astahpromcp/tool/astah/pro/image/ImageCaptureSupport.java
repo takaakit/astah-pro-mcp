@@ -157,7 +157,7 @@ public class ImageCaptureSupport {
                 }
 
                 String encoded = Base64.getEncoder().encodeToString(pngBytes);
-                return new McpSchema.ImageContent(null, encoded, "image/png");
+                return McpSchema.ImageContent.builder(encoded, "image/png").build();
 
             } catch (OutOfMemoryError e) {
                 throw new RuntimeException("Insufficient memory to process screenshot", e);

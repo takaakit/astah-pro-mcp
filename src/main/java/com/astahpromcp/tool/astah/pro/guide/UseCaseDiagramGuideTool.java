@@ -37,7 +37,7 @@ public class UseCaseDiagramGuideTool implements ToolProvider {
     private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get usecase diagram guide: {}", param);
         
-        String content = """
+        String contents = """
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * UseCases are a means to capture the requirements of systems, i.e., what systems are supposed to do. The key concepts specified in this clause are Actors, UseCases, and subjects. Each UseCase’s subject represents a system under consideration to which the UseCase applies. Users and any other systems that may interact with a subject are represented as Actors.
 * Actors may represent roles played by human users, external hardware, or other systems.
@@ -50,6 +50,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * An Include relationship between UseCases is shown by a dashed arrow with an open arrowhead pointing from the base UseCase to the included UseCase. The arrow is labeled with the keyword «include».
         """;
         
-        return new GuideDTO(content);
+        return new GuideDTO(contents);
     }
 }
