@@ -94,9 +94,9 @@ public final class ToolSupport {
             
             return ResponseSupport.success(outputDto);
             
-        } catch (Exception e) {
-            String msg = String.format("Exception @tool=%s: %s", toolName, e.getMessage());
-            log.error(msg);
+        } catch (Throwable t) {
+            String msg = String.format("Exception @tool=%s: %s", toolName, t.getMessage());
+            log.error(msg, t);
             return ResponseSupport.error(msg);
         }
     }
@@ -174,9 +174,9 @@ public final class ToolSupport {
             
             return ResponseSupport.success(contents);
             
-        } catch (Exception e) {
-            String msg = String.format("Exception @tool=%s: %s", toolName, e.getMessage());
-            log.error(msg);
+        } catch (Throwable t) {
+            String msg = String.format("Exception @tool=%s: %s", toolName, t.getMessage());
+            log.error(msg, t);
             return ResponseSupport.error(msg);
         }
     }
@@ -259,9 +259,9 @@ public final class ToolSupport {
 
             return ResponseSupport.success(outputDto, contents);
 
-        } catch (Exception e) {
-            String msg = String.format("Exception @tool=%s: %s", toolName, e.getMessage());
-            log.error(msg);
+        } catch (Throwable t) {
+            String msg = String.format("Exception @tool=%s: %s", toolName, t.getMessage());
+            log.error(msg, t);
             return ResponseSupport.error(msg);
         }
     }

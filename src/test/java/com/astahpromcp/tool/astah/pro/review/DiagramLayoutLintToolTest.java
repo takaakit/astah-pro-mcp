@@ -5,7 +5,6 @@ import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.ReportDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class DiagramLayoutLintToolTest {
 
@@ -32,14 +32,14 @@ public class DiagramLayoutLintToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/layout/DiagramLayoutLintToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new DiagramLayoutLintTool(
                 projectAccessor,
-                transactionManager,
+                transactionSupport,
                 astahProToolSupport,
                 true);
 

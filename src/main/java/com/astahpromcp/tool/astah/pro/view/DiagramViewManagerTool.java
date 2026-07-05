@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO
 import com.astahpromcp.tool.astah.pro.view.inputdto.PresentationWithHighlightColorDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -30,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IDiagramViewManager.html
@@ -44,14 +44,14 @@ public class DiagramViewManagerTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final IDiagramViewManager diagramViewManager;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public DiagramViewManagerTool(ProjectAccessor projectAccessor, IDiagramViewManager diagramViewManager, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public DiagramViewManagerTool(ProjectAccessor projectAccessor, IDiagramViewManager diagramViewManager, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.diagramViewManager = diagramViewManager;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -329,15 +329,10 @@ public class DiagramViewManagerTool implements ToolProvider {
             throw new RuntimeException("Failed to get the current diagram.");
         }
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             diagramViewManager.layoutAll();
-            transactionManager.endTransaction();
-            
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        });
+        
 
         return DiagramDTOAssembler.toDTO(currentDiagram);
     }
@@ -476,8 +471,7 @@ public class DiagramViewManagerTool implements ToolProvider {
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             if (astahPresentation instanceof INodePresentation) {
                 diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, Color.decode(param.highlightColor()));
             } else if (astahPresentation instanceof ILinkPresentation) {
@@ -485,12 +479,7 @@ public class DiagramViewManagerTool implements ToolProvider {
             } else {
                 diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, Color.decode(param.highlightColor()));
             }
-            transactionManager.endTransaction();
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        });
 
         return PresentationDTOAssembler.toDTO(astahPresentation);
     }
@@ -500,15 +489,10 @@ public class DiagramViewManagerTool implements ToolProvider {
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             diagramViewManager.clearAllViewProperties(astahPresentation);
-            transactionManager.endTransaction();
+        });
 
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
         
         return PresentationDTOAssembler.toDTO(astahPresentation);
     }

@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithColo
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithLabelDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -26,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class PresentationToolTest {
 
@@ -41,7 +41,7 @@ public class PresentationToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/presentation/PresentationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
@@ -51,7 +51,7 @@ public class PresentationToolTest {
         // Tool
         tool = new PresentationTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             imageCaptureSupport,
             true);

@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.MessageDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IMessage.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class MessageTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public MessageTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public MessageTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -121,17 +121,11 @@ public class MessageTool implements ToolProvider {
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahMessage.setArgument(param.argument());
-            transactionManager.endTransaction();
+        });
 
-            return MessageDTOAssembler.toDTO(astahMessage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return MessageDTOAssembler.toDTO(astahMessage);
     }
 
     private MessageDTO setGuard(McpSyncServerExchange exchange, MessageWithGuardDTO param) throws Exception {
@@ -139,16 +133,11 @@ public class MessageTool implements ToolProvider {
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahMessage.setGuard(param.guard());
-            transactionManager.endTransaction();
+        });
 
-            return MessageDTOAssembler.toDTO(astahMessage);
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return MessageDTOAssembler.toDTO(astahMessage);
     }
 
     private MessageDTO setReturnValue(McpSyncServerExchange exchange, MessageWithReturnValueDTO param) throws Exception {
@@ -156,17 +145,11 @@ public class MessageTool implements ToolProvider {
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahMessage.setReturnValue(param.returnValue());
-            transactionManager.endTransaction();
+        });
 
-            return MessageDTOAssembler.toDTO(astahMessage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return MessageDTOAssembler.toDTO(astahMessage);
     }
 
     private MessageDTO setReturnValueVariable(McpSyncServerExchange exchange, MessageWithReturnValueVariableDTO param) throws Exception {
@@ -174,17 +157,11 @@ public class MessageTool implements ToolProvider {
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahMessage.setReturnValueVariable(param.returnValueVariable());
-            transactionManager.endTransaction();
+        });
 
-            return MessageDTOAssembler.toDTO(astahMessage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return MessageDTOAssembler.toDTO(astahMessage);
     }
 
     private MessageDTO setAsynchronous(McpSyncServerExchange exchange, MessageWithAsynchronousDTO param) throws Exception {
@@ -192,16 +169,11 @@ public class MessageTool implements ToolProvider {
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahMessage.setAsynchronous(param.isAsynchronous());
-            transactionManager.endTransaction();
+        });
 
-            return MessageDTOAssembler.toDTO(astahMessage);
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return MessageDTOAssembler.toDTO(astahMessage);
     }
 
     private MessageDTO setOperation(McpSyncServerExchange exchange, MessageWithOperationDTO param) throws Exception {
@@ -210,16 +182,10 @@ public class MessageTool implements ToolProvider {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
         IOperation astahOperation = astahProToolSupport.getOperation(param.operationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahMessage.setOperation(astahOperation);
-            transactionManager.endTransaction();
+        });
 
-            return MessageDTOAssembler.toDTO(astahMessage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return MessageDTOAssembler.toDTO(astahMessage);
     }
 }

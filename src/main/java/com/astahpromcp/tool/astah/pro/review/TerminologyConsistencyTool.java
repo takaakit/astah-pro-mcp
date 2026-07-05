@@ -9,23 +9,23 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.StepsDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
 public class TerminologyConsistencyTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public TerminologyConsistencyTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public TerminologyConsistencyTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }

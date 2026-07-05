@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERDomainWithParentERDomainD
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERDomainWithPhysicalNameDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDomainDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDomainDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -23,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDomain.html
@@ -30,13 +30,13 @@ import java.util.List;
 public class ERDomainTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERDomainTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERDomainTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -135,17 +135,11 @@ public class ERDomainTool implements ToolProvider {
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setDatatype(astahERDatatype);
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setDefaultValue(McpSyncServerExchange exchange, ERDomainWithDefaultValueDTO param) throws Exception {
@@ -153,17 +147,11 @@ public class ERDomainTool implements ToolProvider {
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setDefaultValue(param.defaultValue());
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setLengthPrecision(McpSyncServerExchange exchange, ERDomainWithLengthPrecisionDTO param) throws Exception {
@@ -171,17 +159,11 @@ public class ERDomainTool implements ToolProvider {
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setLengthPrecision(param.lengthPrecision());
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setLogicalName(McpSyncServerExchange exchange, ERDomainWithLogicalNameDTO param) throws Exception {
@@ -189,17 +171,11 @@ public class ERDomainTool implements ToolProvider {
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setLogicalName(param.logicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setPhysicalName(McpSyncServerExchange exchange, ERDomainWithPhysicalNameDTO param) throws Exception {
@@ -207,17 +183,11 @@ public class ERDomainTool implements ToolProvider {
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setPhysicalName(param.physicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setNotNull(McpSyncServerExchange exchange, ERDomainWithNotNullDTO param) throws Exception {
@@ -225,17 +195,11 @@ public class ERDomainTool implements ToolProvider {
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setNotNull(param.isNotNull());
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setParentERDomain(McpSyncServerExchange exchange, ERDomainWithParentERDomainDTO param) throws Exception {
@@ -244,16 +208,10 @@ public class ERDomainTool implements ToolProvider {
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
         IERDomain astahParentERDomain = astahProToolSupport.getERDomain(param.parentERDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDomain.setParentDomain(astahParentERDomain);
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(astahERDomain);
-            
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 }

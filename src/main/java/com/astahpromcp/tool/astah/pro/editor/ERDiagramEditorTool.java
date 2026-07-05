@@ -17,7 +17,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ERDiagramEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IERDiagram;
 import com.change_vision.jude.api.inf.model.IERPackage;
@@ -32,6 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERDiagramEditor.html
@@ -39,15 +39,15 @@ import java.util.List;
 public class ERDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final ERDiagramEditor erDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public ERDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ERDiagramEditor erDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public ERDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ERDiagramEditor erDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.erDiagramEditor = erDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -111,19 +111,13 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         IERPackage astahERPackage = astahProToolSupport.getERPackage(param.targetERPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERDiagram createdAstahERDiagram = erDiagramEditor.createERDiagram(
+        IERDiagram createdAstahERDiagram = txnAstah.call( () -> {
+            return erDiagramEditor.createERDiagram(
                 astahERPackage,
                 param.newERDiagramName());
-            transactionManager.endTransaction();
+        });
 
-            return ERDiagramDTOAssembler.toDTO(createdAstahERDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDiagramDTOAssembler.toDTO(createdAstahERDiagram);
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationOnERDiagramDTO param) throws Exception {
@@ -134,25 +128,19 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         erDiagramEditor.setDiagram(astahERDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = erDiagramEditor.createNodePresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return erDiagramEditor.createNodePresentation(
                 astahElement,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationOnERDiagramDTO param) throws Exception {
@@ -165,24 +153,18 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         erDiagramEditor.setDiagram(astahERDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = erDiagramEditor.createLinkPresentation(
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return erDiagramEditor.createLinkPresentation(
                 astahElement,
                 astahSourceNodePresentation,
                 astahTargetNodePresentation);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubtypeRelationshipGroup(McpSyncServerExchange exchange, NewSubtypeRelationshipGroupOnERDiagramDTO param) throws Exception {
@@ -197,22 +179,16 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         erDiagramEditor.setDiagram(astahERDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = erDiagramEditor.createSubtypeRelationshipGroup(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return erDiagramEditor.createSubtypeRelationshipGroup(
                 subtypeRelationshipPresentations.toArray(new ILinkPresentation[0]),
                 param.direction());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

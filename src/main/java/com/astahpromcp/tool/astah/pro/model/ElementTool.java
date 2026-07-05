@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithTaggedValueDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ElementWithTypeModifierDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ElementDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IElement.html
@@ -31,13 +31,13 @@ import java.util.Set;
 public class ElementTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ElementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ElementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -106,17 +106,11 @@ public class ElementTool implements ToolProvider {
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahElement.addStereotype(param.stereotype());
-            transactionManager.endTransaction();
+        });
 
-            return ElementDTOAssembler.toDTO(astahElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ElementDTOAssembler.toDTO(astahElement);
     }
 
     private ElementDTO removeStereotype(McpSyncServerExchange exchange, ElementWithStereotypeDTO param) throws Exception {
@@ -124,17 +118,11 @@ public class ElementTool implements ToolProvider {
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahElement.removeStereotype(param.stereotype());
-            transactionManager.endTransaction();
+        });
 
-            return ElementDTOAssembler.toDTO(astahElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ElementDTOAssembler.toDTO(astahElement);
     }
 
     private ElementDTO setTypeModifier(McpSyncServerExchange exchange, ElementWithTypeModifierDTO param) throws Exception {
@@ -142,17 +130,11 @@ public class ElementTool implements ToolProvider {
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahElement.setTypeModifier(param.typeModifier());
-            transactionManager.endTransaction();
+        });
 
-            return ElementDTOAssembler.toDTO(astahElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ElementDTOAssembler.toDTO(astahElement);
     }
 
     private ElementDTO changeTaggedValue(McpSyncServerExchange exchange, ElementWithTaggedValueDTO param) throws Exception {
@@ -160,22 +142,16 @@ public class ElementTool implements ToolProvider {
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
 
-        try {
-            for (ITaggedValue taggedValue : astahElement.getTaggedValues()) {
-                if (taggedValue.getKey().equals(param.targetKey())) {
-                    transactionManager.beginTransaction();
+        for (ITaggedValue taggedValue : astahElement.getTaggedValues()) {
+            if (taggedValue.getKey().equals(param.targetKey())) {
+                txnAstah.run( () -> {
                     taggedValue.setValue(param.value());
-                    transactionManager.endTransaction();
-                    break;
-                }
+                });
+                break;
             }
-
-            return ElementDTOAssembler.toDTO(astahElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
         }
+
+        return ElementDTOAssembler.toDTO(astahElement);
     }
 
     private NameIdTypeListDTO getDiagramsOfElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {

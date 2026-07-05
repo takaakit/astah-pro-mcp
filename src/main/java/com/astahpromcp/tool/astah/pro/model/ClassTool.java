@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithLeafDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ClassDTOAssembler;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -21,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IClass.html
@@ -29,14 +29,14 @@ public class ClassTool implements ToolProvider {
 
     private final BasicModelEditor basicModelEditor;
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ClassTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ClassTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.basicModelEditor = basicModelEditor;
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -120,17 +120,11 @@ public class ClassTool implements ToolProvider {
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahClass.setAbstract(param.isAbstract());
-            transactionManager.endTransaction();
+        });
 
-            return ClassDTOAssembler.toDTO(astahClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(astahClass);
     }
 
     private ClassDTO setActive(McpSyncServerExchange exchange, ClassWithActiveDTO param) throws Exception {
@@ -138,17 +132,11 @@ public class ClassTool implements ToolProvider {
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahClass.setActive(param.isActive());
-            transactionManager.endTransaction();
+        });
 
-            return ClassDTOAssembler.toDTO(astahClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(astahClass);
     }
 
     private ClassDTO setLeaf(McpSyncServerExchange exchange, ClassWithLeafDTO param) throws Exception {
@@ -156,17 +144,11 @@ public class ClassTool implements ToolProvider {
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahClass.setLeaf(param.isLeaf());
-            transactionManager.endTransaction();
+        });
 
-            return ClassDTOAssembler.toDTO(astahClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(astahClass);
     }
 
     private ClassDTO addInvariant(McpSyncServerExchange exchange, ClassWithInvariantDTO param) throws Exception {
@@ -174,17 +156,11 @@ public class ClassTool implements ToolProvider {
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             basicModelEditor.createConstraint(astahClass, param.invariant());
-            transactionManager.endTransaction();
+        });
 
-            return ClassDTOAssembler.toDTO(astahClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(astahClass);
     }
 
     private ClassDTO removeInvariant(McpSyncServerExchange exchange, ClassWithInvariantDTO param) throws Exception {
@@ -194,17 +170,11 @@ public class ClassTool implements ToolProvider {
 
         for (IConstraint constraint : astahClass.getConstraints()) {
             if (param.invariant().equals(constraint.getName())) {
-                try {
-                    transactionManager.beginTransaction();
+                txnAstah.run( () -> {
                     basicModelEditor.delete(constraint);
-                    transactionManager.endTransaction();
+                });
 
-                    break;
-                    
-                } catch (Exception e) {
-                    transactionManager.abortTransaction();
-                    throw e;
-                }
+                break;
             }
         }
 

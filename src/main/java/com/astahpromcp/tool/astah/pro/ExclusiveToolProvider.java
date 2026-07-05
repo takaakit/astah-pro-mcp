@@ -8,7 +8,9 @@ import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.SwingUtilities;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
@@ -69,10 +71,37 @@ public final class ExclusiveToolProvider implements ToolProvider {
             }
 
             try {
-                return definition.toolHandler().apply(exchange, request);
+                McpSchema.CallToolResult result = definition.toolHandler().apply(exchange, request);
+                flushEdt(toolName);  // Drain the EDT queue
+                return result;
+            
+            } catch (Throwable t) {
+                String msg = String.format("Unexpected failure @tool=%s: %s", toolName, t.getMessage());
+                log.error(msg, t);
+                return ResponseSupport.error(msg);
+            
             } finally {
                 AstahApiLock.LOCK.unlock();
             }
         };
+    }
+
+    private static void flushEdt(String toolName) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            return;
+        }
+
+        // Wait with a bounded timeout instead of invokeAndWait: if the EDT is blocked
+        CountDownLatch latch = new CountDownLatch(1);
+        SwingUtilities.invokeLater(latch::countDown);  // no-op: drain the EDT queue before releasing the Astah API lock
+        try {
+            if (!latch.await(McpServerConfig.EDT_FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                log.warn("EDT did not drain within {} seconds; releasing the Astah API lock anyway @tool={}",
+                        McpServerConfig.EDT_FLUSH_TIMEOUT_SECONDS, toolName);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Interrupted while flushing EDT after tool execution @tool={}", toolName);
+        }
     }
 }

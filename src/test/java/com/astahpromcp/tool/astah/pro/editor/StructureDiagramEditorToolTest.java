@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -25,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class StructureDiagramEditorToolTest {
 
@@ -37,7 +37,7 @@ public class StructureDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/editor/StructureDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
@@ -48,7 +48,7 @@ public class StructureDiagramEditorToolTest {
         // Tool
         tool = new StructureDiagramEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             diagramEditorSupport,
             imageCaptureSupport,

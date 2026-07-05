@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERIndexWithKeyDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERIndexWithUniqueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERIndexDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERIndexDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERIndex.html
@@ -26,13 +26,13 @@ import java.util.List;
 public class ERIndexTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERIndexTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERIndexTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -110,17 +110,11 @@ public class ERIndexTool implements ToolProvider {
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.erAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERIndex.addERAttribute(astahERAttribute);
-            transactionManager.endTransaction();
+        });
 
-            return ERIndexDTOAssembler.toDTO(astahERIndex);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
     private ERIndexDTO removeERAttribute(McpSyncServerExchange exchange, ERIndexWithERAttributeDTO param) throws Exception {
@@ -129,17 +123,11 @@ public class ERIndexTool implements ToolProvider {
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.erAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERIndex.removeERAttribute(astahERAttribute);
-            transactionManager.endTransaction();
+        });
 
-            return ERIndexDTOAssembler.toDTO(astahERIndex);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
     private ERIndexDTO setKey(McpSyncServerExchange exchange, ERIndexWithKeyDTO param) throws Exception {
@@ -147,17 +135,11 @@ public class ERIndexTool implements ToolProvider {
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERIndex.setKey(param.isKey());
-            transactionManager.endTransaction();
+        });
 
-            return ERIndexDTOAssembler.toDTO(astahERIndex);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
     private ERIndexDTO setUnique(McpSyncServerExchange exchange, ERIndexWithUniqueDTO param) throws Exception {
@@ -165,16 +147,10 @@ public class ERIndexTool implements ToolProvider {
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERIndex.setUnique(param.isUnique());
-            transactionManager.endTransaction();
+        });
 
-            return ERIndexDTOAssembler.toDTO(astahERIndex);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 }

@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithEventDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.TransitionDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -18,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ITransition.html
@@ -25,13 +25,13 @@ import java.util.List;
 public class TransitionTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public TransitionTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public TransitionTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -101,17 +101,11 @@ public class TransitionTool implements ToolProvider {
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahTransition.setAction(param.action());
-            transactionManager.endTransaction();
+        });
 
-            return TransitionDTOAssembler.toDTO(astahTransition);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
     private TransitionDTO setEvent(McpSyncServerExchange exchange, TransitionWithEventDTO param) throws Exception {
@@ -119,17 +113,11 @@ public class TransitionTool implements ToolProvider {
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahTransition.setEvent(param.event());
-            transactionManager.endTransaction();
+        });
 
-            return TransitionDTOAssembler.toDTO(astahTransition);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
     private TransitionDTO setGuard(McpSyncServerExchange exchange, TransitionWithGuardDTO param) throws Exception {
@@ -137,16 +125,10 @@ public class TransitionTool implements ToolProvider {
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahTransition.setGuard(param.guard());
-            transactionManager.endTransaction();
+        });
 
-            return TransitionDTOAssembler.toDTO(astahTransition);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return TransitionDTOAssembler.toDTO(astahTransition);
     }
 }

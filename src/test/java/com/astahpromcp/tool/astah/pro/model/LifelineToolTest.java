@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.LifelineWithLengthDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class LifelineToolTest {
 
@@ -35,14 +35,14 @@ public class LifelineToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/LifelineToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new LifelineTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

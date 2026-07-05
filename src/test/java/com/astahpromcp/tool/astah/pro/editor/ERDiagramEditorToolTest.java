@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ERDiagramEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IERDiagram;
 import com.change_vision.jude.api.inf.model.IEREntity;
@@ -37,6 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERDiagramEditorToolTest {
 
@@ -51,7 +51,7 @@ public class ERDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         ERDiagramEditor erDiagramEditor = projectAccessor.getDiagramEditorFactory().getERDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ERDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
@@ -62,7 +62,7 @@ public class ERDiagramEditorToolTest {
         // Tool
         tool = new ERDiagramEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             erDiagramEditor,
             astahProToolSupport,
             imageCaptureSupport,

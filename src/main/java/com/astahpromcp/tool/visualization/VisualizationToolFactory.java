@@ -2,8 +2,7 @@ package com.astahpromcp.tool.visualization;
 
 import com.astahpromcp.tool.ToolCategoryFlags;
 import com.astahpromcp.tool.ToolProvider;
-import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -18,13 +17,13 @@ public class VisualizationToolFactory {
 
     public List<ToolProvider> createToolProviders(ToolCategoryFlags categoryFlags) {
         try {
-            AstahAPI api = AstahAPI.getAstahAPI();
-            ProjectAccessor projectAccessor = api.getProjectAccessor();
+            ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
 
             return List.of(
-                    new PlantumlTool(projectAccessor)
+                    new PlantumlTool(),
+                    new GraphvizTool(imageConvertSupport)
             );
-            
+
         } catch (Exception e) {
             log.warn("Error creating visualization tools", e);
             return List.of();

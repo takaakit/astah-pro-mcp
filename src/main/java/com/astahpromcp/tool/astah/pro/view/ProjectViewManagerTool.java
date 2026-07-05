@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ElementDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementListDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IEntity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IProjectViewManager.html
@@ -27,14 +27,14 @@ public class ProjectViewManagerTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final IProjectViewManager projectViewManager;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ProjectViewManagerTool(ProjectAccessor projectAccessor, IProjectViewManager projectViewManager, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ProjectViewManagerTool(ProjectAccessor projectAccessor, IProjectViewManager projectViewManager, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.projectViewManager = projectViewManager;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }

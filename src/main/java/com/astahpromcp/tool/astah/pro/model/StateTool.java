@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithExitDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithInternalTransitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.StateDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IState.html
@@ -26,13 +26,13 @@ import java.util.List;
 public class StateTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public StateTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public StateTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -116,20 +116,14 @@ public class StateTool implements ToolProvider {
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahState.addInternalTransition(
                 param.event(),
                 param.guard(),
                 param.action());
-            transactionManager.endTransaction();
+        });
 
-            return StateDTOAssembler.toDTO(astahState);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return StateDTOAssembler.toDTO(astahState);
     }
 
     private StateDTO deleteAllInternalTransitions(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -137,17 +131,11 @@ public class StateTool implements ToolProvider {
 
         IState astahState = astahProToolSupport.getState(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahState.deleteAllInternalTransitions();
-            transactionManager.endTransaction();
+        });
 
-            return StateDTOAssembler.toDTO(astahState);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return StateDTOAssembler.toDTO(astahState);
     }
 
     private StateDTO setEntry(McpSyncServerExchange exchange, StateWithEntryDTO param) throws Exception {
@@ -155,17 +143,11 @@ public class StateTool implements ToolProvider {
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahState.setEntry(param.entry());
-            transactionManager.endTransaction();
+        });
 
-            return StateDTOAssembler.toDTO(astahState);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return StateDTOAssembler.toDTO(astahState);
     }
 
     private StateDTO setDoActivity(McpSyncServerExchange exchange, StateWithDoActivityDTO param) throws Exception {
@@ -173,17 +155,11 @@ public class StateTool implements ToolProvider {
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahState.setDoActivity(param.doActivity());
-            transactionManager.endTransaction();
+        });
 
-            return StateDTOAssembler.toDTO(astahState);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return StateDTOAssembler.toDTO(astahState);
     }
 
     private StateDTO setExit(McpSyncServerExchange exchange, StateWithExitDTO param) throws Exception {
@@ -191,16 +167,10 @@ public class StateTool implements ToolProvider {
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahState.setExit(param.exit());
-            transactionManager.endTransaction();
+        });
 
-            return StateDTOAssembler.toDTO(astahState);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return StateDTOAssembler.toDTO(astahState);
     }
 }

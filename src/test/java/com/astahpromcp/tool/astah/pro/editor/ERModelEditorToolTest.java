@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERModelEditorToolTest {
 
@@ -43,7 +43,7 @@ public class ERModelEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         ERModelEditor erModelEditor = projectAccessor.getModelEditorFactory().getERModelEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ERModelEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
@@ -52,7 +52,7 @@ public class ERModelEditorToolTest {
         tool = new ERModelEditorTool(
             erModelEditor,
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

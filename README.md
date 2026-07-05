@@ -100,15 +100,13 @@ To use the full tool version, specify port `8888`; to use the query-only tool ve
 
 Run this command for project scope in your project directory:
 ```bash
-claude mcp add --scope project astah-pro-mcp -- npx -y mcp-remote@latest http://127.0.0.1:8888/mcp --allow-http
+claude mcp add --transport http --scope project astah-pro-mcp http://127.0.0.1:8888/mcp
 ```
 
 Or run this command for user scope:
 ```bash
-claude mcp add --scope user astah-pro-mcp -- npx -y mcp-remote@latest http://127.0.0.1:8888/mcp --allow-http
+claude mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888/mcp
 ```
-
-> *Note:* As of June 12, 2026, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Claude Code*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
 
 
 #### Codex CLI
@@ -121,8 +119,6 @@ transport = "http"
 url = "http://127.0.0.1:8888/mcp"
 startup_timeout_sec = 10
 ```
-
-> *Note:* If you are using *Codex CLI* on *WSL2* in Windows, you need to allow WSL to access Windows' 127.0.0.1. So, see [here](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking) and consider enabling Mirrored mode.
 
 
 #### Antigravity CLI

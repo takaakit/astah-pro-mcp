@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.SequenceDiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
@@ -29,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class SequenceDiagramEditorToolTest {
 
@@ -50,7 +50,7 @@ public class SequenceDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/editor/SequenceDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
@@ -61,7 +61,7 @@ public class SequenceDiagramEditorToolTest {
         // Tool
         tool = new SequenceDiagramEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             sequenceDiagramEditor,
             astahProToolSupport,
             imageCaptureSupport,

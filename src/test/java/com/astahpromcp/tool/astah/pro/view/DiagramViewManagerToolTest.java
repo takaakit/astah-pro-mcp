@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.view.inputdto.PresentationWithHighlightCol
 import com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Disabled("DiagramViewManager is not available in non-plugin")
 public class DiagramViewManagerToolTest {
@@ -54,7 +54,7 @@ public class DiagramViewManagerToolTest {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
         projectAccessor.open("src/test/resources/modelfile/view/DiagramViewManagerToolTest.asta");
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         diagramViewManager = astahApi.getViewManager().getDiagramViewManager();
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -62,7 +62,7 @@ public class DiagramViewManagerToolTest {
         tool = new DiagramViewManagerTool(
             projectAccessor,
             diagramViewManager,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

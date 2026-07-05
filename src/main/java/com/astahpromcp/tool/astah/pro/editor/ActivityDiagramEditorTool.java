@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPrese
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.ActivityDiagramEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IPackage;
@@ -29,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
@@ -36,15 +36,15 @@ import java.util.List;
 public class ActivityDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final ActivityDiagramEditor activityDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.activityDiagramEditor = activityDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -222,25 +222,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createAcceptEventAction(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createAcceptEventAction(
                 param.newAcceptEventActionName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptTimeEventAction(McpSyncServerExchange exchange, NewAcceptTimeEventActionDTO param) throws Exception {
@@ -250,25 +244,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createAcceptTimeEventAction(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createAcceptTimeEventAction(
                 param.newAcceptTimeEventActionName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAction(McpSyncServerExchange exchange, NewActionDTO param) throws Exception {
@@ -278,25 +266,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createAction(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createAction(
                 param.newActionName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private ActivityDiagramDTO createActivityDiagram(McpSyncServerExchange exchange, NewActivityDiagramDTO param) throws Exception {
@@ -304,19 +286,13 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         IPackage astahParentPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IActivityDiagram astahActivityDiagram = activityDiagramEditor.createActivityDiagram(
+        IActivityDiagram astahActivityDiagram = txnAstah.call( () -> {
+            return activityDiagramEditor.createActivityDiagram(
                 astahParentPackage,
                 param.newActivityDiagramName());
-            transactionManager.endTransaction();
+        });
 
-            return ActivityDiagramDTOAssembler.toDTO(astahActivityDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ActivityDiagramDTOAssembler.toDTO(astahActivityDiagram);
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createActivityParameterNode(McpSyncServerExchange exchange, NewActivityParameterNodeDTO param) throws Exception {
@@ -327,26 +303,20 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createActivityParameterNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createActivityParameterNode(
                 param.newActivityParameterNodeName(),
                 astahBaseClass,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createCallBehaviorAction(McpSyncServerExchange exchange, NewCallBehaviorActionDTO param) throws Exception {
@@ -357,26 +327,20 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createCallBehaviorAction(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createCallBehaviorAction(
                 param.newCallBehaviorActionName(),
                 astahReferenceActivityDiagram,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createConnector(McpSyncServerExchange exchange, NewConnectorDTO param) throws Exception {
@@ -386,25 +350,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createConnector(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createConnector(
                 param.newConnectorName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createDecisionMergeNode(McpSyncServerExchange exchange, NewDecisionMergeNodeDTO param) throws Exception {
@@ -414,25 +372,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createDecisionMergeNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createDecisionMergeNode(
                 null,   // No parent node presentation
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
@@ -444,24 +396,18 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = activityDiagramEditor.createDependency(
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createDependency(
                 param.newDependencyName(),
                 astahClientNodePresentation,
                 astahSupplierNodePresentation);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalNode(McpSyncServerExchange exchange, NewFinalNodeDTO param) throws Exception {
@@ -471,25 +417,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createFinalNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createFinalNode(
                 param.newFinalNodeName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFlow(McpSyncServerExchange exchange, NewFlowDTO param) throws Exception {
@@ -501,23 +441,17 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahNodePresentation = activityDiagramEditor.createFlow(
+        ILinkPresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createFlow(
                 astahSourceNodePresentation,
                 astahTargetNodePresentation);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahNodePresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFlowFinalNode(McpSyncServerExchange exchange, NewFlowFinalNodeDTO param) throws Exception {
@@ -527,25 +461,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createFlowFinalNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createFlowFinalNode(
                 param.newFlowFinalNodeName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkNode(McpSyncServerExchange exchange, NewForkNodeDTO param) throws Exception {
@@ -555,25 +483,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createForkNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createForkNode(
                 null,   // No parent node presentation
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialNode(McpSyncServerExchange exchange, NewInitialNodeDTO param) throws Exception {
@@ -583,25 +505,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createInitialNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createInitialNode(
                 param.newInitialNodeName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinNode(McpSyncServerExchange exchange, NewJoinNodeDTO param) throws Exception {
@@ -611,25 +527,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createJoinNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createJoinNode(
                 null,   // No parent node presentation
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createObjectNode(McpSyncServerExchange exchange, NewObjectNodeDTO param) throws Exception {
@@ -640,26 +550,20 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createObjectNode(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createObjectNode(
                 param.newObjectNodeName(),
                 astahBaseClass,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartition(McpSyncServerExchange exchange, NewPartitionDTO param) throws Exception {
@@ -675,25 +579,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createPartition(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createPartition(
                 astahSuperNodePresentation,
                 astahPreviousNodePresentation,
                 param.newPartitionName(),
                 param.isHorizontal());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(McpSyncServerExchange exchange, NewPinWithBaseClassAndParentActionDTO param) throws Exception {
@@ -705,9 +603,8 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createPin(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createPin(
                 param.newPinName(),
                 astahBaseClass,
                 param.isInput(),
@@ -715,18 +612,13 @@ public class ActivityDiagramEditorTool implements ToolProvider {
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createProcess(McpSyncServerExchange exchange, NewProcessDTO param) throws Exception {
@@ -736,25 +628,19 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createProcess(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createProcess(
                 param.newProcessName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createSendSignalAction(McpSyncServerExchange exchange, NewSendSignalActionDTO param) throws Exception {
@@ -764,24 +650,18 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = activityDiagramEditor.createSendSignalAction(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return activityDiagramEditor.createSendSignalAction(
                 param.newSendSignalActionName(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetActivityDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

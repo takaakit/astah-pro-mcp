@@ -5,7 +5,6 @@ import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.model.IInclude;
 import com.change_vision.jude.api.inf.model.IExtend;
@@ -21,6 +20,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class UseCaseModelEditorToolTest {
 
@@ -36,7 +36,7 @@ public class UseCaseModelEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         UseCaseModelEditor useCaseModelEditor = projectAccessor.getModelEditorFactory().getUseCaseModelEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/UseCaseModelEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
@@ -44,7 +44,7 @@ public class UseCaseModelEditorToolTest {
         // Tool
         tool = new UseCaseModelEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             useCaseModelEditor,
             astahProToolSupport,
             true);

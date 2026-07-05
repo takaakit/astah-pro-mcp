@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.RequirementWithIdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.RequirementWithTextDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.RequirementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.RequirementDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IRequirement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IRequirement.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class RequirementTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public RequirementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public RequirementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -93,17 +93,11 @@ public class RequirementTool implements ToolProvider {
 
         IRequirement astahRequirement = astahProToolSupport.getRequirement(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahRequirement.setRequirementID(param.requirementId());
-            transactionManager.endTransaction();
+        });
 
-            return RequirementDTOAssembler.toDTO(astahRequirement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return RequirementDTOAssembler.toDTO(astahRequirement);
     }
 
     private RequirementDTO setRequirementText(McpSyncServerExchange exchange, RequirementWithTextDTO param) throws Exception {
@@ -111,16 +105,10 @@ public class RequirementTool implements ToolProvider {
 
         IRequirement astahRequirement = astahProToolSupport.getRequirement(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahRequirement.setRequirementText(param.requirementText());
-            transactionManager.endTransaction();
+        });
 
-            return RequirementDTOAssembler.toDTO(astahRequirement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return RequirementDTOAssembler.toDTO(astahRequirement);
     }
 }

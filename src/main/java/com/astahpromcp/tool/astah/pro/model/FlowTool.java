@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithActionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.FlowDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.FlowDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IFlow;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IFlow.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class FlowTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public FlowTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public FlowTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -93,17 +93,11 @@ public class FlowTool implements ToolProvider {
 
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahFlow.setAction(param.action());
-            transactionManager.endTransaction();
+        });
 
-            return FlowDTOAssembler.toDTO(astahFlow);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return FlowDTOAssembler.toDTO(astahFlow);
     }
 
     private FlowDTO setGuard(McpSyncServerExchange exchange, FlowWithGuardDTO param) throws Exception {
@@ -111,16 +105,10 @@ public class FlowTool implements ToolProvider {
 
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahFlow.setGuard(param.guard());
-            transactionManager.endTransaction();
+        });
 
-            return FlowDTOAssembler.toDTO(astahFlow);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return FlowDTOAssembler.toDTO(astahFlow);
     }
 }

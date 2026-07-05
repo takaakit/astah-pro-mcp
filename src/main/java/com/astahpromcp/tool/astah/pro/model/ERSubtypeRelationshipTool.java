@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERSubtypeRelationshipWithLo
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERSubtypeRelationshipWithPhysicalNameDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERSubtypeRelationshipDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERSubtypeRelationshipDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERSubtypeRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -20,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERSubtypeRelationship.html
@@ -27,13 +27,13 @@ import java.util.List;
 public class ERSubtypeRelationshipTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERSubtypeRelationshipTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERSubtypeRelationshipTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -110,17 +110,11 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERSubtypeRelationship.setConclusive(param.isConclusive());
-            transactionManager.endTransaction();
+        });
 
-            return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
     private ERSubtypeRelationshipDTO setDiscriminatorAttr(McpSyncServerExchange exchange, ERSubtypeRelationshipWithDiscriminatorAttrDTO param) throws Exception {
@@ -129,17 +123,11 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.erDiscriminatorAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERSubtypeRelationship.setDiscriminatorAttribute(astahERAttribute);
-            transactionManager.endTransaction();
+        });
 
-            return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
     private ERSubtypeRelationshipDTO setLogicalName(McpSyncServerExchange exchange, ERSubtypeRelationshipWithLogicalNameDTO param) throws Exception {
@@ -147,17 +135,11 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERSubtypeRelationship.setLogicalName(param.logicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
     private ERSubtypeRelationshipDTO setPhysicalName(McpSyncServerExchange exchange, ERSubtypeRelationshipWithPhysicalNameDTO param) throws Exception {
@@ -165,16 +147,10 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERSubtypeRelationship.setPhysicalName(param.physicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 }

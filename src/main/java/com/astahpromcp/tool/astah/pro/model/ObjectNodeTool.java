@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ObjectNodeWithBaseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ObjectNodeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ObjectNodeDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IObjectNode;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,18 +16,19 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
 public class ObjectNodeTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ObjectNodeTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ObjectNodeTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -85,16 +85,10 @@ public class ObjectNodeTool implements ToolProvider {
         IObjectNode astahObjectNode = astahProToolSupport.getObjectNode(param.targetObjectNodeId());
         IClass astahBaseClass = astahProToolSupport.getClass(param.baseClassId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahObjectNode.setBase(astahBaseClass);
-            transactionManager.endTransaction();
+        });
 
-            return ObjectNodeDTOAssembler.toDTO(astahObjectNode);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ObjectNodeDTOAssembler.toDTO(astahObjectNode);
     }
 }

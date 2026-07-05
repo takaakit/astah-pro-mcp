@@ -114,7 +114,10 @@ public class ExclusiveToolProviderTest {
             throw new IllegalStateException("handler failure");
         }), 30);
 
-        assertThrows(IllegalStateException.class, () -> wrapped.toolHandler().apply(null, null));
+        McpSchema.CallToolResult result = wrapped.toolHandler().apply(null, null);
+
+        assertTrue(result.isError(), "Result should be an error when the handler throws");
+        assertTrue(firstContentText(result).contains("handler failure"), "Error message should include the handler's failure reason");
         assertFalse(AstahApiLock.LOCK.isLocked(), "Lock should be released even when the handler throws");
     }
 

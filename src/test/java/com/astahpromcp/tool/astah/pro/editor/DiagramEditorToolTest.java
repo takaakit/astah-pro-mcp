@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
@@ -15,7 +16,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class DiagramEditorToolTest {
 
@@ -52,7 +53,7 @@ public class DiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/editor/DiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
@@ -64,7 +65,7 @@ public class DiagramEditorToolTest {
         // Tool
         tool = new DiagramEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             diagramEditorSupport,
             imageConvertSupport,

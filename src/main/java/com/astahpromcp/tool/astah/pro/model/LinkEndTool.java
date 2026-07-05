@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithCompositionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithNavigationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LinkEndDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LinkEndDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILinkEnd.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class LinkEndTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public LinkEndTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public LinkEndTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -85,17 +85,11 @@ public class LinkEndTool implements ToolProvider {
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahLinkEnd.setAggregation(param.isAggregation());
-            transactionManager.endTransaction();
+        });
 
-            return LinkEndDTOAssembler.toDTO(astahLinkEnd);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
     private LinkEndDTO setComposition(McpSyncServerExchange exchange, LinkEndWithCompositionDTO param) throws Exception {
@@ -103,17 +97,11 @@ public class LinkEndTool implements ToolProvider {
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahLinkEnd.setComposite(param.isComposition());
-            transactionManager.endTransaction();
+        });
 
-            return LinkEndDTOAssembler.toDTO(astahLinkEnd);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
     private LinkEndDTO setNavigation(McpSyncServerExchange exchange, LinkEndWithNavigationDTO param) throws Exception {
@@ -121,16 +109,10 @@ public class LinkEndTool implements ToolProvider {
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahLinkEnd.setNavigability(param.isNavigation() ? "Navigable" : "Non_Navigable");
-            transactionManager.endTransaction();
+        });
 
-            return LinkEndDTOAssembler.toDTO(astahLinkEnd);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 }

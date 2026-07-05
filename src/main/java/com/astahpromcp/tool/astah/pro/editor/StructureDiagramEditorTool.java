@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.StructureDiagramEditor;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IElement;
@@ -32,6 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StructureDiagramEditor.html
@@ -39,15 +39,15 @@ import java.util.List;
 public class StructureDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public StructureDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public StructureDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.diagramEditorSupport = diagramEditorSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -114,37 +114,32 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         structureDiagramEditor.setDiagram(astahStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = structureDiagramEditor.createNodePresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            INodePresentation nodePresentation = structureDiagramEditor.createNodePresentation(
                 astahElement,
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
-            
+
             // Use normal notation (e.g., interfaces as rectangles), except for actors on Use Case or Sequence diagrams.
             if (astahElement.hasStereotype("actor")
                 && (astahStructureDiagram instanceof IUseCaseDiagram || astahStructureDiagram instanceof ISequenceDiagram)) {
-                astahNodePresentation.setProperty(
+                nodePresentation.setProperty(
                     Key.NOTATION_TYPE,
                     Value.NOTATION_TYPE_ICON);
             } else {
-                astahNodePresentation.setProperty(
+                nodePresentation.setProperty(
                     Key.NOTATION_TYPE,
                     Value.NOTATION_TYPE_NORMAL);
             }
-            transactionManager.endTransaction();
+            return nodePresentation;
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationDTO param) throws Exception {
@@ -164,21 +159,15 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         structureDiagramEditor.setDiagram(astahStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = structureDiagramEditor.createLinkPresentation(astahElement, astahSourceNode, astahTargetNode);
-            transactionManager.endTransaction();
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return structureDiagramEditor.createLinkPresentation(astahElement, astahSourceNode, astahTargetNode);
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNestingLinkPresentation(McpSyncServerExchange exchange, NewNestingLinkPresentationDTO param) throws Exception {
@@ -197,20 +186,14 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         structureDiagramEditor.setDiagram(astahStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = structureDiagramEditor.createContainmentLinkPresentation(astahParentNode, astahChildNode);
-            transactionManager.endTransaction();
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return structureDiagramEditor.createContainmentLinkPresentation(astahParentNode, astahChildNode);
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

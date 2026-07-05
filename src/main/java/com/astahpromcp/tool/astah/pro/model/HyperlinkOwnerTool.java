@@ -15,7 +15,6 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithUrlHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IHyperlink;
 import com.change_vision.jude.api.inf.model.IHyperlinkOwner;
@@ -29,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IHyperlinkOwner.html
@@ -37,13 +37,13 @@ import java.util.List;
 public class HyperlinkOwnerTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public HyperlinkOwnerTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public HyperlinkOwnerTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -166,17 +166,11 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.createURLHyperlink(url, param.hyperlinkComment());
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO addFilePathHyperlinkToNamedElement(McpSyncServerExchange exchange, NamedElementWithFilePathHyperlinkDTO param) throws Exception {
@@ -185,20 +179,14 @@ public class HyperlinkOwnerTool implements ToolProvider {
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
         Path p = Paths.get(param.filePath()).normalize();
         
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.createFileHyperlink(
             p.getFileName() == null ? "" : p.getFileName().toString(),
             p.getParent() == null ? "" : p.getParent().toString(),
             param.hyperlinkComment());
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO addNamedElementHyperlinkToNamedElement(McpSyncServerExchange exchange, NamedElementWithNamedElementHyperlinkDTO param) throws Exception {
@@ -207,19 +195,13 @@ public class HyperlinkOwnerTool implements ToolProvider {
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
         INamedElement astahNamedElementToLink = astahProToolSupport.getNamedElement(param.namedElementIdToLink());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.createElementHyperlink(
-            astahNamedElementToLink,
-            param.hyperlinkComment());
-            transactionManager.endTransaction();
+                astahNamedElementToLink,
+                param.hyperlinkComment());
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO removeAllUrlHyperlinksFromNamedElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -229,15 +211,10 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isURL()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahNamedElement.deleteHyperlink(hyperlink);
-                transactionManager.endTransaction();
+            });
 
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
             }
         }
 
@@ -251,15 +228,10 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isFile()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahNamedElement.deleteHyperlink(hyperlink);
-                transactionManager.endTransaction();
+            });
 
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
             }
         }
 
@@ -273,15 +245,10 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isModel()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahNamedElement.deleteHyperlink(hyperlink);
-                transactionManager.endTransaction();
+            });
 
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
             }
         }
 
@@ -310,17 +277,11 @@ public class HyperlinkOwnerTool implements ToolProvider {
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
         IHyperlinkOwner hyperlinkOwner = getHyperlinkOwnerForNodePresentation(astahNodePresentation);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             hyperlinkOwner.createURLHyperlink(url, param.hyperlinkComment());
-            transactionManager.endTransaction();
+        });
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
     private NodePresentationDTO addFilePathHyperlinkToNodePresentation(McpSyncServerExchange exchange, NodePresentationWithFilePathHyperlinkDTO param) throws Exception {
@@ -331,20 +292,14 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         Path p = Paths.get(param.filePath()).normalize();
         
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             hyperlinkOwner.createFileHyperlink(
-            p.getFileName() == null ? "" : p.getFileName().toString(),
-            p.getParent() == null ? "" : p.getParent().toString(),
-            param.hyperlinkComment());
-            transactionManager.endTransaction();
+                p.getFileName() == null ? "" : p.getFileName().toString(),
+                p.getParent() == null ? "" : p.getParent().toString(),
+                param.hyperlinkComment());
+        });
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
     private NodePresentationDTO addNamedElementHyperlinkToNodePresentation(McpSyncServerExchange exchange, NodePresentationWithNamedElementHyperlinkDTO param) throws Exception {
@@ -355,19 +310,13 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         INamedElement astahNamedElementToLink = astahProToolSupport.getNamedElement(param.namedElementIdToLink());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             hyperlinkOwner.createElementHyperlink(
-            astahNamedElementToLink,
-            param.hyperlinkComment());
-            transactionManager.endTransaction();
+                astahNamedElementToLink,
+                param.hyperlinkComment());
+        });
 
-            return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
     private NodePresentationDTO removeAllUrlHyperlinksFromNodePresentation(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -378,15 +327,10 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isURL()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 hyperlinkOwner.deleteHyperlink(hyperlink);
-                transactionManager.endTransaction();
+            });
 
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
             }
         }
 
@@ -401,15 +345,10 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isFile()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 hyperlinkOwner.deleteHyperlink(hyperlink);
-                transactionManager.endTransaction();
+            });
 
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
             }
         }
 
@@ -424,15 +363,10 @@ public class HyperlinkOwnerTool implements ToolProvider {
 
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isModel()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 hyperlinkOwner.deleteHyperlink(hyperlink);
-                transactionManager.endTransaction();
+            });
 
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
             }
         }
 

@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithUrlHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IHyperlinkOwner;
 import com.change_vision.jude.api.inf.model.INamedElement;
@@ -30,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class HyperlinkOwnerToolTest {
 
@@ -52,14 +52,14 @@ public class HyperlinkOwnerToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/HyperlinkOwnerToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new HyperlinkOwnerTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

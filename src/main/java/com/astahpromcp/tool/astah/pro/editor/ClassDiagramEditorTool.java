@@ -15,7 +15,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssemb
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.*;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IAssociationClass;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
@@ -32,6 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ClassDiagramEditor.html
@@ -39,15 +39,15 @@ import java.util.List;
 public class ClassDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final ClassDiagramEditor classDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public ClassDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, ClassDiagramEditor classDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public ClassDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ClassDiagramEditor classDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.classDiagramEditor = classDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -111,17 +111,11 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IClassDiagram createdAstahClassDiagram = classDiagramEditor.createClassDiagram(astahPackage, param.newDiagramName());
-            transactionManager.endTransaction();
+        IClassDiagram createdAstahClassDiagram = txnAstah.call( () -> {
+            return classDiagramEditor.createClassDiagram(astahPackage, param.newDiagramName());
+        });
 
-            return DiagramDTOAssembler.toDTO(createdAstahClassDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DiagramDTOAssembler.toDTO(createdAstahClassDiagram);
     }
 
     private Pair<PresentationListDTO, List<McpSchema.Content>> createAssociationClassPresentation(McpSyncServerExchange exchange, NewAssociationClassPresentationDTO param) throws Exception {
@@ -134,29 +128,23 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
         classDiagramEditor.setDiagram(astahClassDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            IPresentation[] astahPresentations = classDiagramEditor.createAssociationClassPresentation(
+        IPresentation[] astahPresentations = txnAstah.call( () -> {
+            return classDiagramEditor.createAssociationClassPresentation(
                 astahAssociationClass,
                 astahSourceNodePresentation,
                 astahTargetNodePresentation);
-            transactionManager.endTransaction();
+        });
 
-            List<PresentationDTO> presentationDTOs = new ArrayList<>();
-            for (IPresentation astahPresentation : astahPresentations) {
-                presentationDTOs.add(PresentationDTOAssembler.toDTO(astahPresentation));
-            }
-
-            PresentationListDTO dto = new PresentationListDTO(presentationDTOs);
-
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
-
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
+        List<PresentationDTO> presentationDTOs = new ArrayList<>();
+        for (IPresentation astahPresentation : astahPresentations) {
+            presentationDTOs.add(PresentationDTOAssembler.toDTO(astahPresentation));
         }
+
+        PresentationListDTO dto = new PresentationListDTO(presentationDTOs);
+
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInstanceSpecification(McpSyncServerExchange exchange, NewInstanceWithPointDTO param) throws Exception {
@@ -167,26 +155,20 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
         classDiagramEditor.setDiagram(astahClassDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = classDiagramEditor.createInstanceSpecification(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return classDiagramEditor.createInstanceSpecification(
                 param.newInstanceName(),
                 astahClass.getFullName("."),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createInstanceSpecificationLink(McpSyncServerExchange exchange, NewLinkSourceAndTargetDTO param) throws Exception {
@@ -198,22 +180,16 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
         classDiagramEditor.setDiagram(astahClassDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = classDiagramEditor.createInstanceSpecificationLink(
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return classDiagramEditor.createInstanceSpecificationLink(
                 astahSourceNode,
                 astahTargetNode);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithColo
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithLabelDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -25,6 +24,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/IPresentation.html
@@ -32,14 +32,14 @@ import java.util.List;
 public class PresentationTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public PresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public PresentationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
@@ -123,21 +123,15 @@ public class PresentationTool implements ToolProvider {
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahPresentation.setLabel(param.label());
-            transactionManager.endTransaction();
+        });
 
-            PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
+        PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeFillColor(McpSyncServerExchange exchange, PresentationWithColorDTO param) throws Exception {
@@ -145,21 +139,15 @@ public class PresentationTool implements ToolProvider {
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahPresentation.setProperty(Key.FILL_COLOR, param.color());
-            transactionManager.endTransaction();
+        });
 
-            PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
+        PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeLineColor(McpSyncServerExchange exchange, PresentationWithColorDTO param) throws Exception {
@@ -167,21 +155,15 @@ public class PresentationTool implements ToolProvider {
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahPresentation.setProperty(Key.LINE_COLOR, param.color());
-            transactionManager.endTransaction();
+        });
 
-            PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
+        PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeFontColor(McpSyncServerExchange exchange, PresentationWithColorDTO param) throws Exception {
@@ -189,20 +171,14 @@ public class PresentationTool implements ToolProvider {
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahPresentation.setProperty(Key.FONT_COLOR, param.color());
-            transactionManager.endTransaction();
+        });
 
-            PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
+        PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.OperationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.OperationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IOperation.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class OperationTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public OperationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public OperationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -156,17 +156,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setAbstract(param.isAbstract());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setLeaf(McpSyncServerExchange exchange, OperationWithLeafDTO param) throws Exception {
@@ -174,17 +168,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setLeaf(param.isLeaf());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setStatic(McpSyncServerExchange exchange, OperationWithStaticDTO param) throws Exception {
@@ -192,17 +180,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setStatic(param.isStatic());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setReturnType(McpSyncServerExchange exchange, OperationWithReturnTypeDTO param) throws Exception {
@@ -211,17 +193,11 @@ public class OperationTool implements ToolProvider {
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
         IClass astahReturnType = astahProToolSupport.getClass(param.returnTypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setReturnType(astahReturnType);
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setReturnTypeExpression(McpSyncServerExchange exchange, OperationWithReturnTypeExpressionDTO param) throws Exception {
@@ -229,17 +205,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setReturnTypeExpression(param.returnTypeExpression());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO addPrecondition(McpSyncServerExchange exchange, OperationWithPreconditionDTO param) throws Exception {
@@ -247,17 +217,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.addPreCondition(param.precondition());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO addPostcondition(McpSyncServerExchange exchange, OperationWithPostconditionDTO param) throws Exception {
@@ -265,17 +229,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.addPostCondition(param.postcondition());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setBodyCondition(McpSyncServerExchange exchange, OperationWithBodyConditionDTO param) throws Exception {
@@ -283,17 +241,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setBodyCondition(param.bodyCondition());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO removePrecondition(McpSyncServerExchange exchange, OperationWithPreconditionDTO param) throws Exception {
@@ -301,17 +253,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.removePreCondition(param.precondition());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO removePostcondition(McpSyncServerExchange exchange, OperationWithPostconditionDTO param) throws Exception {
@@ -319,17 +265,11 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.removePostCondition(param.postcondition());
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO removeBodyCondition(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -337,16 +277,10 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.id());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahOperation.setBodyCondition("");
-            transactionManager.endTransaction();
+        });
 
-            return OperationDTOAssembler.toDTO(astahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(astahOperation);
     }
 }

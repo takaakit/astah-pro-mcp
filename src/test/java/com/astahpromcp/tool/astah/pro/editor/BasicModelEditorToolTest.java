@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -19,6 +18,7 @@ import java.beans.Transient;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class BasicModelEditorToolTest {
 
@@ -61,7 +61,7 @@ public class BasicModelEditorToolTest {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
         projectAccessor.open("src/test/resources/modelfile/editor/BasicModelEditorToolTest.asta");
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -69,7 +69,7 @@ public class BasicModelEditorToolTest {
         tool = new BasicModelEditorTool(
             basicModelEditor,
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

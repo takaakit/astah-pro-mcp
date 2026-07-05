@@ -5,7 +5,6 @@ import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewUseCaseDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class UseCaseDiagramEditorToolTest {
 
@@ -28,7 +28,7 @@ public class UseCaseDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         UseCaseDiagramEditor useCaseDiagramEditor = projectAccessor.getDiagramEditorFactory().getUseCaseDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/UseCaseDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
@@ -36,7 +36,7 @@ public class UseCaseDiagramEditorToolTest {
         // Tool
         tool = new UseCaseDiagramEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             useCaseDiagramEditor,
             astahProToolSupport,
             true);

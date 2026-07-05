@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ActionWithCallingActivityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActionDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IActivity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAction.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class ActionTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ActionTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ActionTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -87,16 +87,10 @@ public class ActionTool implements ToolProvider {
         IAction astahAction = astahProToolSupport.getAction(param.targetActionId());
         IActivity astahCallingActivity = astahProToolSupport.getActivity(param.callingActivityId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAction.setCallingActivity(astahCallingActivity);
-            transactionManager.endTransaction();
+        });
 
-            return ActionDTOAssembler.toDTO(astahAction);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ActionDTOAssembler.toDTO(astahAction);
     }
 }

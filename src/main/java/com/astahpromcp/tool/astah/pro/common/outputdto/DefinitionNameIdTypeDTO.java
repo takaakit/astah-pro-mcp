@@ -2,9 +2,12 @@ package com.astahpromcp.tool.astah.pro.common.outputdto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
-public record DefinitionIdTypeDTO(
+public record DefinitionNameIdTypeDTO(
     @JsonPropertyDescription("Definition")
     String definition,
+
+    @JsonPropertyDescription("Name")
+    String name,
 
     @JsonPropertyDescription("Identifier")
     String id,
@@ -12,8 +15,9 @@ public record DefinitionIdTypeDTO(
     @JsonPropertyDescription("Type")
     String type
 ) {
-    public static DefinitionIdTypeDTO empty() {
-        return new DefinitionIdTypeDTO(
+    public static DefinitionNameIdTypeDTO empty() {
+        return new DefinitionNameIdTypeDTO(
+            "",
             "",
             "",
             "");

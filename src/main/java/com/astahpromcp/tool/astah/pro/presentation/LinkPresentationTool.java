@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithPointsDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -24,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/ILinkPresentation.html
@@ -31,14 +31,14 @@ import java.util.List;
 public class LinkPresentationTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public LinkPresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public LinkPresentationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
@@ -108,21 +108,15 @@ public class LinkPresentationTool implements ToolProvider {
 			pointArray[i] = new Point2D.Double(point.x(), point.y());
 		}
 
-		try {
-            transactionManager.beginTransaction();
-			linkPresentation.setAllPoints(pointArray);
-            transactionManager.endTransaction();
+        txnAstah.run( () -> {
+            linkPresentation.setAllPoints(pointArray);
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(linkPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(linkPresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> setLineStyle(McpSyncServerExchange exchange, LinkPresentationWithLineStyleDTO param) throws Exception {
@@ -130,20 +124,14 @@ public class LinkPresentationTool implements ToolProvider {
 
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             linkPresentation.setProperty(Key.LINE_SHAPE, param.lineStyle().astahValue);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(linkPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(linkPresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

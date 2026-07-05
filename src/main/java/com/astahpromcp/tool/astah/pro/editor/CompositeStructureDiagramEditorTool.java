@@ -20,7 +20,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.CompositeStructureDiagramEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ICompositeStructureDiagram;
 import com.change_vision.jude.api.inf.model.IElement;
@@ -37,6 +36,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/CompositeStructureDiagramEditor.html
@@ -44,15 +44,15 @@ import java.util.List;
 public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final CompositeStructureDiagramEditor compositeStructureDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public CompositeStructureDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, CompositeStructureDiagramEditor compositeStructureDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public CompositeStructureDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, CompositeStructureDiagramEditor compositeStructureDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.compositeStructureDiagramEditor = compositeStructureDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -137,17 +137,11 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            ICompositeStructureDiagram createdAstahCompositeStructureDiagram = compositeStructureDiagramEditor.createCompositeStructureDiagram(astahPackage, param.newDiagramName());
-            transactionManager.endTransaction();
+        ICompositeStructureDiagram createdAstahCompositeStructureDiagram = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createCompositeStructureDiagram(astahPackage, param.newDiagramName());
+        });
 
-            return DiagramDTOAssembler.toDTO(createdAstahCompositeStructureDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DiagramDTOAssembler.toDTO(createdAstahCompositeStructureDiagram);
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createConnectorPresentation(McpSyncServerExchange exchange, NewConnectorPresentationDTO param) throws Exception {
@@ -159,24 +153,18 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = compositeStructureDiagramEditor.createConnectorPresentation(
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createConnectorPresentation(
                 astahSourceNodePresentation,
                 astahTargetNodePresentation,
                 param.newConnectorName());
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPortPresentation(McpSyncServerExchange exchange, NewPortPresentationDTO param) throws Exception {
@@ -188,26 +176,20 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = compositeStructureDiagramEditor.createPortPresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createPortPresentation(
                 astahTargetNodePresentation,
                 astahPort,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createProvidedInterfacePresentation(McpSyncServerExchange exchange, NewProvidedInterfacePresentationDTO param) throws Exception {
@@ -219,26 +201,20 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = compositeStructureDiagramEditor.createProvidedInterfacePresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createProvidedInterfacePresentation(
                 astahTargetNodePresentation,
                 astahInterface,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createRequiredInterfacePresentation(McpSyncServerExchange exchange, NewRequiredInterfacePresentationDTO param) throws Exception {
@@ -250,26 +226,20 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = compositeStructureDiagramEditor.createRequiredInterfacePresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createRequiredInterfacePresentation(
                 astahTargetNodePresentation,
                 astahInterface,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createStructuredClassPresentation(McpSyncServerExchange exchange, NewStructuredClassPresentationDTO param) throws Exception {
@@ -280,25 +250,19 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = compositeStructureDiagramEditor.createStructuredClassPresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createStructuredClassPresentation(
                 astahElement,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createStructuredClassPresentationUnderParent(McpSyncServerExchange exchange, NewStructuredClassPresentationUnderParentDTO param) throws Exception {
@@ -310,25 +274,19 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = compositeStructureDiagramEditor.createStructuredClassPresentation(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return compositeStructureDiagramEditor.createStructuredClassPresentation(
                 astahElement,
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

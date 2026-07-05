@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.model.inputdto.EnumerationLiteralWithValueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.EnumerationLiteralDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.EnumerationLiteralDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IEnumerationLiteral;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -15,18 +14,19 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
 public class EnumerationLiteralTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public EnumerationLiteralTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public EnumerationLiteralTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -67,16 +67,10 @@ public class EnumerationLiteralTool implements ToolProvider {
 
         IEnumerationLiteral astahEnumerationLiteral = astahProToolSupport.getEnumerationLiteral(param.targetEnumerationLiteralId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahEnumerationLiteral.setValue(param.value());
-            transactionManager.endTransaction();
+        });
 
-            return EnumerationLiteralDTOAssembler.toDTO(astahEnumerationLiteral);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return EnumerationLiteralDTOAssembler.toDTO(astahEnumerationLiteral);
     }
 }

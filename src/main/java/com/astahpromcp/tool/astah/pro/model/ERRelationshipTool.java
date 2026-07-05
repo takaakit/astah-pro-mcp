@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERRelationshipWithParentVer
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERRelationshipWithPhysicalNameDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERRelationshipDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERRelationshipDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -23,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERRelationship.html
@@ -30,13 +30,13 @@ import java.util.List;
 public class ERRelationshipTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERRelationshipTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERRelationshipTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -134,17 +134,11 @@ public class ERRelationshipTool implements ToolProvider {
 
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setCardinality(param.cardinality());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setERIndex(McpSyncServerExchange exchange, ERRelationshipWithERIndexDTO param) throws Exception {
@@ -153,17 +147,11 @@ public class ERRelationshipTool implements ToolProvider {
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.erIndexId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setERIndex(astahERIndex);
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setLogicalName(McpSyncServerExchange exchange, ERRelationshipWithLogicalNameDTO param) throws Exception {
@@ -171,17 +159,11 @@ public class ERRelationshipTool implements ToolProvider {
 
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setLogicalName(param.logicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setPhysicalName(McpSyncServerExchange exchange, ERRelationshipWithPhysicalNameDTO param) throws Exception {
@@ -189,17 +171,11 @@ public class ERRelationshipTool implements ToolProvider {
 
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setPhysicalName(param.physicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setParentRequired(McpSyncServerExchange exchange, ERRelationshipWithParentRequiredDTO param) throws Exception {
@@ -207,17 +183,11 @@ public class ERRelationshipTool implements ToolProvider {
 
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setParentRequired(param.isParentRequired());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setVerbPhraseParent(McpSyncServerExchange exchange, ERRelationshipWithParentVerbPhraseDTO param) throws Exception {
@@ -225,17 +195,11 @@ public class ERRelationshipTool implements ToolProvider {
 
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setVerbPhraseParent(param.parentVerbPhrase());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setVerbPhraseChild(McpSyncServerExchange exchange, ERRelationshipWithChildVerbPhraseDTO param) throws Exception {
@@ -243,16 +207,10 @@ public class ERRelationshipTool implements ToolProvider {
 
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERRelationship.setVerbPhraseChild(param.childVerbPhrase());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 }

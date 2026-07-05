@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithLeafDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ClassToolTest {
 
@@ -39,7 +39,7 @@ public class ClassToolTest {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
         BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/ClassToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -47,7 +47,7 @@ public class ClassToolTest {
         tool = new ClassTool(
             basicModelEditor,
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

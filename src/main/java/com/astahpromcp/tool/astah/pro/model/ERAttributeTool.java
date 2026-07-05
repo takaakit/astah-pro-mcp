@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERAttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERAttributeDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
@@ -18,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERAttribute.html
@@ -25,13 +25,13 @@ import java.util.List;
 public class ERAttributeTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERAttributeTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERAttributeTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -137,17 +137,11 @@ public class ERAttributeTool implements ToolProvider {
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setDatatype(astahERDatatype);
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setDomain(McpSyncServerExchange exchange, ERAttributeWithERDomainDTO param) throws Exception {
@@ -156,17 +150,11 @@ public class ERAttributeTool implements ToolProvider {
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.erDomainId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setDomain(astahERDomain);
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setDefaultValue(McpSyncServerExchange exchange, ERAttributeWithDefaultValueDTO param) throws Exception {
@@ -174,17 +162,11 @@ public class ERAttributeTool implements ToolProvider {
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setDefaultValue(param.defaultValue());
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setLengthPrecision(McpSyncServerExchange exchange, ERAttributeWithLengthPrecisionDTO param) throws Exception {
@@ -192,17 +174,11 @@ public class ERAttributeTool implements ToolProvider {
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setLengthPrecision(param.lengthPrecision());
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setLogicalName(McpSyncServerExchange exchange, ERAttributeWithLogicalNameDTO param) throws Exception {
@@ -210,17 +186,11 @@ public class ERAttributeTool implements ToolProvider {
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setLogicalName(param.logicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setPhysicalName(McpSyncServerExchange exchange, ERAttributeWithPhysicalNameDTO param) throws Exception {
@@ -228,17 +198,11 @@ public class ERAttributeTool implements ToolProvider {
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setPhysicalName(param.physicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setPrimaryKey(McpSyncServerExchange exchange, ERAttributeWithPrimaryKeyDTO param) throws Exception {
@@ -246,17 +210,11 @@ public class ERAttributeTool implements ToolProvider {
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setPrimaryKey(param.isPrimaryKey());
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setNotNull(McpSyncServerExchange exchange, ERAttributeWithNotNullDTO param) throws Exception {
@@ -264,16 +222,10 @@ public class ERAttributeTool implements ToolProvider {
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERAttribute.setNotNull(param.isNotNull());
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(astahERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 }

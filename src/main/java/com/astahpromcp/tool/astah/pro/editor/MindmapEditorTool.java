@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.ChangeToFloatingTopicDTO;
@@ -25,7 +26,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.MindmapEditor;
 import com.change_vision.jude.api.inf.model.IMindMapDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
@@ -41,6 +41,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/MindmapEditor.html
@@ -48,16 +49,16 @@ import java.util.List;
 public class MindmapEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final MindmapEditor mindmapEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageConvertSupport imageConvertSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public MindmapEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, MindmapEditor mindmapEditor, AstahProToolSupport astahProToolSupport, ImageConvertSupport imageConvertSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public MindmapEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, MindmapEditor mindmapEditor, AstahProToolSupport astahProToolSupport, ImageConvertSupport imageConvertSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.mindmapEditor = mindmapEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageConvertSupport = imageConvertSupport;
@@ -185,17 +186,11 @@ public class MindmapEditorTool implements ToolProvider {
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IMindMapDiagram createdAstahMindmapDiagram = mindmapEditor.createMindmapDiagram(astahPackage, param.newDiagramName());
-            transactionManager.endTransaction();
+        IMindMapDiagram createdAstahMindmapDiagram = txnAstah.call( () -> {
+            return mindmapEditor.createMindmapDiagram(astahPackage, param.newDiagramName());
+        });
 
-            return DiagramDTOAssembler.toDTO(createdAstahMindmapDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DiagramDTOAssembler.toDTO(createdAstahMindmapDiagram);
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeToFloatingTopic(McpSyncServerExchange exchange, ChangeToFloatingTopicDTO param) throws Exception {
@@ -206,21 +201,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.changeToFloatingTopic(astahTopic);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFloatingTopic(McpSyncServerExchange exchange, NewFloatingTopicDTO param) throws Exception {
@@ -230,25 +219,19 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahFloatingTopic = mindmapEditor.createFloatingTopic(
+        INodePresentation astahFloatingTopic = txnAstah.call( () -> {
+            return mindmapEditor.createFloatingTopic(
                 param.newFloatingTopicLabel(),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFloatingTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFloatingTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createTopic(McpSyncServerExchange exchange, NewTopicDTO param) throws Exception {
@@ -259,21 +242,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahTopic = mindmapEditor.createTopic(astahParentTopic, param.newTopicLabel());
-            transactionManager.endTransaction();
+        INodePresentation astahTopic = txnAstah.call( () -> {
+            return mindmapEditor.createTopic(astahParentTopic, param.newTopicLabel());
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTopicLink(McpSyncServerExchange exchange, NewLinkBetweenTopicsDTO param) throws Exception {
@@ -285,21 +262,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLink = mindmapEditor.createMMLinkPresentation(astahSourceTopic, astahTargetTopic);
-            transactionManager.endTransaction();
+        ILinkPresentation astahLink = txnAstah.call( () -> {
+            return mindmapEditor.createMMLinkPresentation(astahSourceTopic, astahTargetTopic);
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLink);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLink);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfTopic(McpSyncServerExchange exchange, ChangeParentOfTopicDTO param) throws Exception {
@@ -311,21 +282,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.moveTo(astahTargetTopic, astahNewParentTopic);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> moveTopicWithinSiblingOrder(McpSyncServerExchange exchange, MoveTopicWithinSiblingOrderDTO param) throws Exception {
@@ -337,24 +302,18 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.moveTo(
                 astahTargetTopic,
                 astahParentTopic,
                 param.newSiblingIndex());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertSvgImageIntoTopic(McpSyncServerExchange exchange, NewSvgImageIntoTopicDTO param) throws Exception {
@@ -367,21 +326,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         Image image = imageConvertSupport.svgToImage(param.imageSvgCode());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.setImage(astahTopic, image);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-            McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(diagramImage));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(diagramImage));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertPngImageIntoTopic(McpSyncServerExchange exchange, NewPngImageIntoTopicDTO param) throws Exception {
@@ -394,21 +347,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         Image image = imageConvertSupport.urlToImage(param.imageUrl());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.setImage(astahTopic, image);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-            McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(diagramImage));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(diagramImage));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertJpgImageIntoTopic(McpSyncServerExchange exchange, NewJpgImageIntoTopicDTO param) throws Exception {
@@ -421,21 +368,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         Image image = imageConvertSupport.urlToImage(param.imageUrl());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.setImage(astahTopic, image);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-            McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(diagramImage));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(diagramImage));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteChildTopics(McpSyncServerExchange exchange, DeleteChildTopicsDTO param) throws Exception {
@@ -446,21 +387,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.deleteChildren(astahTargetParentTopic);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetParentTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetParentTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteImageFromTopic(McpSyncServerExchange exchange, DeleteImageFromTopicDTO param) throws Exception {
@@ -471,21 +406,15 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.deleteImage(astahTargetTopic);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> setBoundaryOfTopic(McpSyncServerExchange exchange, TopicWithBoundaryVisibilityDTO param) throws Exception {
@@ -496,20 +425,14 @@ public class MindmapEditorTool implements ToolProvider {
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             mindmapEditor.setBoundaryVisibility(astahTargetTopic, param.boundaryVisibility());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

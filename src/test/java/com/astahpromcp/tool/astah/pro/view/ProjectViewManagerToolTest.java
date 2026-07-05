@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementListDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Disabled("ProjectViewManager is not available in non-plugin")
 public class ProjectViewManagerToolTest {
@@ -36,7 +36,7 @@ public class ProjectViewManagerToolTest {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
         projectAccessor.open("src/test/resources/modelfile/view/ProjectViewManagerToolTest.asta");
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         IProjectViewManager projectViewManager = astahApi.getViewManager().getProjectViewManager();
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -44,7 +44,7 @@ public class ProjectViewManagerToolTest {
         tool = new ProjectViewManagerTool(
             projectAccessor,
             projectViewManager,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
         

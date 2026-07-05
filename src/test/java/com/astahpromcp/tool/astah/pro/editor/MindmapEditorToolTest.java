@@ -2,13 +2,13 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.MindmapEditor;
 import com.change_vision.jude.api.inf.model.IMindMapDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class MindmapEditorToolTest {
 
@@ -52,7 +53,7 @@ public class MindmapEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/editor/MindmapEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         MindmapEditor mindmapEditor = projectAccessor.getDiagramEditorFactory().getMindmapEditor();
@@ -64,7 +65,7 @@ public class MindmapEditorToolTest {
         // Tool
         tool = new MindmapEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             mindmapEditor,
             astahProToolSupport,
             imageConvertSupport,

@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.SlotWithValueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.SlotDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.ISlot;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -16,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ISlot.html
@@ -23,13 +23,13 @@ import java.util.List;
 public class SlotTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public SlotTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public SlotTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -85,16 +85,10 @@ public class SlotTool implements ToolProvider {
 
         ISlot astahSlot = astahProToolSupport.getSlot(param.targetSlotId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahSlot.setValue(param.value());
-            transactionManager.endTransaction();
+        });
 
-            return SlotDTOAssembler.toDTO(astahSlot);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return SlotDTOAssembler.toDTO(astahSlot);
     }
 }

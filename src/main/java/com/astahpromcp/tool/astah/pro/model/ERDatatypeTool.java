@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERDatatypeWithLengthConstra
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERDatatypeWithPrecisionConstraintDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDatatypeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDatatypeDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -19,6 +18,7 @@ import io.modelcontextprotocol.server.McpSyncServerExchange;
 import java.util.List;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDatatype.html
@@ -26,13 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 public class ERDatatypeTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERDatatypeTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERDatatypeTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -109,17 +109,11 @@ public class ERDatatypeTool implements ToolProvider {
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDatatype.setLengthConstraint(param.lengthConstraint());
-            transactionManager.endTransaction();
+        });
 
-            return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
     private ERDatatypeDTO setPrecisionConstraint(McpSyncServerExchange exchange, ERDatatypeWithPrecisionConstraintDTO param) throws Exception {
@@ -127,17 +121,11 @@ public class ERDatatypeTool implements ToolProvider {
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDatatype.setPrecisionConstraint(param.precisionConstraint());
-            transactionManager.endTransaction();
+        });
 
-            return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
     private ERDatatypeDTO setDefaultLengthPrecision(McpSyncServerExchange exchange, ERDatatypeWithDefaultLengthPrecisionDTO param) throws Exception {
@@ -145,17 +133,11 @@ public class ERDatatypeTool implements ToolProvider {
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDatatype.setDefaultLengthPrecision(param.defaultLengthPrecision());
-            transactionManager.endTransaction();
+        });
 
-            return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
     private ERDatatypeDTO setDescription(McpSyncServerExchange exchange, ERDatatypeWithDescriptionDTO param) throws Exception {
@@ -163,16 +145,10 @@ public class ERDatatypeTool implements ToolProvider {
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahERDatatype.setDefinition(param.description());
-            transactionManager.endTransaction();
+        });
 
-            return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 }

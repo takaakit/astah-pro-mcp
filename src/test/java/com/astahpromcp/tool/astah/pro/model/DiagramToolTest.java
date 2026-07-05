@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ImageFileDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -27,6 +26,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class DiagramToolTest {
 
@@ -42,7 +42,7 @@ public class DiagramToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/DiagramToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -53,7 +53,7 @@ public class DiagramToolTest {
         // Tool
         tool = new DiagramTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             imageOutputDir,
             true);

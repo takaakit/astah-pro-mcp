@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.StateMachineDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
@@ -30,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class StateMachineDiagramEditorToolTest {
 
@@ -55,7 +55,7 @@ public class StateMachineDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         StateMachineDiagramEditor stateMachineDiagramEditor = projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/StateMachineDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
@@ -66,7 +66,7 @@ public class StateMachineDiagramEditorToolTest {
         // Tool
         tool = new StateMachineDiagramEditorTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             stateMachineDiagramEditor,
             astahProToolSupport,
             imageCaptureSupport,

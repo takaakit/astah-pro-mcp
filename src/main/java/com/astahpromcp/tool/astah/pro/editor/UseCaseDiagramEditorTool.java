@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewUseCaseDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseDiagramEditor.html
@@ -24,14 +24,14 @@ import java.util.List;
 public class UseCaseDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final UseCaseDiagramEditor useCaseDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public UseCaseDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, UseCaseDiagramEditor useCaseDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public UseCaseDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, UseCaseDiagramEditor useCaseDiagramEditor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.useCaseDiagramEditor = useCaseDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
@@ -74,18 +74,12 @@ public class UseCaseDiagramEditorTool implements ToolProvider {
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IUseCaseDiagram astahUseCaseDiagram = useCaseDiagramEditor.createUseCaseDiagram(
+        IUseCaseDiagram astahUseCaseDiagram = txnAstah.call( () -> {
+            return useCaseDiagramEditor.createUseCaseDiagram(
                 astahPackage,
                 param.newUseCaseDiagramName());
-            transactionManager.endTransaction();
+        });
 
-            return DiagramDTOAssembler.toDTO(astahUseCaseDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DiagramDTOAssembler.toDTO(astahUseCaseDiagram);
     }
 }

@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
@@ -22,8 +23,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePrese
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.DiagramEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
-import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -38,6 +37,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/DiagramEditor.html
@@ -45,16 +45,16 @@ import java.util.List;
 public class DiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
     private final ImageConvertSupport imageConvertSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public DiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageConvertSupport imageConvertSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public DiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageConvertSupport imageConvertSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.diagramEditorSupport = diagramEditorSupport;
         this.imageConvertSupport = imageConvertSupport;
@@ -151,30 +151,24 @@ public class DiagramEditorTool implements ToolProvider {
 
         Image image = imageConvertSupport.svgToImage(param.imageSvgCode());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             // Note: The return value of createImage() is null (likely due to an API bug), so the return value cannot be used.
             diagramEditor.createImage(
                 image,
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            RectangleDTO dto = new RectangleDTO(
-                param.locationX(),
-                param.locationY(),
-                image.getWidth(null),
-                image.getHeight(null));
+        RectangleDTO dto = new RectangleDTO(
+            param.locationX(),
+            param.locationY(),
+            image.getWidth(null),
+            image.getHeight(null));
 
-            McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(diagramImage));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(diagramImage));
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> insertPngImage(McpSyncServerExchange exchange, NewPngImageWithPointDTO param) throws Exception {
@@ -193,30 +187,24 @@ public class DiagramEditorTool implements ToolProvider {
 
         Image image = imageConvertSupport.urlToImage(param.imageUrl());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             // Note: The return value of createImage() is null (likely due to an API bug), so the return value cannot be used.
             diagramEditor.createImage(
                 image,
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            RectangleDTO dto = new RectangleDTO(
-                param.locationX(),
-                param.locationY(),
-                image.getWidth(null),
-                image.getHeight(null));
+        RectangleDTO dto = new RectangleDTO(
+            param.locationX(),
+            param.locationY(),
+            image.getWidth(null),
+            image.getHeight(null));
 
-            McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(diagramImage));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(diagramImage));
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> insertJpgImage(McpSyncServerExchange exchange, NewJpgImageWithPointDTO param) throws Exception {
@@ -235,30 +223,24 @@ public class DiagramEditorTool implements ToolProvider {
 
         Image image = imageConvertSupport.urlToImage(param.imageUrl());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             // Note: The return value of createImage() is null (likely due to an API bug), so the return value cannot be used.
             diagramEditor.createImage(
                 image,
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            RectangleDTO dto = new RectangleDTO(
-                param.locationX(),
-                param.locationY(),
-                image.getWidth(null),
-                image.getHeight(null));
+        RectangleDTO dto = new RectangleDTO(
+            param.locationX(),
+            param.locationY(),
+            image.getWidth(null),
+            image.getHeight(null));
 
-            McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(diagramImage));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(diagramImage));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertRect(McpSyncServerExchange exchange, NewRectDTO param) throws Exception {
@@ -275,26 +257,20 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = diagramEditor.createRect(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return diagramEditor.createRect(
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()),
                 param.width(),
                 param.height());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertText(McpSyncServerExchange exchange, NewTextWithPointDTO param) throws Exception {
@@ -311,25 +287,19 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahNodePresentation = diagramEditor.createText(
+        INodePresentation astahNodePresentation = txnAstah.call( () -> {
+            return diagramEditor.createText(
                 param.textContent(),
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private DiagramDTO deleteDiagram(McpSyncServerExchange exchange, DeleteDiagramDTO param) throws Exception {
@@ -349,17 +319,11 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             diagramEditor.deleteDiagram();
-            transactionManager.endTransaction();
+        });
 
-            return diagramDTO;
-
-        } catch (InvalidEditingException e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return diagramDTO;
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> deletePresentation(McpSyncServerExchange exchange, DeletePresentationDTO param) throws Exception {
@@ -381,19 +345,13 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             diagramEditor.deletePresentation(astahPresentation);
-            transactionManager.endTransaction();
+        });
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(presentationDTO, List.of(image));
-
-        } catch (InvalidEditingException e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(presentationDTO, List.of(image));
     }
 
 }

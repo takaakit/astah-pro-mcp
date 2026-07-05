@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -41,7 +40,6 @@ public class ProjectAccessorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
         projectAccessor.open("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 

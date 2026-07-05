@@ -29,6 +29,12 @@ public final class McpServerConfig {
     // Maximum time a tool call waits to acquire exclusive access to the Astah API
     public static final long ASTAH_API_LOCK_TIMEOUT_SECONDS = 30;
 
+    // Maximum time to wait for the EDT queue to drain after a tool execution.
+    public static final long EDT_FLUSH_TIMEOUT_SECONDS = 20;
+
+    // Maximum time a script run may execute.
+    public static final long SCRIPT_EXECUTION_TIMEOUT_SECONDS = 60;
+
     // Root directory where generated output is stored.
     public static final Path ROOT_OUTPUT_DIR = Paths.get(System.getProperty("user.home"), ".astah-pro-mcp");
 

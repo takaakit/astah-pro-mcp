@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -16,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
@@ -23,13 +23,13 @@ import java.util.List;
 public class NamedElementTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public NamedElementTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public NamedElementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -113,17 +113,11 @@ public class NamedElementTool implements ToolProvider {
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.setName(param.name());
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO setAlias1(McpSyncServerExchange exchange, NamedElementWithAlias1DTO param) throws Exception {
@@ -131,17 +125,11 @@ public class NamedElementTool implements ToolProvider {
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.setAlias1(param.alias1());
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO setAlias2(McpSyncServerExchange exchange, NamedElementWithAlias2DTO param) throws Exception {
@@ -149,17 +137,11 @@ public class NamedElementTool implements ToolProvider {
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.setAlias2(param.alias2());
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO setDefinition(McpSyncServerExchange exchange, NamedElementWithDefinitionDTO param) throws Exception {
@@ -167,17 +149,11 @@ public class NamedElementTool implements ToolProvider {
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.setDefinition(param.definition());
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO setVisibility(McpSyncServerExchange exchange, NamedElementWithVisibilityDTO param) throws Exception {
@@ -185,16 +161,10 @@ public class NamedElementTool implements ToolProvider {
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNamedElement.setVisibility(param.visibility().astahValue);
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 }

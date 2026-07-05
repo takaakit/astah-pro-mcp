@@ -37,7 +37,7 @@ public class ProjectInfoTool implements ToolProvider {
     private final AstahProToolSupport astahProToolSupport;
     private final List<List<NameIdTypeDTO>> nameIdTypeDTOChunksCache;
     private final List<List<LabelIdTypeDTO>> labelIdTypeDTOChunksCache;
-    private final List<List<DefinitionIdTypeDTO>> definitionIdTypeDTOChunksCache;
+    private final List<List<DefinitionNameIdTypeDTO>> definitionNameIdTypeDTOChunksCache;
     private final Object nameCacheLock = new Object();
     private final Object labelCacheLock = new Object();
     private final Object definitionCacheLock = new Object();
@@ -48,7 +48,7 @@ public class ProjectInfoTool implements ToolProvider {
         this.astahProToolSupport = astahProToolSupport;
         this.nameIdTypeDTOChunksCache = new ArrayList<>();
         this.labelIdTypeDTOChunksCache = new ArrayList<>();
-        this.definitionIdTypeDTOChunksCache = new ArrayList<>();
+        this.definitionNameIdTypeDTOChunksCache = new ArrayList<>();
         this.includeEditTools = includeEditTools;
     }
 
@@ -100,17 +100,17 @@ public class ProjectInfoTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_definitions",
-                "Return the total number of chunks and the data of the first chunk of all definitions in the project. The chunk data is a simplified information: definition, identifier, and type.",
+                "Return the total number of chunks and the data of the first chunk of all definitions in the project. The chunk data is a simplified information: definition, name, identifier, and type.",
                 this::getAllDefinitions,
                 NoInputDTO.class,
-                AllDefinitionIdTypeDTO.class),
+                AllDefinitionNameIdTypeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_all_definitions",
-                "Return the chunk data of all definitions in the project. The chunk data is a simplified information: definition, identifier, and type.",
+                "Return the chunk data of all definitions in the project. The chunk data is a simplified information: definition, name, identifier, and type.",
                 this::getDefinitionsChunk,
                 ChunkDTO.class,
-                DefinitionIdTypeListDTO.class),
+                DefinitionNameIdTypeListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_dgm_prsts",
@@ -165,6 +165,13 @@ public class ProjectInfoTool implements ToolProvider {
                 "retrieve_classifier_relationships_as_puml",
                 "Return the PlantUML code that represents the relationships between the classifiers within the project. When you need to know the relationships between classifiers across the entire project, use this tool. Note that the relationships returned by this tool include only the relationship types; for example, association role names, multiplicities, composition, aggregation, and association names are not included.",
                 this::retrieveClassifiersRelationshipsAsPlantuml,
+                NoInputDTO.class,
+                PlantumlDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "get_relationships_as_puml_code",
+                "Return the PlantUML code for a class diagram that shows only the relationships among NamedElements in the Astah project. However, do not include the role names, multiplicities, or composition types of the relationships. If you need that information, retrieve the detail information for each individual relationship. This tool is recommended when you want to understand the overall element relationships in the Astah project.",
+                this::getRelationshipsAsPlantumlCode,
                 NoInputDTO.class,
                 PlantumlDTO.class)
         );
@@ -223,53 +230,53 @@ public class ProjectInfoTool implements ToolProvider {
         return new NameIdTypeListDTO(chunk);
     }
 
-    private AllDefinitionIdTypeDTO getAllDefinitions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private AllDefinitionNameIdTypeDTO getAllDefinitions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get information of all definitions: {}", param);
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
-        List<DefinitionIdTypeDTO> definitionIdTypeDTOs = new ArrayList<>();
+        List<DefinitionNameIdTypeDTO> definitionNameIdTypeDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
             try {
-                definitionIdTypeDTOs.add(DefinitionIdTypeDTOAssembler.toDTO(astahNamedElement));
+                definitionNameIdTypeDTOs.add(DefinitionNameIdTypeDTOAssembler.toDTO(astahNamedElement));
             } catch (Exception e) {
-                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to DefinitionIdTypeDTO: " + e.getMessage());
+                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to DefinitionNameIdTypeDTO: " + e.getMessage());
             }
         }
 
-        List<List<DefinitionIdTypeDTO>> newCache = new ArrayList<>();
-        if (definitionIdTypeDTOs.isEmpty()) {
+        List<List<DefinitionNameIdTypeDTO>> newCache = new ArrayList<>();
+        if (definitionNameIdTypeDTOs.isEmpty()) {
             newCache.add(new ArrayList<>());
         } else {
-            for (int i = 0; i < definitionIdTypeDTOs.size(); i += CHUNK_SIZE) {
-                newCache.add(new ArrayList<>(definitionIdTypeDTOs.subList(i, Math.min(definitionIdTypeDTOs.size(), i + CHUNK_SIZE))));
+            for (int i = 0; i < definitionNameIdTypeDTOs.size(); i += CHUNK_SIZE) {
+                newCache.add(new ArrayList<>(definitionNameIdTypeDTOs.subList(i, Math.min(definitionNameIdTypeDTOs.size(), i + CHUNK_SIZE))));
             }
         }
 
-        List<DefinitionIdTypeDTO> firstChunk;
+        List<DefinitionNameIdTypeDTO> firstChunk;
         int totalChunks;
         synchronized (definitionCacheLock) {
-            definitionIdTypeDTOChunksCache.clear();
-            definitionIdTypeDTOChunksCache.addAll(newCache);
-            totalChunks = definitionIdTypeDTOChunksCache.size();
-            firstChunk = definitionIdTypeDTOChunksCache.get(0);
+            definitionNameIdTypeDTOChunksCache.clear();
+            definitionNameIdTypeDTOChunksCache.addAll(newCache);
+            totalChunks = definitionNameIdTypeDTOChunksCache.size();
+            firstChunk = definitionNameIdTypeDTOChunksCache.get(0);
         }
 
-        return new AllDefinitionIdTypeDTO(totalChunks, firstChunk);
+        return new AllDefinitionNameIdTypeDTO(totalChunks, firstChunk);
     }
 
-    private DefinitionIdTypeListDTO getDefinitionsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
+    private DefinitionNameIdTypeListDTO getDefinitionsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
         log.debug("Get definitions chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();
-        List<DefinitionIdTypeDTO> chunk;
+        List<DefinitionNameIdTypeDTO> chunk;
         synchronized (definitionCacheLock) {
-            if (chunkIndex < 0 || chunkIndex >= definitionIdTypeDTOChunksCache.size()) {
+            if (chunkIndex < 0 || chunkIndex >= definitionNameIdTypeDTOChunksCache.size()) {
                 throw new RuntimeException("Invalid chunk index: " + chunkIndex);
             }
-            chunk = definitionIdTypeDTOChunksCache.get(chunkIndex);
+            chunk = definitionNameIdTypeDTOChunksCache.get(chunkIndex);
         }
 
-        return new DefinitionIdTypeListDTO(chunk);
+        return new DefinitionNameIdTypeListDTO(chunk);
     }
 
     private AllLabelIdTypeInfoDTO getAllPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
@@ -826,6 +833,81 @@ public class ProjectInfoTool implements ToolProvider {
 
         plantumlCode.append("@enduml").append("\n");
         log.debug("Classifiers relationships as PlantUML: {}", plantumlCode.toString());
+
+        return new PlantumlDTO(plantumlCode.toString());
+    }
+
+    private PlantumlDTO getRelationshipsAsPlantumlCode(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+        log.debug("Get relationships as PlantUML code: {}", param);
+
+        StringBuilder plantumlCode = new StringBuilder("@startuml\n");
+
+        List<INamedElement> namedElements = new ArrayList<>(Arrays.asList(projectAccessor.findElements(INamedElement.class)));
+        namedElements.sort(Comparator.comparing(element -> element.getFullName(".")));
+
+        for (INamedElement namedElement : namedElements) {
+            if (namedElement.getName().isEmpty()) {
+                continue;
+            }
+
+            if (namedElement instanceof IClass) {
+                // Add nested classes
+                for (IClass nestedClass : ((IClass) namedElement).getNestedClasses()) {
+                    plantumlCode.append("\"").append(namedElement.getFullName(".")).append("\"")
+                            .append(" +-- ")
+                            .append("\"").append(nestedClass.getFullName(".")).append("\"\n");
+                }
+
+                // Add inheritances
+                for (IGeneralization generalization : ((IClass) namedElement).getGeneralizations()) {
+                    INamedElement superType = generalization.getSuperType();
+                    if (superType == null) {
+                        continue;
+                    }
+
+                    plantumlCode.append("\"").append(namedElement.getFullName(".")).append("\"")
+                            .append(" --|> ")
+                            .append("\"").append(superType.getFullName(".")).append("\"\n");
+                }
+            }
+
+            // Add realizations
+            for (IRealization realization : namedElement.getClientRealizations()) {
+                INamedElement supplier = realization.getSupplier();
+                if (supplier == null) {
+                    continue;
+                }
+
+                plantumlCode.append("\"").append(namedElement.getFullName(".")).append("\"")
+                        .append(" ..|> ")
+                        .append("\"").append(supplier.getFullName(".")).append("\"\n");
+            }
+
+            // Add dependencies
+            for (IDependency dependency : namedElement.getClientDependencies()) {
+                INamedElement supplier = dependency.getSupplier();
+                if (supplier == null) {
+                    continue;
+                }
+
+                plantumlCode.append("\"").append(namedElement.getFullName(".")).append("\"")
+                        .append(" ..> ")
+                        .append("\"").append(supplier.getFullName(".")).append("\"\n");
+            }
+
+            // Add usages
+            for (IUsage usage : namedElement.getClientUsages()) {
+                INamedElement supplier = usage.getSupplier();
+                if (supplier == null) {
+                    continue;
+                }
+
+                plantumlCode.append("\"").append(namedElement.getFullName(".")).append("\"")
+                        .append(" ..> ")
+                        .append("\"").append(supplier.getFullName(".")).append("\"\n");
+            }
+        }
+        plantumlCode.append("@enduml\n");
 
         return new PlantumlDTO(plantumlCode.toString());
     }

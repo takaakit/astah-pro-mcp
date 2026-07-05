@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERRelationshipWithParentVer
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERRelationshipWithPhysicalNameDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERRelationshipDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERRelationshipToolTest {
 
@@ -42,14 +42,14 @@ public class ERRelationshipToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/ERRelationshipToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new ERRelationshipTool(
             projectAccessor,
-            transactionManager,
+            transactionSupport,
             astahProToolSupport,
             true);
 

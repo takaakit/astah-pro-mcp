@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LifelineDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -23,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILifeline.html
@@ -30,13 +30,13 @@ import java.util.List;
 public class LifelineTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public LifelineTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public LifelineTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -100,17 +100,11 @@ public class LifelineTool implements ToolProvider {
         ILifeline astahLifeline = astahProToolSupport.getLifeline(param.targetLifelineId());
         IClass astahBaseClass = astahProToolSupport.getClass(param.baseClassId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahLifeline.setBase(astahBaseClass);
-            transactionManager.endTransaction();
+        });
 
-            return LifelineDTOAssembler.toDTO(astahLifeline);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return LifelineDTOAssembler.toDTO(astahLifeline);
     }
 
     private NodePresentationDTO setLength(McpSyncServerExchange exchange, LifelineWithLengthDTO param) throws Exception {
@@ -125,16 +119,10 @@ public class LifelineTool implements ToolProvider {
         }
         INodePresentation astahLifelinePresentation = (INodePresentation) astahLifelinePresentations[0];
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahLifelinePresentation.setProperty(Key.LIFELINE_LENGTH, String.valueOf(param.length()));
-            transactionManager.endTransaction();
+        });
 
-            return NodePresentationDTOAssembler.toDTO(astahLifelinePresentation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NodePresentationDTOAssembler.toDTO(astahLifelinePresentation);
     }
 }

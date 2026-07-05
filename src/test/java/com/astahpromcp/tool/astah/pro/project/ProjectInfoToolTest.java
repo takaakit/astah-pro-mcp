@@ -44,6 +44,7 @@ public class ProjectInfoToolTest {
     private Method retrieveClassifiersWithinPackage;
     private Method retrievePackageStructureAsPlantuml;
     private Method retrieveClassifiersRelationshipsAsPlantuml;
+    private Method getRelationshipsAsPlantumlCode;
     private Field nameIdTypeDTOChunksCacheField;
     private Field labelIdTypeDTOChunksCacheField;
 
@@ -134,6 +135,13 @@ public class ProjectInfoToolTest {
         retrieveClassifiersRelationshipsAsPlantuml = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "retrieveClassifiersRelationshipsAsPlantuml",
+            McpSyncServerExchange.class,
+            NoInputDTO.class);
+
+        // getRelationshipsAsPlantumlCode() method
+        getRelationshipsAsPlantumlCode = TestSupport.getAccessibleMethod(
+            ProjectInfoTool.class,
+            "getRelationshipsAsPlantumlCode",
             McpSyncServerExchange.class,
             NoInputDTO.class);
 
@@ -650,5 +658,48 @@ public class ProjectInfoToolTest {
         assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..> \"Quuy10\""));
         assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..> \"Quuy11\""));
         assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..|> \"Quuy16\""));
+    }
+
+    @Test
+    void getRelationshipsAsPlantumlCode_ok() throws Exception {
+        // Get classifiers used as endpoints of Baz's relationships
+        IClass baz = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Baz");
+        IClass quuy09 = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Quuy09");
+        IClass quuy10 = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Quuy10");
+        IClass quuy11 = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Quuy11");
+        IClass quuy16 = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Quuy16");
+
+        // Node names are fully-qualified names
+        String bazFqn = baz.getFullName(".");
+        String quuy09Fqn = quuy09.getFullName(".");
+        String quuy10Fqn = quuy10.getFullName(".");
+        String quuy11Fqn = quuy11.getFullName(".");
+        String quuy16Fqn = quuy16.getFullName(".");
+
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call getRelationshipsAsPlantumlCode()
+        // ----------------------------------------
+        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getRelationshipsAsPlantumlCode,
+            tool,
+            inputDTO,
+            PlantumlDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertNotNull(outputDTO.plantumlCode());
+
+        String plantumlCode = outputDTO.plantumlCode();
+        assertTrue(plantumlCode.startsWith("@startuml"));
+        assertTrue(plantumlCode.contains("@enduml"));
+
+        // Generalization, realization, dependency and usage are output using fully-qualified names
+        assertTrue(plantumlCode.contains("\"" + bazFqn + "\" --|> \"" + quuy09Fqn + "\""));
+        assertTrue(plantumlCode.contains("\"" + bazFqn + "\" ..|> \"" + quuy16Fqn + "\""));
+        assertTrue(plantumlCode.contains("\"" + bazFqn + "\" ..> \"" + quuy10Fqn + "\""));
+        assertTrue(plantumlCode.contains("\"" + bazFqn + "\" ..> \"" + quuy11Fqn + "\""));
     }
 }

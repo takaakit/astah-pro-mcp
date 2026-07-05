@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithWidthDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -26,6 +25,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
@@ -33,14 +33,14 @@ import java.util.List;
 public class NodePresentationTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public NodePresentationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public NodePresentationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
         this.includeEditTools = includeEditTools;
@@ -127,22 +127,16 @@ public class NodePresentationTool implements ToolProvider {
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNodePresentation.setLocation(new Point2D.Double(param.locationX(), param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
-            RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
+        Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
+        RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationWidth(McpSyncServerExchange exchange, NodePresentationWithWidthDTO param) throws Exception {
@@ -150,22 +144,16 @@ public class NodePresentationTool implements ToolProvider {
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNodePresentation.setWidth(param.width());
-            transactionManager.endTransaction();
+        });
 
-            Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
-            RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
+        Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
+        RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationHeight(McpSyncServerExchange exchange, NodePresentationWithHeightDTO param) throws Exception {
@@ -173,21 +161,15 @@ public class NodePresentationTool implements ToolProvider {
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahNodePresentation.setHeight(param.height());
-            transactionManager.endTransaction();
+        });
 
-            Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
-            RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
+        Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
+        RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.StateMachineDiagramEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
@@ -27,6 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StateMachineDiagramEditor.html
@@ -34,15 +34,15 @@ import java.util.List;
 public class StateMachineDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final StateMachineDiagramEditor stateMachineDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public StateMachineDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, StateMachineDiagramEditor stateMachineDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public StateMachineDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, StateMachineDiagramEditor stateMachineDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.stateMachineDiagramEditor = stateMachineDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -186,23 +186,17 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             stateMachineDiagramEditor.addRegion(
                 astahParentNodePresentation,
                 param.isHorizontal());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteRegion(McpSyncServerExchange exchange, DeleteRegionDTO param) throws Exception {
@@ -213,23 +207,17 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             stateMachineDiagramEditor.deleteRegion(
                 astahParentNodePresentation,
                 param.index());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfState(McpSyncServerExchange exchange, ChangeParentStateDTO param) throws Exception {
@@ -247,23 +235,17 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             stateMachineDiagramEditor.changeParentOfState(
                 astahTargetNodePresentation,
                 astahParentNodePresentation);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createChoicePseudostate(McpSyncServerExchange exchange, NewChoicePseudostateDTO param) throws Exception {
@@ -280,25 +262,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahChoicePseudostate = stateMachineDiagramEditor.createChoicePseudostate(
+        INodePresentation astahChoicePseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createChoicePseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahChoicePseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahChoicePseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createDeepHistoryPseudostate(McpSyncServerExchange exchange, NewDeepHistoryPseudostateDTO param) throws Exception {
@@ -315,25 +291,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahDeepHistoryPseudostate = stateMachineDiagramEditor.createDeepHistoryPseudostate(
+        INodePresentation astahDeepHistoryPseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createDeepHistoryPseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahDeepHistoryPseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahDeepHistoryPseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createShallowHistoryPseudostate(McpSyncServerExchange exchange, NewShallowHistoryPseudostateDTO param) throws Exception {
@@ -350,25 +320,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahShallowHistoryPseudostate = stateMachineDiagramEditor.createShallowHistoryPseudostate(
+        INodePresentation astahShallowHistoryPseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createShallowHistoryPseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahShallowHistoryPseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahShallowHistoryPseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalState(McpSyncServerExchange exchange, NewFinalStateDTO param) throws Exception {
@@ -385,25 +349,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahFinalState = stateMachineDiagramEditor.createFinalState(
+        INodePresentation astahFinalState = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createFinalState(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFinalState);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFinalState);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkPseudostate(McpSyncServerExchange exchange, NewForkPseudostateDTO param) throws Exception {
@@ -420,27 +378,21 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahForkPseudostate = stateMachineDiagramEditor.createForkPseudostate(
+        INodePresentation astahForkPseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createForkPseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()),
                 param.width(),
                 param.height());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahForkPseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahForkPseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialPseudostate(McpSyncServerExchange exchange, NewInitialPseudostateDTO param) throws Exception {
@@ -457,25 +409,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahInitialPseudostate = stateMachineDiagramEditor.createInitialPseudostate(
+        INodePresentation astahInitialPseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createInitialPseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahInitialPseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahInitialPseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinPseudostate(McpSyncServerExchange exchange, NewJoinPseudostateDTO param) throws Exception {
@@ -492,27 +438,21 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahJoinPseudostate = stateMachineDiagramEditor.createJoinPseudostate(
+        INodePresentation astahJoinPseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createJoinPseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()),
                 param.width(),
                 param.height());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJoinPseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJoinPseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJunctionPseudostate(McpSyncServerExchange exchange, NewJunctionPseudostateDTO param) throws Exception {
@@ -529,25 +469,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahJunctionPseudostate = stateMachineDiagramEditor.createJunctionPseudostate(
+        INodePresentation astahJunctionPseudostate = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createJunctionPseudostate(
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJunctionPseudostate);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJunctionPseudostate);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createState(McpSyncServerExchange exchange, NewStateDTO param) throws Exception {
@@ -564,26 +498,20 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation astahState = stateMachineDiagramEditor.createState(
+        INodePresentation astahState = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createState(
                 param.newStateName(),
                 astahParentNodePresentation,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahState);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahState);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private DiagramDTO createStateMachineDiagram(McpSyncServerExchange exchange, NewStateMachineDiagramDTO param) throws Exception {
@@ -591,19 +519,13 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         INamedElement astahParentNamedElement = astahProToolSupport.getNamedElement(param.parentNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
-            IStateMachineDiagram astahStateMachineDiagram = stateMachineDiagramEditor.createStatemachineDiagram(
+        IStateMachineDiagram astahStateMachineDiagram = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createStatemachineDiagram(
                 astahParentNamedElement,
                 param.newStateMachineDiagramName());
-            transactionManager.endTransaction();
+        });
 
-            return DiagramDTOAssembler.toDTO(astahStateMachineDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DiagramDTOAssembler.toDTO(astahStateMachineDiagram);
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubMachineState(McpSyncServerExchange exchange, NewSubMachineStateDTO param) throws Exception {
@@ -615,26 +537,20 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             stateMachineDiagramEditor.createSubmachineState(
                 astahParentNodePresentation,
                 astahSubMachineDiagram,
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTransition(McpSyncServerExchange exchange, NewTransitionDTO param) throws Exception {
@@ -646,22 +562,16 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation astahLinkPresentation = stateMachineDiagramEditor.createTransition(
+        ILinkPresentation astahLinkPresentation = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createTransition(
                 astahSourceNodePresentation,
                 astahTargetNodePresentation);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

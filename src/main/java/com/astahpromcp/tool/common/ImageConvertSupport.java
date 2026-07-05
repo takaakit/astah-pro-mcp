@@ -1,4 +1,4 @@
-package com.astahpromcp.tool.astah.pro.editor;
+package com.astahpromcp.tool.common;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.TranscoderException;

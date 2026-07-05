@@ -65,7 +65,6 @@ Class Diagram Layout Rules:
 * The positions of the node presentations are adjusted so that, whenever possible, the arrow direction of relationship and dependency link presentations goes from top to bottom or from left to right.
 * The positions are adjusted so that node presentation rectangles never overlap, except when one node presentation contains the other. For example, it is acceptable for the rectangle of a package to overlap with the rectangle of a class contained within that package, but it is not acceptable for rectangles of classes contained within the same package to overlap.
 * If there are multiple link presentations between two node presentations, the paths of those link presentations do not overlap.
-* For each class diagram, repeat the cycle of "checking compliance with the above rules -> adjusting the layout" up to three times so that the above rules are satisfied simultaneously.
 
 
 Sequence Diagram Layout Rules:
@@ -78,6 +77,7 @@ Sequence Diagram Layout Rules:
 
 
 Activity Diagram Layout Rules:
+* Each newly created control-flow or object-flow link presentation uses a right-angle line.
 * The node-presentation positions are adjusted so that the axes of the initial node, action node, and finish node in the same flow are aligned in a straight line either vertically or horizontally, making it easier to recognize that those nodes belong to the same flow.
 * The positions of the node presentations are adjusted so that, whenever possible, the arrow direction of link presentations goes from top to bottom or from left to right.
 * The positions are adjusted so that node presentations inside a partition do not touch the partition edges and have some margin around them.
@@ -106,7 +106,7 @@ Requirement Diagram Layout Rules:
 
 
 Required adjustments after layout:
-* Detect overlaps involving any newly placed node or link presentation using the tool, and adjust either the positions of the node presentations or the paths of the link presentations to eliminate the detected overlaps. However, if a particular overlap issue is not resolved after three consecutive layout adjustment attempts, give up on resolving that overlap and move on to resolving a different overlap issue.
+* Detect overlaps involving any newly placed node or link presentation using the tool, and adjust either the positions of the node presentations or the paths of the link presentations to eliminate the detected overlaps. However, the readability of the diagram is also important. Therefore, do not place node presentations too far apart merely to avoid overlaps, and do not excessively increase the number of vertices in the paths of link presentations, especially to four or more vertices. In addition, if a particular overlap issue is not resolved after three consecutive layout adjustment attempts, give up on resolving that overlap and move on to resolving a different overlap issue.
         """;
 
         List<McpSchema.Content> contents = new ArrayList<>();

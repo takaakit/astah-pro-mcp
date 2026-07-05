@@ -65,6 +65,7 @@ This MCP server operates as a plugin for the modeling tool Astah. Using the tool
 IMPORTANT POINTS to Keep in Mind:
 * Immediately after creating a new diagram, create a note in the upper-left corner of the diagram that describes what the diagram is meant to illustrate.
 * Immediately after creating a new diagram, insert an SVG illustrative graphic in the upper-right corner of the diagram that represents the content of the diagram.
+* Immediately after creating a new class, interface, or enumeration element, describe the responsibility of that element in the element's definition field.
 * When you place new elements on the diagram, as a final check, be sure to re-verify that the placement coordinates of the elements you placed are appropriate and properly aligned (e.g., centered alignment, top-edge alignment, etc.), and always make any necessary fine adjustments to the coordinates of the newly placed elements.  
 * When creating a presentation on a diagram that corresponds to a model, you must provide not only the diagram information but also the information of the corresponding model. In contrast, when creating a presentation that is not associated with a model (such as notes), no corresponding model information is required.  
 * Deleting a presentation does not remove the corresponding model. In contrast, deleting a model will also remove its corresponding presentation.  
@@ -78,6 +79,7 @@ IMPORTANT POINTS to Keep in Mind:
 * Make sure to detect any overlaps caused by newly added node/link presentations using the tool and resolve them. However, NEVER take the incorrect approach of resolving overlaps by simply hiding the node/link presentations.
 * Draw all node/link presentations related to the content intended to be represented in the diagram, without omission. In particular, be careful not to forget to draw any link presentations that should be included.
 * You can place presentations at negative X or Y coordinates on the diagram. For example, a node/link presentation can be placed at (-100, -100).
+* After you have finished editing the model elements and diagrams, you MUST review all definitions of the model elements and diagrams, and revise any definition text that is inconsistent with the corresponding model element or diagram.
 
 
 Procedure for Editing Models and Diagrams:

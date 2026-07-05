@@ -121,6 +121,50 @@ class McpClientApprovalServletTest {
     }
 
     @Test
+    void service_rejectsDeclinedInitializeWithServiceUnavailableNotForbidden() throws Exception {
+        // When the user declines, the rejection must be 503, not 401/403, so MCP clients
+        // do not mistake it for an OAuth authentication challenge. The dialog is stubbed
+        // via a spy so the outcome is deterministic and no real dialog is shown.
+        McpClientApprovalServlet spyServlet = spy(servlet);
+        doReturn(false).when(spyServlet).promptUserForApproval(any());
+
+        when(request.getHeader("Origin")).thenReturn(null);
+        when(request.getHeader("Mcp-Session-Id")).thenReturn(null);
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(request.getRemotePort()).thenReturn(8080);
+        when(request.getRemoteHost()).thenReturn("localhost");
+        when(request.getHeader("User-Agent")).thenReturn("Test-Agent");
+
+        spyServlet.service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Connection not approved by user");
+        verify(response, never()).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
+        verify(response, never()).sendError(eq(HttpServletResponse.SC_UNAUTHORIZED), anyString());
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_passesThroughApprovedInitialize() throws Exception {
+        // When the user approves, the request is delegated to the transport and not rejected.
+        McpClientApprovalServlet spyServlet = spy(servlet);
+        doReturn(true).when(spyServlet).promptUserForApproval(any());
+
+        when(request.getHeader("Origin")).thenReturn(null);
+        when(request.getHeader("Mcp-Session-Id")).thenReturn(null);
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(request.getRemotePort()).thenReturn(8080);
+        when(request.getRemoteHost()).thenReturn("localhost");
+        when(request.getHeader("User-Agent")).thenReturn("Test-Agent");
+
+        spyServlet.service(request, response);
+
+        verify(delegate).service(eq(request), ArgumentMatchers.any(HttpServletResponse.class));
+        verify(response, never()).sendError(anyInt(), anyString());
+    }
+
+    @Test
     void service_allowsRequestForDefaultIpv6LoopbackOrigin() throws Exception {
         servlet = new McpClientApprovalServlet(delegate, null, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
 

@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPrese
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
@@ -29,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/SequenceDiagramEditor.html
@@ -36,15 +36,15 @@ import java.util.List;
 public class SequenceDiagramEditorTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final SequenceDiagramEditor sequenceDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     private final boolean includeEditTools;
 
-    public SequenceDiagramEditorTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, SequenceDiagramEditor sequenceDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public SequenceDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, SequenceDiagramEditor sequenceDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.sequenceDiagramEditor = sequenceDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
@@ -157,19 +157,13 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            ISequenceDiagram createdAstahSequenceDiagram = sequenceDiagramEditor.createSequenceDiagram(
+        ISequenceDiagram createdAstahSequenceDiagram = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createSequenceDiagram(
                 astahPackage,
                 param.newSequenceDiagramName());
-            transactionManager.endTransaction();
+        });
 
-            return SequenceDiagramDTOAssembler.toDTO(createdAstahSequenceDiagram);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return SequenceDiagramDTOAssembler.toDTO(createdAstahSequenceDiagram);
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createCombinedFragment(McpSyncServerExchange exchange, NewCombinedFragmentDTO param) throws Exception {
@@ -179,9 +173,8 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation combinedFragment = sequenceDiagramEditor.createCombinedFragment(
+        INodePresentation combinedFragment = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createCombinedFragment(
                 param.newCombinedFragmentName(),
                 param.combinedFragmentKind().astahValue,
                 new Point2D.Double(
@@ -189,18 +182,13 @@ public class SequenceDiagramEditorTool implements ToolProvider {
                         param.locationY()),
                 param.width(),
                 param.height());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(combinedFragment);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(combinedFragment);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createMessage(McpSyncServerExchange exchange, NewMessageDTO param) throws Exception {
@@ -225,25 +213,19 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation message = sequenceDiagramEditor.createMessage(
+        ILinkPresentation message = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createMessage(
                 param.newMessageName(),
                 senderNode,
                 receiverNode,
                 param.locationY());
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(message);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(message);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createCreateMessage(McpSyncServerExchange exchange, NewCreateMessageDTO param) throws Exception {
@@ -266,25 +248,19 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation createMessage = sequenceDiagramEditor.createCreateMessage(
+        ILinkPresentation createMessage = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createCreateMessage(
                 param.newCreateMessageName(),
                 senderNode,
                 receiverNode,
                 param.locationY());
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(createMessage);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(createMessage);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDestroyMessage(McpSyncServerExchange exchange, NewDestroyMessageDTO param) throws Exception {
@@ -307,25 +283,19 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation destroyMessage = sequenceDiagramEditor.createDestroyMessage(
+        ILinkPresentation destroyMessage = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createDestroyMessage(
                 param.newDestroyMessageName(),
                 senderNode,
                 receiverNode,
                 param.locationY());
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(destroyMessage);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(destroyMessage);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createReturnMessage(McpSyncServerExchange exchange, NewReturnMessageDTO param) throws Exception {
@@ -340,23 +310,17 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation returnMessage = sequenceDiagramEditor.createReturnMessage(
+        ILinkPresentation returnMessage = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createReturnMessage(
                 param.newReturnMessageName(),
                 targetMessage);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(returnMessage);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(returnMessage);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(McpSyncServerExchange exchange, NewLostMessageDTO param) throws Exception {
@@ -374,24 +338,18 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation lostMessage = sequenceDiagramEditor.createLostMessage(
+        ILinkPresentation lostMessage = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createLostMessage(
                 param.newLostMessageName(),
                 senderNode,
                 new Point2D.Double(param.endPointX(), param.endPointY()));
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(lostMessage);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(lostMessage);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFoundMessage(McpSyncServerExchange exchange, NewFoundMessageDTO param) throws Exception {
@@ -408,24 +366,18 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            ILinkPresentation foundMessage = sequenceDiagramEditor.createFoundMessage(
+        ILinkPresentation foundMessage = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createFoundMessage(
                 param.newFoundMessageName(),
                 new Point2D.Double(param.startPointX(), param.startPointY()),
                 receiverNode);
-            transactionManager.endTransaction();
+        });
 
-            LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(foundMessage);
+        LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(foundMessage);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInteractionUse(McpSyncServerExchange exchange, NewInteractionUseDTO param) throws Exception {
@@ -435,9 +387,8 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation interactionUse = sequenceDiagramEditor.createInteractionUse(
+        INodePresentation interactionUse = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createInteractionUse(
                 param.newInteractionUseName(),
                 "",
                 null,
@@ -446,18 +397,13 @@ public class SequenceDiagramEditorTool implements ToolProvider {
                         param.locationY()),
                 param.width(),
                 param.height());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(interactionUse);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(interactionUse);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createLifeline(McpSyncServerExchange exchange, NewLifelineDTO param) throws Exception {
@@ -467,23 +413,17 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation lifeline = sequenceDiagramEditor.createLifeline(
+        INodePresentation lifeline = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createLifeline(
                 param.newLifelineName(),
                 param.locationX());
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(lifeline);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(lifeline);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createTermination(McpSyncServerExchange exchange, NewTerminationDTO param) throws Exception {
@@ -494,21 +434,15 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        try {
-            transactionManager.beginTransaction();
-            INodePresentation termination = sequenceDiagramEditor.createTermination(
+        INodePresentation termination = txnAstah.call( () -> {
+            return sequenceDiagramEditor.createTermination(
                 targetNode);
-            transactionManager.endTransaction();
+        });
 
-            NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(termination);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(termination);
 
-            McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
 
-            return Pair.of(dto, List.of(image));
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return Pair.of(dto, List.of(image));
     }
 }

@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AttributeDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAttribute.html
@@ -24,13 +24,13 @@ import java.util.List;
 public class AttributeTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public AttributeTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public AttributeTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -114,17 +114,11 @@ public class AttributeTool implements ToolProvider {
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAttribute.setInitialValue(param.initialValue());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
     private AttributeDTO setStatic(McpSyncServerExchange exchange, AttributeWithStaticDTO param) throws Exception {
@@ -132,17 +126,11 @@ public class AttributeTool implements ToolProvider {
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAttribute.setStatic(param.isStatic());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
     private AttributeDTO setType(McpSyncServerExchange exchange, AttributeWithTypeDTO param) throws Exception {
@@ -151,17 +139,11 @@ public class AttributeTool implements ToolProvider {
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
         IClass astahType = astahProToolSupport.getClass(param.attributeTypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAttribute.setType(astahType);
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
     private AttributeDTO setTypeExpression(McpSyncServerExchange exchange, AttributeWithTypeExpressionDTO param) throws Exception {
@@ -169,17 +151,11 @@ public class AttributeTool implements ToolProvider {
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAttribute.setTypeExpression(param.typeExpression());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
     private AttributeDTO setMultiplicity(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
@@ -191,32 +167,17 @@ public class AttributeTool implements ToolProvider {
         String upperStringMultiplicity = param.upperMultiplicity();
 
         if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAttribute.setMultiplicityStrings(new String[][]{{lowerStringMultiplicity, upperStringMultiplicity}});
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else if (!lowerStringMultiplicity.isEmpty() && upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAttribute.setMultiplicityString(lowerStringMultiplicity);
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else if (lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAttribute.setMultiplicityString(upperStringMultiplicity);
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else {
             throw new IllegalArgumentException("Lower multiplicity and upper multiplicity are both empty.");
         }

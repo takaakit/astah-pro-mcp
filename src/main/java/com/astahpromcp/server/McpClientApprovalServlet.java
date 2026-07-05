@@ -81,13 +81,25 @@ public class McpClientApprovalServlet extends HttpServlet {
 
         // If the request is an initialize attempt, request approval from the user
         if (context.isInitializeAttempt()) {
-            boolean approved = requestUserApproval(context);
-            if (!approved) {
-                log.info("Rejected MCP connection from {}", context.clientAddress());
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Connection rejected by user");
-                return;
+            ApprovalOutcome outcome = requestUserApproval(context);
+            switch (outcome) {
+                case APPROVED:
+                    log.info("Approved MCP connection from {}", context.clientAddress());
+                    break;
+                case BUSY:
+                    // Transient: another approval dialog is open. Ask the client to retry.
+                    log.info("Approval in progress; asked MCP client {} to retry", context.clientAddress());
+                    resp.setHeader("Retry-After", "2");
+                    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                            "Approval dialog in progress; retry shortly");
+                    return;
+                case DECLINED:
+                default:
+                    // Permanent: the user did not approve (or no approval is possible).
+                    log.info("Rejected MCP connection from {}", context.clientAddress());
+                    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Connection not approved by user");
+                    return;
             }
-            log.info("Approved MCP connection from {}", context.clientAddress());
         }
 
         // Create a response wrapper to track the status and the issued session ID
@@ -116,48 +128,58 @@ public class McpClientApprovalServlet extends HttpServlet {
         }
     }
 
+    // Outcome of a user approval request
+    enum ApprovalOutcome {
+        APPROVED,
+        DECLINED,
+        BUSY
+    }
+
     // Request approval from the user
-    private boolean requestUserApproval(RequestContext context) {
+    private ApprovalOutcome requestUserApproval(RequestContext context) {
         // Auto-approve follow-up initializes from the same client right after a user approval
         if (isWithinApprovalGracePeriod(context)) {
             log.info("Auto-approved MCP connection from {} within the approval grace period (User-Agent: {}).",
                     context.clientAddress(), context.userAgent());
-            return true;
+            return ApprovalOutcome.APPROVED;
         }
 
-        // If the environment is headless, reject the connection
-        if (GraphicsEnvironment.isHeadless()) {
-            log.warn("Headless environment detected. Rejecting connection from {}:{}.",
-                    context.remoteAddress(), context.remotePort());
-            return false;
-        }
-
-        // If another approval dialog is already open, reject immediately (the client may retry)
+        // If another approval dialog is already open, treat it as transient (the client may retry)
         if (!dialogLock.tryLock()) {
-            log.warn("Another approval dialog is in progress. Rejecting connection from {}.",
-                    context.clientAddress());
-            return false;
+            log.warn("Another approval dialog is in progress. Asking client {} to retry.", context.clientAddress());
+            return ApprovalOutcome.BUSY;
         }
 
         try {
-            AtomicBoolean approved = new AtomicBoolean(false);
-            String message = buildDialogMessage(context);
-            Object[] options = {"Connect", "Cancel"};
-            runOnEdtBlocking(() -> showApprovalDialog(message, options, approved));
-            if (approved.get()) {
+            if (promptUserForApproval(context)) {
                 recordApproval(context);
+                return ApprovalOutcome.APPROVED;
             }
-            return approved.get();
+            return ApprovalOutcome.DECLINED;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return false;
+            return ApprovalOutcome.DECLINED;
         } catch (InvocationTargetException e) {
             log.error("Failed to display approval dialog", e.getCause());
-            return false;
+            return ApprovalOutcome.DECLINED;
         } finally {
             dialogLock.unlock();
         }
+    }
+
+    // Prompt the user with a modal dialog and return whether they approved the connection
+    boolean promptUserForApproval(RequestContext context) throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            log.warn("Headless environment detected. Rejecting connection from {}:{}.", context.remoteAddress(), context.remotePort());
+            return false;
+        }
+
+        AtomicBoolean approved = new AtomicBoolean(false);
+        String message = buildDialogMessage(context);
+        Object[] options = {"Connect", "Cancel"};
+        runOnEdtBlocking(() -> showApprovalDialog(message, options, approved));
+        return approved.get();
     }
 
     // Check whether the request falls within the grace period of the last user approval.
@@ -349,7 +371,7 @@ public class McpClientApprovalServlet extends HttpServlet {
         }
     }
 
-    private static final class RequestContext {
+    static final class RequestContext {
 
         private final String method;
         private final String sessionId;

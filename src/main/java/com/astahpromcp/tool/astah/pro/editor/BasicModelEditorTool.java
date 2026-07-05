@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicModelEditor.html
@@ -25,14 +25,14 @@ public class BasicModelEditorTool implements ToolProvider {
 
     private final BasicModelEditor basicModelEditor;
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.basicModelEditor = basicModelEditor;
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -312,17 +312,11 @@ public class BasicModelEditorTool implements ToolProvider {
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementid());
         INamedElement newParentAstahNamedElement = astahProToolSupport.getNamedElement(param.newParentNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             basicModelEditor.changeParent(newParentAstahNamedElement, astahTargetNamedElement);
-            transactionManager.endTransaction();
+        });
 
-            return NamedElementDTOAssembler.toDTO(astahTargetNamedElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return NamedElementDTOAssembler.toDTO(astahTargetNamedElement);
     }
 
     private ArtifactDTO createArtifact(McpSyncServerExchange exchange, NewArtifactInPackageDTO param) throws Exception {
@@ -330,17 +324,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IArtifact createdAstahArtifact = basicModelEditor.createArtifact(parentAstahPackage, param.newArtifactName());
-            transactionManager.endTransaction();
+        IArtifact createdAstahArtifact = txnAstah.call( () -> {
+            return basicModelEditor.createArtifact(parentAstahPackage, param.newArtifactName());
+        });
 
-            return ArtifactDTOAssembler.toDTO(createdAstahArtifact);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ArtifactDTOAssembler.toDTO(createdAstahArtifact);
     }
 
     private PackageDTO createPackageInParentPackage(McpSyncServerExchange exchange, NewPackageInPackageDTO param) throws Exception {
@@ -348,17 +336,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IPackage createdAstahPackage = basicModelEditor.createPackage(parentAstahPackage, param.newPackageName());
-            transactionManager.endTransaction();
+        IPackage createdAstahPackage = txnAstah.call( () -> {
+            return basicModelEditor.createPackage(parentAstahPackage, param.newPackageName());
+        });
 
-            return PackageDTOAssembler.toDTO(createdAstahPackage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return PackageDTOAssembler.toDTO(createdAstahPackage);
     }
 
     private ClassDTO createClassInParentPackage(McpSyncServerExchange exchange, NewClassInPackageDTO param) throws Exception {
@@ -366,17 +348,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IClass createdAstahClass = basicModelEditor.createClass(parentAstahPackage, param.newClassName());
-            transactionManager.endTransaction();
+        IClass createdAstahClass = txnAstah.call( () -> {
+            return basicModelEditor.createClass(parentAstahPackage, param.newClassName());
+        });
 
-            return ClassDTOAssembler.toDTO(createdAstahClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(createdAstahClass);
     }
 
     private ClassDTO createClassInParentClass(McpSyncServerExchange exchange, NewClassInClassDTO param) throws Exception {
@@ -384,17 +360,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IClass createdAstahClass = basicModelEditor.createClass(parentAstahClass, param.newClassName());
-            transactionManager.endTransaction();
+        IClass createdAstahClass = txnAstah.call( () -> {
+            return basicModelEditor.createClass(parentAstahClass, param.newClassName());
+        });
 
-            return ClassDTOAssembler.toDTO(createdAstahClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(createdAstahClass);
     }
 
     private EnumerationDTO createEnumerationInParentPackage(McpSyncServerExchange exchange, NewEnumerationInPackageDTO param) throws Exception {
@@ -402,17 +372,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IEnumeration createdAstahEnumeration = basicModelEditor.createEnumeration(parentAstahPackage, param.newEnumerationName());
-            transactionManager.endTransaction();
+        IEnumeration createdAstahEnumeration = txnAstah.call( () -> {
+            return basicModelEditor.createEnumeration(parentAstahPackage, param.newEnumerationName());
+        });
 
-            return EnumerationDTOAssembler.toDTO(createdAstahEnumeration);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return EnumerationDTOAssembler.toDTO(createdAstahEnumeration);
     }
 
     private ClassDTO createInterfaceInParentPackage(McpSyncServerExchange exchange, NewInterfaceInPackageDTO param) throws Exception {
@@ -420,17 +384,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IClass createdAstahInterface = basicModelEditor.createInterface(parentAstahPackage, param.newInterfaceName());
-            transactionManager.endTransaction();
+        IClass createdAstahInterface = txnAstah.call( () -> {
+            return basicModelEditor.createInterface(parentAstahPackage, param.newInterfaceName());
+        });
 
-            return ClassDTOAssembler.toDTO(createdAstahInterface);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(createdAstahInterface);
     }
 
     private ClassDTO createInterfaceInParentClass(McpSyncServerExchange exchange, NewInterfaceInClassDTO param) throws Exception {
@@ -438,17 +396,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IClass createdAstahInterface = basicModelEditor.createInterface(parentAstahClass, param.newInterfaceName());
-            transactionManager.endTransaction();
+        IClass createdAstahInterface = txnAstah.call( () -> {
+            return basicModelEditor.createInterface(parentAstahClass, param.newInterfaceName());
+        });
 
-            return ClassDTOAssembler.toDTO(createdAstahInterface);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(createdAstahInterface);
     }
 
     private ComponentDTO createComponent(McpSyncServerExchange exchange, NewComponentInPackageDTO param) throws Exception {
@@ -456,17 +408,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IComponent createdAstahComponent = basicModelEditor.createComponent(parentAstahPackage, param.newComponentName());
-            transactionManager.endTransaction();
+        IComponent createdAstahComponent = txnAstah.call( () -> {
+            return basicModelEditor.createComponent(parentAstahPackage, param.newComponentName());
+        });
 
-            return ComponentDTOAssembler.toDTO(createdAstahComponent);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ComponentDTOAssembler.toDTO(createdAstahComponent);
     }
 
     private PortDTO createPort(McpSyncServerExchange exchange, NewPortInClassDTO param) throws Exception {
@@ -474,17 +420,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IPort createdAstahPort = basicModelEditor.createPort(parentAstahClass, param.newPortName());
-            transactionManager.endTransaction();
+        IPort createdAstahPort = txnAstah.call( () -> {
+            return basicModelEditor.createPort(parentAstahClass, param.newPortName());
+        });
 
-            return PortDTOAssembler.toDTO(createdAstahPort);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return PortDTOAssembler.toDTO(createdAstahPort);
     }
 
     private AttributeDTO createAttribute(McpSyncServerExchange exchange, NewAttributeInClassDTO param) throws Exception {
@@ -492,17 +432,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IAttribute createdAstahAttribute = basicModelEditor.createAttribute(parentAstahClass, param.newAttributeName(), "int");
-            transactionManager.endTransaction();
+        IAttribute createdAstahAttribute = txnAstah.call( () -> {
+            return basicModelEditor.createAttribute(parentAstahClass, param.newAttributeName(), "int");
+        });
 
-            return AttributeDTOAssembler.toDTO(createdAstahAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(createdAstahAttribute);
     }
 
     private EnumerationLiteralDTO createEnumerationLiteral(McpSyncServerExchange exchange, NewEnumerationLiteralInEnumerationDTO param) throws Exception {
@@ -510,17 +444,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IEnumeration astahEnumeration = astahProToolSupport.getEnumeration(param.parentEnumerationId());
 
-        try {
-            transactionManager.beginTransaction();
-            IEnumerationLiteral createdAstahEnumerationLiteral = basicModelEditor.createEnumerationLiteral(astahEnumeration, param.newEnumerationLiteralName());
-            transactionManager.endTransaction();
+        IEnumerationLiteral createdAstahEnumerationLiteral = txnAstah.call( () -> {
+            return basicModelEditor.createEnumerationLiteral(astahEnumeration, param.newEnumerationLiteralName());
+        });
 
-            return EnumerationLiteralDTOAssembler.toDTO(createdAstahEnumerationLiteral);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return EnumerationLiteralDTOAssembler.toDTO(createdAstahEnumerationLiteral);
     }
 
     private OperationDTO createOperation(McpSyncServerExchange exchange, NewOperationInClassDTO param) throws Exception {
@@ -528,17 +456,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IOperation createdAstahOperation = basicModelEditor.createOperation(parentAstahClass, param.newOperationName(), "void");
-            transactionManager.endTransaction();
+        IOperation createdAstahOperation = txnAstah.call( () -> {
+            return basicModelEditor.createOperation(parentAstahClass, param.newOperationName(), "void");
+        });
 
-            return OperationDTOAssembler.toDTO(createdAstahOperation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return OperationDTOAssembler.toDTO(createdAstahOperation);
     }
 
     private ParameterDTO createParameter(McpSyncServerExchange exchange, NewParameterToOperationDTO param) throws Exception {
@@ -546,20 +468,14 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IOperation astahTargetOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        try {
-            transactionManager.beginTransaction();
-            IParameter createdAstahParameter = basicModelEditor.createParameter(
+        IParameter createdAstahParameter = txnAstah.call( () -> {
+            return basicModelEditor.createParameter(
                 astahTargetOperation,
                 param.newParameterName(),
                 "int");
-            transactionManager.endTransaction();
+        });
 
-            return ParameterDTOAssembler.toDTO(createdAstahParameter);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ParameterDTOAssembler.toDTO(createdAstahParameter);
     }
 
     private AssociationDTO createAssociation(McpSyncServerExchange exchange, NewAssociationDTO param) throws Exception {
@@ -568,27 +484,22 @@ public class BasicModelEditorTool implements ToolProvider {
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IAssociation createdAstahAssociation = basicModelEditor.createAssociation(
+        IAssociation createdAstahAssociation = txnAstah.call( () -> {
+            IAssociation association = basicModelEditor.createAssociation(
                 astahSourceClass,
                 astahTargetClass,
                 "",
                 "",
                 "");
 
-            createdAstahAssociation.getMemberEnds()[0].setNavigability(param.sourceNavigability().astahValue);
-            createdAstahAssociation.getMemberEnds()[1].setNavigability(param.targetNavigability().astahValue);
-            createdAstahAssociation.getMemberEnds()[0].setAggregationKind(param.sourceAggregationKind().astahValue);
-            createdAstahAssociation.getMemberEnds()[1].setAggregationKind(param.targetAggregationKind().astahValue);
-            transactionManager.endTransaction();
+            association.getMemberEnds()[0].setNavigability(param.sourceNavigability().astahValue);
+            association.getMemberEnds()[1].setNavigability(param.targetNavigability().astahValue);
+            association.getMemberEnds()[0].setAggregationKind(param.sourceAggregationKind().astahValue);
+            association.getMemberEnds()[1].setAggregationKind(param.targetAggregationKind().astahValue);
+            return association;
+        });
 
-            return AssociationDTOAssembler.toDTO(createdAstahAssociation);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AssociationDTOAssembler.toDTO(createdAstahAssociation);
     }
 
     private AssociationClassDTO createAssociationClass(McpSyncServerExchange exchange, NewAssociationClassDTO param) throws Exception {
@@ -597,22 +508,16 @@ public class BasicModelEditorTool implements ToolProvider {
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IAssociationClass createdAstahAssociationClass = basicModelEditor.createAssociationClass(
+        IAssociationClass createdAstahAssociationClass = txnAstah.call( () -> {
+            return basicModelEditor.createAssociationClass(
                 astahSourceClass,
                 astahTargetClass,
                 param.newAssociationClassName(),
                 "",
                 "");
-            transactionManager.endTransaction();
+        });
 
-            return AssociationClassDTOAssembler.toDTO(createdAstahAssociationClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AssociationClassDTOAssembler.toDTO(createdAstahAssociationClass);
     }
 
     private DependencyDTO createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
@@ -621,21 +526,15 @@ public class BasicModelEditorTool implements ToolProvider {
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         INamedElement targetAstahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            return basicModelEditor.createDependency(
                 targetAstahNamedElement,
                 sourceAstahNamedElement,
                 "");
-            transactionManager.endTransaction();
+        });
 
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private GeneralizationDTO createGeneralization(McpSyncServerExchange exchange, NewGeneralizationDTO param) throws Exception {
@@ -644,20 +543,14 @@ public class BasicModelEditorTool implements ToolProvider {
         IClass astahSubClass = astahProToolSupport.getClass(param.subClassId());
         IClass astahSuperClass = astahProToolSupport.getClass(param.superClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IGeneralization createdAstahGeneralization = basicModelEditor.createGeneralization(
+        IGeneralization createdAstahGeneralization = txnAstah.call( () -> {
+            return basicModelEditor.createGeneralization(
                 astahSubClass,
                 astahSuperClass,
                 "");
-            transactionManager.endTransaction();
+        });
 
-            return GeneralizationDTOAssembler.toDTO(createdAstahGeneralization);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return GeneralizationDTOAssembler.toDTO(createdAstahGeneralization);
     }
 
     private RealizationDTO createRealization(McpSyncServerExchange exchange, NewRealizationDTO param) throws Exception {
@@ -666,20 +559,14 @@ public class BasicModelEditorTool implements ToolProvider {
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
         IClass astahSupplierClass = astahProToolSupport.getClass(param.supplierClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IRealization createdAstahRealization = basicModelEditor.createRealization(
+        IRealization createdAstahRealization = txnAstah.call( () -> {
+            return basicModelEditor.createRealization(
                 astahClientClass,
                 astahSupplierClass,
                 "");
-            transactionManager.endTransaction();
+        });
 
-            return RealizationDTOAssembler.toDTO(createdAstahRealization);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return RealizationDTOAssembler.toDTO(createdAstahRealization);
     }
 
     private UsageDTO createUsage(McpSyncServerExchange exchange, NewUsageDTO param) throws Exception {
@@ -688,20 +575,14 @@ public class BasicModelEditorTool implements ToolProvider {
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
         IClass astahSupplierClass = astahProToolSupport.getClass(param.supplierClassId());
 
-        try {
-            transactionManager.beginTransaction();
-            IUsage createdAstahUsage = basicModelEditor.createUsage(
+        IUsage createdAstahUsage = txnAstah.call( () -> {
+            return basicModelEditor.createUsage(
                 astahClientClass,
                 astahSupplierClass,
                 "");
-            transactionManager.endTransaction();
+        });
 
-            return UsageDTOAssembler.toDTO(createdAstahUsage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return UsageDTOAssembler.toDTO(createdAstahUsage);
     }
 
     private AttributeDTO createQualifier(McpSyncServerExchange exchange, NewQualifierToAssociationEndDTO param) throws Exception {
@@ -710,21 +591,15 @@ public class BasicModelEditorTool implements ToolProvider {
         IAttribute astahAssociationEnd = astahProToolSupport.getAttribute(param.targetAssociationEndId());
         IClass astahType = astahProToolSupport.getClass(param.qualifierTypeId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Create an attribute on the owner class to serve as the qualifier
-            IAttribute createdAstahQualifier = basicModelEditor.createQualifier(
+        // Create an attribute on the owner class to serve as the qualifier
+        IAttribute createdAstahQualifier = txnAstah.call( () -> {
+            return basicModelEditor.createQualifier(
                 astahAssociationEnd,
                 param.newQualifierName(),
                 astahType);
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(createdAstahQualifier);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(createdAstahQualifier);
     }
 
     private ElementDTO createTaggedValue(McpSyncServerExchange exchange, NewTaggedValueToElementDTO param) throws Exception {
@@ -732,20 +607,14 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             basicModelEditor.createTaggedValue(
                 astahElement,
                 param.newKeyOfTaggedValue(),
                 param.newValueOfTaggedValue());
-            transactionManager.endTransaction();
+        });
 
-            return ElementDTOAssembler.toDTO(astahElement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ElementDTOAssembler.toDTO(astahElement);
     }
 
     private ClassDTO createTemplateParameter(McpSyncServerExchange exchange, NewTemplateParameterToClassDTO param) throws Exception {
@@ -754,21 +623,15 @@ public class BasicModelEditorTool implements ToolProvider {
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
         IClass astahType = astahProToolSupport.getClass(param.templateParameterTypeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             basicModelEditor.createTemplateParameter(
                 astahTargetClass,
                 param.newTemplateParameterName(),
                 astahType,
                 "");
-            transactionManager.endTransaction();
+        });
 
-            return ClassDTOAssembler.toDTO(astahTargetClass);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ClassDTOAssembler.toDTO(astahTargetClass);
     }
 
     private ElementDTO deleteElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -778,17 +641,11 @@ public class BasicModelEditorTool implements ToolProvider {
 
         ElementDTO deletedElementDTO = ElementDTOAssembler.toDTO(astahElement);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             basicModelEditor.delete(astahElement);
-            transactionManager.endTransaction();
+        });
 
-            return deletedElementDTO;
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return deletedElementDTO;
     }
 
     private RequirementDTO createRequirementInParentPackage(McpSyncServerExchange exchange, NewRequirementInPackageDTO param) throws Exception {
@@ -796,19 +653,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IRequirement createdAstahRequirement = basicModelEditor.createRequirement(
+        IRequirement createdAstahRequirement = txnAstah.call( () -> {
+            return basicModelEditor.createRequirement(
                 parentAstahPackage,
                 param.newRequirementName());
-            transactionManager.endTransaction();
+        });
 
-            return RequirementDTOAssembler.toDTO(createdAstahRequirement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return RequirementDTOAssembler.toDTO(createdAstahRequirement);
     }
 
     private RequirementDTO createRequirementInParentRequirement(McpSyncServerExchange exchange, NewRequirementInRequirementDTO param) throws Exception {
@@ -816,19 +667,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IRequirement parentAstahRequirement = astahProToolSupport.getRequirement(param.parentRequirementId());
 
-        try {
-            transactionManager.beginTransaction();
-            IRequirement createdAstahRequirement = basicModelEditor.createRequirement(
+        IRequirement createdAstahRequirement = txnAstah.call( () -> {
+            return basicModelEditor.createRequirement(
                 parentAstahRequirement,
                 param.newRequirementName());
-            transactionManager.endTransaction();
+        });
 
-            return RequirementDTOAssembler.toDTO(createdAstahRequirement);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return RequirementDTOAssembler.toDTO(createdAstahRequirement);
     }
 
     private TestCaseDTO createTestCaseInParentPackage(McpSyncServerExchange exchange, NewTestCaseInPackageDTO param) throws Exception {
@@ -836,20 +681,14 @@ public class BasicModelEditorTool implements ToolProvider {
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            ITestCase createdAstahTestCase = basicModelEditor.createTestCase(
+        ITestCase createdAstahTestCase = txnAstah.call( () -> {
+            return basicModelEditor.createTestCase(
                 parentAstahPackage,
                 param.newTestCaseName());
-            transactionManager.endTransaction();
+        });
 
 
-            return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
     }
 
     private TestCaseDTO createTestCaseInParentTestCase(McpSyncServerExchange exchange, NewTestCaseInTestCaseDTO param) throws Exception {
@@ -857,19 +696,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         ITestCase parentAstahTestCase = astahProToolSupport.getTestCase(param.parentTestCaseId());
 
-        try {
-            transactionManager.beginTransaction();
-            ITestCase createdAstahTestCase = basicModelEditor.createTestCase(
+        ITestCase createdAstahTestCase = txnAstah.call( () -> {
+            return basicModelEditor.createTestCase(
                 parentAstahTestCase,
                 param.newTestCaseName());
-            transactionManager.endTransaction();
+        });
 
-            return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
     }
 
     private DependencyDTO createCopyDependency(McpSyncServerExchange exchange, NewCopyDependencyDTO param) throws Exception {
@@ -878,23 +711,17 @@ public class BasicModelEditorTool implements ToolProvider {
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
                 sourceAstahRequirement,
                 "");
-            
-            createdAstahDependency.addStereotype("copy");
-            transactionManager.endTransaction();
+            dependency.addStereotype("copy");
+            return dependency;
+        });
 
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private DependencyDTO createDeriveReqtDependency(McpSyncServerExchange exchange, NewDeriveReqtDependencyDTO param) throws Exception {
@@ -903,23 +730,17 @@ public class BasicModelEditorTool implements ToolProvider {
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
                 sourceAstahRequirement,
                 "");
+            dependency.addStereotype("deriveReqt");
+            return dependency;
+        });
 
-            createdAstahDependency.addStereotype("deriveReqt");
-            transactionManager.endTransaction();
-
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private DependencyDTO createRefineDependency(McpSyncServerExchange exchange, NewRefineDependencyDTO param) throws Exception {
@@ -928,23 +749,17 @@ public class BasicModelEditorTool implements ToolProvider {
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
                 sourceAstahNamedElement,
                 "");
+            dependency.addStereotype("refine");
+            return dependency;
+        });
 
-            createdAstahDependency.addStereotype("refine");
-            transactionManager.endTransaction();
-
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private DependencyDTO createSatisfyDependency(McpSyncServerExchange exchange, NewSatisfyDependencyDTO param) throws Exception {
@@ -953,23 +768,17 @@ public class BasicModelEditorTool implements ToolProvider {
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
                 sourceAstahNamedElement,
                 "");
+            dependency.addStereotype("satisfy");
+            return dependency;
+        });
 
-            createdAstahDependency.addStereotype("satisfy");
-            transactionManager.endTransaction();
-
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private DependencyDTO createTraceDependency(McpSyncServerExchange exchange, NewTraceDependencyDTO param) throws Exception {
@@ -978,23 +787,17 @@ public class BasicModelEditorTool implements ToolProvider {
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         INamedElement targetAstahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            IDependency dependency = basicModelEditor.createDependency(
                 targetAstahNamedElement,
                 sourceAstahNamedElement,
                 "");
+            dependency.addStereotype("trace");
+            return dependency;
+        });
 
-            createdAstahDependency.addStereotype("trace");
-            transactionManager.endTransaction();
-
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private DependencyDTO createVerifyDependency(McpSyncServerExchange exchange, NewVerifyDependencyDTO param) throws Exception {
@@ -1003,23 +806,17 @@ public class BasicModelEditorTool implements ToolProvider {
         ITestCase sourceAstahTestCase = astahProToolSupport.getTestCase(param.sourceTestCaseId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        try {
-            transactionManager.beginTransaction();
-            // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
-            IDependency createdAstahDependency = basicModelEditor.createDependency(
+        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        IDependency createdAstahDependency = txnAstah.call( () -> {
+            IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
                 sourceAstahTestCase,
                 "");
+            dependency.addStereotype("verify");
+            return dependency;
+        });
 
-            createdAstahDependency.addStereotype("verify");
-            transactionManager.endTransaction();
-
-            return DependencyDTOAssembler.toDTO(createdAstahDependency);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
     private ConstraintDTO createConstraint(McpSyncServerExchange exchange, NewConstraintDTO param) throws Exception {
@@ -1027,18 +824,12 @@ public class BasicModelEditorTool implements ToolProvider {
 
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        try {
-            transactionManager.beginTransaction();
-            IConstraint createdAstahConstraint = basicModelEditor.createConstraint(
+        IConstraint createdAstahConstraint = txnAstah.call( () -> {
+            return basicModelEditor.createConstraint(
                 astahTargetNamedElement,
                 param.newConstraintName());
-            transactionManager.endTransaction();
+        });
 
-            return ConstraintDTOAssembler.toDTO(createdAstahConstraint);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ConstraintDTOAssembler.toDTO(createdAstahConstraint);
     }
 }

@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERModelEditor.html
@@ -25,14 +25,14 @@ public class ERModelEditorTool implements ToolProvider {
 
     private final ERModelEditor erModelEditor;
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public ERModelEditorTool(ERModelEditor erModelEditor, ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ERModelEditorTool(ERModelEditor erModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.erModelEditor = erModelEditor;
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -157,19 +157,13 @@ public class ERModelEditorTool implements ToolProvider {
 
         IModel astahProject = projectAccessor.getProject();
 
-        try {
-            transactionManager.beginTransaction();
-            IERModel astahERModel = erModelEditor.createERModel(
+        IERModel astahERModel = txnAstah.call( () -> {
+            return erModelEditor.createERModel(
                 astahProject,
                 param.newERModelName());
-            transactionManager.endTransaction();
+        });
 
-            return ERModelDTOAssembler.toDTO(astahERModel);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERModelDTOAssembler.toDTO(astahERModel);
     }
 
     private ERPackageDTO createERPackage(McpSyncServerExchange exchange, NewERPackageInERPackageDTO param) throws Exception {
@@ -177,19 +171,13 @@ public class ERModelEditorTool implements ToolProvider {
 
         IERPackage parentERPackage = astahProToolSupport.getERPackage(param.parentERPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERPackage createdERPackage = erModelEditor.createERPackage(
+        IERPackage createdERPackage = txnAstah.call( () -> {
+            return erModelEditor.createERPackage(
                 parentERPackage,
                 param.newERPackageName());
-            transactionManager.endTransaction();
+        });
 
-            return ERPackageDTOAssembler.toDTO(createdERPackage);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERPackageDTOAssembler.toDTO(createdERPackage);
     }
 
     private EREntityDTO createEREntity(McpSyncServerExchange exchange, NewEREntityInERPackageDTO param) throws Exception {
@@ -197,20 +185,14 @@ public class ERModelEditorTool implements ToolProvider {
 
         IERPackage parentERPackage = astahProToolSupport.getERPackage(param.parentERPackageId());
 
-        try {
-            transactionManager.beginTransaction();
-            IEREntity createdEREntity = erModelEditor.createEREntity(
+        IEREntity createdEREntity = txnAstah.call( () -> {
+            return erModelEditor.createEREntity(
                 parentERPackage,
                 param.newEREntityLogicalName(),
                 param.newEREntityPhysicalName());
-            transactionManager.endTransaction();
+        });
 
-            return EREntityDTOAssembler.toDTO(createdEREntity);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return EREntityDTOAssembler.toDTO(createdEREntity);
     }
 
     private ERAttributeDTO createERAttribute(McpSyncServerExchange exchange, NewERAttributeInEREntityDTO param) throws Exception {
@@ -219,21 +201,15 @@ public class ERModelEditorTool implements ToolProvider {
         IEREntity targetEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
         IERDatatype erDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERAttribute createdERAttribute = erModelEditor.createERAttribute(
+        IERAttribute createdERAttribute = txnAstah.call( () -> {
+            return erModelEditor.createERAttribute(
                 targetEREntity,
                 param.newERAttributeLogicalName(),
                 param.newERAttributePhysicalName(),
                 erDatatype);
-            transactionManager.endTransaction();
+        });
 
-            return ERAttributeDTOAssembler.toDTO(createdERAttribute);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERAttributeDTOAssembler.toDTO(createdERAttribute);
     }
 
     private ERDatatypeDTO createERDatatype(McpSyncServerExchange exchange, NewERDatatypeInERModelDTO param) throws Exception {
@@ -241,19 +217,13 @@ public class ERModelEditorTool implements ToolProvider {
 
         IERModel erModel = astahProToolSupport.getERModel(param.targetERModelId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERDatatype createdERDatatype = erModelEditor.createERDatatype(
+        IERDatatype createdERDatatype = txnAstah.call( () -> {
+            return erModelEditor.createERDatatype(
                 erModel,
                 param.newERDatatypeName());
-            transactionManager.endTransaction();
+        });
 
-            return ERDatatypeDTOAssembler.toDTO(createdERDatatype);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDatatypeDTOAssembler.toDTO(createdERDatatype);
     }
 
     private ERDomainDTO createERDomainInERModel(McpSyncServerExchange exchange, NewERDomainInERModelDTO param) throws Exception {
@@ -262,22 +232,16 @@ public class ERModelEditorTool implements ToolProvider {
         IERModel erModel = astahProToolSupport.getERModel(param.targetERModelId());
         IERDatatype erDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERDomain createdERDomain = erModelEditor.createERDomain(
+        IERDomain createdERDomain = txnAstah.call( () -> {
+            return erModelEditor.createERDomain(
                 erModel,
                 null,
                 param.newERDomainLogicalName(),
                 param.newERDomainPhysicalName(),
                 erDatatype);
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(createdERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(createdERDomain);
     }
 
     private ERDomainDTO createERDomainInERDomain(McpSyncServerExchange exchange, NewERDomainInERDomainDTO param) throws Exception {
@@ -286,22 +250,16 @@ public class ERModelEditorTool implements ToolProvider {
         IERDomain parentERDomain = astahProToolSupport.getERDomain(param.parentERDomainId());
         IERDatatype erDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERDomain createdERDomain = erModelEditor.createERDomain(
+        IERDomain createdERDomain = txnAstah.call( () -> {
+            return erModelEditor.createERDomain(
                 null,
                 parentERDomain,
                 param.newERDomainLogicalName(),
                 param.newERDomainPhysicalName(),
                 erDatatype);
-            transactionManager.endTransaction();
+        });
 
-            return ERDomainDTOAssembler.toDTO(createdERDomain);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERDomainDTOAssembler.toDTO(createdERDomain);
     }
 
     private ERRelationshipDTO createIdentifyingRelationship(McpSyncServerExchange exchange, NewIdentifyingRelationshipDTO param) throws Exception {
@@ -310,21 +268,15 @@ public class ERModelEditorTool implements ToolProvider {
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERRelationship createdERRelationship = erModelEditor.createIdentifyingRelationship(
+        IERRelationship createdERRelationship = txnAstah.call( () -> {
+            return erModelEditor.createIdentifyingRelationship(
                 parentEREntity,
                 childEREntity,
                 param.newRelationshipLogicalName(),
                 param.newRelationshipPhysicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
     }
 
     private ERRelationshipDTO createNonIdentifyingRelationship(McpSyncServerExchange exchange, NewNonIdentifyingRelationshipDTO param) throws Exception {
@@ -333,21 +285,15 @@ public class ERModelEditorTool implements ToolProvider {
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERRelationship createdERRelationship = erModelEditor.createNonIdentifyingRelationship(
+        IERRelationship createdERRelationship = txnAstah.call( () -> {
+            return erModelEditor.createNonIdentifyingRelationship(
                 parentEREntity,
                 childEREntity,
                 param.newRelationshipLogicalName(),
                 param.newRelationshipPhysicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
     }
 
     private ERRelationshipDTO createManyToManyRelationship(McpSyncServerExchange exchange, NewManyToManyRelationshipDTO param) throws Exception {
@@ -356,21 +302,15 @@ public class ERModelEditorTool implements ToolProvider {
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERRelationship createdERRelationship = erModelEditor.createMultiToMultiRelationship(
+        IERRelationship createdERRelationship = txnAstah.call( () -> {
+            return erModelEditor.createMultiToMultiRelationship(
                 parentEREntity,
                 childEREntity,
                 param.newRelationshipLogicalName(),
                 param.newRelationshipPhysicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
     }
 
     private ERSubtypeRelationshipDTO createSubtypeRelationship(McpSyncServerExchange exchange, NewSubtypeRelationshipDTO param) throws Exception {
@@ -379,21 +319,15 @@ public class ERModelEditorTool implements ToolProvider {
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
-        try {
-            transactionManager.beginTransaction();
-            IERSubtypeRelationship createdSubtypeRelationship = erModelEditor.createSubtypeRelationship(
+        IERSubtypeRelationship createdSubtypeRelationship = txnAstah.call( () -> {
+            return erModelEditor.createSubtypeRelationship(
                 parentEREntity,
                 childEREntity,
                 param.newRelationshipLogicalName(),
                 param.newRelationshipPhysicalName());
-            transactionManager.endTransaction();
+        });
 
-            return ERSubtypeRelationshipDTOAssembler.toDTO(createdSubtypeRelationship);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERSubtypeRelationshipDTOAssembler.toDTO(createdSubtypeRelationship);
     }
 
     private ERIndexDTO createERIndex(McpSyncServerExchange exchange, NewERIndexDTO param) throws Exception {
@@ -406,22 +340,16 @@ public class ERModelEditorTool implements ToolProvider {
             erAttributes.add(astahProToolSupport.getERAttribute(attributeId));
         }
 
-        try {
-            transactionManager.beginTransaction();
-            IERIndex createdERIndex = erModelEditor.createERIndex(
+        IERIndex createdERIndex = txnAstah.call( () -> {
+            return erModelEditor.createERIndex(
                 param.newERIndexName(),
                 parentEREntity,
                 param.unique(),
                 param.key(),
                 erAttributes.toArray(new IERAttribute[0]));
-            transactionManager.endTransaction();
+        });
 
-            return ERIndexDTOAssembler.toDTO(createdERIndex);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return ERIndexDTOAssembler.toDTO(createdERIndex);
     }
 
     private ElementDTO delete(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -431,16 +359,10 @@ public class ERModelEditorTool implements ToolProvider {
 
         ElementDTO deletedElementDTO = ElementDTOAssembler.toDTO(astahElement);
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             erModelEditor.delete(astahElement);
-            transactionManager.endTransaction();
+        });
 
-            return deletedElementDTO;
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return deletedElementDTO;
     }
 }

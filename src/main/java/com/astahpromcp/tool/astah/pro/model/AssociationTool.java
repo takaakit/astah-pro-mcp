@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AssociationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AttributeDTOAssembler;
-import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAssociation.html
@@ -26,13 +26,13 @@ import java.util.List;
 public class AssociationTool implements ToolProvider {
 
     private final ProjectAccessor projectAccessor;
-    private final ITransactionManager transactionManager;
+    private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final boolean includeEditTools;
 
-    public AssociationTool(ProjectAccessor projectAccessor, ITransactionManager transactionManager, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public AssociationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
-        this.transactionManager = transactionManager;
+        this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.includeEditTools = includeEditTools;
     }
@@ -181,17 +181,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndA.setInitialValue(param.initialValue());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndA);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
     private AttributeDTO setInitialValueOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithInitialValueDTO param) throws Exception {
@@ -199,17 +193,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndB.setInitialValue(param.initialValue());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndB);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
     private AttributeDTO setStaticOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithStaticDTO param) throws Exception {
@@ -217,17 +205,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndA.setStatic(param.isStatic());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndA);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
     private AttributeDTO setStaticOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithStaticDTO param) throws Exception {
@@ -235,17 +217,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndB.setStatic(param.isStatic());
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndB);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
     private AttributeDTO setMultiplicityOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
@@ -257,32 +233,17 @@ public class AssociationTool implements ToolProvider {
         String upperStringMultiplicity = param.upperMultiplicity();
 
         if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAssociationEndA.setMultiplicityStrings(new String[][]{{lowerStringMultiplicity, upperStringMultiplicity}});
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else if (!lowerStringMultiplicity.isEmpty() && upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAssociationEndA.setMultiplicityString(lowerStringMultiplicity);
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else if (lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAssociationEndA.setMultiplicityString(upperStringMultiplicity);
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else {
             throw new IllegalArgumentException("Lower multiplicity and upper multiplicity are both empty.");
         }
@@ -299,32 +260,17 @@ public class AssociationTool implements ToolProvider {
         String upperStringMultiplicity = param.upperMultiplicity();
 
         if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAssociationEndB.setMultiplicityStrings(new String[][]{{lowerStringMultiplicity, upperStringMultiplicity}});
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else if (!lowerStringMultiplicity.isEmpty() && upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAssociationEndB.setMultiplicityString(lowerStringMultiplicity);
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else if (lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
-            try {
-                transactionManager.beginTransaction();
+            txnAstah.run( () -> {
                 astahAssociationEndB.setMultiplicityString(upperStringMultiplicity);
-                transactionManager.endTransaction();
-            } catch (Exception e) {
-                transactionManager.abortTransaction();
-                throw e;
-            }
+            });
         } else {
             throw new IllegalArgumentException("Lower multiplicity and upper multiplicity are both empty.");
         }
@@ -337,17 +283,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndA.setAggregationKind(param.aggregationKind().astahValue);
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndA);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
     private AttributeDTO setAggregationKindOfAssociationEndB(McpSyncServerExchange exchange, AssociationEndWithAggregationKindDTO param) throws Exception {
@@ -355,17 +295,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndB.setAggregationKind(param.aggregationKind().astahValue);
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndB);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
     private AttributeDTO setNavigabilityOfAssociationEndA(McpSyncServerExchange exchange, AssociationEndWithNavigabilityDTO param) throws Exception {
@@ -373,17 +307,11 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndA.setNavigability(param.navigabilityKind().astahValue);
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndA);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
     private AttributeDTO setNavigabilityOfAssociationEndB(McpSyncServerExchange exchange, AssociationEndWithNavigabilityDTO param) throws Exception {
@@ -391,16 +319,10 @@ public class AssociationTool implements ToolProvider {
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
 
-        try {
-            transactionManager.beginTransaction();
+        txnAstah.run( () -> {
             astahAssociationEndB.setNavigability(param.navigabilityKind().astahValue);
-            transactionManager.endTransaction();
+        });
 
-            return AttributeDTOAssembler.toDTO(astahAssociationEndB);
-
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+        return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 }
