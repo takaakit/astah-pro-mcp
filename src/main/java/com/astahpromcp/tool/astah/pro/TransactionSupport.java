@@ -1,8 +1,10 @@
 package com.astahpromcp.tool.astah.pro;
 
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import lombok.extern.slf4j.Slf4j;
 
 // Helper for running Astah model edits within a transaction
+@Slf4j
 public final class TransactionSupport {
 
     @FunctionalInterface
@@ -28,21 +30,23 @@ public final class TransactionSupport {
             T result = action.execute();
             transactionManager.endTransaction();
             return result;
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
+        } catch (Throwable t) {
+            try {
+                if (transactionManager.isInTransaction()) {
+                    transactionManager.abortTransaction();
+                }
+            } catch (Throwable abortFailure) {
+                log.warn("Failed to abort the transaction after a failed edit", abortFailure);
+            }
+            throw t;
         }
     }
 
     // Runs the given command (a model edit with no result) inside a transaction
     public void run(TransactionalCommand command) throws Exception {
-        transactionManager.beginTransaction();
-        try {
+        call(() -> {
             command.execute();
-            transactionManager.endTransaction();
-        } catch (Exception e) {
-            transactionManager.abortTransaction();
-            throw e;
-        }
+            return null;
+        });
     }
 }

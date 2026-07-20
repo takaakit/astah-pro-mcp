@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.model.outputdto;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record PortDTO(
-    @JsonPropertyDescription("Attribute information")
+    @JsonPropertyDescription("Attribute info")
     AttributeDTO attribute,
 
     @JsonPropertyDescription("Is Behavior")

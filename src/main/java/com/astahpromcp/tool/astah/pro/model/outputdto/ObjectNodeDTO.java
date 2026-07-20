@@ -4,7 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record ObjectNodeDTO(
-    @JsonPropertyDescription("Activity node information")
+    @JsonPropertyDescription("Activity node info")
     ActivityNodeDTO activityNode,
 
     @JsonPropertyDescription("Base class")

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record ComponentDTO(
-    @JsonPropertyDescription("Class information")
+    @JsonPropertyDescription("Class info")
     @JsonProperty("class")
     ClassDTO class_   // For avoiding Java keyword collision
 ) {

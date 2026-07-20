@@ -35,6 +35,12 @@ public final class McpServerConfig {
     // Maximum time a script run may execute.
     public static final long SCRIPT_EXECUTION_TIMEOUT_SECONDS = 60;
 
+    // Maximum time to establish a connection when fetching knowledge documents from the web.
+    public static final long KNOWLEDGE_FETCH_CONNECT_TIMEOUT_SECONDS = 10;
+
+    // Maximum time to wait for a response when fetching knowledge documents from the web.
+    public static final long KNOWLEDGE_FETCH_REQUEST_TIMEOUT_SECONDS = 30;
+
     // Root directory where generated output is stored.
     public static final Path ROOT_OUTPUT_DIR = Paths.get(System.getProperty("user.home"), ".astah-pro-mcp");
 

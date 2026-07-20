@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.common;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -17,7 +18,57 @@ import javax.imageio.ImageIO;
 
 public class ImageConvertSupport {
 
+    private static final int MAX_RASTERIZED_IMAGE_DIMENSION = 4096;
+
+    public record RasterizedSvgImage(
+            BufferedImage image,
+            int displayWidth,
+            int displayHeight
+    ) {
+    }
+
     public Image svgToImage(String svgCode) {
+        validateSvgCode(svgCode);
+        return transcodeSvg(svgCode, null);
+    }
+
+    public RasterizedSvgImage svgToRasterizedImage(String svgCode, double scale) {
+        validateScale(scale);
+
+        validateSvgCode(svgCode);
+
+        BufferedImage displayImage = transcodeSvg(svgCode, null);
+        int displayWidth = displayImage.getWidth();
+        int displayHeight = displayImage.getHeight();
+        double effectiveScale = Math.min(scale, maxAdditionalScale(displayWidth, displayHeight));
+        int rasterizedWidth = Math.max(1, (int) Math.round(displayWidth * effectiveScale));
+
+        if (rasterizedWidth == displayWidth) {
+            return new RasterizedSvgImage(displayImage, displayWidth, displayHeight);
+        }
+
+        // Only the width hint is passed; Batik derives the height from the SVG's aspect ratio.
+        BufferedImage rasterizedImage = transcodeSvg(svgCode, (float) rasterizedWidth);
+
+        return new RasterizedSvgImage(rasterizedImage, displayWidth, displayHeight);
+    }
+
+    private void validateScale(double scale) {
+        if (scale <= 0.0 || Double.isNaN(scale) || Double.isInfinite(scale)) {
+            throw new IllegalArgumentException("Scale must be a positive finite number");
+        }
+    }
+
+    private double maxAdditionalScale(int displayWidth, int displayHeight) {
+        int maxDisplayDimension = Math.max(displayWidth, displayHeight);
+        if (maxDisplayDimension <= 0 || maxDisplayDimension >= MAX_RASTERIZED_IMAGE_DIMENSION) {
+            return 1.0;
+        }
+
+        return Math.max(1.0, (double) MAX_RASTERIZED_IMAGE_DIMENSION / maxDisplayDimension);
+    }
+
+    private void validateSvgCode(String svgCode) {
         if (svgCode == null || svgCode.isBlank()) {
             throw new IllegalArgumentException("SVG code must not be null or blank");
         }
@@ -34,7 +85,9 @@ public class ImageConvertSupport {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid SVG markup", e);
         }
+    }
 
+    private BufferedImage transcodeSvg(String svgCode, Float width) {
         // Create ImageTranscoder
         final BufferedImage[] imageHolder = new BufferedImage[1];
         ImageTranscoder transcoder = new ImageTranscoder() {
@@ -49,6 +102,10 @@ public class ImageConvertSupport {
                 imageHolder[0] = img;
             }
         };
+
+        if (width != null) {
+            transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, width);
+        }
 
         // Convert SVG to Image
         try (StringReader reader = new StringReader(svgCode)) {

@@ -12,20 +12,9 @@ public final class ResponseSupport {
     private ResponseSupport() {
     }
 
-    // Success method is used to return a success response with DTO
+    // Return a DTO as structured content
     public static McpSchema.CallToolResult success(Object dto) {
-        try {
-            String jsonContent = JsonSupport.OBJ_MAPPER.writeValueAsString(dto);
-
-            return McpSchema.CallToolResult.builder()
-                    .addTextContent(jsonContent)
-                    .isError(false)
-                    .structuredContent(JsonSupport.MCP_JSON_MAPPER, jsonContent)
-                    .build();
-
-        } catch (JacksonException | IllegalArgumentException e) {
-            return error(serializationErrorMessage(dto, e));
-        }
+        return successWithStructuredContent(dto, List.of());
     }
 
     // Success method is used to return a success response with contents
@@ -36,19 +25,22 @@ public final class ResponseSupport {
                 .build();
     }
 
-    // Success method is used to return a success response with DTO and contents
+    // Return a DTO as structured content and other McpSchema contents
     public static McpSchema.CallToolResult success(Object dto, List<McpSchema.Content> contents) {
+        return successWithStructuredContent(dto, contents == null ? List.of() : contents);
+    }
+
+    private static McpSchema.CallToolResult successWithStructuredContent(
+            Object dto,
+            List<McpSchema.Content> contents) {
         try {
             String jsonContent = JsonSupport.OBJ_MAPPER.writeValueAsString(dto);
 
-            McpSchema.CallToolResult.Builder builder = McpSchema.CallToolResult.builder()
-                    .addTextContent(jsonContent)
-                    .isError(false);
-            if (contents != null) {
-                contents.forEach(builder::addContent);
-            }
-
-            return builder.build();
+            return McpSchema.CallToolResult.builder()
+                    .content(contents)
+                    .isError(false)
+                    .structuredContent(JsonSupport.MCP_JSON_MAPPER, jsonContent)
+                    .build();
 
         } catch (JacksonException | IllegalArgumentException e) {
             return error(serializationErrorMessage(dto, e));

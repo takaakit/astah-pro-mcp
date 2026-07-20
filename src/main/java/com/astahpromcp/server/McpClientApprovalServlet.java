@@ -1,20 +1,35 @@
 package com.astahpromcp.server;
 
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.tool.JsonSupport;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.HttpHeaders;
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,31 +45,27 @@ public class McpClientApprovalServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final HttpServletStreamableServerTransportProvider delegate;
-    
+
     // Serializes approval dialogs; initialize requests arriving while a dialog
     // is open are rejected immediately to prevent dialog flooding.
     private final ReentrantLock dialogLock = new ReentrantLock();
-    
+
     // Last user approval, used for the approval grace period (guarded by graceLock)
     private final Object graceLock = new Object();
-    
+
     private long lastApprovalAtMillis;
     private String lastApprovedUserAgent;
-    private final McpServerApp.ClientDisconnectHandler disconnectHandler;
     private final Set<String> originHostAllowlist;
 
     // For production
-    public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate,
-                                    McpServerApp.ClientDisconnectHandler disconnectHandler) {
-        this(delegate, disconnectHandler, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
+    public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate) {
+        this(delegate, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
     }
 
     // For testing
     public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate,
-                                    McpServerApp.ClientDisconnectHandler disconnectHandler,
                                     Set<String> originHostAllowlist) {
         this.delegate = Objects.requireNonNull(delegate, "delegate");
-        this.disconnectHandler = disconnectHandler;
 
         if (originHostAllowlist != null) {
             this.originHostAllowlist = originHostAllowlist.stream()
@@ -69,18 +80,44 @@ public class McpClientApprovalServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        RequestContext context = RequestContext.from(req);
+        HttpServletRequest actualReq = req;
+
+        // Some clients pass the session ID as a query parameter (legacy HTTP+SSE convention) instead of the Mcp-Session-Id header; normalize it so the transport can find the session
+        String sessionIdParam = req.getParameter("sessionId") != null
+                ? req.getParameter("sessionId")
+                : req.getParameter("session_id");
+        if (sessionIdParam != null && !sessionIdParam.isBlank() && req.getHeader(HttpHeaders.MCP_SESSION_ID) == null) {
+            actualReq = new SessionHeaderInjectingRequestWrapper(req, sessionIdParam.trim());
+        }
+
+        // The JSON-RPC method decides probe handling and approval below, and the servlet input stream is single-read, so cache the POST body and parse it once here
+        JsonRpcCall call = JsonRpcCall.NONE;
+        if ("POST".equalsIgnoreCase(actualReq.getMethod())) {
+            CachedBodyRequestWrapper cachedReq = new CachedBodyRequestWrapper(actualReq);
+            call = JsonRpcCall.parse(cachedReq.getBody());
+            actualReq = cachedReq;
+        }
+
+        RequestContext context = RequestContext.from(actualReq);
 
         // If the origin is not allowed, reject the request
-        if (!isOriginAllowed(req)) {
-            String origin = Optional.ofNullable(req.getHeader("Origin")).orElse("<none>");
+        if (!isOriginAllowed(actualReq)) {
+            String origin = Optional.ofNullable(actualReq.getHeader("Origin")).orElse("<none>");
             log.warn("Rejected MCP request due to disallowed Origin header: {}", origin);
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Origin not allowed");
             return;
         }
 
+        // 'server/discover' is a pre-initialize probe sent by newer MCP clients. The transport rejects pre-session methods it does not know with a plain HTTP 400 instead of a JSON-RPC error envelope, so answer -32601 here; the client then falls back to the legacy initialize handshake.
+        if ("server/discover".equals(call.method()) && context.sessionId().isEmpty()) {
+            log.info("Received server/discover probe from {}; replying 'Method not found' to trigger the initialize fallback",
+                    context.clientAddress());
+            respondMethodNotFound(resp, call.id());
+            return;
+        }
+
         // If the request is an initialize attempt, request approval from the user
-        if (context.isInitializeAttempt()) {
+        if (call.isInitialize()) {
             ApprovalOutcome outcome = requestUserApproval(context);
             switch (outcome) {
                 case APPROVED:
@@ -106,26 +143,35 @@ public class McpClientApprovalServlet extends HttpServlet {
         SessionTrackingResponseWrapper responseWrapper = new SessionTrackingResponseWrapper(resp);
 
         // Service the request
-        delegate.service(req, responseWrapper);
+        delegate.service(actualReq, responseWrapper);
 
-        // Register the session issued by the transport after a successful initialization
-        if (context.isInitializeAttempt() && responseWrapper.isSuccessful()) {
-            Optional<String> issuedSessionId = responseWrapper.issuedSessionId();
-            if (issuedSessionId.isPresent() && disconnectHandler != null) {
-                disconnectHandler.registerClientSession(
-                        issuedSessionId.get(),
-                        context.clientAddress(),
-                        context.userAgent());
-            }
+        // Log the session issued by the transport after a successful initialization
+        if (call.isInitialize() && responseWrapper.isSuccessful()) {
+            responseWrapper.issuedSessionId().ifPresent(sessionId ->
+                    log.info("Registered client session: {} from {} (User-Agent: {})",
+                            sessionId, context.clientAddress(), context.userAgent()));
         }
 
-        // If the request is a delete attempt and the request is successful, terminate only that session
+        // Log when the MCP client closes its session
         if (context.isDeleteRequest() && responseWrapper.isSuccessful() && context.sessionId().isPresent()) {
             log.info("Connection closed by MCP client (session '{}').", context.sessionId().get());
-            if (disconnectHandler != null) {
-                disconnectHandler.handleClientDisconnect(context.sessionId().get(), "client_disconnect");
-            }
         }
+    }
+
+    // Reply with a JSON-RPC 'Method not found' error envelope
+    private static void respondMethodNotFound(HttpServletResponse resp, JsonNode requestId) throws IOException {
+        ObjectNode envelope = JsonSupport.OBJ_MAPPER.createObjectNode();
+        envelope.put("jsonrpc", "2.0");
+        ObjectNode error = envelope.putObject("error");
+        error.put("code", -32601);
+        error.put("message", "Method not found");
+        envelope.set("id", requestId == null ? NullNode.getInstance() : requestId);
+
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write(JsonSupport.OBJ_MAPPER.writeValueAsString(envelope));
+        resp.getWriter().flush();
     }
 
     // Outcome of a user approval request
@@ -240,7 +286,7 @@ public class McpClientApprovalServlet extends HttpServlet {
             return false;
         }
     }
-    
+
     private static String normalizeHost(String host) {
         if (host == null) {
             return null;
@@ -302,6 +348,30 @@ public class McpClientApprovalServlet extends HttpServlet {
             if (tempOwner != null) {
                 tempOwner.dispose();
             }
+        }
+    }
+
+    // Minimal view of the JSON-RPC call carried in a POST body
+    record JsonRpcCall(String method, JsonNode id) {
+
+        static final JsonRpcCall NONE = new JsonRpcCall(null, null);
+
+        static JsonRpcCall parse(String body) {
+            try {
+                JsonNode root = JsonSupport.OBJ_MAPPER.readTree(body);
+                if (root != null && root.isObject()) {
+                    JsonNode method = root.get("method");
+                    return new JsonRpcCall(method != null && method.isString() ? method.asString() : null,
+                            root.get("id"));
+                }
+            } catch (RuntimeException e) {
+                // Malformed JSON; the transport reports the error to the client
+            }
+            return NONE;
+        }
+
+        boolean isInitialize() {
+            return "initialize".equals(method);
         }
     }
 
@@ -407,10 +477,6 @@ public class McpClientApprovalServlet extends HttpServlet {
             return new RequestContext(method, sessionIdHeader, remoteAddress, remotePort, remoteHost, userAgent);
         }
 
-        boolean isInitializeAttempt() {
-            return "POST".equalsIgnoreCase(method) && sessionId == null;
-        }
-
         boolean isDeleteRequest() {
             return "DELETE".equalsIgnoreCase(method);
         }
@@ -437,6 +503,101 @@ public class McpClientApprovalServlet extends HttpServlet {
 
         String userAgent() {
             return userAgent;
+        }
+    }
+
+    // Presents the session ID from a query parameter as the Mcp-Session-Id header
+    private static final class SessionHeaderInjectingRequestWrapper extends HttpServletRequestWrapper {
+
+        private final String sessionId;
+
+        SessionHeaderInjectingRequestWrapper(HttpServletRequest request, String sessionId) {
+            super(request);
+            this.sessionId = sessionId;
+        }
+
+        @Override
+        public String getHeader(String name) {
+            if (HttpHeaders.MCP_SESSION_ID.equalsIgnoreCase(name)) {
+                return sessionId;
+            }
+            return super.getHeader(name);
+        }
+
+        @Override
+        public Enumeration<String> getHeaders(String name) {
+            if (HttpHeaders.MCP_SESSION_ID.equalsIgnoreCase(name)) {
+                return Collections.enumeration(Collections.singletonList(sessionId));
+            }
+            return super.getHeaders(name);
+        }
+
+        @Override
+        public Enumeration<String> getHeaderNames() {
+            List<String> names = new java.util.ArrayList<>(Collections.list(super.getHeaderNames()));
+            boolean hasSessionId = names.stream().anyMatch(HttpHeaders.MCP_SESSION_ID::equalsIgnoreCase);
+            if (!hasSessionId) {
+                names.add(HttpHeaders.MCP_SESSION_ID);
+            }
+            return Collections.enumeration(names);
+        }
+    }
+
+    // Buffers the request body so it can be inspected here and still be read by the transport
+    private static final class CachedBodyRequestWrapper extends HttpServletRequestWrapper {
+
+        private final byte[] cachedBody;
+
+        CachedBodyRequestWrapper(HttpServletRequest request) throws IOException {
+            super(request);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            request.getInputStream().transferTo(baos);
+            this.cachedBody = baos.toByteArray();
+        }
+
+        @Override
+        public ServletInputStream getInputStream() throws IOException {
+            return new ServletInputStream() {
+                private final ByteArrayInputStream bais = new ByteArrayInputStream(cachedBody);
+
+                @Override
+                public int read() throws IOException {
+                    return bais.read();
+                }
+
+                @Override
+                public boolean isFinished() {
+                    return bais.available() == 0;
+                }
+
+                @Override
+                public boolean isReady() {
+                    return true;
+                }
+
+                @Override
+                public void setReadListener(ReadListener readListener) {
+                    if (readListener != null) {
+                        try {
+                            readListener.onDataAvailable();
+                            if (isFinished()) {
+                                readListener.onAllDataRead();
+                            }
+                        } catch (IOException e) {
+                            readListener.onError(e);
+                        }
+                    }
+                }
+            };
+        }
+
+        @Override
+        public BufferedReader getReader() throws IOException {
+            return new BufferedReader(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8));
+        }
+
+        String getBody() {
+            return new String(cachedBody, StandardCharsets.UTF_8);
         }
     }
 }

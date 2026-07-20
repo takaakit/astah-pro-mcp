@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewAssociationClassPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewInstanceWithPointDTO;
@@ -18,6 +17,7 @@ import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
 import com.change_vision.jude.api.inf.model.IAssociationClass;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
+import com.change_vision.jude.api.inf.model.IInstanceSpecification;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -85,21 +85,21 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_asso_class_prst",
-                "Create a new association class presentation of the specified class (specified by ID) between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified class diagram (specified by ID), and return the newly created node and link presentations along with the updated diagram image.",
+                "Create a new association class presentation of the specified class (specified by ID) between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified class diagram (specified by ID), and return the newly created node and link presentations along with the updated diagram image in low resolution.",
                 this::createAssociationClassPresentation,
                 NewAssociationClassPresentationDTO.class,
                 PresentationListDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_instance_spec",
-                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created node presentation of the instance specification along with the updated diagram image.",
+                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created node presentation of the instance specification along with the updated diagram image in low resolution.",
                 this::createInstanceSpecification,
                 NewInstanceWithPointDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_between_instance_specs",
-                "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation along with the updated diagram image. Note that the created link has no arrowheads.",
+                "Create a link between two instance specifications (specified by ID) on the specified class diagram (specified by ID), and return the newly created link presentation along with the updated diagram image in low resolution. Note that the created link has no arrowheads.",
                 this::createInstanceSpecificationLink,
                 NewLinkSourceAndTargetDTO.class,
                 LinkPresentationDTO.class)
@@ -142,7 +142,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
         PresentationListDTO dto = new PresentationListDTO(presentationDTOs);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -156,17 +156,20 @@ public class ClassDiagramEditorTool implements ToolProvider {
         classDiagramEditor.setDiagram(astahClassDiagram);
 
         INodePresentation astahNodePresentation = txnAstah.call( () -> {
-            return classDiagramEditor.createInstanceSpecification(
+            INodePresentation createdNodePresentation = classDiagramEditor.createInstanceSpecification(
                 param.newInstanceName(),
-                astahClass.getFullName("."),
                 new Point2D.Double(
                     param.locationX(),
                     param.locationY()));
+            
+            ((IInstanceSpecification) createdNodePresentation.getModel()).setClassifier(astahClass);
+            
+            return createdNodePresentation;
         });
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -188,7 +191,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

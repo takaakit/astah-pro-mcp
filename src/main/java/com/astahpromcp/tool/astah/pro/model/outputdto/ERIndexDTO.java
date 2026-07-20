@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record ERIndexDTO(
-    @JsonPropertyDescription("Named element information")
+    @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
     @JsonPropertyDescription("ER attributes")

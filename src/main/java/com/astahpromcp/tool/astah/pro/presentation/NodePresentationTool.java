@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
@@ -84,21 +83,21 @@ public class NodePresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_location",
-                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image.",
+                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image in low resolution.",
                 this::setNodePresentationLocation,
                 NodePresentationWithLocationDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_width",
-                "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image.",
+                "Set the width of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image in low resolution.",
                 this::setNodePresentationWidth,
                 NodePresentationWithWidthDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_height",
-                "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image.",
+                "Set the height of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image in low resolution.",
                 this::setNodePresentationHeight,
                 NodePresentationWithHeightDTO.class,
                 RectangleDTO.class)
@@ -134,7 +133,7 @@ public class NodePresentationTool implements ToolProvider {
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahNodePresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -151,7 +150,7 @@ public class NodePresentationTool implements ToolProvider {
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahNodePresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -168,7 +167,7 @@ public class NodePresentationTool implements ToolProvider {
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahNodePresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahNodePresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }

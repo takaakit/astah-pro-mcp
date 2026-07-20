@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNoteAnchorDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNoteDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
@@ -74,14 +73,14 @@ public class BasicDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_note",
-                "Create a new note at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created node presentation of the note along with the updated diagram image.",
+                "Create a new note at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created node presentation of the note along with the updated diagram image in low resolution. The note content is automatically wrapped at the right edge of the note, so there is no need to insert line breaks in the middle of a sentence to fit the note's display width.",
                 this::createNote,
                 NewNoteDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_note_anchor",
-                "Create a new note anchor between the specified note (specified by ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation of the note anchor along with the updated diagram image.",
+                "Create a new note anchor between the specified note (specified by ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation of the note anchor along with the updated diagram image in low resolution.",
                 this::createNoteAnchor,
                 NewNoteAnchorDTO.class,
                 LinkPresentationDTO.class)
@@ -123,7 +122,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -152,7 +151,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

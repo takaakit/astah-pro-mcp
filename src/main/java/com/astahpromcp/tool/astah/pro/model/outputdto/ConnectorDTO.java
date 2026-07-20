@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record ConnectorDTO(
-    @JsonPropertyDescription("Named element information")
+    @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
     @JsonPropertyDescription("Parts (The first array: source side, The second array: target side)")

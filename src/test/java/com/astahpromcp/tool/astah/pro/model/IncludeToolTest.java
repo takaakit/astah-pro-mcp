@@ -54,7 +54,7 @@ public class IncludeToolTest {
     }
 
     @Test
-    void getInfo() throws Exception {
+    void getInfo_ok() throws Exception {
         // Get include
         IInclude include = (IInclude) TestSupport.instance().getNamedElementByClassAndName(
             IInclude.class,

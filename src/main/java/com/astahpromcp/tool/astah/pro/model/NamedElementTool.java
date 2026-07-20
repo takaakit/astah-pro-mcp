@@ -86,7 +86,7 @@ public class NamedElementTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_definition",
-                "Set the definition of the specified named element (specified by ID), and return the model element of the named element after it is edited.",
+                "Set the definition of the specified named element (specified by ID), and return the model element of the named element after it is edited. The definition is automatically wrapped at the right edge, so there is no need to insert line breaks in the middle of a sentence to fit the definition's display width.",
                 this::setDefinition,
                 NamedElementWithDefinitionDTO.class,
                 NamedElementDTO.class),

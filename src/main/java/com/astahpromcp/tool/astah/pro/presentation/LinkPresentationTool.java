@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
@@ -75,14 +74,14 @@ public class LinkPresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_points_of_link_prst",
-                "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation after it is set along with the updated diagram image. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
+                "Set all points with the connection points in the rectangles of the specified link presentation (specified by ID), and return the link presentation after it is set along with the updated diagram image in low resolution. Note that it must include the connection points with the rectangle (node presentation). The connection points must be inside the node presentation rectangles, not on their borders.",
                 this::setAllPoints,
                 LinkPresentationWithPointsDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_line_style_of_link_prst",
-                "Set the line style of the specified link presentation (specified by ID), and return the link presentation after it is set along with the updated diagram image.",
+                "Set the line style of the specified link presentation (specified by ID), and return the link presentation after it is set along with the updated diagram image in low resolution.",
                 this::setLineStyle,
                 LinkPresentationWithLineStyleDTO.class,
                 LinkPresentationDTO.class)
@@ -114,7 +113,7 @@ public class LinkPresentationTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(linkPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(linkPresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -130,7 +129,7 @@ public class LinkPresentationTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(linkPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(linkPresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }

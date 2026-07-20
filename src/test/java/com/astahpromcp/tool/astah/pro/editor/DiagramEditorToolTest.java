@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,7 +58,7 @@ public class DiagramEditorToolTest {
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

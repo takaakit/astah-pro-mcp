@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.SequenceDiagramDTO;
@@ -82,70 +81,70 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_combined_fragment",
-                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created node presentation of the combined fragment along with the updated diagram image.",
+                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created node presentation of the combined fragment along with the updated diagram image in low resolution.",
                 this::createCombinedFragment,
                 NewCombinedFragmentDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_msg",
-                "Create a new message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the message along with the updated diagram image. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
                 this::createMessage,
                 NewMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_create_msg",
-                "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the create message along with the updated diagram image. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the create message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
                 this::createCreateMessage,
                 NewCreateMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_destroy_msg",
-                "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the destroy message along with the updated diagram image. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the destroy message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
                 this::createDestroyMessage,
                 NewDestroyMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_return_msg",
-                "Create a new return message to the specified message (specified by ID) on the specified sequence diagram (specified by ID), and return the newly created link presentation of the return message along with the updated diagram image.",
+                "Create a new return message to the specified message (specified by ID) on the specified sequence diagram (specified by ID), and return the newly created link presentation of the return message along with the updated diagram image in low resolution.",
                 this::createReturnMessage,
                 NewReturnMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_lost_msg",
-                "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the lost message along with the updated diagram image. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the lost message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
                 this::createLostMessage,
                 NewLostMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_found_msg",
-                "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the found message along with the updated diagram image. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.",
+                "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the found message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.",
                 this::createFoundMessage,
                 NewFoundMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_interaction_use",
-                "Create a new interaction use on the specified sequence diagram (specified by ID), and return the newly created node presentation of the interaction use along with the updated diagram image. Note that the InteractionUse to be created must cover at least one lifeline. In other words, attempting to create an InteractionUse in an area where no lifelines exist will result in failure.",
+                "Create a new interaction use on the specified sequence diagram (specified by ID), and return the newly created node presentation of the interaction use along with the updated diagram image in low resolution. Note that the InteractionUse to be created must cover at least one lifeline. In other words, attempting to create an InteractionUse in an area where no lifelines exist will result in failure.",
                 this::createInteractionUse,
                 NewInteractionUseDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_lifeline",
-                "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created node presentation of the lifeline along with the updated diagram image.",
+                "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created node presentation of the lifeline along with the updated diagram image in low resolution.",
                 this::createLifeline,
                 NewLifelineDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_termination",
-                "Create a new termination on the specified sequence diagram (specified by ID), and return the newly created node presentation of the termination along with the updated diagram image.",
+                "Create a new termination on the specified sequence diagram (specified by ID), and return the newly created node presentation of the termination along with the updated diagram image in low resolution.",
                 this::createTermination,
                 NewTerminationDTO.class,
                 NodePresentationDTO.class)
@@ -186,7 +185,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(combinedFragment);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -223,7 +222,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(message);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -258,7 +257,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(createMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -293,7 +292,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(destroyMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -318,7 +317,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(returnMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -347,7 +346,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(lostMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -375,7 +374,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(foundMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -401,7 +400,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(interactionUse);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -421,7 +420,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(lifeline);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -441,7 +440,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(termination);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetSequenceDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

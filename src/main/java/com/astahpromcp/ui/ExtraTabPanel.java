@@ -3,7 +3,9 @@ package com.astahpromcp.ui;
 import com.astahpromcp.config.LogbackConfig;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +13,10 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 public class ExtraTabPanel extends JPanel {
+
+    // Bound memory: keep roughly the last ~1 MB of log text in the panel.
+    private static final int MAX_LOG_CHARS = 1_000_000;
+
     private JTextArea logTextArea;
 
     public ExtraTabPanel() {
@@ -66,13 +72,30 @@ public class ExtraTabPanel extends JPanel {
         return scrollPane;
     }
 
+    // Called on the Swing EDT, so the document edits below are EDT-safe.
     public void appendLogMessage(String message) {
-        if (logTextArea != null) {
-            logTextArea.append(message + "\n");
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
-            });
+        if (logTextArea == null) {
+            return;
         }
+        logTextArea.append(message + "\n");
+
+        // Drop the oldest text once the buffer exceeds the cap, to keep memory bounded in long sessions.
+        Document doc = logTextArea.getDocument();
+        int overflow = overflowChars(doc.getLength(), MAX_LOG_CHARS);
+        if (overflow > 0) {
+            try {
+                doc.remove(0, overflow);
+            } catch (BadLocationException e) {
+                // Best-effort trim; ignore.
+            }
+        }
+
+        logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
+    }
+
+    // Number of leading characters to drop so that the buffer stays within the cap
+    static int overflowChars(int length, int cap) {
+        return Math.max(0, length - cap);
     }
 
     private void openLogFile() {

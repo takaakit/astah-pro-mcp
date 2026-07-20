@@ -54,7 +54,7 @@ public class StateMachineDiagramToolTest {
     }
 
     @Test
-    void getInfo() throws Exception {
+    void getInfo_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,

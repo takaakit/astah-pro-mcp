@@ -24,15 +24,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PlantumlGuideTool implements ToolProvider {
 
-    private static final int CHUNK_SIZE = 51200; // characters 50KB (50 * 1024)
     private final List<String> contentCache;
     private final Path outputDirectory;
     private final HttpClient httpClient;
 
     public PlantumlGuideTool(Path outputDirectory) {
-        this(outputDirectory, HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build());
+        this(outputDirectory, KnowledgeToolSupport.newHttpClient());
     }
 
     public PlantumlGuideTool(Path outputDirectory, HttpClient httpClient) {
@@ -96,22 +93,13 @@ public class PlantumlGuideTool implements ToolProvider {
         }
 
         String allTextContentString = allTextContent.toString();
-        allTextContentString = allTextContentString.replace("?? Copied!", "");
 
-        String outputFileName = "plantuml_guide.txt";
+        String outputFileName = "plantuml_guide.md";
         Path outputPath = outputDirectory.resolve(outputFileName);
         Files.writeString(outputPath, allTextContentString, StandardCharsets.UTF_8);
         log.info("PlantUML guide saved to file: {}", outputPath.toAbsolutePath());
 
-        List<String> chunks = KnowledgeToolSupport.splitText(allTextContentString, CHUNK_SIZE);
-        if (chunks.isEmpty()) {
-            chunks.add(""); // Ensure there is at least one empty chunk
-        }
-
-        contentCache.clear();
-        contentCache.addAll(chunks);
-
-        return new DocumentDTO(chunks.size(), chunks.get(0));
+        return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
     private DocumentChunkDTO getPlantumlGuideChunk(McpSyncServerExchange exchange, ChunkDTO param) {

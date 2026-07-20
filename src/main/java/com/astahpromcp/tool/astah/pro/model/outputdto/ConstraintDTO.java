@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record ConstraintDTO(
-    @JsonPropertyDescription("Named element information")
+    @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
     @JsonPropertyDescription("Constrained elements")

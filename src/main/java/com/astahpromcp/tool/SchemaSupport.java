@@ -7,7 +7,7 @@ import com.github.victools.jsonschema.module.jackson.JacksonOption;
 
 // JSON schema utility
 public final class SchemaSupport {
-    
+
     private static final SchemaGenerator GENERATOR = createSchemaGenerator();
 
     private SchemaSupport() {
@@ -19,22 +19,21 @@ public final class SchemaSupport {
             OptionPreset.PLAIN_JSON);
 
         // Configure for simpler JSON output
-        return new SchemaGenerator(
-            configBuilder
-                .with(new JacksonSchemaModule(JacksonOption.FLATTENED_ENUMS_FROM_JSONPROPERTY))
-                .without(Option.SCHEMA_VERSION_INDICATOR)      // Remove the $schema field
-                .without(Option.DEFINITIONS_FOR_ALL_OBJECTS)   // Suppress automatic $defs generation
-                // Note: INLINE_ALL_SCHEMAS cannot be used because schemas are recursive
-                .build());
+        configBuilder
+            .with(new JacksonSchemaModule(JacksonOption.FLATTENED_ENUMS_FROM_JSONPROPERTY))
+            .without(Option.SCHEMA_VERSION_INDICATOR)      // Remove the $schema field
+            .without(Option.DEFINITIONS_FOR_ALL_OBJECTS);  // Suppress automatic $defs generation
+            // Note: INLINE_ALL_SCHEMAS cannot be used because schemas are recursive
+
+        // Every property is required
+        configBuilder.forFields().withRequiredCheck(field -> true);
+
+        return new SchemaGenerator(configBuilder.build());
     }
 
-    static JsonNode generateSchemaNode(Class<?> type) {
-        return GENERATOR.generateSchema(type);
-    }
-        
     // Generate a formatted JSON schema from a record type
     public static String generateSchema(Class<?> recordClass) {
-        JsonNode schemaNode = generateSchemaNode(recordClass);
+        JsonNode schemaNode = GENERATOR.generateSchema(recordClass);
         try {
             return JsonSupport.OBJ_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schemaNode);
 

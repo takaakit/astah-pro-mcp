@@ -9,15 +9,9 @@ import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class OCLSpecificationTool implements ToolProvider {
 
-    private static final int CHUNK_SIZE = 51200; // characters 50KB (50 * 1024)
     private final List<String> contentCache;
 
     private final Path outputDirectory;
@@ -70,36 +63,15 @@ public class OCLSpecificationTool implements ToolProvider {
         }
 
         log.info("Loading OCL Specification from PDF URL.");
-        try (InputStream is = URI.create(oclSpecificationUrl).toURL().openStream()) {
+        try (InputStream is = KnowledgeToolSupport.openUrlStream(oclSpecificationUrl)) {
             if (is == null) {
                 throw new IOException("OCL Specification PDF resource not found.");
             }
 
-            String text;
             byte[] bytes = is.readAllBytes();
-            try (PDDocument document = Loader.loadPDF(bytes)) {
-                text = new PDFTextStripper().getText(document);
-            }
+            String text = KnowledgeToolSupport.convertPdfToMarkdown(bytes, outputDirectory, "ocl_specification_2_4");
 
-            // Replace multiple spaces with a single space
-            text = text.replaceAll("\t\r", " ");
-            text = text.replaceAll(" {2,}", " ");
-
-            // Write the extracted text to a file
-            String textFileName = "ocl_specification_2_4.txt";
-            Path outputPath = outputDirectory.resolve(textFileName);
-            Files.write(outputPath, text.getBytes(StandardCharsets.UTF_8));
-            log.info("OCL Specification text saved to file: {}", outputPath.toAbsolutePath());
-
-            List<String> chunks = KnowledgeToolSupport.splitText(text, CHUNK_SIZE);
-            if (chunks.isEmpty()) {
-                chunks.add(""); // Ensure there is at least one empty chunk
-            }
-
-            contentCache.clear();
-            contentCache.addAll(chunks);
-
-            return new DocumentDTO(chunks.size(), chunks.get(0));
+            return KnowledgeToolSupport.chunkAndCache(text, contentCache);
 
         } catch (IOException e) {
             log.error("Failed to load OCL Specification from URL: {}", oclSpecificationUrl, e);

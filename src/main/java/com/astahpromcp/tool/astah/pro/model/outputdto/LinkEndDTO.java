@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.model.outputdto;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record LinkEndDTO(
-        @JsonPropertyDescription("Named element information")
+        @JsonPropertyDescription("Named element info")
         NamedElementDTO namedElement,
 
         @JsonPropertyDescription("Is Aggregation")

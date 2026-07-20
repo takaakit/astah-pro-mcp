@@ -15,6 +15,7 @@ import com.astahpromcp.tool.astah.pro.project.*;
 import com.astahpromcp.tool.astah.pro.view.*;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.*;
+import com.change_vision.jude.api.inf.exception.InvalidUsingException;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.*;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class AstahProToolFactory {
     private final Path imageOutputDir;
 
     public AstahProToolFactory() {
-        this(McpServerConfig.WORKSPACE_DIR.resolve("diagram-images"));
+        this(McpServerConfig.WORKSPACE_DIR.resolve("images"));
     }
 
     public AstahProToolFactory(Path imageOutputDir) {
@@ -43,9 +44,6 @@ public class AstahProToolFactory {
             ProjectAccessor projectAccessor = api.getProjectAccessor();
             IModelEditorFactory modelEditorFactory = projectAccessor.getModelEditorFactory();
             BasicModelEditor basicModelEditor = modelEditorFactory.getBasicModelEditor();
-            IViewManager viewManager = projectAccessor.getViewManager();
-            IDiagramViewManager diagramViewManager = viewManager.getDiagramViewManager();
-            IProjectViewManager projectViewManager = viewManager.getProjectViewManager();
             IDiagramEditorFactory diagramEditorFactory = projectAccessor.getDiagramEditorFactory();
             ClassDiagramEditor classDiagramEditor = diagramEditorFactory.getClassDiagramEditor();
             SequenceDiagramEditor sequenceDiagramEditor = diagramEditorFactory.getSequenceDiagramEditor();
@@ -69,8 +67,6 @@ public class AstahProToolFactory {
             // Common tools
             providers.add(new AstahProMcpGuideTool(projectAccessor));
             providers.add(new DiagramLayoutGuideTool());
-            providers.add(new DiagramViewManagerTool(projectAccessor, diagramViewManager, transactionSupport, astahProToolSupport, includeEditorTools));
-            providers.add(new ProjectViewManagerTool(projectAccessor, projectViewManager, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new BasicDiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new BasicModelEditorTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageConvertSupport, imageCaptureSupport, includeEditorTools));
@@ -84,10 +80,21 @@ public class AstahProToolFactory {
             providers.add(new PresentationTool(projectAccessor, transactionSupport, astahProToolSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new ProjectAccessorTool(projectAccessor, astahProToolSupport, includeEditorTools));
             providers.add(new ProjectInfoTool(projectAccessor, astahProToolSupport, includeEditorTools));
-            providers.add(new ImageCaptureTool(imageCaptureSupport));
+            providers.add(new ImageCaptureTool(projectAccessor, imageCaptureSupport));
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramLayoutLintTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new TerminologyConsistencyTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
+            
+            // The view managers are available only inside the running Astah GUI (plugin environment).
+            try {
+                IViewManager viewManager = projectAccessor.getViewManager();
+                IDiagramViewManager diagramViewManager = viewManager.getDiagramViewManager();
+                IProjectViewManager projectViewManager = viewManager.getProjectViewManager();
+                providers.add(new DiagramViewManagerTool(projectAccessor, diagramViewManager, transactionSupport, astahProToolSupport, includeEditorTools));
+                providers.add(new ProjectViewManagerTool(projectAccessor, projectViewManager, transactionSupport, astahProToolSupport, includeEditorTools));
+            } catch (InvalidUsingException e) {
+                log.warn("View manager tools are unavailable (not running inside Astah): {}", e.getMessage());
+            }
 
             // Activity diagram tools
             if (categoryFlags.activityDiagramEnabled()) {

@@ -229,17 +229,27 @@ public class DiagramViewManagerTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(diagram);
     }
 
+    // Return the diagram currently open in Diagram Editor
+    private IDiagram requireCurrentDiagram() {
+        IDiagram currentDiagram;
+        try {
+            currentDiagram = diagramViewManager.getCurrentDiagram();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the current diagram.", e);
+        }
+
+        if (currentDiagram == null) {
+            throw new IllegalStateException(
+                    "No diagram is currently open in the Diagram Editor. Open a diagram first (e.g., with the 'open_dgm' tool).");
+        }
+
+        return currentDiagram;
+    }
+
     private DiagramDTO getCurrentDiagram(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Get current diagram: {}", param);
 
-        IDiagram currentAstahDiagram;
-        try {
-            currentAstahDiagram = diagramViewManager.getCurrentDiagram();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current diagram.");
-        }
-
-        return DiagramDTOAssembler.toDTO(currentAstahDiagram);
+        return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
     private PresentationListDTO getSelectedPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
@@ -302,7 +312,7 @@ public class DiagramViewManagerTool implements ToolProvider {
             throw new RuntimeException("Failed to unselect all presentations.");
         }
 
-        return DiagramDTOAssembler.toDTO(diagramViewManager.getCurrentDiagram());
+        return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
     private PresentationDTO centerPresentationInDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
@@ -322,17 +332,12 @@ public class DiagramViewManagerTool implements ToolProvider {
     private DiagramDTO autoLayout(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Auto layout: {}", param);
 
-        IDiagram currentDiagram;
-        try {
-            currentDiagram = diagramViewManager.getCurrentDiagram();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current diagram.");
-        }
+        IDiagram currentDiagram = requireCurrentDiagram();
 
         txnAstah.run( () -> {
             diagramViewManager.layoutAll();
         });
-        
+
 
         return DiagramDTOAssembler.toDTO(currentDiagram);
     }
@@ -352,18 +357,13 @@ public class DiagramViewManagerTool implements ToolProvider {
             throw new RuntimeException("Failed to zoom.");
         }
 
-        return DiagramDTOAssembler.toDTO(diagramViewManager.getCurrentDiagram());
+        return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
     private DiagramDTO zoomFit(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
         log.debug("Zoom fit: {}", param);
 
-        IDiagram currentDiagram;
-        try {
-            currentDiagram = diagramViewManager.getCurrentDiagram();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current diagram.");
-        }
+        IDiagram currentDiagram = requireCurrentDiagram();
 
         JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();
         if (mainFrame == null) {

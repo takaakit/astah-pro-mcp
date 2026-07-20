@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record AssociationClassDTO(
-    @JsonPropertyDescription("Class information")
+    @JsonPropertyDescription("Class info")
     @JsonProperty("class")
     ClassDTO class_,    // For avoiding Java keyword collision
 
-    @JsonPropertyDescription("Association information")
+    @JsonPropertyDescription("Association info")
     AssociationDTO association
 ) {
 }

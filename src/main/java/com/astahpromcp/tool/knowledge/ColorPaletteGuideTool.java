@@ -25,15 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ColorPaletteGuideTool implements ToolProvider {
 
-    private static final int CHUNK_SIZE = 51200; // characters 50KB (50 * 1024)
     private final List<String> contentCache;
     private final Path outputDirectory;
     private final HttpClient httpClient;
 
     public ColorPaletteGuideTool(Path outputDirectory) {
-        this(outputDirectory, HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build());
+        this(outputDirectory, KnowledgeToolSupport.newHttpClient());
     }
 
     public ColorPaletteGuideTool(Path outputDirectory, HttpClient httpClient) {
@@ -97,22 +94,13 @@ public class ColorPaletteGuideTool implements ToolProvider {
         }
 
         String allTextContentString = allTextContent.toString();
-        allTextContentString = allTextContentString.replace("?? Copied!", "");
 
-        String outputFileName = "color_palette_guide.txt";
+        String outputFileName = "color_palette_guide.md";
         Path outputPath = outputDirectory.resolve(outputFileName);
         Files.writeString(outputPath, allTextContentString, StandardCharsets.UTF_8);
         log.info("Color Palette guide saved to file: {}", outputPath.toAbsolutePath());
 
-        List<String> chunks = KnowledgeToolSupport.splitText(allTextContentString, CHUNK_SIZE);
-        if (chunks.isEmpty()) {
-            chunks.add(""); // Ensure there is at least one empty chunk
-        }
-
-        contentCache.clear();
-        contentCache.addAll(chunks);
-
-        return new DocumentDTO(chunks.size(), chunks.get(0));
+        return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
     private DocumentChunkDTO getColorPaletteGuideChunk(McpSyncServerExchange exchange, ChunkDTO param) {

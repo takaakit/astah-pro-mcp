@@ -42,7 +42,7 @@ public class ExclusiveToolProviderTest {
     }
 
     @Test
-    void serializesConcurrentToolCalls() throws Exception {
+    void createToolDefinitions_ok_serializesConcurrentToolCalls() throws Exception {
         int threadCount = 8;
         AtomicInteger activeCalls = new AtomicInteger();
         AtomicInteger maxObservedConcurrency = new AtomicInteger();
@@ -83,7 +83,7 @@ public class ExclusiveToolProviderTest {
     }
 
     @Test
-    void returnsErrorWhenLockNotAcquiredWithinTimeout() throws Exception {
+    void createToolDefinitions_ng_returnsErrorWhenLockNotAcquiredWithinTimeout() throws Exception {
         ToolDefinition wrapped = wrap(definitionWith((exchange, request) ->
                 ResponseSupport.error("should not be reached")), 1);
 
@@ -109,7 +109,7 @@ public class ExclusiveToolProviderTest {
     }
 
     @Test
-    void releasesLockWhenHandlerThrows() {
+    void createToolDefinitions_ng_releasesLockWhenHandlerThrows() {
         ToolDefinition wrapped = wrap(definitionWith((exchange, request) -> {
             throw new IllegalStateException("handler failure");
         }), 30);
@@ -122,7 +122,7 @@ public class ExclusiveToolProviderTest {
     }
 
     @Test
-    void preservesToolSchemaAndDelegateName() {
+    void createToolDefinitions_ok_preservesToolSchemaAndDelegateName() {
         ToolDefinition definition = definitionWith((exchange, request) -> ResponseSupport.error("dummy"));
         ToolProvider delegate = new ToolProvider() {
             @Override

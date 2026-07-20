@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record CommentDTO(
-    @JsonPropertyDescription("Named element information")
+    @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
     @JsonPropertyDescription("Comment body text")

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record EnumerationDTO(
-    @JsonPropertyDescription("Class information")
+    @JsonPropertyDescription("Class info")
     ClassDTO classDTO,
 
     @JsonPropertyDescription("Enumeration literals")

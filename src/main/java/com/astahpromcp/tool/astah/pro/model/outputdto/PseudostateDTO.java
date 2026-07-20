@@ -4,7 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.PseudostateKind;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record PseudostateDTO(
-    @JsonPropertyDescription("Vertex information")
+    @JsonPropertyDescription("Vertex info")
     VertexDTO vertex,
 
     @JsonPropertyDescription("Pseudostate kind")

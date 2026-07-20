@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,7 +42,7 @@ public class BasicDiagramEditorToolTest {
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

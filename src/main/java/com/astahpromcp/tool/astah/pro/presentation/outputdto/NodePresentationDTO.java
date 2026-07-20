@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record NodePresentationDTO(
-    @JsonPropertyDescription("Presentation information")
+    @JsonPropertyDescription("Presentation info")
     PresentationDTO presentation,
 
     @JsonPropertyDescription("Label, identifier and type of connected links")

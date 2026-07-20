@@ -25,7 +25,6 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,7 +59,7 @@ public class StateMachineDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/StateMachineDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -172,7 +171,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void addRegion() throws Exception {
+    void addRegion_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -203,7 +202,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void deleteRegion() throws Exception {
+    void deleteRegion_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -234,7 +233,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void changeParentOfState() throws Exception {
+    void changeParentOfState_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -270,7 +269,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createChoicePseudostate() throws Exception {
+    void createChoicePseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -302,7 +301,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createDeepHistoryPseudostate() throws Exception {
+    void createDeepHistoryPseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -334,7 +333,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createShallowHistoryPseudostate() throws Exception {
+    void createShallowHistoryPseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -366,7 +365,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createFinalState() throws Exception {
+    void createFinalState_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -398,7 +397,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createForkPseudostate() throws Exception {
+    void createForkPseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -432,7 +431,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createInitialPseudostate() throws Exception {
+    void createInitialPseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -464,7 +463,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createJoinPseudostate() throws Exception {
+    void createJoinPseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -498,7 +497,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createJunctionPseudostate() throws Exception {
+    void createJunctionPseudostate_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -530,7 +529,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createState() throws Exception {
+    void createState_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -563,7 +562,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createStateMachineDiagram() throws Exception {
+    void createStateMachineDiagram_ok() throws Exception {
         // Get parent node presentation
         IPackage parentPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
@@ -588,7 +587,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createSubMachineState() throws Exception {
+    void createSubMachineState_ok() throws Exception {
         // Get state machine diagrams
         IStateMachineDiagram stateMachineDiagram0 = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,
@@ -627,7 +626,7 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
-    void createTransition() throws Exception {
+    void createTransition_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachineDiagram.class,

@@ -46,44 +46,50 @@ public final class ExclusiveToolProvider implements ToolProvider {
     }
 
     // Wrap a tool handler so that it acquires the Astah API lock before running.
-    private BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> wrapWithLock(
-            ToolDefinition definition) {
+    private BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> wrapWithLock(ToolDefinition definition) {
 
         String toolName = definition.toolSchema().name();
 
         return (exchange, request) -> {
-            boolean acquired;
             try {
-                acquired = AstahApiLock.LOCK.tryLock(lockTimeoutSeconds, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                String msg = String.format("Interrupted while waiting for Astah API access @tool=%s", toolName);
-                log.warn(msg);
-                return ResponseSupport.error(msg);
-            }
-
-            if (!acquired) {
-                String msg = String.format(
-                        "Astah is busy processing another agent's request (waited %d seconds) @tool=%s. Please retry shortly.",
-                        lockTimeoutSeconds, toolName);
-                log.warn(msg);
-                return ResponseSupport.error(msg);
-            }
-
-            try {
-                McpSchema.CallToolResult result = definition.toolHandler().apply(exchange, request);
-                flushEdt(toolName);  // Drain the EDT queue
-                return result;
-            
+                return executeWithLock(definition, toolName, exchange, request);
             } catch (Throwable t) {
-                String msg = String.format("Unexpected failure @tool=%s: %s", toolName, t.getMessage());
+                String msg = String.format("Unexpected failure @tool=%s: %s", toolName, t);
                 log.error(msg, t);
                 return ResponseSupport.error(msg);
-            
-            } finally {
-                AstahApiLock.LOCK.unlock();
             }
         };
+    }
+
+    // Acquire the Astah API lock, run the tool handler, and release the lock.
+    private McpSchema.CallToolResult executeWithLock(ToolDefinition definition, String toolName, McpSyncServerExchange exchange, McpSchema.CallToolRequest request) {
+
+        boolean acquired;
+        try {
+            acquired = AstahApiLock.LOCK.tryLock(lockTimeoutSeconds, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            String msg = String.format("Interrupted while waiting for Astah API access @tool=%s", toolName);
+            log.warn(msg);
+            return ResponseSupport.error(msg);
+        }
+
+        if (!acquired) {
+            String msg = String.format(
+                    "Astah is busy processing another agent's request (waited %d seconds) @tool=%s. Please retry shortly.",
+                    lockTimeoutSeconds, toolName);
+            log.warn(msg);
+            return ResponseSupport.error(msg);
+        }
+
+        try {
+            McpSchema.CallToolResult result = definition.toolHandler().apply(exchange, request);
+            flushEdt(toolName);  // Drain the EDT queue
+            return result;
+
+        } finally {
+            AstahApiLock.LOCK.unlock();
+        }
     }
 
     private static void flushEdt(String toolName) {

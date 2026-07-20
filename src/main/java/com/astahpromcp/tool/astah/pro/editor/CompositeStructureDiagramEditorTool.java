@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewConnectorPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPortPresentationDTO;
@@ -90,42 +89,42 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_connector_prst",
-                "Create a new connector presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified composite structure diagram (specified by ID), and return the newly created link presentation of the connector along with the updated diagram image. The specified source/target node presentations are allowed to be part presentation or port presentation.",
+                "Create a new connector presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified composite structure diagram (specified by ID), and return the newly created link presentation of the connector along with the updated diagram image in low resolution. The specified source/target node presentations are allowed to be part presentation or port presentation.",
                 this::createConnectorPresentation,
                 NewConnectorPresentationDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_port_prst",
-                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the port along with the updated diagram image.",
+                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the port along with the updated diagram image in low resolution.",
                 this::createPortPresentation,
                 NewPortPresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_provided_interface_prst",
-                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the provided interface along with the updated diagram image.",
+                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the provided interface along with the updated diagram image in low resolution.",
                 this::createProvidedInterfacePresentation,
                 NewProvidedInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_required_interface_prst",
-                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the required interface along with the updated diagram image.",
+                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the required interface along with the updated diagram image in low resolution.",
                 this::createRequiredInterfacePresentation,
                 NewRequiredInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_structured_class_prst",
-                "Create a new structured class presentation of the specified structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the structured class along with the updated diagram image.",
+                "Create a new structured class presentation of the specified structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the structured class along with the updated diagram image in low resolution.",
                 this::createStructuredClassPresentation,
                 NewStructuredClassPresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_structured_class_prst_under_parent",
-                "Create a new structured class presentation of the specified structured class (specified by ID) under the specified parent node presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the structured class along with the updated diagram image.",
+                "Create a new structured class presentation of the specified structured class (specified by ID) under the specified parent node presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the structured class along with the updated diagram image in low resolution.",
                 this::createStructuredClassPresentationUnderParent,
                 NewStructuredClassPresentationUnderParentDTO.class,
                 NodePresentationDTO.class)
@@ -162,7 +161,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetCompositeStructureDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -187,7 +186,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetCompositeStructureDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -212,7 +211,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetCompositeStructureDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -237,7 +236,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetCompositeStructureDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -260,7 +259,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetCompositeStructureDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -285,7 +284,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetCompositeStructureDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetCompositeStructureDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

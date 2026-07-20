@@ -48,6 +48,7 @@ public class DiagramEditorSupport {
                 projectAccessor.getDiagramEditorFactory().getClassDiagramEditor(),
                 projectAccessor.getDiagramEditorFactory().getCompositeStructureDiagramEditor(),
                 projectAccessor.getDiagramEditorFactory().getERDiagramEditor(),
+                projectAccessor.getDiagramEditorFactory().getMindmapEditor(),
                 projectAccessor.getDiagramEditorFactory().getRequirementDiagramEditor(),
                 projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor(),
                 projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor(),

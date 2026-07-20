@@ -15,8 +15,8 @@ public final class DtoBinder {
     // Converts the given argument map into the specified DTO.
     public static <T> BindResult<T> bind(Map<String, Object> args, Class<T> type) {
         try {
-            // Convert the arguments into the DTO
-            T dto = JsonSupport.OBJ_MAPPER.convertValue(args, type);
+            // Convert the arguments into the DTO, rejecting unknown properties
+            T dto = JsonSupport.STRICT_OBJ_MAPPER.convertValue(args == null ? Map.of() : args, type);
 
             return new BindResult<>(dto, null);
 

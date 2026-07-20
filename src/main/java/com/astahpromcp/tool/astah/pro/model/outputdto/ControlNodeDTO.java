@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.model.outputdto;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record ControlNodeDTO(
-    @JsonPropertyDescription("Activity node information")
+    @JsonPropertyDescription("Activity node info")
     ActivityNodeDTO activityNode,
 
     @JsonPropertyDescription("Is Connector")

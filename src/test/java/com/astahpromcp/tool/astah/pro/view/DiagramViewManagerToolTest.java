@@ -448,7 +448,7 @@ public class DiagramViewManagerToolTest {
     }
 
     @Test
-    void highlightPresentation_nodePresentation_ok() throws Exception {
+    void highlightPresentation_ok_nodePresentation() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
@@ -482,7 +482,7 @@ public class DiagramViewManagerToolTest {
     }
 
     @Test
-    void highlightPresentation_linkPresentation_ok() throws Exception {
+    void highlightPresentation_ok_linkPresentation() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,

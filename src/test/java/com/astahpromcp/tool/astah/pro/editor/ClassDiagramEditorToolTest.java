@@ -20,8 +20,10 @@ import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.ILink;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
+import com.change_vision.jude.api.inf.model.IInstanceSpecification;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -32,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,7 +57,7 @@ public class ClassDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/ClassDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -192,7 +193,7 @@ public class ClassDiagramEditorToolTest {
         // Get class
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
-            "Foo");
+            "Bar");
         
         // Create input DTO
         NewInstanceWithPointDTO inputDTO = new NewInstanceWithPointDTO(
@@ -213,6 +214,13 @@ public class ClassDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Get instance specification
+        IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElementByClassAndName(
+            IInstanceSpecification.class,
+            "TestInstance");
+        assertNotNull(instanceSpecification);
+        assertEquals("Bar", instanceSpecification.getClassifier().getName());
     }
 
     @Test

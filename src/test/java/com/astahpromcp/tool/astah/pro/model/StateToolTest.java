@@ -93,7 +93,7 @@ public class StateToolTest {
     }
 
     @Test
-    void getInfo() throws Exception {
+    void getInfo_ok() throws Exception {
         // Get state
         IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
@@ -116,7 +116,7 @@ public class StateToolTest {
     }
 
     @Test
-    void addInternalTransition() throws Exception {
+    void addInternalTransition_ok() throws Exception {
         // Get state
         IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
@@ -143,7 +143,7 @@ public class StateToolTest {
     }
 
     @Test
-    void deleteAllInternalTransitions() throws Exception {
+    void deleteAllInternalTransitions_ok() throws Exception {
         // Get state
         IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
@@ -166,7 +166,7 @@ public class StateToolTest {
     }
 
     @Test
-    void setEntry() throws Exception {
+    void setEntry_ok() throws Exception {
         // Get state
         IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
@@ -191,7 +191,7 @@ public class StateToolTest {
     }
 
     @Test
-    void setDoActivity() throws Exception {
+    void setDoActivity_ok() throws Exception {
         // Get state
         IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,
@@ -216,7 +216,7 @@ public class StateToolTest {
     }
 
     @Test
-    void setExit() throws Exception {
+    void setExit_ok() throws Exception {
         // Get state
         IState state = (IState) TestSupport.instance().getNamedElementByClassAndName(
             IState.class,

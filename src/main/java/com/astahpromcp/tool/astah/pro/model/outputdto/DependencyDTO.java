@@ -4,7 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record DependencyDTO(
-    @JsonPropertyDescription("Named element information")
+    @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
     @JsonPropertyDescription("Client")

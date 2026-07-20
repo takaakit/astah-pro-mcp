@@ -5,7 +5,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.ChangeToFloatingTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteChildTopicsDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteImageFromTopicDTO;
@@ -97,84 +96,84 @@ public class MindmapEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_to_floating_topic",
-                "Change the specified topic (specified by ID) to a floating topic on the specified mind map diagram (specified by ID), and return the node presentation of the changed topic along with the updated diagram image. A floating topic is a separate topic from the root topic.",
+                "Change the specified topic (specified by ID) to a floating topic on the specified mind map diagram (specified by ID), and return the node presentation of the changed topic along with the updated diagram image in low resolution. A floating topic is a separate topic from the root topic.",
                 this::changeToFloatingTopic,
                 ChangeToFloatingTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_floating_topic",
-                "Create a new floating topic at the specified point (specified by x and y coordinates) on the specified mind map diagram (specified by ID), and return the newly created node presentation of the floating topic along with the updated diagram image. A floating topic is a separate topic from the root topic.",
+                "Create a new floating topic at the specified point (specified by x and y coordinates) on the specified mind map diagram (specified by ID), and return the newly created node presentation of the floating topic along with the updated diagram image in low resolution. A floating topic is a separate topic from the root topic.",
                 this::createFloatingTopic,
                 NewFloatingTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_topic",
-                "Create a new topic under the specified parent topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created node presentation of the topic along with the updated diagram image.",
+                "Create a new topic under the specified parent topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created node presentation of the topic along with the updated diagram image in low resolution.",
                 this::createTopic,
                 NewTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_between_topics",
-                "Create a new link between the specified source topic (specified by ID) and the specified target topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created link presentation of the link along with the updated diagram image.",
+                "Create a new link between the specified source topic (specified by ID) and the specified target topic (specified by ID) on the specified mind map diagram (specified by ID), and return the newly created link presentation of the link along with the updated diagram image in low resolution.",
                 this::createTopicLink,
                 NewLinkBetweenTopicsDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_parent_of_topic",
-                "Change the parent topic (specified by ID) on the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the changed topic along with the updated diagram image.",
+                "Change the parent topic (specified by ID) on the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the changed topic along with the updated diagram image in low resolution.",
                 this::changeParentOfTopic,
                 ChangeParentOfTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "move_topic_within_sibling_order",
-                "Move the specified topic (specified by ID) within the order of its sibling topics on the specified mind map diagram (specified by ID), and return the node presentation of the moved topic along with the updated diagram image.",
+                "Move the specified topic (specified by ID) within the order of its sibling topics on the specified mind map diagram (specified by ID), and return the node presentation of the moved topic along with the updated diagram image in low resolution.",
                 this::moveTopicWithinSiblingOrder,
                 MoveTopicWithinSiblingOrderDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_svg_img_into_topic",
-                "Insert an SVG image (specified by SVG code) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image.",
+                "Insert an SVG image (specified by SVG code) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image in low resolution.",
                 this::insertSvgImageIntoTopic,
                 NewSvgImageIntoTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_png_img_into_topic",
-                "Insert a PNG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image.",
+                "Insert a PNG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image in low resolution.",
                 this::insertPngImageIntoTopic,
                 NewPngImageIntoTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_jpg_img_into_topic",
-                "Insert a JPG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image.",
+                "Insert a JPG image (specified by image URL) into the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image in low resolution.",
                 this::insertJpgImageIntoTopic,
                 NewJpgImageIntoTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_child_topics",
-                "Delete the child topics of the specified topic (specified by ID) from the specified mind map diagram (specified by ID), and return the node presentation of the parent topic information of the deleted child topics along with the updated diagram image.",
+                "Delete the child topics of the specified topic (specified by ID) from the specified mind map diagram (specified by ID), and return the node presentation of the parent topic information of the deleted child topics along with the updated diagram image in low resolution.",
                 this::deleteChildTopics,
                 DeleteChildTopicsDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_img_from_topic",
-                "Delete the image from the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-deleted topic along with the updated diagram image.",
+                "Delete the image from the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-deleted topic along with the updated diagram image in low resolution.",
                 this::deleteImageFromTopic,
                 DeleteImageFromTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_boundary_of_topic",
-                "Set the boundary visibility of the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the root topic within the set boundary along with the updated diagram image. A boundary is an outline that collectively encloses a specific topic and its subordinate topics. It is used to make a particular group of topics stand out or to emphasize it.",
+                "Set the boundary visibility of the specified topic (specified by ID) on the specified mind map diagram (specified by ID), and return the node presentation of the root topic within the set boundary along with the updated diagram image in low resolution. A boundary is an outline that collectively encloses a specific topic and its subordinate topics. It is used to make a particular group of topics stand out or to emphasize it.",
                 this::setBoundaryOfTopic,
                 TopicWithBoundaryVisibilityDTO.class,
                 NodePresentationDTO.class)
@@ -207,7 +206,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -229,7 +228,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFloatingTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -248,7 +247,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -268,7 +267,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLink);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -288,7 +287,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -311,7 +310,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -332,7 +331,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(diagramImage));
     }
@@ -353,7 +352,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(diagramImage));
     }
@@ -374,7 +373,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(diagramImage));
     }
@@ -393,7 +392,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetParentTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -412,7 +411,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -431,7 +430,7 @@ public class MindmapEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

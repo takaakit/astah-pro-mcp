@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNestingLinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationDTO;
@@ -78,21 +77,21 @@ public class StructureDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_node_prst_on_dgm",
-                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation along with the updated diagram image.",
+                "Create a new node presentation of the specified element (specified by ID) on the specified diagram (specified by ID), and return the newly created node presentation along with the updated diagram image in low resolution.",
                 this::createNodePresentation,
                 NewNodePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_prst_on_dgm",
-                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation along with the updated diagram image.",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation along with the updated diagram image in low resolution.",
                 this::createLinkPresentation,
                 NewLinkPresentationDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_nesting_link_prst_on_dgm",
-                "Create a new link presentation that indicates nesting (\"circle-plus\" notation) between the specified parent node presentation (specified by ID) and the specified child node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation along with the updated diagram image. For example, use this tool to draw nested relationships between requirements in a requirements diagram.",
+                "Create a new link presentation that indicates nesting (\"circle-plus\" notation) between the specified parent node presentation (specified by ID) and the specified child node presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation along with the updated diagram image in low resolution. For example, use this tool to draw nested relationships between requirements in a requirements diagram.",
                 this::createNestingLinkPresentation,
                 NewNestingLinkPresentationDTO.class,
                 LinkPresentationDTO.class)
@@ -137,7 +136,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -165,7 +164,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -192,7 +191,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

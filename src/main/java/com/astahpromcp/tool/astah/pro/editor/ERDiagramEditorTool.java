@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationOnERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationOnERDiagramDTO;
@@ -85,21 +84,21 @@ public class ERDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_node_prst_on_er_dgm",
-                "Create a new node presentation of the specified element (specified by ID) on the specified ER diagram (specified by ID), and return the newly created node presentation along with the updated diagram image.",
+                "Create a new node presentation of the specified element (specified by ID) on the specified ER diagram (specified by ID), and return the newly created node presentation along with the updated diagram image in low resolution.",
                 this::createNodePresentation,
                 NewNodePresentationOnERDiagramDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_link_prst_on_er_dgm",
-                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified ER diagram (specified by ID), and return the newly created link presentation along with the updated diagram image.",
+                "Create a new link presentation between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified ER diagram (specified by ID), and return the newly created link presentation along with the updated diagram image in low resolution.",
                 this::createLinkPresentation,
                 NewLinkPresentationOnERDiagramDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_subtype_relationship_group_on_er_dgm",
-                "Create a new node presentation for the group of the shared subtype relationships on the specified ER diagram (specified by ID), and return the newly created node presentation for the group of the subtype relationships along with the updated diagram image.",
+                "Create a new node presentation for the group of the shared subtype relationships on the specified ER diagram (specified by ID), and return the newly created node presentation for the group of the subtype relationships along with the updated diagram image in low resolution.",
                 this::createSubtypeRelationshipGroup,
                 NewSubtypeRelationshipGroupOnERDiagramDTO.class,
                 NodePresentationDTO.class)
@@ -138,7 +137,7 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetERDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -162,7 +161,7 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetERDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -187,7 +186,7 @@ public class ERDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetERDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetERDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

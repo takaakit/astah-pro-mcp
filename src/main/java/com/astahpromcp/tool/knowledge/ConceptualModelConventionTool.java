@@ -24,15 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConceptualModelConventionTool implements ToolProvider {
 
-    private static final int CHUNK_SIZE = 51200; // characters 50KB (50 * 1024)
     private final List<String> contentCache;
     private final Path outputDirectory;
     private final HttpClient httpClient;
 
     public ConceptualModelConventionTool(Path outputDirectory) {
-        this(outputDirectory, HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build());
+        this(outputDirectory, KnowledgeToolSupport.newHttpClient());
     }
 
     public ConceptualModelConventionTool(Path outputDirectory, HttpClient httpClient) {
@@ -96,22 +93,13 @@ public class ConceptualModelConventionTool implements ToolProvider {
         }
 
         String allTextContentString = allTextContent.toString();
-        allTextContentString = allTextContentString.replace("?? Copied!", "");
 
-        String outputFileName = "conceptual_model_conventions.txt";
+        String outputFileName = "conceptual_model_conventions.md";
         Path outputPath = outputDirectory.resolve(outputFileName);
         Files.writeString(outputPath, allTextContentString, StandardCharsets.UTF_8);
         log.info("Conceptual Model Conventions saved to file: {}", outputPath.toAbsolutePath());
 
-        List<String> chunks = KnowledgeToolSupport.splitText(allTextContentString, CHUNK_SIZE);
-        if (chunks.isEmpty()) {
-            chunks.add(""); // Ensure there is at least one empty chunk
-        }
-
-        contentCache.clear();
-        contentCache.addAll(chunks);
-
-        return new DocumentDTO(chunks.size(), chunks.get(0));
+        return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
     private DocumentChunkDTO getConceptualModelConventionChunk(McpSyncServerExchange exchange, ChunkDTO param) {

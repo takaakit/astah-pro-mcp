@@ -6,7 +6,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import java.util.List;
 
 public record ERModelDTO(
-    @JsonPropertyDescription("Package information")
+    @JsonPropertyDescription("Package info")
     PackageDTO pkg,
 
     @JsonPropertyDescription("ER schemata")

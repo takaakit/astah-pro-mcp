@@ -54,7 +54,7 @@ public class StateMachineToolTest {
     }
 
     @Test
-    void getInfo() throws Exception {
+    void getInfo_ok() throws Exception {
         // Get state machine
         IStateMachine stateMachine = (IStateMachine) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachine.class,

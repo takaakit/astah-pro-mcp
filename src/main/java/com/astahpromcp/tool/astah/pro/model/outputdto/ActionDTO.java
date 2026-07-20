@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record ActionDTO(
-    @JsonPropertyDescription("Activity node information")
+    @JsonPropertyDescription("Activity node info")
     ActivityNodeDTO activityNode,
 
     @JsonPropertyDescription("Calling activity")

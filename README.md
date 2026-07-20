@@ -47,9 +47,8 @@ Diagrams created in the videos above: The diagram layouts were manually adjusted
     With over **300** tools exposed in this version, use the AI agents listed below. Other AI agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
     - **Claude Code**
     - **Codex CLI**
+    - **Grok Build**
     - **Antigravity CLI**
-    
-    > *Note:* *Antigravity CLI* may have some teething problems with MCP connections after its recent release.
 
   - For the query-only tool version:
 
@@ -121,6 +120,19 @@ startup_timeout_sec = 10
 ```
 
 
+#### Grok Build
+
+Run this command for project scope in your project directory:
+```bash
+grok mcp add --scope project --transport http astah-pro-mcp http://127.0.0.1:8888/mcp
+```
+
+Or run this command for user scope:
+```bash
+grok mcp add --scope user --transport http astah-pro-mcp http://127.0.0.1:8888/mcp
+```
+
+
 #### Antigravity CLI
 
 Create `.agents/mcp_config.json` under your project directory, or create `~/.gemini/antigravity-cli/mcp_config.json` for user scope.
@@ -129,19 +141,12 @@ Create `.agents/mcp_config.json` under your project directory, or create `~/.gem
 {
   "mcpServers": {
     "astah-pro-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote@latest",
-        "http://127.0.0.1:8888/mcp",
-        "--allow-http"
-      ]
+      "serverUrl": "http://127.0.0.1:8888/mcp"
     }
   }
 }
 ```
 
-> *Note:* As of May 21, 2026, *Streamable HTTP* connections to a local MCP server don't seem to work well in *Antigravity CLI*. Use a bridge such as [*mcp-remote*](https://github.com/geelen/mcp-remote), which requires *Node.js* v20 or later.
 
 <br>
 

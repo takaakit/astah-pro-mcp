@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record ERDiagramDTO(
-    @JsonPropertyDescription("Diagram information")
+    @JsonPropertyDescription("Diagram info")
     DiagramDTO diagram,
 
     @JsonPropertyDescription("Initial Display Level: \"Entity\",\"Primary Key\",\"Attribute\"")

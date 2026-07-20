@@ -49,12 +49,20 @@ public final class LogbackConfig {
         textPaneAppender.setContext(context);
         textPaneAppender.setName("TEXTPANE");
         textPaneAppender.start();
-        
+
         // Configure root logger
         ch.qos.logback.classic.Logger rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.addAppender(fileAppender);
         rootLogger.addAppender(textPaneAppender);
-        rootLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+
+        // Root at INFO
+        rootLogger.setLevel(ch.qos.logback.classic.Level.INFO);
+
+        ch.qos.logback.classic.Logger appLogger = context.getLogger("com.astahpromcp");
+        appLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+
+        ch.qos.logback.classic.Logger mcpLogger = context.getLogger("io.modelcontextprotocol");
+        mcpLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
         
         // Ensure the log directory exists
         try {

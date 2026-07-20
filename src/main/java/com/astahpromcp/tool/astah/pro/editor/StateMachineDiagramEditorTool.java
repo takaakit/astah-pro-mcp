@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
@@ -73,84 +72,84 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "add_region",
-                "Add a new region in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image.",
+                "Add a new region in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image in low resolution.",
                 this::addRegion,
                 NewRegionDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_region",
-                "Delete the specified region (specified by index) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image.",
+                "Delete the specified region (specified by index) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image in low resolution.",
                 this::deleteRegion,
                 DeleteRegionDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_parent_state",
-                "Change the parent state (specified by ID) of the specified state (specified by ID) on the specified state machine diagram (specified by ID), and return the node presentation of the parent-changed state along with the updated diagram image. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
+                "Change the parent state (specified by ID) of the specified state (specified by ID) on the specified state machine diagram (specified by ID), and return the node presentation of the parent-changed state along with the updated diagram image in low resolution. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
                 this::changeParentOfState,
                 ChangeParentStateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_choice_pseudostate",
-                "Create a new choice pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the choice pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new choice pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the choice pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createChoicePseudostate,
                 NewChoicePseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_deep_history_pseudostate",
-                "Create a new deep history pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the deep history pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new deep history pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the deep history pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createDeepHistoryPseudostate,
                 NewDeepHistoryPseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_shallow_history_pseudostate",
-                "Create a new shallow history pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the shallow history pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new shallow history pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the shallow history pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createShallowHistoryPseudostate,
                 NewShallowHistoryPseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_final_state",
-                "Create a new final state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the final state along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new final state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the final state along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createFinalState,
                 NewFinalStateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_fork_pseudostate",
-                "Create a new fork pseudostate of the specified size (specified by width and height) at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the fork pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new fork pseudostate of the specified size (specified by width and height) at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the fork pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createForkPseudostate,
                 NewForkPseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_init_pseudostate",
-                "Create a new initial pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the initial pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new initial pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the initial pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createInitialPseudostate,
                 NewInitialPseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_join_pseudostate",
-                "Create a new join pseudostate of the specified size (specified by width and height) at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the join pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new join pseudostate of the specified size (specified by width and height) at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the join pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createJoinPseudostate,
                 NewJoinPseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_junction_pseudostate",
-                "Create a new junction pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the junction pseudostate along with the updated diagram image. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
+                "Create a new junction pseudostate at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the junction pseudostate along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createJunctionPseudostate,
                 NewJunctionPseudostateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_state",
-                "Create a new state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the state along with the updated diagram image. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
+                "Create a new state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the state along with the updated diagram image in low resolution. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
                 this::createState,
                 NewStateDTO.class,
                 NodePresentationDTO.class),
@@ -164,14 +163,14 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_sub_machine_state",
-                "Create a new sub machine state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the sub machine state along with the updated diagram image.",
+                "Create a new sub machine state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the sub machine state along with the updated diagram image in low resolution.",
                 this::createSubMachineState,
                 NewSubMachineStateDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_transition",
-                "Create a new transition between the specified source state (specified by ID) and the specified target state (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created link presentation of the transition along with the updated diagram image.",
+                "Create a new transition between the specified source state (specified by ID) and the specified target state (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created link presentation of the transition along with the updated diagram image in low resolution.",
                 this::createTransition,
                 NewTransitionDTO.class,
                 LinkPresentationDTO.class)
@@ -194,7 +193,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -215,7 +214,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -243,7 +242,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -272,7 +271,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahChoicePseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -301,7 +300,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahDeepHistoryPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -330,7 +329,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahShallowHistoryPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -359,7 +358,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFinalState);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -390,7 +389,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahForkPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -419,7 +418,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahInitialPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -450,7 +449,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJoinPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -479,7 +478,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJunctionPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -509,7 +508,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahState);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -548,7 +547,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -570,7 +569,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record ERSchemaDTO(
-    @JsonPropertyDescription("ER package information")
+    @JsonPropertyDescription("ER package info")
     ERPackageDTO erPackage,
 
     @JsonPropertyDescription("ER domains")

@@ -5,11 +5,11 @@
 		<bundle.symbolicName>com.astahpromcp.astah-pro-mcp</bundle.symbolicName>
 		<bundle.namespace>com.astahpromcp</bundle.namespace>
 		<plugin.install>true</plugin.install>
-		<astah.version>11.0</astah.version>
+		<astah.version>12.0</astah.version>
 		<astah.edition>pro</astah.edition>
-		<maven.compiler.source>21</maven.compiler.source>
-		<maven.compiler.target>21</maven.compiler.target>
-		<maven.compiler.release>21</maven.compiler.release>
+		<maven.compiler.source>25</maven.compiler.source>
+		<maven.compiler.target>25</maven.compiler.target>
+		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<lombok.version>1.18.46</lombok.version>
@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.astahpromcp</groupId>
 	<artifactId>astah-pro-mcp</artifactId>
-	<version>0.2.6</version>
+	<version>0.2.7</version>
 	<packaging>bundle</packaging>
 	<name>Astah Pro MCP</name>
 	<description>MCP server for Astah professional</description>
@@ -73,9 +73,9 @@
 				<version>3.14.1</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<source>21</source>
-					<target>21</target>
-					<release>21</release>
+					<source>25</source>
+					<target>25</target>
+					<release>25</release>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
@@ -125,6 +125,7 @@
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<Embed-Dependency>*;scope=compile|runtime;type=!pom</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+						<_noee>true</_noee>  <!-- Java 25 class files are unknown to the bundled bnd; do not generate an osgi.ee requirement -->
 					</instructions>
 				</configuration>
 			</plugin>
@@ -183,15 +184,9 @@
 			<scope>test</scope>
 		</dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>6.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>12.1.8</version>
+            <version>12.1.10</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.ee10</groupId>
@@ -254,14 +249,19 @@
             <version>3.0.4</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.7</version>
+            <groupId>org.opendataloader</groupId>
+            <artifactId>opendataloader-pdf-core</artifactId>
+            <version>2.4.7</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.22.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-html2md-converter</artifactId>
+            <version>0.64.8</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.plantuml</groupId>

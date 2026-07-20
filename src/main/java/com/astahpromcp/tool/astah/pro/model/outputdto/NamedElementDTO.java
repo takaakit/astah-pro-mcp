@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record NamedElementDTO(
-        @JsonPropertyDescription("Element information")
+        @JsonPropertyDescription("Element info")
         ElementDTO element,
 
         @JsonPropertyDescription("Element type")

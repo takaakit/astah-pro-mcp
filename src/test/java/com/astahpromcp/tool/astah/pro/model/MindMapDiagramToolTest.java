@@ -56,7 +56,7 @@ public class MindMapDiagramToolTest {
     }
 
     @Test
-    void getInfo() throws Exception {
+    void getInfo_ok() throws Exception {
         // Get mind map diagram
         IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,

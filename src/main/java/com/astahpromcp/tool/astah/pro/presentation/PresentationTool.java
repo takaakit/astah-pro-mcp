@@ -4,7 +4,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
@@ -76,28 +75,28 @@ public class PresentationTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_label",
-                "Set the label of the specified presentation (specified by ID), and return the presentation after it is set along with the updated diagram image. Note that escape sequences such as \\n cannot be used in labels, but actual newline characters (Unicode U+000A, embedded directly in the string) are supported.",
+                "Set the label of the specified presentation (specified by ID), and return the presentation after it is set along with the updated diagram image in low resolution. Note that escape sequences such as \\n cannot be used in labels, but actual newline characters (Unicode U+000A, embedded directly in the string) are supported.",
                 this::setLabel,
                 PresentationWithLabelDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_fill_color",
-                "Change the fill color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image.",
+                "Change the fill color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image in low resolution.",
                 this::changeFillColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_line_color",
-                "Change the line color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image.",
+                "Change the line color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image in low resolution.",
                 this::changeLineColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_font_color",
-                "Change the font color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image.",
+                "Change the font color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image in low resolution.",
                 this::changeFontColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class)
@@ -129,7 +128,7 @@ public class PresentationTool implements ToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -145,7 +144,7 @@ public class PresentationTool implements ToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -161,7 +160,7 @@ public class PresentationTool implements ToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -177,7 +176,7 @@ public class PresentationTool implements ToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(astahPresentation.getDiagram().getId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
 
         return Pair.of(dto, List.of(image));
     }

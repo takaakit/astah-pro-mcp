@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 // Utility methods for building tool schemas and handlers
 @Slf4j
@@ -83,9 +84,17 @@ public final class ToolSupport {
 
         try {
             INPUT_DTO inputDto = parsed.dto();
-            log.debug("Tool input of {}: \n{}", toolName, ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE));
+            log.atDebug()
+                    .setMessage("Tool input of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
+                    .log();
             OUTPUT_DTO outputDto = function.apply(exchange, inputDto);
-            log.debug("Tool output of {}: \n{}", toolName, ReflectionToStringBuilder.toString(outputDto, ToStringStyle.MULTI_LINE_STYLE));
+            log.atDebug()
+                    .setMessage("Tool output of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> ReflectionToStringBuilder.toString(outputDto, ToStringStyle.MULTI_LINE_STYLE))
+                    .log();
             if (outputDto == null) {
                 String msg = String.format("Failure @tool=%s", toolName);
                 log.error(msg);
@@ -163,9 +172,17 @@ public final class ToolSupport {
 
         try {
             INPUT_DTO inputDto = parsed.dto();
-            log.debug("Tool input of {}: \n{}", toolName, ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE));
+            log.atDebug()
+                    .setMessage("Tool input of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
+                    .log();
             List<McpSchema.Content> contents = function.apply(exchange, inputDto);
-            log.debug("Tool output of {}: \n{}", toolName, contents);
+            log.atDebug()
+                    .setMessage("Tool output of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> summarizeContents(contents))
+                    .log();
             if (contents == null) {
                 String msg = String.format("Failure @tool=%s", toolName);
                 log.error(msg);
@@ -181,7 +198,19 @@ public final class ToolSupport {
         }
     }
 
-    // ----------
+    // Summarize contents for debug logging
+    static String summarizeContents(List<McpSchema.Content> contents) {
+        if (contents == null) {
+            return "null";
+        }
+
+        return contents.stream()
+                .map(content -> content instanceof McpSchema.ImageContent image
+                        ? String.format("ImageContent(mimeType=%s, base64 %d chars)",
+                                image.mimeType(), image.data() == null ? 0 : image.data().length())
+                        : String.valueOf(content))
+                .collect(Collectors.joining(",\n", "[", "]"));
+    }
 
     // Tool function returning DTO and contents
     @FunctionalInterface
@@ -244,7 +273,11 @@ public final class ToolSupport {
 
         try {
             INPUT_DTO inputDto = parsed.dto();
-            log.debug("Tool input of {}: \n{}", toolName, ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE));
+            log.atDebug()
+                    .setMessage("Tool input of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
+                    .log();
             Pair<OUTPUT_DTO, List<McpSchema.Content>> result = function.apply(exchange, inputDto);
             if (result == null || result.getLeft() == null) {
                 String msg = String.format("Failure @tool=%s", toolName);
@@ -254,8 +287,16 @@ public final class ToolSupport {
 
             OUTPUT_DTO outputDto = result.getLeft();
             List<McpSchema.Content> contents = result.getRight();
-            log.debug("Tool output DTO of {}: \n{}", toolName, ReflectionToStringBuilder.toString(outputDto, ToStringStyle.MULTI_LINE_STYLE));
-            log.debug("Tool output contents of {}: \n{}", toolName, contents);
+            log.atDebug()
+                    .setMessage("Tool output DTO of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> ReflectionToStringBuilder.toString(outputDto, ToStringStyle.MULTI_LINE_STYLE))
+                    .log();
+            log.atDebug()
+                    .setMessage("Tool output contents of {}: \n{}")
+                    .addArgument(toolName)
+                    .addArgument(() -> summarizeContents(contents))
+                    .log();
 
             return ResponseSupport.success(outputDto, contents);
 

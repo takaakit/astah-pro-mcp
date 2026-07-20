@@ -25,7 +25,6 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,7 +58,7 @@ public class MindmapEditorToolTest {
         MindmapEditor mindmapEditor = projectAccessor.getDiagramEditorFactory().getMindmapEditor();
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

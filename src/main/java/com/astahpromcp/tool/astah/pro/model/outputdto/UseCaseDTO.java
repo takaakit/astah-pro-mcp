@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record UseCaseDTO(
-    @JsonPropertyDescription("Class information")
+    @JsonPropertyDescription("Class info")
     @JsonProperty("class")
     ClassDTO class_,   // For avoiding Java keyword collision
 

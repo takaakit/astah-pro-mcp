@@ -4,8 +4,8 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport.RasterizedSvgImage;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
-import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
@@ -36,13 +36,17 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/DiagramEditor.html
 @Slf4j
 public class DiagramEditorTool implements ToolProvider {
+
+    private static final double SVG_IMAGE_RASTERIZATION_SCALE = 4.0;
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
@@ -86,35 +90,35 @@ public class DiagramEditorTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_svg_img_on_dgm",
-                "Insert an SVG image (specified by SVG code) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image.",
+                "Insert an SVG image (specified by SVG code) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image in low resolution.",
                 this::insertSvgImage,
                 NewSvgImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_png_img_on_dgm",
-                "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image. When specifying a local image file, use the 'file:///' protocol.",
+                "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image in low resolution. When specifying a local image file, use the 'file:///' protocol.",
                 this::insertPngImage,
                 NewPngImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_jpg_img_on_dgm",
-                "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image. When specifying a local image file, use the 'file:///' protocol.",
+                "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image in low resolution. When specifying a local image file, use the 'file:///' protocol.",
                 this::insertJpgImage,
                 NewJpgImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_rect_on_dgm",
-                "Insert a rectangle on the specified diagram (specified by ID), and return the newly created rectangle presentation along with the updated diagram image. For example, use this tool when you want to draw a system boundary on a use case diagram.",
+                "Insert a rectangle on the specified diagram (specified by ID), and return the newly created rectangle presentation along with the updated diagram image in low resolution. For example, use this tool when you want to draw a system boundary on a use case diagram.",
                 this::insertRect,
                 NewRectDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_txt_on_dgm",
-                "Insert a text at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created node presentation of the text along with the updated diagram image.",
+                "Insert a text at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the newly created node presentation of the text along with the updated diagram image in low resolution.",
                 this::insertText,
                 NewTextWithPointDTO.class,
                 NodePresentationDTO.class),
@@ -128,7 +132,7 @@ public class DiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_prst",
-                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation along with the updated diagram image. Note that deleting a presentation does not delete the corresponding element.",
+                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation along with the updated diagram image in low resolution. Note that deleting a presentation does not delete the corresponding element.",
                 this::deletePresentation,
                 DeletePresentationDTO.class,
                 PresentationDTO.class)
@@ -144,31 +148,74 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
 
-        Image image = imageConvertSupport.svgToImage(param.imageSvgCode());
-
-        txnAstah.run( () -> {
-            // Note: The return value of createImage() is null (likely due to an API bug), so the return value cannot be used.
-            diagramEditor.createImage(
+        RasterizedSvgImage svgImage = imageConvertSupport.svgToRasterizedImage(
+                param.imageSvgCode(),
+                SVG_IMAGE_RASTERIZATION_SCALE);
+        Image image = svgImage.image();
+        INodePresentation astahImagePresentation = createImagePresentation(
+                astahDiagram,
+                diagramEditor,
                 image,
-                new Point2D.Double(
-                        param.locationX(),
-                        param.locationY()));
-        });
+                param.locationX(),
+                param.locationY(),
+                svgImage.displayWidth(),
+                svgImage.displayHeight());
 
-        RectangleDTO dto = new RectangleDTO(
-            param.locationX(),
-            param.locationY(),
-            image.getWidth(null),
-            image.getHeight(null));
+        RectangleDTO dto = RectangleDTOAssembler.toDTO(astahImagePresentation.getRectangle());
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(diagramImage));
+    }
+
+    private INodePresentation createImagePresentation(IDiagram astahDiagram, DiagramEditor diagramEditor, Image image, double locationX, double locationY, int displayWidth, int displayHeight) throws Exception {
+
+        Set<String> beforePresentationIds = presentationIds(astahDiagram);
+
+        return txnAstah.call( () -> {
+            // Note: The return value of createImage() is null, so the newly created presentation is identified by diffing the diagram's presentation IDs.
+            INodePresentation createdPresentation = diagramEditor.createImage(
+                    image,
+                    new Point2D.Double(locationX, locationY));
+
+            INodePresentation imagePresentation = createdPresentation != null ? createdPresentation : findNewNodePresentation(astahDiagram, beforePresentationIds);
+            if (imagePresentation == null) {
+                throw new RuntimeException("Failed to identify the created image presentation.");
+            }
+
+            imagePresentation.setWidth(displayWidth);
+            imagePresentation.setHeight(displayHeight);
+
+            return imagePresentation;
+        });
+    }
+
+    private Set<String> presentationIds(IDiagram astahDiagram) throws Exception {
+        Set<String> ids = new HashSet<>();
+        for (IPresentation presentation : astahDiagram.getPresentations()) {
+            ids.add(presentation.getID());
+        }
+
+        return ids;
+    }
+
+    private INodePresentation findNewNodePresentation(IDiagram astahDiagram, Set<String> beforePresentationIds) throws Exception {
+
+        for (IPresentation presentation : astahDiagram.getPresentations()) {
+            if (beforePresentationIds.contains(presentation.getID())) {
+                continue;
+            }
+            if (presentation instanceof INodePresentation nodePresentation) {
+                return nodePresentation;
+            }
+        }
+
+        return null;
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> insertPngImage(McpSyncServerExchange exchange, NewPngImageWithPointDTO param) throws Exception {
@@ -180,7 +227,7 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
@@ -202,7 +249,7 @@ public class DiagramEditorTool implements ToolProvider {
             image.getWidth(null),
             image.getHeight(null));
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(diagramImage));
     }
@@ -216,7 +263,7 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
@@ -238,7 +285,7 @@ public class DiagramEditorTool implements ToolProvider {
             image.getWidth(null),
             image.getHeight(null));
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(diagramImage));
     }
@@ -252,7 +299,7 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
@@ -268,7 +315,7 @@ public class DiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -282,7 +329,7 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
@@ -297,7 +344,7 @@ public class DiagramEditorTool implements ToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(dto, List.of(image));
     }
@@ -314,7 +361,7 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
@@ -340,7 +387,7 @@ public class DiagramEditorTool implements ToolProvider {
         try {
             diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.");
+            throw new RuntimeException("Failed to get diagram editor.", e);
         }
 
         diagramEditor.setDiagram(astahDiagram);
@@ -349,7 +396,7 @@ public class DiagramEditorTool implements ToolProvider {
             diagramEditor.deletePresentation(astahPresentation);
         });
 
-        McpSchema.ImageContent image = imageCaptureSupport.createImageContent(param.targetDiagramId(), ImageRegion.FULL);
+        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 
         return Pair.of(presentationDTO, List.of(image));
     }

@@ -13,9 +13,6 @@ public record NewNonIdentifyingRelationshipDTO(
     String newRelationshipLogicalName,
 
     @JsonPropertyDescription("New relationship physical name")
-    String newRelationshipPhysicalName,
-
-    @JsonPropertyDescription("ER index identifier (optional)")
-    String erIndexId
+    String newRelationshipPhysicalName
 ) {
 }

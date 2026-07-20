@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,7 +45,7 @@ public class LinkPresentationToolTest {
         projectAccessor.open("src/test/resources/modelfile/presentation/LinkPresentationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -111,7 +110,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void getInfo_lineStyle_ok() throws Exception {
+    void getInfo_ok_lineStyle() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -138,7 +137,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void getInfo_lineRightAngleStyle_ok() throws Exception {
+    void getInfo_ok_lineRightAngleStyle() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -165,7 +164,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void getInfo_curveStyle_ok() throws Exception {
+    void getInfo_ok_curveStyle() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -192,7 +191,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void getInfo_curveRightAngleStyle_ok() throws Exception {
+    void getInfo_ok_curveRightAngleStyle() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -261,7 +260,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void setLineStyle_lineToCurve_ok() throws Exception {
+    void setLineStyle_ok_lineToCurve() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -293,7 +292,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void setLineStyle_curveToLineRightAngle_ok() throws Exception {
+    void setLineStyle_ok_curveToLineRightAngle() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -325,7 +324,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void setLineStyle_lineRightAngleToCurveRightAngle_ok() throws Exception {
+    void setLineStyle_ok_lineRightAngleToCurveRightAngle() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
@@ -357,7 +356,7 @@ public class LinkPresentationToolTest {
     }
 
     @Test
-    void setLineStyle_curveRightAngleToLine_ok() throws Exception {
+    void setLineStyle_ok_curveRightAngleToLine() throws Exception {
         // Get link presentation
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",

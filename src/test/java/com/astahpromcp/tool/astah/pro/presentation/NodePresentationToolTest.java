@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,7 +44,7 @@ public class NodePresentationToolTest {
         projectAccessor.open("src/test/resources/modelfile/presentation/NodePresentationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createImageContent(anyString(), any()))
+        when(imageCaptureSupport.createSmallImageContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

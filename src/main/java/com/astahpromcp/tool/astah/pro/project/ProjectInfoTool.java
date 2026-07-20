@@ -27,17 +27,22 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ProjectInfoTool implements ToolProvider {
 
     private static final int CHUNK_SIZE = 400;
+    private static final long CHUNK_CACHE_TTL_NANOS = TimeUnit.SECONDS.toNanos(180);
 
     private final ProjectAccessor projectAccessor;
     private final AstahProToolSupport astahProToolSupport;
     private final List<List<NameIdTypeDTO>> nameIdTypeDTOChunksCache;
     private final List<List<LabelIdTypeDTO>> labelIdTypeDTOChunksCache;
     private final List<List<DefinitionNameIdTypeDTO>> definitionNameIdTypeDTOChunksCache;
+    private long nameIdTypeDTOChunksCacheUpdatedAtNanos = -1L;
+    private long labelIdTypeDTOChunksCacheUpdatedAtNanos = -1L;
+    private long definitionNameIdTypeDTOChunksCacheUpdatedAtNanos = -1L;
     private final Object nameCacheLock = new Object();
     private final Object labelCacheLock = new Object();
     private final Object definitionCacheLock = new Object();
@@ -135,14 +140,14 @@ public class ProjectInfoTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "search_within_named_elements",
-                "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope.",
+                "Search for the specified string within the name and definition (the element's description field) of named elements using partial matching. The search is case-insensitive. Note that presentations are excluded from the search scope. Specify an empty string as the search string to target all named elements.",
                 this::searchWithinNamedElements,
                 SearchDTO.class,
                 NameIdTypeDefinitionListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "search_within_prsts",
-                "Search for the specified string within the label of presentations using partial matching. The search is case-insensitive. Note that named elements are excluded from the search scope. For example, if you want to search for the specified string within note contents, use this tool.",
+                "Search for the specified string within the label of presentations using partial matching. The search is case-insensitive. Note that named elements are excluded from the search scope. For example, if you want to search for the specified string within note contents, use this tool. Specify an empty string as the search string to target all presentations.",
                 this::searchWithinPresentations,
                 SearchDTO.class,
                 LabelIdTypeListDTO.class),
@@ -208,6 +213,7 @@ public class ProjectInfoTool implements ToolProvider {
         synchronized (nameCacheLock) {
             nameIdTypeDTOChunksCache.clear();
             nameIdTypeDTOChunksCache.addAll(newCache);
+            nameIdTypeDTOChunksCacheUpdatedAtNanos = System.nanoTime();
             totalChunks = nameIdTypeDTOChunksCache.size();
             firstChunk = nameIdTypeDTOChunksCache.get(0);
         }
@@ -221,6 +227,12 @@ public class ProjectInfoTool implements ToolProvider {
         int chunkIndex = param.chunkIndex();
         List<NameIdTypeDTO> chunk;
         synchronized (nameCacheLock) {
+            if (nameIdTypeDTOChunksCacheUpdatedAtNanos < 0) {
+                throw new RuntimeException("Chunk cache is not initialized. Call get_info_of_all_named_elements first, then call get_chunk_of_all_named_elements.");
+            }
+            if (System.nanoTime() - nameIdTypeDTOChunksCacheUpdatedAtNanos >= CHUNK_CACHE_TTL_NANOS) {
+                throw new RuntimeException("The cached chunk data was generated 180 or more seconds ago. The Astah model may have been updated. Call get_info_of_all_named_elements again, then call get_chunk_of_all_named_elements.");
+            }
             if (chunkIndex < 0 || chunkIndex >= nameIdTypeDTOChunksCache.size()) {
                 throw new RuntimeException("Invalid chunk index: " + chunkIndex);
             }
@@ -257,6 +269,7 @@ public class ProjectInfoTool implements ToolProvider {
         synchronized (definitionCacheLock) {
             definitionNameIdTypeDTOChunksCache.clear();
             definitionNameIdTypeDTOChunksCache.addAll(newCache);
+            definitionNameIdTypeDTOChunksCacheUpdatedAtNanos = System.nanoTime();
             totalChunks = definitionNameIdTypeDTOChunksCache.size();
             firstChunk = definitionNameIdTypeDTOChunksCache.get(0);
         }
@@ -270,6 +283,12 @@ public class ProjectInfoTool implements ToolProvider {
         int chunkIndex = param.chunkIndex();
         List<DefinitionNameIdTypeDTO> chunk;
         synchronized (definitionCacheLock) {
+            if (definitionNameIdTypeDTOChunksCacheUpdatedAtNanos < 0) {
+                throw new RuntimeException("Chunk cache is not initialized. Call get_info_of_all_definitions first, then call get_chunk_of_all_definitions.");
+            }
+            if (System.nanoTime() - definitionNameIdTypeDTOChunksCacheUpdatedAtNanos >= CHUNK_CACHE_TTL_NANOS) {
+                throw new RuntimeException("The cached chunk data was generated 180 or more seconds ago. The Astah model may have been updated. Call get_info_of_all_definitions again, then call get_chunk_of_all_definitions.");
+            }
             if (chunkIndex < 0 || chunkIndex >= definitionNameIdTypeDTOChunksCache.size()) {
                 throw new RuntimeException("Invalid chunk index: " + chunkIndex);
             }
@@ -311,6 +330,7 @@ public class ProjectInfoTool implements ToolProvider {
         synchronized (labelCacheLock) {
             labelIdTypeDTOChunksCache.clear();
             labelIdTypeDTOChunksCache.addAll(newCache);
+            labelIdTypeDTOChunksCacheUpdatedAtNanos = System.nanoTime();
             totalChunks = labelIdTypeDTOChunksCache.size();
             firstChunk = labelIdTypeDTOChunksCache.get(0);
         }
@@ -324,6 +344,12 @@ public class ProjectInfoTool implements ToolProvider {
         int chunkIndex = param.chunkIndex();
         List<LabelIdTypeDTO> chunk;
         synchronized (labelCacheLock) {
+            if (labelIdTypeDTOChunksCacheUpdatedAtNanos < 0) {
+                throw new RuntimeException("Chunk cache is not initialized. Call get_info_of_all_prsts first, then call get_chunk_of_all_prsts.");
+            }
+            if (System.nanoTime() - labelIdTypeDTOChunksCacheUpdatedAtNanos >= CHUNK_CACHE_TTL_NANOS) {
+                throw new RuntimeException("The cached chunk data was generated 180 or more seconds ago. The Astah model may have been updated. Call get_info_of_all_prsts again, then call get_chunk_of_all_prsts.");
+            }
             if (chunkIndex < 0 || chunkIndex >= labelIdTypeDTOChunksCache.size()) {
                 throw new RuntimeException("Invalid chunk index: " + chunkIndex);
             }
@@ -637,15 +663,16 @@ public class ProjectInfoTool implements ToolProvider {
     private NameIdTypeDefinitionListDTO searchWithinNamedElements(McpSyncServerExchange exchange, SearchDTO param) throws Exception {
         log.debug("Search within named elements: {}", param);
 
-        if (param.searchString() == null || param.searchString().isEmpty()) {
-            throw new RuntimeException("Search string is empty");
-        }
+        // An empty search string targets all named elements
+        String searchString = param.searchString() == null ? "" : param.searchString();
+        boolean matchAll = searchString.isEmpty();
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
         List<NameIdTypeDefinitionDTO> nameIdTypeDefinitionDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
-            if (Strings.CI.containsAny(astahNamedElement.getName(), param.searchString())
-                || Strings.CI.containsAny(astahNamedElement.getDefinition(), param.searchString())) {
+            if (matchAll
+                || Strings.CI.containsAny(astahNamedElement.getName(), searchString)
+                || Strings.CI.containsAny(astahNamedElement.getDefinition(), searchString)) {
                 nameIdTypeDefinitionDTOs.add(NameIdTypeDefinitionDTOAssembler.toDTO(astahNamedElement));
             }
         }
@@ -656,16 +683,17 @@ public class ProjectInfoTool implements ToolProvider {
     private LabelIdTypeListDTO searchWithinPresentations(McpSyncServerExchange exchange, SearchDTO param) throws Exception {
         log.debug("Search within presentations: {}", param);
 
-        if (param.searchString() == null || param.searchString().isEmpty()) {
-            throw new RuntimeException("Search string is empty");
-        }
+        // An empty search string targets all presentations
+        String searchString = param.searchString() == null ? "" : param.searchString();
+        boolean matchAll = searchString.isEmpty();
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(IDiagram.class);
         List<LabelIdTypeDTO> labelIdTypeDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
             IDiagram astahDiagram = (IDiagram) astahNamedElement;
             for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
-                if (Strings.CI.containsAny(astahPresentation.getLabel(), param.searchString())) {
+                if (matchAll
+                    || Strings.CI.containsAny(astahPresentation.getLabel(), searchString)) {
                     labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
                 }
             }

@@ -29,8 +29,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 // MCP server exposing tools over Streamable HTTP.
 @Slf4j
@@ -59,75 +57,8 @@ public final class McpServerApp {
         }
     }
         
-    // Holds client session metadata.
-    public static class ClientSession {
-
-        private final String sessionId;
-        private final String clientAddress;
-        private final String userAgent;
-        private final long connectedAt;
-        
-        public ClientSession(String sessionId, String clientAddress, String userAgent) {
-            this.sessionId = sessionId;
-            this.clientAddress = clientAddress;
-            this.userAgent = userAgent;
-            this.connectedAt = System.currentTimeMillis();
-        }
-        
-        public String getSessionId() {
-            return sessionId;
-        }
-        
-        public String getClientAddress() {
-            return clientAddress;
-        }
-        
-        public String getUserAgent() {
-            return userAgent;
-        }
-        
-        public long getConnectedAt() {
-            return connectedAt;
-        }
-        
-        public long getConnectionDuration() {
-            return System.currentTimeMillis() - connectedAt;
-        }
-        
-        @Override
-        public String toString() {
-            return String.format("ClientSession{sessionId='%s', clientAddress='%s', userAgent='%s', connectedAt=%d}", 
-                    sessionId, clientAddress, userAgent, connectedAt);
-        }
-    }
-    
-    // Handles client disconnect events.
-    public static class ClientDisconnectHandler {
-
-        private McpServerApp serverApp;
-        
-        public void setServerApp(McpServerApp serverApp) {
-            this.serverApp = serverApp;
-        }
-        
-        public void handleClientDisconnect(String sessionId, String reason) {
-            if (serverApp != null) {
-                serverApp.terminateClientSession(sessionId, reason);
-            }
-        }
-        
-        public void registerClientSession(String sessionId, String clientAddress, String userAgent) {
-            if (serverApp != null) {
-                serverApp.registerClientSession(sessionId, clientAddress, userAgent);
-            }
-        }
-    }
-
     private File workspaceDir;
-    
-    // Manage client sessions
-    private final ConcurrentHashMap<String, ClientSession> activeSessions = new ConcurrentHashMap<>();
-    private final AtomicReference<ClientDisconnectHandler> disconnectHandler = new AtomicReference<>();
+
     private final List<ServerInstance> serverInstances = new ArrayList<>();
 
     public void start() throws Exception {
@@ -137,13 +68,8 @@ public final class McpServerApp {
             log.info("Creating workspace directory...");
             createWorkspaceDirectory();
 
-            log.info("Configure client disconnect handler");
-            ClientDisconnectHandler handler = new ClientDisconnectHandler();
-            handler.setServerApp(this);
-            disconnectHandler.set(handler);
-            
             log.info("Start MCP profiles");
-            startProfiles(handler);
+            startProfiles();
 
             log.info("=== MCP SERVER STARTED SUCCESSFULLY ===");
 
@@ -159,7 +85,7 @@ public final class McpServerApp {
     }
 
     // Start the MCP profiles
-    private void startProfiles(ClientDisconnectHandler handler) throws Exception {
+    private void startProfiles() throws Exception {
         List<ServerProfileConfig> profiles = List.of(
                 new ServerProfileConfig(
                     "full",
@@ -173,7 +99,7 @@ public final class McpServerApp {
 
         try {
             for (ServerProfileConfig profile : profiles) {
-                serverInstances.add(startServerInstance(profile, handler));
+                serverInstances.add(startServerInstance(profile));
             }
             
         } catch (Exception e) {
@@ -184,8 +110,7 @@ public final class McpServerApp {
     }
 
     // Start a server instance for a given profile
-    private ServerInstance startServerInstance(ServerProfileConfig profile,
-                                               ClientDisconnectHandler handler) throws Exception {
+    private ServerInstance startServerInstance(ServerProfileConfig profile) throws Exception {
 
         log.info("Initialize MCP profile '{}' on port {} (includeEditorTools={})",
                 profile.name(), profile.port(), profile.includeEditorTools());
@@ -203,7 +128,7 @@ public final class McpServerApp {
         McpSyncServer mcpSyncServer = buildMcpServer(transport, providers);
 
         // Create the servlet
-        McpClientApprovalServlet approvalServlet = new McpClientApprovalServlet(transport, handler);
+        McpClientApprovalServlet approvalServlet = new McpClientApprovalServlet(transport);
 
         // Create the Jetty server
         Server jettyServer = createJettyServer(McpServerConfig.HOST, profile.port(), approvalServlet);
@@ -327,6 +252,8 @@ public final class McpServerApp {
 
         log.info("Add transport servlet");
         ServletHolder holder = new ServletHolder(approvalServlet);
+        // The delegate transport requires async support (@WebServlet(asyncSupported = true)); embedded Jetty already defaults to true, this just makes the requirement explicit
+        holder.setAsyncSupported(true);
         context.addServlet(holder, "/mcp");
 
         return server;
@@ -352,33 +279,6 @@ public final class McpServerApp {
             log.warn("Failed to load project properties, returning empty string for key: {}", key, e);
         }
         return "";
-    }
-
-    // Register a client session.
-    public void registerClientSession(String sessionId, String clientAddress, String userAgent) {
-        ClientSession session = new ClientSession(sessionId, clientAddress, userAgent);
-        activeSessions.put(sessionId, session);
-        log.info("Registered client session: {} from {}", sessionId, clientAddress);
-    }
-    
-    // Terminate a client session and perform clean-up.
-    public void terminateClientSession(String sessionId, String reason) {
-        ClientSession session = activeSessions.remove(sessionId);
-        if (session != null) {
-            log.info("Terminate client session: '{}' (reason={})", sessionId, reason);
-        } else {
-            log.warn("Attempted to terminate non-existent session '{}'", sessionId);
-        }
-    }
-    
-    // Retrieve the number of active sessions.
-    public int getActiveSessionCount() {
-        return activeSessions.size();
-    }
-    
-    // Retrieve all active sessions.
-    public java.util.Collection<ClientSession> getActiveSessions() {
-        return new java.util.ArrayList<>(activeSessions.values());
     }
 
     // Send a shutdown notification to MCP clients when the MCP server stops.

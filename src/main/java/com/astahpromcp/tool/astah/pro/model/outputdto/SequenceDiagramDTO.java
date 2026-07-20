@@ -4,7 +4,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record SequenceDiagramDTO(
-    @JsonPropertyDescription("Diagram information")
+    @JsonPropertyDescription("Diagram info")
     DiagramDTO diagram,
 
     @JsonPropertyDescription("Interaction")

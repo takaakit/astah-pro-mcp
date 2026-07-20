@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record StateDTO(
-    @JsonPropertyDescription("Vertex information")
+    @JsonPropertyDescription("Vertex info")
     VertexDTO vertex,
 
     @JsonPropertyDescription("Entry")

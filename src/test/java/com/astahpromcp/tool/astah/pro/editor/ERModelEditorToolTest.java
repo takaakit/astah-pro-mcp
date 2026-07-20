@@ -380,8 +380,7 @@ public class ERModelEditorToolTest {
             parentEREntity.getId(),
             childEREntity.getId(),
             "TestIdentifyingRelationship",
-            "test_identifying_relationship",
-            null);
+            "test_identifying_relationship");
 
         // ----------------------------------------
         // Call createIdentifyingRelationship()
@@ -422,8 +421,7 @@ public class ERModelEditorToolTest {
             parentEREntity.getId(),
             childEREntity.getId(),
             "TestNonIdentifyingRelationship",
-            "test_non_identifying_relationship",
-            null);
+            "test_non_identifying_relationship");
 
         // ----------------------------------------
         // Call createNonIdentifyingRelationship()

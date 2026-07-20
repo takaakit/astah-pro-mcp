@@ -54,7 +54,7 @@ public class AstahScriptToolTest {
     }
 
     @Test
-    void runScript_print_ok() throws Exception {
+    void runScript_ok_print() throws Exception {
         // Create input DTO
         RunScriptDTO inputDTO = new RunScriptDTO("print('hello from script');");
 
@@ -75,7 +75,7 @@ public class AstahScriptToolTest {
     }
 
     @Test
-    void runScript_lastExpressionValue_ok() throws Exception {
+    void runScript_ok_lastExpressionValue() throws Exception {
         // Create input DTO
         RunScriptDTO inputDTO = new RunScriptDTO("1 + 2");
 
@@ -95,7 +95,7 @@ public class AstahScriptToolTest {
     }
 
     @Test
-    void runScript_astahBinding_ok() throws Exception {
+    void runScript_ok_astahBinding() throws Exception {
         // Create input DTO
         RunScriptDTO inputDTO = new RunScriptDTO("astah.getProject().getName()");
 
@@ -115,7 +115,7 @@ public class AstahScriptToolTest {
     }
 
     @Test
-    void runScript_editModel_ok() throws Exception {
+    void runScript_ok_editModel() throws Exception {
         // Create input DTO
         String script = """
             var TransactionManager = Java.type('com.change_vision.jude.api.inf.editor.TransactionManager');
@@ -151,7 +151,7 @@ public class AstahScriptToolTest {
     }
 
     @Test
-    void runScript_syntaxError_reported() throws Exception {
+    void runScript_ng_syntaxErrorReported() throws Exception {
         // Create input DTO
         RunScriptDTO inputDTO = new RunScriptDTO("var ;");
 
@@ -172,7 +172,7 @@ public class AstahScriptToolTest {
     }
 
     @Test
-    void runScript_danglingTransaction_aborted() throws Exception {
+    void runScript_ng_danglingTransactionAborted() throws Exception {
         // Create input DTO
         String script = """
             var TransactionManager = Java.type('com.change_vision.jude.api.inf.editor.TransactionManager');

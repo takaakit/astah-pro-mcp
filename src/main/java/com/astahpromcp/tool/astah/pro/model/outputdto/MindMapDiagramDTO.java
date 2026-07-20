@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record MindMapDiagramDTO(
-    @JsonPropertyDescription("Diagram information")
+    @JsonPropertyDescription("Diagram info")
     DiagramDTO diagram,
 
     @JsonPropertyDescription("Root topic")
