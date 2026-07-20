@@ -39,7 +39,7 @@ Diagrams created in the videos above: The diagram layouts were manually adjusted
 
 ## Requirements
 
-- **Astah Pro v11.0 or later**
+- **Astah Pro v12.0 or later**
 
 - AI agents
   - For the full (query + edit) tool version:
