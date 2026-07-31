@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -54,7 +53,7 @@ public class SystemsEngineeringKnowledgeTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getSystemsEngineeringKnowledge(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getSystemsEngineeringKnowledge(NoInputDTO param) throws IOException {
         log.debug("Get Systems Engineering knowledge: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -79,7 +78,7 @@ public class SystemsEngineeringKnowledgeTool implements ToolProvider {
         }
     }
 
-    private DocumentChunkDTO getSystemsEngineeringKnowledgeChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getSystemsEngineeringKnowledgeChunk(ChunkDTO param) {
         log.debug("Get Systems Engineering knowledge chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

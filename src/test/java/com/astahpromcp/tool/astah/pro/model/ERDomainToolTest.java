@@ -15,7 +15,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,56 +56,48 @@ public class ERDomainToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setDatatype() method
         setDatatype = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setDatatype",
-            McpSyncServerExchange.class,
             ERDomainWithERDatatypeDTO.class);
 
         // setDefaultValue() method
         setDefaultValue = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setDefaultValue",
-            McpSyncServerExchange.class,
             ERDomainWithDefaultValueDTO.class);
 
         // setLengthPrecision() method
         setLengthPrecision = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setLengthPrecision",
-            McpSyncServerExchange.class,
             ERDomainWithLengthPrecisionDTO.class);
 
         // setLogicalName() method
         setLogicalName = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setLogicalName",
-            McpSyncServerExchange.class,
             ERDomainWithLogicalNameDTO.class);
 
         // setPhysicalName() method
         setPhysicalName = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setPhysicalName",
-            McpSyncServerExchange.class,
             ERDomainWithPhysicalNameDTO.class);
 
         // setNotNull() method
         setNotNull = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setNotNull",
-            McpSyncServerExchange.class,
             ERDomainWithNotNullDTO.class);
 
         // setParentERDomain() method
         setParentERDomain = TestSupport.getAccessibleMethod(
             ERDomainTool.class,
             "setParentERDomain",
-            McpSyncServerExchange.class,
             ERDomainWithParentERDomainDTO.class);
     }
 

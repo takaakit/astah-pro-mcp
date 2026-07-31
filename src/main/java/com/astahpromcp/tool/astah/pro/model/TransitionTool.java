@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.TransitionDTOAssembler;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -88,7 +87,7 @@ public class TransitionTool implements ToolProvider {
         );
     }
 
-    private TransitionDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private TransitionDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get transition information: {}", param);
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.id());
@@ -96,7 +95,7 @@ public class TransitionTool implements ToolProvider {
         return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
-    private TransitionDTO setAction(McpSyncServerExchange exchange, TransitionWithActionDTO param) throws Exception {
+    private TransitionDTO setAction(TransitionWithActionDTO param) throws Exception {
         log.debug("Set action of transition: {}", param);
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
@@ -108,7 +107,7 @@ public class TransitionTool implements ToolProvider {
         return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
-    private TransitionDTO setEvent(McpSyncServerExchange exchange, TransitionWithEventDTO param) throws Exception {
+    private TransitionDTO setEvent(TransitionWithEventDTO param) throws Exception {
         log.debug("Set event of transition: {}", param);
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
@@ -120,7 +119,7 @@ public class TransitionTool implements ToolProvider {
         return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
-    private TransitionDTO setGuard(McpSyncServerExchange exchange, TransitionWithGuardDTO param) throws Exception {
+    private TransitionDTO setGuard(TransitionWithGuardDTO param) throws Exception {
         log.debug("Set guard of transition: {}", param);
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());

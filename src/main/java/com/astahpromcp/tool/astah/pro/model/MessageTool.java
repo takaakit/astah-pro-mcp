@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.MessageDTOAssemb
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -108,7 +107,7 @@ public class MessageTool implements ToolProvider {
         );
     }
 
-    private MessageDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private MessageDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get message information: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.id());
@@ -116,7 +115,7 @@ public class MessageTool implements ToolProvider {
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
-    private MessageDTO setArgument(McpSyncServerExchange exchange, MessageWithArgumentDTO param) throws Exception {
+    private MessageDTO setArgument(MessageWithArgumentDTO param) throws Exception {
         log.debug("Set argument of message: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
@@ -128,7 +127,7 @@ public class MessageTool implements ToolProvider {
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
-    private MessageDTO setGuard(McpSyncServerExchange exchange, MessageWithGuardDTO param) throws Exception {
+    private MessageDTO setGuard(MessageWithGuardDTO param) throws Exception {
         log.debug("Set guard of message: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
@@ -140,7 +139,7 @@ public class MessageTool implements ToolProvider {
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
-    private MessageDTO setReturnValue(McpSyncServerExchange exchange, MessageWithReturnValueDTO param) throws Exception {
+    private MessageDTO setReturnValue(MessageWithReturnValueDTO param) throws Exception {
         log.debug("Set return value of message: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
@@ -152,7 +151,7 @@ public class MessageTool implements ToolProvider {
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
-    private MessageDTO setReturnValueVariable(McpSyncServerExchange exchange, MessageWithReturnValueVariableDTO param) throws Exception {
+    private MessageDTO setReturnValueVariable(MessageWithReturnValueVariableDTO param) throws Exception {
         log.debug("Set return value variable of message: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
@@ -164,7 +163,7 @@ public class MessageTool implements ToolProvider {
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
-    private MessageDTO setAsynchronous(McpSyncServerExchange exchange, MessageWithAsynchronousDTO param) throws Exception {
+    private MessageDTO setAsynchronous(MessageWithAsynchronousDTO param) throws Exception {
         log.debug("Set asynchronous of message: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
@@ -176,7 +175,7 @@ public class MessageTool implements ToolProvider {
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
-    private MessageDTO setOperation(McpSyncServerExchange exchange, MessageWithOperationDTO param) throws Exception {
+    private MessageDTO setOperation(MessageWithOperationDTO param) throws Exception {
         log.debug("Set operation of message: {}", param);
 
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());

@@ -3,7 +3,6 @@ package com.astahpromcp.tool.astah.pro.guide;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,6 @@ public class AstahScriptGuideToolTest {
         getGuide = TestSupport.getAccessibleMethod(
             AstahScriptGuideTool.class,
             "getGuide",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
     }
 

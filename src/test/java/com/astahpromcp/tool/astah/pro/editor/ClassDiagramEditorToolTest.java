@@ -25,7 +25,6 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,28 +72,24 @@ public class ClassDiagramEditorToolTest {
         createClassDiagram = TestSupport.getAccessibleMethod(
             ClassDiagramEditorTool.class,
             "createClassDiagram",
-            McpSyncServerExchange.class,
             NewDiagramInPackageDTO.class);
 
         // createAssociationClassPresentation() method
         createAssociationClassPresentation = TestSupport.getAccessibleMethod(
             ClassDiagramEditorTool.class,
             "createAssociationClassPresentation",
-            McpSyncServerExchange.class,
             NewAssociationClassPresentationDTO.class);
 
         // createInstanceSpecification() method
         createInstanceSpecification = TestSupport.getAccessibleMethod(
             ClassDiagramEditorTool.class,
             "createInstanceSpecification",
-            McpSyncServerExchange.class,
             NewInstanceWithPointDTO.class);
 
         // createInstanceSpecificationLink() method
         createInstanceSpecificationLink = TestSupport.getAccessibleMethod(
             ClassDiagramEditorTool.class,
             "createInstanceSpecificationLink",
-            McpSyncServerExchange.class,
             NewLinkSourceAndTargetDTO.class);
     }
 

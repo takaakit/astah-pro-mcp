@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.UsageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.UsageDTOAssembler;
 import com.change_vision.jude.api.inf.model.IUsage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class UsageTool implements ToolProvider {
         return List.of();
     }
 
-    private UsageDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private UsageDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get usage information: {}", param);
 
         IUsage astahUsage = astahProToolSupport.getUsage(param.id());

@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,21 +47,18 @@ public class CombinedFragmentToolTest {
         addInteractionOperand = TestSupport.getAccessibleMethod(
             CombinedFragmentTool.class,
             "addInteractionOperand",
-            McpSyncServerExchange.class,
             NewInteractionOperandDTO.class);
 
         // setCombinedFragmentKind() method
         setCombinedFragmentKind = TestSupport.getAccessibleMethod(
             CombinedFragmentTool.class,
             "setCombinedFragmentKind",
-            McpSyncServerExchange.class,
             CombinedFragmentWithKindDTO.class);
 
         // setHeightOfInteractionOperand() method
         setHeightOfInteractionOperand = TestSupport.getAccessibleMethod(
             CombinedFragmentTool.class,
             "setHeightOfInteractionOperand",
-            McpSyncServerExchange.class,
             InteractionOperandIndexWithHeightDTO.class);
     }
 

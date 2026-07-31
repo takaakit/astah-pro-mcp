@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,63 +59,54 @@ public class ERAttributeToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setDatatype() method
         setDatatype = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setDatatype",
-            McpSyncServerExchange.class,
             ERAttributeWithERDatatypeDTO.class);
 
         // setDomain() method
         setDomain = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setDomain",
-            McpSyncServerExchange.class,
             ERAttributeWithERDomainDTO.class);
 
         // setDefaultValue() method
         setDefaultValue = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setDefaultValue",
-            McpSyncServerExchange.class,
             ERAttributeWithDefaultValueDTO.class);
 
         // setLengthPrecision() method
         setLengthPrecision = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setLengthPrecision",
-            McpSyncServerExchange.class,
             ERAttributeWithLengthPrecisionDTO.class);
 
         // setLogicalName() method
         setLogicalName = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setLogicalName",
-            McpSyncServerExchange.class,
             ERAttributeWithLogicalNameDTO.class);
 
         // setPhysicalName() method
         setPhysicalName = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setPhysicalName",
-            McpSyncServerExchange.class,
             ERAttributeWithPhysicalNameDTO.class);
 
         // setPrimaryKey() method
         setPrimaryKey = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setPrimaryKey",
-            McpSyncServerExchange.class,
             ERAttributeWithPrimaryKeyDTO.class);
 
         // setNotNull() method
         setNotNull = TestSupport.getAccessibleMethod(
             ERAttributeTool.class,
             "setNotNull",
-            McpSyncServerExchange.class,
             ERAttributeWithNotNullDTO.class);
     }
 

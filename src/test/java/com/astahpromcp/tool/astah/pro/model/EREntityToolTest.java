@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.EREntityDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,28 +47,24 @@ public class EREntityToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             EREntityTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setLogicalName() method
         setLogicalName = TestSupport.getAccessibleMethod(
             EREntityTool.class,
             "setLogicalName",
-            McpSyncServerExchange.class,
             EREntityWithLogicalNameDTO.class);
 
         // setPhysicalName() method
         setPhysicalName = TestSupport.getAccessibleMethod(
             EREntityTool.class,
             "setPhysicalName",
-            McpSyncServerExchange.class,
             EREntityWithPhysicalNameDTO.class);
 
         // setType() method
         setType = TestSupport.getAccessibleMethod(
             EREntityTool.class,
             "setType",
-            McpSyncServerExchange.class,
             EREntityWithTypeDTO.class);
     }
 

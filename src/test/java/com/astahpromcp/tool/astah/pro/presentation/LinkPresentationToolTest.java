@@ -12,7 +12,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,21 +59,18 @@ public class LinkPresentationToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             LinkPresentationTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setAllPoints() method
         setAllPoints = TestSupport.getAccessibleMethod(
             LinkPresentationTool.class,
             "setAllPoints",
-            McpSyncServerExchange.class,
             LinkPresentationWithPointsDTO.class);
 
         // setLineStyle() method
         setLineStyle = TestSupport.getAccessibleMethod(
             LinkPresentationTool.class,
             "setLineStyle",
-            McpSyncServerExchange.class,
             LinkPresentationWithLineStyleDTO.class);
     }
 

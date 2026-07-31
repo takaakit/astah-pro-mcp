@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,217 +76,186 @@ public class BasicModelEditorToolTest {
         changeParent = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "changeParent",
-            McpSyncServerExchange.class,
             NamedElementWithParentDTO.class);
 
         // createPackageInParentPackage() method
         createPackageInParentPackage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createPackageInParentPackage",
-            McpSyncServerExchange.class,
             NewPackageInPackageDTO.class);
 
         // createClassInParentPackage() method
         createClassInParentPackage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createClassInParentPackage",
-            McpSyncServerExchange.class,
             NewClassInPackageDTO.class);
 
         // createClassInParentClass() method
         createClassInParentClass = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createClassInParentClass",
-            McpSyncServerExchange.class,
             NewClassInClassDTO.class);
 
         // createEnumerationInParentPackage() method
         createEnumerationInParentPackage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createEnumerationInParentPackage",
-            McpSyncServerExchange.class,
             NewEnumerationInPackageDTO.class);
 
         // createInterfaceInParentPackage() method
         createInterfaceInParentPackage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createInterfaceInParentPackage",
-            McpSyncServerExchange.class,
             NewInterfaceInPackageDTO.class);
 
         // createInterfaceInParentClass() method
         createInterfaceInParentClass = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createInterfaceInParentClass",
-            McpSyncServerExchange.class,
             NewInterfaceInClassDTO.class);
 
         // createAttribute() method
         createAttribute = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createAttribute",
-            McpSyncServerExchange.class,
             NewAttributeInClassDTO.class);
 
         // createEnumerationLiteral() method
         createEnumerationLiteral = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createEnumerationLiteral",
-            McpSyncServerExchange.class,
             NewEnumerationLiteralInEnumerationDTO.class);
 
         // createOperation() method
         createOperation = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createOperation",
-            McpSyncServerExchange.class,
             NewOperationInClassDTO.class);
 
         // createParameter() method
         createParameter = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createParameter",
-            McpSyncServerExchange.class,
             NewParameterToOperationDTO.class);
 
         // createAssociation() method
         createAssociation = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createAssociation",
-            McpSyncServerExchange.class,
             NewAssociationDTO.class);
 
         // createAssociationClass() method
         createAssociationClass = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createAssociationClass",
-            McpSyncServerExchange.class,
             NewAssociationClassDTO.class);
 
         // createDependency() method
         createDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createDependency",
-            McpSyncServerExchange.class,
             NewDependencyDTO.class);
 
         // createGeneralization() method
         createGeneralization = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createGeneralization",
-            McpSyncServerExchange.class,
             NewGeneralizationDTO.class);
 
         // createRealization() method
         createRealization = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createRealization",
-            McpSyncServerExchange.class,
             NewRealizationDTO.class);
 
         // createUsage() method
         createUsage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createUsage",
-            McpSyncServerExchange.class,
             NewUsageDTO.class);
 
         // createQualifier() method
         createQualifier = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createQualifier",
-            McpSyncServerExchange.class,
             NewQualifierToAssociationEndDTO.class);
 
         // createTaggedValue() method
         createTaggedValue = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createTaggedValue",
-            McpSyncServerExchange.class,
             NewTaggedValueToElementDTO.class);
 
         // createTemplateParameter() method
         createTemplateParameter = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createTemplateParameter",
-            McpSyncServerExchange.class,
             NewTemplateParameterToClassDTO.class);
 
         // deleteElement() method
         deleteElement = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "deleteElement",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // createRequirementInParentPackage() method
         createRequirementInParentPackage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createRequirementInParentPackage",
-            McpSyncServerExchange.class,
             NewRequirementInPackageDTO.class);
 
         // createRequirementInParentRequirement() method
         createRequirementInParentRequirement = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createRequirementInParentRequirement",
-            McpSyncServerExchange.class,
             NewRequirementInRequirementDTO.class);
 
         // createTestCaseInParentPackage() method
         createTestCaseInParentPackage = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createTestCaseInParentPackage",
-            McpSyncServerExchange.class,
             NewTestCaseInPackageDTO.class);
 
         // createTestCaseInParentTestCase() method
         createTestCaseInParentTestCase = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createTestCaseInParentTestCase",
-            McpSyncServerExchange.class,
             NewTestCaseInTestCaseDTO.class);
 
         // createCopyDependency() method
         createCopyDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createCopyDependency",
-            McpSyncServerExchange.class,
             NewCopyDependencyDTO.class);
 
         // createDeriveReqtDependency() method
         createDeriveReqtDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createDeriveReqtDependency",
-            McpSyncServerExchange.class,
             NewDeriveReqtDependencyDTO.class);
 
         // createRefineDependency() method
         createRefineDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createRefineDependency",
-            McpSyncServerExchange.class,
             NewRefineDependencyDTO.class);
 
         // createSatisfyDependency() method
         createSatisfyDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createSatisfyDependency",
-            McpSyncServerExchange.class,
             NewSatisfyDependencyDTO.class);
 
         // createTraceDependency() method
         createTraceDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createTraceDependency",
-            McpSyncServerExchange.class,
             NewTraceDependencyDTO.class);
 
         // createVerifyDependency() method
         createVerifyDependency = TestSupport.getAccessibleMethod(
             BasicModelEditorTool.class,
             "createVerifyDependency",
-            McpSyncServerExchange.class,
             NewVerifyDependencyDTO.class);
     }
 

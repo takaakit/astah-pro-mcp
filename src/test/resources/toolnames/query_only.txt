@@ -1,4 +1,5 @@
 activity_dgm_guide
+architectural_design_smells
 astah_pro_mcp_guide
 astah_script_guide
 capture_astah_window
@@ -118,6 +119,7 @@ get_workspace_dir_path
 is_proj_modified
 is_proj_opened
 mind_map_guide
+read_architectural_design_smells
 read_uml_modeling_architecture_insights
 req_dgm_guide
 retrieve_classifier_relationships_as_puml
@@ -128,6 +130,7 @@ search_within_named_elements
 search_within_prsts
 seq_dgm_guide
 state_machine_dgm_guide
+store_architectural_design_smells
 store_uml_modeling_architecture_insights
 uml_modeling_architecture_insights
 usecase_dgm_guide

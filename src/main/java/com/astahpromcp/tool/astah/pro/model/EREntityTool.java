@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.EREntityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.EREntityDTOAssembler;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -88,7 +87,7 @@ public class EREntityTool implements ToolProvider {
         );
     }
 
-    private EREntityDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private EREntityDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER entity information: {}", param);
 
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.id());
@@ -96,7 +95,7 @@ public class EREntityTool implements ToolProvider {
         return EREntityDTOAssembler.toDTO(astahEREntity);
     }
 
-    private EREntityDTO setLogicalName(McpSyncServerExchange exchange, EREntityWithLogicalNameDTO param) throws Exception {
+    private EREntityDTO setLogicalName(EREntityWithLogicalNameDTO param) throws Exception {
         log.debug("Set logical name of ER entity: {}", param);
 
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
@@ -108,7 +107,7 @@ public class EREntityTool implements ToolProvider {
         return EREntityDTOAssembler.toDTO(astahEREntity);
     }
 
-    private EREntityDTO setPhysicalName(McpSyncServerExchange exchange, EREntityWithPhysicalNameDTO param) throws Exception {
+    private EREntityDTO setPhysicalName(EREntityWithPhysicalNameDTO param) throws Exception {
         log.debug("Set physical name of ER entity: {}", param);
 
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
@@ -120,7 +119,7 @@ public class EREntityTool implements ToolProvider {
         return EREntityDTOAssembler.toDTO(astahEREntity);
     }
 
-    private EREntityDTO setType(McpSyncServerExchange exchange, EREntityWithTypeDTO param) throws Exception {
+    private EREntityDTO setType(EREntityWithTypeDTO param) throws Exception {
         log.debug("Set type of ER entity: {}", param);
 
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());

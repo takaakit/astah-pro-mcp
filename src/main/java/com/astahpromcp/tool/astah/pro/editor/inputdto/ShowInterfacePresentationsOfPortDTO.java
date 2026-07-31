@@ -2,15 +2,12 @@ package com.astahpromcp.tool.astah.pro.editor.inputdto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
-public record NewStructuredClassPresentationUnderParentDTO(
+public record ShowInterfacePresentationsOfPortDTO(
     @JsonPropertyDescription("Target composite structure diagram identifier")
     String targetCompositeStructureDiagramId,
 
-    @JsonPropertyDescription("Target element identifier")
-    String targetElementId,
-
-    @JsonPropertyDescription("Parent node presentation identifier")
-    String parentNodePresentationId,
+    @JsonPropertyDescription("Target node presentation identifier. Must be one of the following node presentation types: Port.")
+    String targetNodePresentationId,
 
     @JsonPropertyDescription("Location X coordinate")
     int locationX,

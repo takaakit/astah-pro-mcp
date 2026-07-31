@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.FlowDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.FlowDTOAssembler;
 import com.change_vision.jude.api.inf.model.IFlow;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class FlowTool implements ToolProvider {
         );
     }
 
-    private FlowDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private FlowDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get flow information: {}", param);
 
         IFlow astahFlow = astahProToolSupport.getFlow(param.id());
@@ -88,7 +87,7 @@ public class FlowTool implements ToolProvider {
         return FlowDTOAssembler.toDTO(astahFlow);
     }
 
-    private FlowDTO setAction(McpSyncServerExchange exchange, FlowWithActionDTO param) throws Exception {
+    private FlowDTO setAction(FlowWithActionDTO param) throws Exception {
         log.debug("Set action of flow: {}", param);
 
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
@@ -100,7 +99,7 @@ public class FlowTool implements ToolProvider {
         return FlowDTOAssembler.toDTO(astahFlow);
     }
 
-    private FlowDTO setGuard(McpSyncServerExchange exchange, FlowWithGuardDTO param) throws Exception {
+    private FlowDTO setGuard(FlowWithGuardDTO param) throws Exception {
         log.debug("Set guard of flow: {}", param);
 
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());

@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.model.INamedElement;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class AstahProMcpGuideTool implements ToolProvider {
         }
     }
 
-    private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private GuideDTO getGuide(NoInputDTO param) throws Exception {
         log.debug("Get Astah Pro MCP Guide: {}", param);
 
         // If the Astah project is not open, create a new one.
@@ -76,6 +75,7 @@ IMPORTANT POINTS to Keep in Mind:
   DO NOT save the Astah project on your own initiative.
 * When new node/link presentations are placed on diagrams, adjust the layout of those presentations in accordance with the diagram layout guide and to avoid diagram layout anti-patterns.
 * After you have finished editing the model elements and diagrams, and immediately before performing the final diagram layout check and adjustment, you MUST maintain terminology consistency across the names, labels, and definitions of model elements and diagrams.
+* After you have finished editing the model elements and diagrams, and immediately before performing the final diagram layout check and adjustment, you MUST maintain the semantic consistency of the diagrams, eliminating semantic inconsistencies both within each diagram and across diagrams.
 * Make sure to detect any overlaps caused by newly added node/link presentations using the tool and resolve them. However, NEVER take the incorrect approach of resolving overlaps by simply hiding the node/link presentations.
 * Draw all node/link presentations related to the content intended to be represented in the diagram, without omission. In particular, be careful not to forget to draw any link presentations that should be included.
 * You can place presentations at negative X or Y coordinates on the diagram. For example, a node/link presentation can be placed at (-100, -100).

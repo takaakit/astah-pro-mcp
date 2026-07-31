@@ -52,6 +52,7 @@ public class AstahProToolFactory {
             RequirementDiagramEditor requirementDiagramEditor = diagramEditorFactory.getRequirementDiagramEditor();
             UseCaseDiagramEditor useCaseDiagramEditor = diagramEditorFactory.getUseCaseDiagramEditor();
             CompositeStructureDiagramEditor compositeStructureDiagramEditor = diagramEditorFactory.getCompositeStructureDiagramEditor();
+            CompositeStructureModelEditor compositeStructureModelEditor = modelEditorFactory.getCompositeStructureModelEditor();
             UseCaseModelEditor useCaseModelEditor = modelEditorFactory.getUseCaseModelEditor();
             ERModelEditor erModelEditor = modelEditorFactory.getERModelEditor();
             ERDiagramEditor erDiagramEditor = diagramEditorFactory.getERDiagramEditor();
@@ -84,6 +85,7 @@ public class AstahProToolFactory {
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramLayoutLintTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new TerminologyConsistencyTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
+            providers.add(new DiagramConsistencyTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             
             // The view managers are available only inside the running Astah GUI (plugin environment).
             try {
@@ -189,8 +191,8 @@ public class AstahProToolFactory {
                 providers.add(new CompositeStructureDiagramGuideTool());
 
                 // Note: The editing APIs for the Composite Structure Diagram don't work as expected right now, so specify that no editing tools should be included.
-                providers.add(new CompositeStructureModelEditorTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport, false));
                 providers.add(new CompositeStructureDiagramEditorTool(projectAccessor, transactionSupport, compositeStructureDiagramEditor, astahProToolSupport, imageCaptureSupport, false));
+                providers.add(new CompositeStructureModelEditorTool(compositeStructureModelEditor, projectAccessor, transactionSupport, astahProToolSupport, false));
                 providers.add(new ConnectorTool(projectAccessor, transactionSupport, astahProToolSupport, false));
                 providers.add(new PortTool(projectAccessor, transactionSupport, astahProToolSupport, false));
             }

@@ -13,7 +13,6 @@ import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,21 +49,18 @@ public class LifelineToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             LifelineTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setBaseClass() method
         setBaseClass = TestSupport.getAccessibleMethod(
             LifelineTool.class,
             "setBaseClass",
-            McpSyncServerExchange.class,
             LifelineWithBaseClassDTO.class);
 
         // setLength() method
         setLength = TestSupport.getAccessibleMethod(
             LifelineTool.class,
             "setLength",
-            McpSyncServerExchange.class,
             LifelineWithLengthDTO.class);
     }
 

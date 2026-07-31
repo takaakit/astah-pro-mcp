@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionDTOAssembler;
 import com.change_vision.jude.api.inf.model.IInteraction;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class InteractionTool implements ToolProvider {
         return List.of();
     }
 
-    private InteractionDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private InteractionDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get interaction information: {}", param);
 
         IInteraction astahInteraction = astahProToolSupport.getInteraction(param.id());

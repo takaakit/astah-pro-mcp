@@ -6,7 +6,6 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.script.inputdto.RunScriptDTO;
 import com.astahpromcp.tool.astah.pro.script.outputdto.ScriptResultDTO;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class AstahScriptTool implements ToolProvider {
         );
     }
 
-    private ScriptResultDTO runScript(McpSyncServerExchange exchange, RunScriptDTO param) throws Exception {
+    private ScriptResultDTO runScript(RunScriptDTO param) throws Exception {
         log.debug("Run astah script: {}", param);
 
         if (param.script() == null || param.script().trim().isEmpty()) {

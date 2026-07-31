@@ -6,7 +6,6 @@ import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ModelFinder;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Assertions;
 
@@ -155,7 +154,6 @@ public class TestSupport {
     public <T> T invokeToolMethodReturningDto(Method method, Object tool, Object inputDTO, Class<T> resultType) throws Exception {
         return (T) method.invoke(
             tool,
-            mock(McpSyncServerExchange.class),
             inputDTO);
     }
 
@@ -163,7 +161,6 @@ public class TestSupport {
     public List<McpSchema.Content> invokeToolMethodReturningContents(Method method, Object tool, Object inputDTO) throws Exception {
         return (List<McpSchema.Content>) method.invoke(
             tool,
-            mock(McpSyncServerExchange.class),
             inputDTO);
     }
 
@@ -171,7 +168,6 @@ public class TestSupport {
     public <T> T invokeToolMethodReturningDtoAndContents(Method method, Object tool, Object inputDTO, Class<T> resultType) throws Exception {
         Pair<T, ?> pair = (Pair<T, ?>) method.invoke(
             tool,
-            mock(McpSyncServerExchange.class),
             inputDTO);
         return pair.getLeft();
     }

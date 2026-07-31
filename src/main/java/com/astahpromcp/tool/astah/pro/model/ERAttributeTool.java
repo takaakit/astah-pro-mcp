@@ -12,7 +12,6 @@ import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -123,7 +122,7 @@ public class ERAttributeTool implements ToolProvider {
         );
     }
 
-    private ERAttributeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERAttributeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER attribute information: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.id());
@@ -131,7 +130,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setDatatype(McpSyncServerExchange exchange, ERAttributeWithERDatatypeDTO param) throws Exception {
+    private ERAttributeDTO setDatatype(ERAttributeWithERDatatypeDTO param) throws Exception {
         log.debug("Set ER datatype of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -144,7 +143,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setDomain(McpSyncServerExchange exchange, ERAttributeWithERDomainDTO param) throws Exception {
+    private ERAttributeDTO setDomain(ERAttributeWithERDomainDTO param) throws Exception {
         log.debug("Set ER domain of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -157,7 +156,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setDefaultValue(McpSyncServerExchange exchange, ERAttributeWithDefaultValueDTO param) throws Exception {
+    private ERAttributeDTO setDefaultValue(ERAttributeWithDefaultValueDTO param) throws Exception {
         log.debug("Set default value of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -169,7 +168,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setLengthPrecision(McpSyncServerExchange exchange, ERAttributeWithLengthPrecisionDTO param) throws Exception {
+    private ERAttributeDTO setLengthPrecision(ERAttributeWithLengthPrecisionDTO param) throws Exception {
         log.debug("Set length/precision of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -181,7 +180,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setLogicalName(McpSyncServerExchange exchange, ERAttributeWithLogicalNameDTO param) throws Exception {
+    private ERAttributeDTO setLogicalName(ERAttributeWithLogicalNameDTO param) throws Exception {
         log.debug("Set logical name of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -193,7 +192,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setPhysicalName(McpSyncServerExchange exchange, ERAttributeWithPhysicalNameDTO param) throws Exception {
+    private ERAttributeDTO setPhysicalName(ERAttributeWithPhysicalNameDTO param) throws Exception {
         log.debug("Set physical name of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -205,7 +204,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setPrimaryKey(McpSyncServerExchange exchange, ERAttributeWithPrimaryKeyDTO param) throws Exception {
+    private ERAttributeDTO setPrimaryKey(ERAttributeWithPrimaryKeyDTO param) throws Exception {
         log.debug("Set primary key of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
@@ -217,7 +216,7 @@ public class ERAttributeTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
-    private ERAttributeDTO setNotNull(McpSyncServerExchange exchange, ERAttributeWithNotNullDTO param) throws Exception {
+    private ERAttributeDTO setNotNull(ERAttributeWithNotNullDTO param) throws Exception {
         log.debug("Set not null of ER attribute: {}", param);
 
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());

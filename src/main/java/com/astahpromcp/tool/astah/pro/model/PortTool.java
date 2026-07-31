@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.PortDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PortDTOAssembler;
 import com.change_vision.jude.api.inf.model.IPort;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class PortTool implements ToolProvider {
         );
     }
 
-    private PortDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PortDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get port information: {}", param);
 
         IPort astahPort = astahProToolSupport.getPort(param.id());
@@ -88,7 +87,7 @@ public class PortTool implements ToolProvider {
         return PortDTOAssembler.toDTO(astahPort);
     }
 
-    private PortDTO setBehavior(McpSyncServerExchange exchange, PortWithBehaviorDTO param) throws Exception {
+    private PortDTO setBehavior(PortWithBehaviorDTO param) throws Exception {
         log.debug("Set behavior of port: {}", param);
 
         IPort astahPort = astahProToolSupport.getPort(param.targetPortId());
@@ -100,7 +99,7 @@ public class PortTool implements ToolProvider {
         return PortDTOAssembler.toDTO(astahPort);
     }
 
-    private PortDTO setService(McpSyncServerExchange exchange, PortWithServiceDTO param) throws Exception {
+    private PortDTO setService(PortWithServiceDTO param) throws Exception {
         log.debug("Set service of port: {}", param);
 
         IPort astahPort = astahProToolSupport.getPort(param.targetPortId());

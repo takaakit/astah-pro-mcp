@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDiagramDTOAssembler;
 import com.change_vision.jude.api.inf.model.IERDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class ERDiagramTool implements ToolProvider {
         );
     }
 
-    private ERDiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERDiagramDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER diagram information: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.id());
@@ -104,7 +103,7 @@ public class ERDiagramTool implements ToolProvider {
         return ERDiagramDTOAssembler.toDTO(astahERDiagram);
     }
 
-    private ERDiagramDTO setAlignAttributeItems(McpSyncServerExchange exchange, ERDiagramWithAlignAttributeItemsDTO param) throws Exception {
+    private ERDiagramDTO setAlignAttributeItems(ERDiagramWithAlignAttributeItemsDTO param) throws Exception {
         log.debug("Set align attribute items of ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -116,7 +115,7 @@ public class ERDiagramTool implements ToolProvider {
         return ERDiagramDTOAssembler.toDTO(astahERDiagram);
     }
 
-    private ERDiagramDTO setInitialDisplayLevel(McpSyncServerExchange exchange, ERDiagramWithInitialDisplayLevelDTO param) throws Exception {
+    private ERDiagramDTO setInitialDisplayLevel(ERDiagramWithInitialDisplayLevelDTO param) throws Exception {
         log.debug("Set initial display level of ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -128,7 +127,7 @@ public class ERDiagramTool implements ToolProvider {
         return ERDiagramDTOAssembler.toDTO(astahERDiagram);
     }
 
-    private ERDiagramDTO setModelType(McpSyncServerExchange exchange, ERDiagramWithModelTypeDTO param) throws Exception {
+    private ERDiagramDTO setModelType(ERDiagramWithModelTypeDTO param) throws Exception {
         log.debug("Set model type of ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -140,7 +139,7 @@ public class ERDiagramTool implements ToolProvider {
         return ERDiagramDTOAssembler.toDTO(astahERDiagram);
     }
 
-    private ERDiagramDTO setNotation(McpSyncServerExchange exchange, ERDiagramWithNotationDTO param) throws Exception {
+    private ERDiagramDTO setNotation(ERDiagramWithNotationDTO param) throws Exception {
         log.debug("Set notation of ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());

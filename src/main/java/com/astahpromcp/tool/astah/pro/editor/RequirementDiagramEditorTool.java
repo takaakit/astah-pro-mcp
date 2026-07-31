@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.editor.RequirementDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IRequirementDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -68,7 +67,7 @@ public class RequirementDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private DiagramDTO createRequirementDiagram(McpSyncServerExchange exchange, NewDiagramInPackageDTO param) throws Exception {
+    private DiagramDTO createRequirementDiagram(NewDiagramInPackageDTO param) throws Exception {
         log.debug("Create requirement diagram: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.targetPackageId());

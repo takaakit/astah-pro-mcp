@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionUseDT
 import com.change_vision.jude.api.inf.model.IInteractionUse;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -81,7 +80,7 @@ public class InteractionUseTool implements ToolProvider {
         );
     }
 
-    private InteractionUseDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private InteractionUseDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get interaction use information: {}", param);
 
         IInteractionUse astahInteractionUse = astahProToolSupport.getInteractionUse(param.id());
@@ -89,7 +88,7 @@ public class InteractionUseTool implements ToolProvider {
         return InteractionUseDTOAssembler.toDTO(astahInteractionUse);
     }
 
-    private InteractionUseDTO setArgument(McpSyncServerExchange exchange, InteractionUseWithArgumentDTO param) throws Exception {
+    private InteractionUseDTO setArgument(InteractionUseWithArgumentDTO param) throws Exception {
         log.debug("Set argument of interaction use: {}", param);
 
         IInteractionUse astahInteractionUse = astahProToolSupport.getInteractionUse(param.targetInteractionUseId());
@@ -101,7 +100,7 @@ public class InteractionUseTool implements ToolProvider {
         return InteractionUseDTOAssembler.toDTO(astahInteractionUse);
     }
 
-    private InteractionUseDTO setSequenceDiagram(McpSyncServerExchange exchange, InteractionUseWithSequenceDiagramDTO param) throws Exception {
+    private InteractionUseDTO setSequenceDiagram(InteractionUseWithSequenceDiagramDTO param) throws Exception {
         log.debug("Set sequence diagram to interaction use: {}", param);
 
         IInteractionUse astahInteractionUse = astahProToolSupport.getInteractionUse(param.targetInteractionUseId());

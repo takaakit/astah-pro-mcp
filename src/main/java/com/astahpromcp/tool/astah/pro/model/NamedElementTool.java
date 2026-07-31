@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class NamedElementTool implements ToolProvider {
         );
     }
 
-    private NamedElementDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NamedElementDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get named element information: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
@@ -108,7 +107,7 @@ public class NamedElementTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO setName(McpSyncServerExchange exchange, NamedElementWithNameDTO param) throws Exception {
+    private NamedElementDTO setName(NamedElementWithNameDTO param) throws Exception {
         log.debug("Set name of named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
@@ -120,7 +119,7 @@ public class NamedElementTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO setAlias1(McpSyncServerExchange exchange, NamedElementWithAlias1DTO param) throws Exception {
+    private NamedElementDTO setAlias1(NamedElementWithAlias1DTO param) throws Exception {
         log.debug("Set alias1 of named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
@@ -132,7 +131,7 @@ public class NamedElementTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO setAlias2(McpSyncServerExchange exchange, NamedElementWithAlias2DTO param) throws Exception {
+    private NamedElementDTO setAlias2(NamedElementWithAlias2DTO param) throws Exception {
         log.debug("Set alias2 of named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
@@ -144,7 +143,7 @@ public class NamedElementTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO setDefinition(McpSyncServerExchange exchange, NamedElementWithDefinitionDTO param) throws Exception {
+    private NamedElementDTO setDefinition(NamedElementWithDefinitionDTO param) throws Exception {
         log.debug("Set definition of named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
@@ -156,7 +155,7 @@ public class NamedElementTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO setVisibility(McpSyncServerExchange exchange, NamedElementWithVisibilityDTO param) throws Exception {
+    private NamedElementDTO setVisibility(NamedElementWithVisibilityDTO param) throws Exception {
         log.debug("Set visibility of named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());

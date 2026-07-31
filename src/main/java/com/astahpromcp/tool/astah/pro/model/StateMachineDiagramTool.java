@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.StateMachineDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.StateMachineDiagramDTOAssembler;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class StateMachineDiagramTool implements ToolProvider {
         return List.of();
     }
 
-    private StateMachineDiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private StateMachineDiagramDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get state machine diagram information: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.id());

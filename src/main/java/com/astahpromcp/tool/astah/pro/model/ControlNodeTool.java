@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ControlNodeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ControlNodeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IControlNode;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class ControlNodeTool implements ToolProvider {
         return List.of();
     }
 
-    private ControlNodeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ControlNodeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get control node information: {}", param);
 
         IControlNode astahControlNode = astahProToolSupport.getControlNode(param.id());

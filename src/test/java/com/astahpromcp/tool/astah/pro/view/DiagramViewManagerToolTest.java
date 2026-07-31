@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IDiagramViewManager;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -70,98 +69,84 @@ public class DiagramViewManagerToolTest {
         openDiagram = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "openDiagram",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // closeDiagram() method
         closeDiagram = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "closeDiagram",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getCurrentDiagram() method
         getCurrentDiagram = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "getCurrentDiagram",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getSelectedPresentations() method
         getSelectedPresentations = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "getSelectedPresentations",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // selectPresentations() method
         selectPresentations = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "selectPresentations",
-            McpSyncServerExchange.class,
             IdListDTO.class);
 
         // selectAllPresentations() method
         selectAllPresentations = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "selectAllPresentations",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // unselectAllPresentations() method
         unselectAllPresentations = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "unselectAllPresentations",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // centerPresentationInDiagram() method
         centerPresentationInDiagram = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "centerPresentationInDiagram",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // autoLayout() method
         autoLayout = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "autoLayout",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // zoom() method
         zoom = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "zoom",
-            McpSyncServerExchange.class,
             ZoomFactorDTO.class);
 
         // zoomFit() method
         zoomFit = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "zoomFit",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // highlightPresentation() method
         highlightPresentation = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "highlightPresentation",
-            McpSyncServerExchange.class,
             PresentationWithHighlightColorDTO.class);
 
         // unhighlightPresentation() method
         unhighlightPresentation = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "unhighlightPresentation",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getHighlightedPresentationsWithinDiagram() method
         getHighlightedPresentationsWithinDiagram = TestSupport.getAccessibleMethod(
             DiagramViewManagerTool.class,
             "getHighlightedPresentationsWithinDiagram",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

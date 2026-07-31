@@ -22,7 +22,6 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Value;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -98,7 +97,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(NewNodePresentationDTO param) throws Exception {
         log.debug("Create node presentation on diagram: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
@@ -141,7 +140,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(NewLinkPresentationDTO param) throws Exception {
         log.debug("Create link presentation on diagram: {}", param);
 
         IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -169,7 +168,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNestingLinkPresentation(McpSyncServerExchange exchange, NewNestingLinkPresentationDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNestingLinkPresentation(NewNestingLinkPresentationDTO param) throws Exception {
         log.debug("Create nesting link presentation on diagram: {}", param);
 
         IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());

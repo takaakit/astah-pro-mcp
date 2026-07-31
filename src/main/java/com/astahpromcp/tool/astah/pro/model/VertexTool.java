@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.VertexDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.VertexDTOAssembler;
 import com.change_vision.jude.api.inf.model.IVertex;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -65,7 +64,7 @@ public class VertexTool implements ToolProvider {
         return List.of();
     }
 
-    private VertexDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private VertexDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get vertex information: {}", param);
 
         IVertex astahVertex = astahProToolSupport.getVertex(param.id());

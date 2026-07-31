@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERSubtypeRelatio
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERSubtypeRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -97,7 +96,7 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
         );
     }
 
-    private ERSubtypeRelationshipDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERSubtypeRelationshipDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER subtype relationship information: {}", param);
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.id());
@@ -105,7 +104,7 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
         return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
-    private ERSubtypeRelationshipDTO setConclusive(McpSyncServerExchange exchange, ERSubtypeRelationshipWithConclusiveDTO param) throws Exception {
+    private ERSubtypeRelationshipDTO setConclusive(ERSubtypeRelationshipWithConclusiveDTO param) throws Exception {
         log.debug("Set conclusive of ER subtype relationship: {}", param);
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
@@ -117,7 +116,7 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
         return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
-    private ERSubtypeRelationshipDTO setDiscriminatorAttr(McpSyncServerExchange exchange, ERSubtypeRelationshipWithDiscriminatorAttrDTO param) throws Exception {
+    private ERSubtypeRelationshipDTO setDiscriminatorAttr(ERSubtypeRelationshipWithDiscriminatorAttrDTO param) throws Exception {
         log.debug("Set discriminator attribute of ER subtype relationship: {}", param);
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
@@ -130,7 +129,7 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
         return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
-    private ERSubtypeRelationshipDTO setLogicalName(McpSyncServerExchange exchange, ERSubtypeRelationshipWithLogicalNameDTO param) throws Exception {
+    private ERSubtypeRelationshipDTO setLogicalName(ERSubtypeRelationshipWithLogicalNameDTO param) throws Exception {
         log.debug("Set logical name of ER subtype relationship: {}", param);
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());
@@ -142,7 +141,7 @@ public class ERSubtypeRelationshipTool implements ToolProvider {
         return ERSubtypeRelationshipDTOAssembler.toDTO(astahERSubtypeRelationship);
     }
 
-    private ERSubtypeRelationshipDTO setPhysicalName(McpSyncServerExchange exchange, ERSubtypeRelationshipWithPhysicalNameDTO param) throws Exception {
+    private ERSubtypeRelationshipDTO setPhysicalName(ERSubtypeRelationshipWithPhysicalNameDTO param) throws Exception {
         log.debug("Set physical name of ER subtype relationship: {}", param);
 
         IERSubtypeRelationship astahERSubtypeRelationship = astahProToolSupport.getERSubtypeRelationship(param.targetERSubtypeRelationshipId());

@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ERDiagramDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IERDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,35 +49,30 @@ public class ERDiagramToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERDiagramTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setAlignAttributeItems() method
         setAlignAttributeItems = TestSupport.getAccessibleMethod(
             ERDiagramTool.class,
             "setAlignAttributeItems",
-            McpSyncServerExchange.class,
             ERDiagramWithAlignAttributeItemsDTO.class);
 
         // setInitialDisplayLevel() method
         setInitialDisplayLevel = TestSupport.getAccessibleMethod(
             ERDiagramTool.class,
             "setInitialDisplayLevel",
-            McpSyncServerExchange.class,
             ERDiagramWithInitialDisplayLevelDTO.class);
 
         // setModelType() method
         setModelType = TestSupport.getAccessibleMethod(
             ERDiagramTool.class,
             "setModelType",
-            McpSyncServerExchange.class,
             ERDiagramWithModelTypeDTO.class);
 
         // setNotation() method
         setNotation = TestSupport.getAccessibleMethod(
             ERDiagramTool.class,
             "setNotation",
-            McpSyncServerExchange.class,
             ERDiagramWithNotationDTO.class);
     }
 

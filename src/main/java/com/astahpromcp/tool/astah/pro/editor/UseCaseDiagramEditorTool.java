@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -69,7 +68,7 @@ public class UseCaseDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private DiagramDTO createUseCaseDiagram(McpSyncServerExchange exchange, NewUseCaseDiagramDTO param) throws Exception {
+    private DiagramDTO createUseCaseDiagram(NewUseCaseDiagramDTO param) throws Exception {
         log.debug("Create usecase diagram: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());

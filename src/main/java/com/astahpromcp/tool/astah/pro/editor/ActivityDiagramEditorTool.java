@@ -19,7 +19,6 @@ import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -214,7 +213,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptEventAction(McpSyncServerExchange exchange, NewAcceptEventActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptEventAction(NewAcceptEventActionDTO param) throws Exception {
         log.debug("Create accept event action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -236,7 +235,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptTimeEventAction(McpSyncServerExchange exchange, NewAcceptTimeEventActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptTimeEventAction(NewAcceptTimeEventActionDTO param) throws Exception {
         log.debug("Create accept time event action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -258,7 +257,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAction(McpSyncServerExchange exchange, NewActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createAction(NewActionDTO param) throws Exception {
         log.debug("Create action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -280,7 +279,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private ActivityDiagramDTO createActivityDiagram(McpSyncServerExchange exchange, NewActivityDiagramDTO param) throws Exception {
+    private ActivityDiagramDTO createActivityDiagram(NewActivityDiagramDTO param) throws Exception {
         log.debug("Create activity diagram: {}", param);
 
         IPackage astahParentPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -294,7 +293,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return ActivityDiagramDTOAssembler.toDTO(astahActivityDiagram);
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createActivityParameterNode(McpSyncServerExchange exchange, NewActivityParameterNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createActivityParameterNode(NewActivityParameterNodeDTO param) throws Exception {
         log.debug("Create activity parameter node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -318,7 +317,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createCallBehaviorAction(McpSyncServerExchange exchange, NewCallBehaviorActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createCallBehaviorAction(NewCallBehaviorActionDTO param) throws Exception {
         log.debug("Create call behavior action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -342,7 +341,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createConnector(McpSyncServerExchange exchange, NewConnectorDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createConnector(NewConnectorDTO param) throws Exception {
         log.debug("Create connector: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -364,7 +363,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createDecisionMergeNode(McpSyncServerExchange exchange, NewDecisionMergeNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createDecisionMergeNode(NewDecisionMergeNodeDTO param) throws Exception {
         log.debug("Create decision merge node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -386,7 +385,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDependency(NewDependencyDTO param) throws Exception {
         log.debug("Create dependency: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -409,7 +408,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalNode(McpSyncServerExchange exchange, NewFinalNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalNode(NewFinalNodeDTO param) throws Exception {
         log.debug("Create final node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -431,7 +430,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFlow(McpSyncServerExchange exchange, NewFlowDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFlow(NewFlowDTO param) throws Exception {
         log.debug("Create flow: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -453,7 +452,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFlowFinalNode(McpSyncServerExchange exchange, NewFlowFinalNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFlowFinalNode(NewFlowFinalNodeDTO param) throws Exception {
         log.debug("Create flow final node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -475,7 +474,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkNode(McpSyncServerExchange exchange, NewForkNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkNode(NewForkNodeDTO param) throws Exception {
         log.debug("Create fork node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -497,7 +496,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialNode(McpSyncServerExchange exchange, NewInitialNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialNode(NewInitialNodeDTO param) throws Exception {
         log.debug("Create initial node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -519,7 +518,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinNode(McpSyncServerExchange exchange, NewJoinNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinNode(NewJoinNodeDTO param) throws Exception {
         log.debug("Create join node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -541,7 +540,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createObjectNode(McpSyncServerExchange exchange, NewObjectNodeDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createObjectNode(NewObjectNodeDTO param) throws Exception {
         log.debug("Create object node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -565,7 +564,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartition(McpSyncServerExchange exchange, NewPartitionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartition(NewPartitionDTO param) throws Exception {
         log.debug("Create partition: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -593,7 +592,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(McpSyncServerExchange exchange, NewPinWithBaseClassAndParentActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(NewPinWithBaseClassAndParentActionDTO param) throws Exception {
         log.debug("Create pin: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -620,7 +619,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createProcess(McpSyncServerExchange exchange, NewProcessDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createProcess(NewProcessDTO param) throws Exception {
         log.debug("Create process: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
@@ -642,7 +641,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSendSignalAction(McpSyncServerExchange exchange, NewSendSignalActionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSendSignalAction(NewSendSignalActionDTO param) throws Exception {
         log.debug("Create send signal action: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());

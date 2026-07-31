@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,49 +49,42 @@ public class MessageToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setArgument() method
         setArgument = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "setArgument",
-            McpSyncServerExchange.class,
             MessageWithArgumentDTO.class);
 
         // setGuard() method
         setGuard = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "setGuard",
-            McpSyncServerExchange.class,
             MessageWithGuardDTO.class);
 
         // setReturnValue() method
         setReturnValue = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "setReturnValue",
-            McpSyncServerExchange.class,
             MessageWithReturnValueDTO.class);
 
         // setReturnValueVariable() method
         setReturnValueVariable = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "setReturnValueVariable",
-            McpSyncServerExchange.class,
             MessageWithReturnValueVariableDTO.class);
 
         // setAsynchronous() method
         setAsynchronous = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "setAsynchronous",
-            McpSyncServerExchange.class,
             MessageWithAsynchronousDTO.class);
 
         // setOperation() method
         setOperation = TestSupport.getAccessibleMethod(
             MessageTool.class,
             "setOperation",
-            McpSyncServerExchange.class,
             MessageWithOperationDTO.class);
     }
 

@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,14 +57,12 @@ public class BasicDiagramEditorToolTest {
         createNote = TestSupport.getAccessibleMethod(
             BasicDiagramEditorTool.class,
             "createNote",
-            McpSyncServerExchange.class,
             NewNoteDTO.class);
 
         // createNoteAnchor() method
         createNoteAnchor = TestSupport.getAccessibleMethod(
             BasicDiagramEditorTool.class,
             "createNoteAnchor",
-            McpSyncServerExchange.class,
             NewNoteAnchorDTO.class);
     }
 

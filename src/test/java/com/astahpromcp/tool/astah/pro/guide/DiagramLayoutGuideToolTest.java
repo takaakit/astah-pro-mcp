@@ -2,7 +2,6 @@ package com.astahpromcp.tool.astah.pro.guide;
 
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,14 +29,12 @@ public class DiagramLayoutGuideToolTest {
         getGuide = TestSupport.getAccessibleMethod(
             DiagramLayoutGuideTool.class,
             "getGuide",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getAntiPatterns() method
         getAntiPatterns = TestSupport.getAccessibleMethod(
             DiagramLayoutGuideTool.class,
             "getAntiPatterns",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
     }
 

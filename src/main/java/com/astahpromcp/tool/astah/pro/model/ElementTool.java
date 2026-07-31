@@ -16,7 +16,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ElementDTOAssemb
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class ElementTool implements ToolProvider {
         );
     }
 
-    private ElementDTO addStereotype(McpSyncServerExchange exchange, ElementWithStereotypeDTO param) throws Exception {
+    private ElementDTO addStereotype(ElementWithStereotypeDTO param) throws Exception {
         log.debug("Add stereotype to element: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
@@ -113,7 +112,7 @@ public class ElementTool implements ToolProvider {
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
-    private ElementDTO removeStereotype(McpSyncServerExchange exchange, ElementWithStereotypeDTO param) throws Exception {
+    private ElementDTO removeStereotype(ElementWithStereotypeDTO param) throws Exception {
         log.debug("Remove stereotype from element: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
@@ -125,7 +124,7 @@ public class ElementTool implements ToolProvider {
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
-    private ElementDTO setTypeModifier(McpSyncServerExchange exchange, ElementWithTypeModifierDTO param) throws Exception {
+    private ElementDTO setTypeModifier(ElementWithTypeModifierDTO param) throws Exception {
         log.debug("Set type modifier of element: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
@@ -137,7 +136,7 @@ public class ElementTool implements ToolProvider {
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
-    private ElementDTO changeTaggedValue(McpSyncServerExchange exchange, ElementWithTaggedValueDTO param) throws Exception {
+    private ElementDTO changeTaggedValue(ElementWithTaggedValueDTO param) throws Exception {
         log.debug("Change value of tagged value: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
@@ -154,7 +153,7 @@ public class ElementTool implements ToolProvider {
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
-    private NameIdTypeListDTO getDiagramsOfElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NameIdTypeListDTO getDiagramsOfElement(IdDTO param) throws Exception {
         log.debug("Get diagrams of element: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());

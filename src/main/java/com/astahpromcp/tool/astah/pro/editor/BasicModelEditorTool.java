@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -306,7 +305,7 @@ public class BasicModelEditorTool implements ToolProvider {
         );
     }
 
-    private NamedElementDTO changeParent(McpSyncServerExchange exchange, NamedElementWithParentDTO param) throws Exception {
+    private NamedElementDTO changeParent(NamedElementWithParentDTO param) throws Exception {
         log.debug("Change parent: {}", param);
 
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementid());
@@ -319,7 +318,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahTargetNamedElement);
     }
 
-    private ArtifactDTO createArtifact(McpSyncServerExchange exchange, NewArtifactInPackageDTO param) throws Exception {
+    private ArtifactDTO createArtifact(NewArtifactInPackageDTO param) throws Exception {
         log.debug("Create artifact in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -331,7 +330,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ArtifactDTOAssembler.toDTO(createdAstahArtifact);
     }
 
-    private PackageDTO createPackageInParentPackage(McpSyncServerExchange exchange, NewPackageInPackageDTO param) throws Exception {
+    private PackageDTO createPackageInParentPackage(NewPackageInPackageDTO param) throws Exception {
         log.debug("Create package in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -343,7 +342,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return PackageDTOAssembler.toDTO(createdAstahPackage);
     }
 
-    private ClassDTO createClassInParentPackage(McpSyncServerExchange exchange, NewClassInPackageDTO param) throws Exception {
+    private ClassDTO createClassInParentPackage(NewClassInPackageDTO param) throws Exception {
         log.debug("Create class in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -355,7 +354,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(createdAstahClass);
     }
 
-    private ClassDTO createClassInParentClass(McpSyncServerExchange exchange, NewClassInClassDTO param) throws Exception {
+    private ClassDTO createClassInParentClass(NewClassInClassDTO param) throws Exception {
         log.debug("Create class in parent class: {}", param);
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
@@ -367,7 +366,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(createdAstahClass);
     }
 
-    private EnumerationDTO createEnumerationInParentPackage(McpSyncServerExchange exchange, NewEnumerationInPackageDTO param) throws Exception {
+    private EnumerationDTO createEnumerationInParentPackage(NewEnumerationInPackageDTO param) throws Exception {
         log.debug("Create enumeration in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -379,7 +378,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return EnumerationDTOAssembler.toDTO(createdAstahEnumeration);
     }
 
-    private ClassDTO createInterfaceInParentPackage(McpSyncServerExchange exchange, NewInterfaceInPackageDTO param) throws Exception {
+    private ClassDTO createInterfaceInParentPackage(NewInterfaceInPackageDTO param) throws Exception {
         log.debug("Create interface in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -391,7 +390,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(createdAstahInterface);
     }
 
-    private ClassDTO createInterfaceInParentClass(McpSyncServerExchange exchange, NewInterfaceInClassDTO param) throws Exception {
+    private ClassDTO createInterfaceInParentClass(NewInterfaceInClassDTO param) throws Exception {
         log.debug("Create interface in parent class: {}", param);
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
@@ -403,7 +402,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(createdAstahInterface);
     }
 
-    private ComponentDTO createComponent(McpSyncServerExchange exchange, NewComponentInPackageDTO param) throws Exception {
+    private ComponentDTO createComponent(NewComponentInPackageDTO param) throws Exception {
         log.debug("Create component in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -415,7 +414,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ComponentDTOAssembler.toDTO(createdAstahComponent);
     }
 
-    private PortDTO createPort(McpSyncServerExchange exchange, NewPortInClassDTO param) throws Exception {
+    private PortDTO createPort(NewPortInClassDTO param) throws Exception {
         log.debug("Create port: {}", param);
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
@@ -427,7 +426,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return PortDTOAssembler.toDTO(createdAstahPort);
     }
 
-    private AttributeDTO createAttribute(McpSyncServerExchange exchange, NewAttributeInClassDTO param) throws Exception {
+    private AttributeDTO createAttribute(NewAttributeInClassDTO param) throws Exception {
         log.debug("Create attribute: {}", param);
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
@@ -439,7 +438,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(createdAstahAttribute);
     }
 
-    private EnumerationLiteralDTO createEnumerationLiteral(McpSyncServerExchange exchange, NewEnumerationLiteralInEnumerationDTO param) throws Exception {
+    private EnumerationLiteralDTO createEnumerationLiteral(NewEnumerationLiteralInEnumerationDTO param) throws Exception {
         log.debug("Create enumeration literal: {}", param);
 
         IEnumeration astahEnumeration = astahProToolSupport.getEnumeration(param.parentEnumerationId());
@@ -451,7 +450,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return EnumerationLiteralDTOAssembler.toDTO(createdAstahEnumerationLiteral);
     }
 
-    private OperationDTO createOperation(McpSyncServerExchange exchange, NewOperationInClassDTO param) throws Exception {
+    private OperationDTO createOperation(NewOperationInClassDTO param) throws Exception {
         log.debug("Create operation: {}", param);
 
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
@@ -463,7 +462,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(createdAstahOperation);
     }
 
-    private ParameterDTO createParameter(McpSyncServerExchange exchange, NewParameterToOperationDTO param) throws Exception {
+    private ParameterDTO createParameter(NewParameterToOperationDTO param) throws Exception {
         log.debug("Create parameter: {}", param);
 
         IOperation astahTargetOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -478,7 +477,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ParameterDTOAssembler.toDTO(createdAstahParameter);
     }
 
-    private AssociationDTO createAssociation(McpSyncServerExchange exchange, NewAssociationDTO param) throws Exception {
+    private AssociationDTO createAssociation(NewAssociationDTO param) throws Exception {
         log.debug("Create association: {}", param);
 
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
@@ -502,7 +501,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return AssociationDTOAssembler.toDTO(createdAstahAssociation);
     }
 
-    private AssociationClassDTO createAssociationClass(McpSyncServerExchange exchange, NewAssociationClassDTO param) throws Exception {
+    private AssociationClassDTO createAssociationClass(NewAssociationClassDTO param) throws Exception {
         log.debug("Create association class: {}", param);
 
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
@@ -520,7 +519,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return AssociationClassDTOAssembler.toDTO(createdAstahAssociationClass);
     }
 
-    private DependencyDTO createDependency(McpSyncServerExchange exchange, NewDependencyDTO param) throws Exception {
+    private DependencyDTO createDependency(NewDependencyDTO param) throws Exception {
         log.debug("Create dependency: {}", param);
 
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
@@ -537,7 +536,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private GeneralizationDTO createGeneralization(McpSyncServerExchange exchange, NewGeneralizationDTO param) throws Exception {
+    private GeneralizationDTO createGeneralization(NewGeneralizationDTO param) throws Exception {
         log.debug("Create generalization: {}", param);
 
         IClass astahSubClass = astahProToolSupport.getClass(param.subClassId());
@@ -553,7 +552,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return GeneralizationDTOAssembler.toDTO(createdAstahGeneralization);
     }
 
-    private RealizationDTO createRealization(McpSyncServerExchange exchange, NewRealizationDTO param) throws Exception {
+    private RealizationDTO createRealization(NewRealizationDTO param) throws Exception {
         log.debug("Create realization: {}", param);
 
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
@@ -569,7 +568,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return RealizationDTOAssembler.toDTO(createdAstahRealization);
     }
 
-    private UsageDTO createUsage(McpSyncServerExchange exchange, NewUsageDTO param) throws Exception {
+    private UsageDTO createUsage(NewUsageDTO param) throws Exception {
         log.debug("Create usage: {}", param);
 
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
@@ -585,7 +584,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return UsageDTOAssembler.toDTO(createdAstahUsage);
     }
 
-    private AttributeDTO createQualifier(McpSyncServerExchange exchange, NewQualifierToAssociationEndDTO param) throws Exception {
+    private AttributeDTO createQualifier(NewQualifierToAssociationEndDTO param) throws Exception {
         log.debug("Create qualifier: {}", param);
 
         IAttribute astahAssociationEnd = astahProToolSupport.getAttribute(param.targetAssociationEndId());
@@ -602,7 +601,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(createdAstahQualifier);
     }
 
-    private ElementDTO createTaggedValue(McpSyncServerExchange exchange, NewTaggedValueToElementDTO param) throws Exception {
+    private ElementDTO createTaggedValue(NewTaggedValueToElementDTO param) throws Exception {
         log.debug("Create tagged value: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
@@ -617,7 +616,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
-    private ClassDTO createTemplateParameter(McpSyncServerExchange exchange, NewTemplateParameterToClassDTO param) throws Exception {
+    private ClassDTO createTemplateParameter(NewTemplateParameterToClassDTO param) throws Exception {
         log.debug("Create template parameter: {}", param);
 
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
@@ -634,7 +633,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahTargetClass);
     }
 
-    private ElementDTO deleteElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ElementDTO deleteElement(IdDTO param) throws Exception {
         log.debug("Delete element: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
@@ -648,7 +647,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return deletedElementDTO;
     }
 
-    private RequirementDTO createRequirementInParentPackage(McpSyncServerExchange exchange, NewRequirementInPackageDTO param) throws Exception {
+    private RequirementDTO createRequirementInParentPackage(NewRequirementInPackageDTO param) throws Exception {
         log.debug("Create requirement in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -662,7 +661,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return RequirementDTOAssembler.toDTO(createdAstahRequirement);
     }
 
-    private RequirementDTO createRequirementInParentRequirement(McpSyncServerExchange exchange, NewRequirementInRequirementDTO param) throws Exception {
+    private RequirementDTO createRequirementInParentRequirement(NewRequirementInRequirementDTO param) throws Exception {
         log.debug("Create requirement in parent requirement: {}", param);
 
         IRequirement parentAstahRequirement = astahProToolSupport.getRequirement(param.parentRequirementId());
@@ -676,7 +675,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return RequirementDTOAssembler.toDTO(createdAstahRequirement);
     }
 
-    private TestCaseDTO createTestCaseInParentPackage(McpSyncServerExchange exchange, NewTestCaseInPackageDTO param) throws Exception {
+    private TestCaseDTO createTestCaseInParentPackage(NewTestCaseInPackageDTO param) throws Exception {
         log.debug("Create test case in parent package: {}", param);
 
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -691,7 +690,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
     }
 
-    private TestCaseDTO createTestCaseInParentTestCase(McpSyncServerExchange exchange, NewTestCaseInTestCaseDTO param) throws Exception {
+    private TestCaseDTO createTestCaseInParentTestCase(NewTestCaseInTestCaseDTO param) throws Exception {
         log.debug("Create test case in parent test case: {}", param);
 
         ITestCase parentAstahTestCase = astahProToolSupport.getTestCase(param.parentTestCaseId());
@@ -705,7 +704,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return TestCaseDTOAssembler.toDTO(createdAstahTestCase);
     }
 
-    private DependencyDTO createCopyDependency(McpSyncServerExchange exchange, NewCopyDependencyDTO param) throws Exception {
+    private DependencyDTO createCopyDependency(NewCopyDependencyDTO param) throws Exception {
         log.debug("Create copy dependency: {}", param);
 
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
@@ -724,7 +723,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private DependencyDTO createDeriveReqtDependency(McpSyncServerExchange exchange, NewDeriveReqtDependencyDTO param) throws Exception {
+    private DependencyDTO createDeriveReqtDependency(NewDeriveReqtDependencyDTO param) throws Exception {
         log.debug("Create derive reqt dependency: {}", param);
 
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
@@ -743,7 +742,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private DependencyDTO createRefineDependency(McpSyncServerExchange exchange, NewRefineDependencyDTO param) throws Exception {
+    private DependencyDTO createRefineDependency(NewRefineDependencyDTO param) throws Exception {
         log.debug("Create refine dependency: {}", param);
 
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
@@ -762,7 +761,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private DependencyDTO createSatisfyDependency(McpSyncServerExchange exchange, NewSatisfyDependencyDTO param) throws Exception {
+    private DependencyDTO createSatisfyDependency(NewSatisfyDependencyDTO param) throws Exception {
         log.debug("Create satisfy dependency: {}", param);
 
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
@@ -781,7 +780,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private DependencyDTO createTraceDependency(McpSyncServerExchange exchange, NewTraceDependencyDTO param) throws Exception {
+    private DependencyDTO createTraceDependency(NewTraceDependencyDTO param) throws Exception {
         log.debug("Create trace dependency: {}", param);
 
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
@@ -800,7 +799,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private DependencyDTO createVerifyDependency(McpSyncServerExchange exchange, NewVerifyDependencyDTO param) throws Exception {
+    private DependencyDTO createVerifyDependency(NewVerifyDependencyDTO param) throws Exception {
         log.debug("Create verify dependency: {}", param);
 
         ITestCase sourceAstahTestCase = astahProToolSupport.getTestCase(param.sourceTestCaseId());
@@ -819,7 +818,7 @@ public class BasicModelEditorTool implements ToolProvider {
         return DependencyDTOAssembler.toDTO(createdAstahDependency);
     }
 
-    private ConstraintDTO createConstraint(McpSyncServerExchange exchange, NewConstraintDTO param) throws Exception {
+    private ConstraintDTO createConstraint(NewConstraintDTO param) throws Exception {
         log.debug("Create constraint: {}", param);
 
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());

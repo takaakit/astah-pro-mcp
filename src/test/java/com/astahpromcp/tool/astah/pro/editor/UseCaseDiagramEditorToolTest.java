@@ -8,7 +8,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,6 @@ public class UseCaseDiagramEditorToolTest {
         createUseCaseDiagram = TestSupport.getAccessibleMethod(
             UseCaseDiagramEditorTool.class,
             "createUseCaseDiagram",
-            McpSyncServerExchange.class,
             NewUseCaseDiagramDTO.class);
     }
 

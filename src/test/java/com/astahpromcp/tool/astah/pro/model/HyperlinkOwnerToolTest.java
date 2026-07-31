@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.model.IHyperlinkOwner;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,84 +66,72 @@ public class HyperlinkOwnerToolTest {
         addUrlHyperlinkToNamedElement = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "addUrlHyperlinkToNamedElement",
-            McpSyncServerExchange.class,
             NamedElementWithUrlHyperlinkDTO.class);
 
         // addFilePathHyperlinkToNamedElement() method
         addFilePathHyperlinkToNamedElement = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "addFilePathHyperlinkToNamedElement",
-            McpSyncServerExchange.class,
             NamedElementWithFilePathHyperlinkDTO.class);
 
         // addNamedElementHyperlinkToNamedElement() method
         addNamedElementHyperlinkToNamedElement = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "addNamedElementHyperlinkToNamedElement",
-            McpSyncServerExchange.class,
             NamedElementWithNamedElementHyperlinkDTO.class);
 
         // removeAllUrlHyperlinksFromNamedElement() method
         removeAllUrlHyperlinksFromNamedElement = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "removeAllUrlHyperlinksFromNamedElement",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // removeAllFilePathHyperlinksFromNamedElement() method
         removeAllFilePathHyperlinksFromNamedElement = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "removeAllFilePathHyperlinksFromNamedElement",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // removeAllNamedElementHyperlinksFromNamedElement() method
         removeAllNamedElementHyperlinksFromNamedElement = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "removeAllNamedElementHyperlinksFromNamedElement",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // addUrlHyperlinkToNodePresentation() method
         addUrlHyperlinkToNodePresentation = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "addUrlHyperlinkToNodePresentation",
-            McpSyncServerExchange.class,
             NodePresentationWithUrlHyperlinkDTO.class);
 
         // addFilePathHyperlinkToNodePresentation() method
         addFilePathHyperlinkToNodePresentation = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "addFilePathHyperlinkToNodePresentation",
-            McpSyncServerExchange.class,
             NodePresentationWithFilePathHyperlinkDTO.class);
 
         // addNamedElementHyperlinkToNodePresentation() method
         addNamedElementHyperlinkToNodePresentation = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "addNamedElementHyperlinkToNodePresentation",
-            McpSyncServerExchange.class,
             NodePresentationWithNamedElementHyperlinkDTO.class);
 
         // removeAllUrlHyperlinksFromNodePresentation() method
         removeAllUrlHyperlinksFromNodePresentation = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "removeAllUrlHyperlinksFromNodePresentation",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // removeAllFilePathHyperlinksFromNodePresentation() method
         removeAllFilePathHyperlinksFromNodePresentation = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "removeAllFilePathHyperlinksFromNodePresentation",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // removeAllNamedElementHyperlinksFromNodePresentation() method
         removeAllNamedElementHyperlinksFromNodePresentation = TestSupport.getAccessibleMethod(
             HyperlinkOwnerTool.class,
             "removeAllNamedElementHyperlinksFromNodePresentation",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

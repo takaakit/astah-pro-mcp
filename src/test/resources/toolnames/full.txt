@@ -12,6 +12,7 @@ add_region
 add_stereotype
 add_url_hyperlink_to_named_elem
 add_url_hyperlink_to_node_prst
+architectural_design_smells
 astah_pro_mcp_guide
 astah_script_guide
 capture_astah_window
@@ -135,6 +136,7 @@ delete_region
 detect_overlap
 dgm_layout_anti_patterns
 dgm_layout_guide
+diagram_consistency_maintenance_steps
 er_dgm_guide
 export_dgm_png_img
 find_named_elements_by_name
@@ -254,6 +256,7 @@ is_proj_opened
 mind_map_guide
 move_topic_within_sibling_order
 open_proj
+read_architectural_design_smells
 read_uml_modeling_architecture_insights
 remove_all_file_path_hyperlinks_from_named_elem
 remove_all_file_path_hyperlinks_from_node_prst
@@ -349,6 +352,7 @@ set_val_of_enum_literal
 set_val_of_slot
 set_visibility
 state_machine_dgm_guide
+store_architectural_design_smells
 store_uml_modeling_architecture_insights
 terminology_consistency_maintenance_steps
 uml_modeling_architecture_insights

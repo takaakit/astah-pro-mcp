@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -87,7 +86,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNote(McpSyncServerExchange exchange, NewNoteDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNote(NewNoteDTO param) throws Exception {
         log.debug("Create note: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -127,7 +126,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNoteAnchor(McpSyncServerExchange exchange, NewNoteAnchorDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNoteAnchor(NewNoteAnchorDTO param) throws Exception {
         log.debug("Create note anchor: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());

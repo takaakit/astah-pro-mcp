@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,37 +50,31 @@ public class StateToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             StateTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         addInternalTransition = TestSupport.getAccessibleMethod(
             StateTool.class,
             "addInternalTransition",
-            McpSyncServerExchange.class,
             StateWithInternalTransitionDTO.class);
 
         deleteAllInternalTransitions = TestSupport.getAccessibleMethod(
             StateTool.class,
             "deleteAllInternalTransitions",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         setEntry = TestSupport.getAccessibleMethod(
             StateTool.class,
             "setEntry",
-            McpSyncServerExchange.class,
             StateWithEntryDTO.class);
 
         setDoActivity = TestSupport.getAccessibleMethod(
             StateTool.class,
             "setDoActivity",
-            McpSyncServerExchange.class,
             StateWithDoActivityDTO.class);
 
         setExit = TestSupport.getAccessibleMethod(
             StateTool.class,
             "setExit",
-            McpSyncServerExchange.class,
             StateWithExitDTO.class);
     }
 

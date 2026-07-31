@@ -16,7 +16,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Rectangle2D;
@@ -101,7 +100,7 @@ public class DiagramTool implements ToolProvider {
         return List.of();
     }
 
-    private DiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private DiagramDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get diagram information: {}", param);
         
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
@@ -109,7 +108,7 @@ public class DiagramTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(astahDiagram);
     }
 
-    private RectangleDTO getDiagramBoundRect(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private RectangleDTO getDiagramBoundRect(IdDTO param) throws Exception {
         log.debug("Get diagram bound rect: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
@@ -118,7 +117,7 @@ public class DiagramTool implements ToolProvider {
         return RectangleDTOAssembler.toDTO(astahRectangle);
     }
 
-    private PresentationListDTO getPresentationsOnDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PresentationListDTO getPresentationsOnDiagram(IdDTO param) throws Exception {
         log.debug("Get presentations on diagram: {}", param);
         
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
@@ -131,7 +130,7 @@ public class DiagramTool implements ToolProvider {
         return new PresentationListDTO(presentationDTOs);
     }
 
-    private ImageFileDTO exportPngImage(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ImageFileDTO exportPngImage(IdDTO param) throws Exception {
         log.debug("Export PNG image: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());

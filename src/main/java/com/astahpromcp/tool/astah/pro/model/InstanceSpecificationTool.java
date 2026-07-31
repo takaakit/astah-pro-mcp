@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InstanceSpecific
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IInstanceSpecification;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class InstanceSpecificationTool implements ToolProvider {
         );
     }
 
-    private InstanceSpecificationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private InstanceSpecificationDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get instance specification information: {}", param);
 
         IInstanceSpecification astahInstanceSpecification = astahProToolSupport.getInstanceSpecification(param.id());
@@ -82,7 +81,7 @@ public class InstanceSpecificationTool implements ToolProvider {
         return InstanceSpecificationDTOAssembler.toDTO(astahInstanceSpecification);
     }
 
-    private InstanceSpecificationDTO setClassifier(McpSyncServerExchange exchange, InstanceSpecificationWithClassifierDTO param) throws Exception {
+    private InstanceSpecificationDTO setClassifier(InstanceSpecificationWithClassifierDTO param) throws Exception {
         log.debug("Set classifier to instance specification: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassifierId());

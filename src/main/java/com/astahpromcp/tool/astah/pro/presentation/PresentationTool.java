@@ -16,7 +16,6 @@ import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -103,7 +102,7 @@ public class PresentationTool implements ToolProvider {
         );
     }
 
-    private ElementDTO getElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ElementDTO getElement(IdDTO param) throws Exception {
         log.debug("Get element corresponding to presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.id());
@@ -117,7 +116,7 @@ public class PresentationTool implements ToolProvider {
         }
     }
 
-    private Pair<PresentationDTO, List<McpSchema.Content>> setLabel(McpSyncServerExchange exchange, PresentationWithLabelDTO param) throws Exception {
+    private Pair<PresentationDTO, List<McpSchema.Content>> setLabel(PresentationWithLabelDTO param) throws Exception {
         log.debug("Set label of presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
@@ -133,7 +132,7 @@ public class PresentationTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<PresentationDTO, List<McpSchema.Content>> changeFillColor(McpSyncServerExchange exchange, PresentationWithColorDTO param) throws Exception {
+    private Pair<PresentationDTO, List<McpSchema.Content>> changeFillColor(PresentationWithColorDTO param) throws Exception {
         log.debug("Change fill color of presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
@@ -149,7 +148,7 @@ public class PresentationTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<PresentationDTO, List<McpSchema.Content>> changeLineColor(McpSyncServerExchange exchange, PresentationWithColorDTO param) throws Exception {
+    private Pair<PresentationDTO, List<McpSchema.Content>> changeLineColor(PresentationWithColorDTO param) throws Exception {
         log.debug("Change line color of presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
@@ -165,7 +164,7 @@ public class PresentationTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<PresentationDTO, List<McpSchema.Content>> changeFontColor(McpSyncServerExchange exchange, PresentationWithColorDTO param) throws Exception {
+    private Pair<PresentationDTO, List<McpSchema.Content>> changeFontColor(PresentationWithColorDTO param) throws Exception {
         log.debug("Change font color of presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());

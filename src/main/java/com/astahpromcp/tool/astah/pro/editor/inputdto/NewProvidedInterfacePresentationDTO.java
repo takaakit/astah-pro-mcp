@@ -6,7 +6,7 @@ public record NewProvidedInterfacePresentationDTO(
     @JsonPropertyDescription("Target composite structure diagram identifier")
     String targetCompositeStructureDiagramId,
 
-    @JsonPropertyDescription("Target node presentation identifier. It must be a part presentation or port presentation.")
+    @JsonPropertyDescription("Target node presentation identifier. Must be one of the following node presentation types: Port, or Part.")
     String targetNodePresentationId,
 
     @JsonPropertyDescription("Target interface identifier")

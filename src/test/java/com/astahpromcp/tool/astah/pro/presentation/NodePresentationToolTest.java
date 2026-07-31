@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,35 +58,30 @@ public class NodePresentationToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             NodePresentationTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getNodePresentationRectangle() method
         getNodePresentationRectangle = TestSupport.getAccessibleMethod(
             NodePresentationTool.class,
             "getNodePresentationRectangle",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setNodePresentationLocation() method
         setNodePresentationLocation = TestSupport.getAccessibleMethod(
             NodePresentationTool.class,
             "setNodePresentationLocation",
-            McpSyncServerExchange.class,
             NodePresentationWithLocationDTO.class);
 
         // setNodePresentationWidth() method
         setNodePresentationWidth = TestSupport.getAccessibleMethod(
             NodePresentationTool.class,
             "setNodePresentationWidth",
-            McpSyncServerExchange.class,
             NodePresentationWithWidthDTO.class);
 
         // setNodePresentationHeight() method
         setNodePresentationHeight = TestSupport.getAccessibleMethod(
             NodePresentationTool.class,
             "setNodePresentationHeight",
-            McpSyncServerExchange.class,
             NodePresentationWithHeightDTO.class);
     }
 

@@ -6,7 +6,7 @@ public record NewPortPresentationDTO(
     @JsonPropertyDescription("Target composite structure diagram identifier")
     String targetCompositeStructureDiagramId,
 
-    @JsonPropertyDescription("Target node presentation identifier. It must be a part presentation or structured class presentation.")
+    @JsonPropertyDescription("Target node presentation identifier. Must be one of the following node presentation types: Part, or StructuredClass.")
     String targetNodePresentationId,
 
     @JsonPropertyDescription("Target port identifier")

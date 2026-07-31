@@ -15,7 +15,6 @@ import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -107,7 +106,7 @@ public class ClassTool implements ToolProvider {
         );
     }
 
-    private ClassDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ClassDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get class or interface information: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.id());
@@ -115,7 +114,7 @@ public class ClassTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahClass);
     }
 
-    private ClassDTO setAbstract(McpSyncServerExchange exchange, ClassWithAbstractDTO param) throws Exception {
+    private ClassDTO setAbstract(ClassWithAbstractDTO param) throws Exception {
         log.debug("Set abstract of class: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
@@ -127,7 +126,7 @@ public class ClassTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahClass);
     }
 
-    private ClassDTO setActive(McpSyncServerExchange exchange, ClassWithActiveDTO param) throws Exception {
+    private ClassDTO setActive(ClassWithActiveDTO param) throws Exception {
         log.debug("Set active of class: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
@@ -139,7 +138,7 @@ public class ClassTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahClass);
     }
 
-    private ClassDTO setLeaf(McpSyncServerExchange exchange, ClassWithLeafDTO param) throws Exception {
+    private ClassDTO setLeaf(ClassWithLeafDTO param) throws Exception {
         log.debug("Set leaf of class: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
@@ -151,7 +150,7 @@ public class ClassTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahClass);
     }
 
-    private ClassDTO addInvariant(McpSyncServerExchange exchange, ClassWithInvariantDTO param) throws Exception {
+    private ClassDTO addInvariant(ClassWithInvariantDTO param) throws Exception {
         log.debug("Add invariant to class: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
@@ -163,7 +162,7 @@ public class ClassTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahClass);
     }
 
-    private ClassDTO removeInvariant(McpSyncServerExchange exchange, ClassWithInvariantDTO param) throws Exception {
+    private ClassDTO removeInvariant(ClassWithInvariantDTO param) throws Exception {
         log.debug("Remove invariant from class: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());

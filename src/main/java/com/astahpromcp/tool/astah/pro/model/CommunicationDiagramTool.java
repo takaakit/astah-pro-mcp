@@ -12,7 +12,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionDTOAs
 import com.change_vision.jude.api.inf.model.ICommunicationDiagram;
 import com.change_vision.jude.api.inf.model.IInteraction;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class CommunicationDiagramTool implements ToolProvider {
         return List.of();
     }
 
-    private CommunicationDiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private CommunicationDiagramDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get communication diagram information: {}", param);
 
         ICommunicationDiagram astahCommunicationDiagram = astahProToolSupport.getCommunicationDiagram(param.id());
@@ -82,7 +81,7 @@ public class CommunicationDiagramTool implements ToolProvider {
         return CommunicationDiagramDTOAssembler.toDTO(astahCommunicationDiagram);
     }
 
-    private InteractionDTO getInteraction(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private InteractionDTO getInteraction(IdDTO param) throws Exception {
         log.debug("Get interaction information of communication diagram: {}", param);
 
         ICommunicationDiagram astahCommunicationDiagram = astahProToolSupport.getCommunicationDiagram(param.id());

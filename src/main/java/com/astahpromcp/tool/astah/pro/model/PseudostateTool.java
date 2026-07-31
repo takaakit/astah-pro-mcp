@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.PseudostateDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PseudostateDTOAssembler;
 import com.change_vision.jude.api.inf.model.IPseudostate;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class PseudostateTool implements ToolProvider {
         return List.of();
     }
 
-    private PseudostateDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PseudostateDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get pseudostate information: {}", param);
 
         IPseudostate astahPseudostate = astahProToolSupport.getPseudostate(param.id());

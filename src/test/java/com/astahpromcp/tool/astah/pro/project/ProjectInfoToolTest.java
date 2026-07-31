@@ -20,7 +20,6 @@ import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,98 +70,84 @@ public class ProjectInfoToolTest {
         getAllNamedElements = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getAllNamedElements",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getNamedElementsChunk() method
         getNamedElementsChunk = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getNamedElementsChunk",
-            McpSyncServerExchange.class,
             ChunkDTO.class);
 
         // getAllPresentations() method
         getAllPresentations = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getAllPresentations",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getPresentationsChunk() method
         getPresentationsChunk = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getPresentationsChunk",
-            McpSyncServerExchange.class,
             ChunkDTO.class);
 
         // getAllDefinitions() method
         getAllDefinitions = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getAllDefinitions",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getDefinitionsChunk() method
         getDefinitionsChunk = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getDefinitionsChunk",
-            McpSyncServerExchange.class,
             ChunkDTO.class);
         
         // getAllConstraintsAndConditions() method
         getAllConstraintsAndConditions = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getAllConstraintsAndConditions",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // retrieveClassifiersThatReferenceOrBeReferencedBy() method
         retrieveClassifiersThatReferenceOrBeReferencedBy = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "retrieveClassifiersThatReferenceOrBeReferencedBy",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // searchWithinNamedElements() method
         searchWithinNamedElements = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "searchWithinNamedElements",
-            McpSyncServerExchange.class,
             SearchDTO.class);
 
         // searchWithinPresentations() method
         searchWithinPresentations = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "searchWithinPresentations",
-            McpSyncServerExchange.class,
             SearchDTO.class);
 
         // retrieveClassifiersWithinPackage() method
         retrieveClassifiersWithinPackage = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "retrieveClassifiersWithinPackage",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // retrievePackageStructureAsPlantuml() method
         retrievePackageStructureAsPlantuml = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "retrievePackageStructureAsPlantuml",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // retrieveClassifiersRelationshipsAsPlantuml() method
         retrieveClassifiersRelationshipsAsPlantuml = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "retrieveClassifiersRelationshipsAsPlantuml",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getRelationshipsAsPlantumlCode() method
         getRelationshipsAsPlantumlCode = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getRelationshipsAsPlantumlCode",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // nameIdTypeDTOChunksCacheUpdatedAtNanos field

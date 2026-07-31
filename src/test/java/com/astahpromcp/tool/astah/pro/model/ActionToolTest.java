@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IActivity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,14 +44,12 @@ public class ActionToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ActionTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setCallingActivity() method
         setCallingActivity = TestSupport.getAccessibleMethod(
             ActionTool.class,
             "setCallingActivity",
-            McpSyncServerExchange.class,
             ActionWithCallingActivityDTO.class);
     }
 

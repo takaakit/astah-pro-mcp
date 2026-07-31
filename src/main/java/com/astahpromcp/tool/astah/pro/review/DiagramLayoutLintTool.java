@@ -18,7 +18,6 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -79,7 +78,7 @@ public class DiagramLayoutLintTool implements ToolProvider {
                 ReportDTO.class));
     }
 
-    private ReportDTO detectOverlap(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ReportDTO detectOverlap(IdDTO param) throws Exception {
         log.debug("Detect overlap: {}", param);
 
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());

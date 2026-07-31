@@ -13,7 +13,6 @@ import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,42 +54,36 @@ public class ClassToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ClassTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setAbstract() method
         setAbstract = TestSupport.getAccessibleMethod(
             ClassTool.class,
             "setAbstract",
-            McpSyncServerExchange.class,
             ClassWithAbstractDTO.class);
 
         // setActive() method
         setActive = TestSupport.getAccessibleMethod(
             ClassTool.class,
             "setActive",
-            McpSyncServerExchange.class,
             ClassWithActiveDTO.class);
 
         // setLeaf() method
         setLeaf = TestSupport.getAccessibleMethod(
             ClassTool.class,
             "setLeaf",
-            McpSyncServerExchange.class,
             ClassWithLeafDTO.class);
 
         // addInvariant() method
         addInvariant = TestSupport.getAccessibleMethod(
             ClassTool.class,
             "addInvariant",
-            McpSyncServerExchange.class,
             ClassWithInvariantDTO.class);
 
         // removeInvariant() method
         removeInvariant = TestSupport.getAccessibleMethod(
             ClassTool.class,
             "removeInvariant",
-            McpSyncServerExchange.class,
             ClassWithInvariantDTO.class);
     }
 

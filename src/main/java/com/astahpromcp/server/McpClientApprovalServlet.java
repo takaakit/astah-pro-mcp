@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -46,8 +47,8 @@ public class McpClientApprovalServlet extends HttpServlet {
 
     private final HttpServletStreamableServerTransportProvider delegate;
 
-    // Serializes approval dialogs; initialize requests arriving while a dialog
-    // is open are rejected immediately to prevent dialog flooding.
+    // Serializes approval dialogs of this servlet instance, that is, of one port.
+    // Initialize requests arriving while a dialog is open wait for their turn, so at most one dialog is shown at a time per port. Dialogs of the other port are independent by design.
     private final ReentrantLock dialogLock = new ReentrantLock();
 
     // Last user approval, used for the approval grace period (guarded by graceLock)
@@ -118,25 +119,12 @@ public class McpClientApprovalServlet extends HttpServlet {
 
         // If the request is an initialize attempt, request approval from the user
         if (call.isInitialize()) {
-            ApprovalOutcome outcome = requestUserApproval(context);
-            switch (outcome) {
-                case APPROVED:
-                    log.info("Approved MCP connection from {}", context.clientAddress());
-                    break;
-                case BUSY:
-                    // Transient: another approval dialog is open. Ask the client to retry.
-                    log.info("Approval in progress; asked MCP client {} to retry", context.clientAddress());
-                    resp.setHeader("Retry-After", "2");
-                    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                            "Approval dialog in progress; retry shortly");
-                    return;
-                case DECLINED:
-                default:
-                    // Permanent: the user did not approve (or no approval is possible).
-                    log.info("Rejected MCP connection from {}", context.clientAddress());
-                    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Connection not approved by user");
-                    return;
+            if (!requestUserApproval(context)) {
+                log.info("Rejected MCP connection from {}", context.clientAddress());
+                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Connection not approved by user");
+                return;
             }
+            log.info("Approved MCP connection from {}", context.clientAddress());
         }
 
         // Create a response wrapper to track the status and the issued session ID
@@ -174,41 +162,47 @@ public class McpClientApprovalServlet extends HttpServlet {
         resp.getWriter().flush();
     }
 
-    // Outcome of a user approval request
-    enum ApprovalOutcome {
-        APPROVED,
-        DECLINED,
-        BUSY
-    }
-
-    // Request approval from the user
-    private ApprovalOutcome requestUserApproval(RequestContext context) {
+    // Request approval from the user and return whether the connection may proceed
+    private boolean requestUserApproval(RequestContext context) {
         // Auto-approve follow-up initializes from the same client right after a user approval
         if (isWithinApprovalGracePeriod(context)) {
             log.info("Auto-approved MCP connection from {} within the approval grace period (User-Agent: {}).",
                     context.clientAddress(), context.userAgent());
-            return ApprovalOutcome.APPROVED;
+            return true;
         }
 
-        // If another approval dialog is already open, treat it as transient (the client may retry)
-        if (!dialogLock.tryLock()) {
-            log.warn("Another approval dialog is in progress. Asking client {} to retry.", context.clientAddress());
-            return ApprovalOutcome.BUSY;
+        // Queue behind an approval dialog that is already open rather than rejecting the request.
+        // The wait is bounded so that a dialog left unanswered cannot park every worker thread of this port, and interruptible so that a server shutdown does not have to wait for the user.
+        boolean acquired;
+        try {
+            acquired = dialogLock.tryLock(McpServerConfig.APPROVAL_DIALOG_WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Interrupted while waiting for the approval dialog of another connection; rejecting {}",
+                    context.clientAddress());
+            return false;
+        }
+
+        if (!acquired) {
+            log.warn("Gave up waiting for the approval dialog of another connection after {} seconds; rejecting {}",
+                    McpServerConfig.APPROVAL_DIALOG_WAIT_TIMEOUT_SECONDS, context.clientAddress());
+            return false;
         }
 
         try {
             if (promptUserForApproval(context)) {
                 recordApproval(context);
-                return ApprovalOutcome.APPROVED;
+                return true;
             }
-            return ApprovalOutcome.DECLINED;
+            return false;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ApprovalOutcome.DECLINED;
+            return false;
         } catch (InvocationTargetException e) {
             log.error("Failed to display approval dialog", e.getCause());
-            return ApprovalOutcome.DECLINED;
+            return false;
         } finally {
             dialogLock.unlock();
         }

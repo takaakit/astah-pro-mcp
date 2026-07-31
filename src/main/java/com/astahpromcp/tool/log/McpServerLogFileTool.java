@@ -6,7 +6,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.log.outputdto.LogFileDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -40,7 +39,7 @@ public class McpServerLogFileTool implements ToolProvider {
         }
     }
 
-    private LogFileDTO getMcpServerLogFile(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private LogFileDTO getMcpServerLogFile(NoInputDTO param) throws IOException {
         log.debug("Get information of mcp server log: {}", param);
         
         String mcpServerLogFilePath = LogbackConfig.getLogFilePath().toString();

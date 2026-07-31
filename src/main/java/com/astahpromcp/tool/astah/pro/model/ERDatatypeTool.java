@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ERDatatypeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDatatypeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class ERDatatypeTool implements ToolProvider {
         );
     }
 
-    private ERDatatypeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERDatatypeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER datatype information: {}", param);
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.id());
@@ -104,7 +103,7 @@ public class ERDatatypeTool implements ToolProvider {
         return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
-    private ERDatatypeDTO setLengthConstraint(McpSyncServerExchange exchange, ERDatatypeWithLengthConstraintDTO param) throws Exception {
+    private ERDatatypeDTO setLengthConstraint(ERDatatypeWithLengthConstraintDTO param) throws Exception {
         log.debug("Set length constraint of ER datatype: {}", param);
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
@@ -116,7 +115,7 @@ public class ERDatatypeTool implements ToolProvider {
         return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
-    private ERDatatypeDTO setPrecisionConstraint(McpSyncServerExchange exchange, ERDatatypeWithPrecisionConstraintDTO param) throws Exception {
+    private ERDatatypeDTO setPrecisionConstraint(ERDatatypeWithPrecisionConstraintDTO param) throws Exception {
         log.debug("Set precision constraint of ER datatype: {}", param);
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
@@ -128,7 +127,7 @@ public class ERDatatypeTool implements ToolProvider {
         return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
-    private ERDatatypeDTO setDefaultLengthPrecision(McpSyncServerExchange exchange, ERDatatypeWithDefaultLengthPrecisionDTO param) throws Exception {
+    private ERDatatypeDTO setDefaultLengthPrecision(ERDatatypeWithDefaultLengthPrecisionDTO param) throws Exception {
         log.debug("Set default length/precision of ER datatype: {}", param);
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
@@ -140,7 +139,7 @@ public class ERDatatypeTool implements ToolProvider {
         return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
-    private ERDatatypeDTO setDescription(McpSyncServerExchange exchange, ERDatatypeWithDescriptionDTO param) throws Exception {
+    private ERDatatypeDTO setDescription(ERDatatypeWithDescriptionDTO param) throws Exception {
         log.debug("Set description of ER datatype: {}", param);
 
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());

@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AttributeDTOAsse
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class AttributeTool implements ToolProvider {
         );
     }
 
-    private AttributeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private AttributeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get info of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.id());
@@ -109,7 +108,7 @@ public class AttributeTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
-    private AttributeDTO setInitialValue(McpSyncServerExchange exchange, AttributeWithInitialValueDTO param) throws Exception {
+    private AttributeDTO setInitialValue(AttributeWithInitialValueDTO param) throws Exception {
         log.debug("Set initial value of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
@@ -121,7 +120,7 @@ public class AttributeTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
-    private AttributeDTO setStatic(McpSyncServerExchange exchange, AttributeWithStaticDTO param) throws Exception {
+    private AttributeDTO setStatic(AttributeWithStaticDTO param) throws Exception {
         log.debug("Set static of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
@@ -133,7 +132,7 @@ public class AttributeTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
-    private AttributeDTO setType(McpSyncServerExchange exchange, AttributeWithTypeDTO param) throws Exception {
+    private AttributeDTO setType(AttributeWithTypeDTO param) throws Exception {
         log.debug("Set type of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
@@ -146,7 +145,7 @@ public class AttributeTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
-    private AttributeDTO setTypeExpression(McpSyncServerExchange exchange, AttributeWithTypeExpressionDTO param) throws Exception {
+    private AttributeDTO setTypeExpression(AttributeWithTypeExpressionDTO param) throws Exception {
         log.debug("Set type expression of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
@@ -158,7 +157,7 @@ public class AttributeTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAttribute);
     }
 
-    private AttributeDTO setMultiplicity(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
+    private AttributeDTO setMultiplicity(AttributeWithMultiplicityDTO param) throws Exception {
         log.debug("Set multiplicity of attribute: {}", param);
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());

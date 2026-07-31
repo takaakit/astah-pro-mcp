@@ -3,7 +3,6 @@ package com.astahpromcp.tool.visualization;
 import com.astahpromcp.tool.*;
 import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.visualization.inputdto.DotDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.plantuml.dot.ExeState;
@@ -46,7 +45,7 @@ public class GraphvizTool implements ToolProvider {
         }
     }
 
-    private List<McpSchema.Content> generateGraphImageFromDot(McpSyncServerExchange exchange, DotDTO param) throws Exception {
+    private List<McpSchema.Content> generateGraphImageFromDot(DotDTO param) throws Exception {
         log.debug("Generate graph image from DOT code: {}", param);
 
         McpSchema.ImageContent content = createPngImageContentFromDot(param.dotCode());

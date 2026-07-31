@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ERDatatypeDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,35 +49,30 @@ public class ERDatatypeToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERDatatypeTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setLengthConstraint() method
         setLengthConstraint = TestSupport.getAccessibleMethod(
             ERDatatypeTool.class,
             "setLengthConstraint",
-            McpSyncServerExchange.class,
             ERDatatypeWithLengthConstraintDTO.class);
 
         // setPrecisionConstraint() method
         setPrecisionConstraint = TestSupport.getAccessibleMethod(
             ERDatatypeTool.class,
             "setPrecisionConstraint",
-            McpSyncServerExchange.class,
             ERDatatypeWithPrecisionConstraintDTO.class);
 
         // setDefaultLengthPrecision() method
         setDefaultLengthPrecision = TestSupport.getAccessibleMethod(
             ERDatatypeTool.class,
             "setDefaultLengthPrecision",
-            McpSyncServerExchange.class,
             ERDatatypeWithDefaultLengthPrecisionDTO.class);
 
         // setDescription() method
         setDescription = TestSupport.getAccessibleMethod(
             ERDatatypeTool.class,
             "setDescription",
-            McpSyncServerExchange.class,
             ERDatatypeWithDescriptionDTO.class);
     }
 

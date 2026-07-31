@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.UseCaseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.UseCaseDTOAssembler;
 import com.change_vision.jude.api.inf.model.IUseCase;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class UseCaseTool implements ToolProvider {
         return List.of();
     }
 
-    private UseCaseDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private UseCaseDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get usecase information: {}", param);
 
         IUseCase astahUseCase = astahProToolSupport.getUseCase(param.id());

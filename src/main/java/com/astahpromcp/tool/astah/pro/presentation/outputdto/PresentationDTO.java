@@ -144,9 +144,13 @@ public record PresentationDTO(
             this.typeName = typeName;
         }
 
+        public boolean matches(String typeName) {
+            return this.typeName.equals(typeName);
+        }
+
         public static Type getCorrespondingType(String typeName) {
             for (Type type : Type.values()) {
-                if (typeName.equals(type.typeName)) {
+                if (type.matches(typeName)) {
                     return type;
                 }
             }

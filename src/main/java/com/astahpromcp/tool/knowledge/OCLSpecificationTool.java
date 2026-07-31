@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -54,7 +53,7 @@ public class OCLSpecificationTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getOCLSpecification(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getOCLSpecification(NoInputDTO param) throws IOException {
         log.debug("Get OCL specification: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -79,7 +78,7 @@ public class OCLSpecificationTool implements ToolProvider {
         }
     }
 
-    private DocumentChunkDTO getOCLSpecificationChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getOCLSpecificationChunk(ChunkDTO param) {
         log.debug("Get OCL specification chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

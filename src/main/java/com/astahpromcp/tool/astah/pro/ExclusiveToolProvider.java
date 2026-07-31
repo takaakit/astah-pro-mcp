@@ -83,6 +83,15 @@ public final class ExclusiveToolProvider implements ToolProvider {
         }
 
         try {
+            // A tool that timed out earlier may have left a thread that is still using the Astah API.
+            // Checked here rather than before tryLock, so that a suspension which starts while this call is waiting for the lock is caught too.
+            String suspensionReason = AstahApiLock.suspensionReason();
+            if (suspensionReason != null) {
+                String msg = String.format("Astah API access is unavailable @tool=%s: %s", toolName, suspensionReason);
+                log.warn(msg);
+                return ResponseSupport.error(msg);
+            }
+
             McpSchema.CallToolResult result = definition.toolHandler().apply(exchange, request);
             flushEdt(toolName);  // Drain the EDT queue
             return result;

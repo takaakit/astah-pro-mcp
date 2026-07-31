@@ -14,7 +14,6 @@ import com.change_vision.jude.api.inf.model.IMindMapDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,91 +74,78 @@ public class MindmapEditorToolTest {
         createMindmapDiagram = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "createMindmapDiagram",
-            McpSyncServerExchange.class,
             NewDiagramInPackageDTO.class);
 
         // changeToFloatingTopic() method
         changeToFloatingTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "changeToFloatingTopic",
-            McpSyncServerExchange.class,
             ChangeToFloatingTopicDTO.class);
 
         // createFloatingTopic() method
         createFloatingTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "createFloatingTopic",
-            McpSyncServerExchange.class,
             NewFloatingTopicDTO.class);
 
         // createTopic() method
         createTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "createTopic",
-            McpSyncServerExchange.class,
             NewTopicDTO.class);
 
         // createTopicLink() method
         createTopicLink = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "createTopicLink",
-            McpSyncServerExchange.class,
             NewLinkBetweenTopicsDTO.class);
 
         // changeParentOfTopic() method
         changeParentOfTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "changeParentOfTopic",
-            McpSyncServerExchange.class,
             ChangeParentOfTopicDTO.class);
 
         // moveTopicWithinSiblingOrder() method
         moveTopicWithinSiblingOrder = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "moveTopicWithinSiblingOrder",
-            McpSyncServerExchange.class,
             MoveTopicWithinSiblingOrderDTO.class);
 
         // insertSvgImageIntoTopic() method
         insertSvgImageIntoTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "insertSvgImageIntoTopic",
-            McpSyncServerExchange.class,
             NewSvgImageIntoTopicDTO.class);
 
         // insertPngImageIntoTopic() method
         insertPngImageIntoTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "insertPngImageIntoTopic",
-            McpSyncServerExchange.class,
             NewPngImageIntoTopicDTO.class);
 
         // insertJpgImageIntoTopic() method
         insertJpgImageIntoTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "insertJpgImageIntoTopic",
-            McpSyncServerExchange.class,
             NewJpgImageIntoTopicDTO.class);
 
         // deleteChildTopics() method
         deleteChildTopics = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "deleteChildTopics",
-            McpSyncServerExchange.class,
             DeleteChildTopicsDTO.class);
 
         // deleteImageFromTopic() method
         deleteImageFromTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "deleteImageFromTopic",
-            McpSyncServerExchange.class,
             DeleteImageFromTopicDTO.class);
 
         // setBoundaryOfTopic() method
         setBoundaryOfTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
             "setBoundaryOfTopic",
-            McpSyncServerExchange.class,
             TopicWithBoundaryVisibilityDTO.class);
     }
 

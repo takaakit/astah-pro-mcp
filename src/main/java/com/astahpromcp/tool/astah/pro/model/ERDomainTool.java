@@ -17,7 +17,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDomainDTOAssem
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -121,7 +120,7 @@ public class ERDomainTool implements ToolProvider {
         );
     }
 
-    private ERDomainDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERDomainDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER domain information: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.id());
@@ -129,7 +128,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setDatatype(McpSyncServerExchange exchange, ERDomainWithERDatatypeDTO param) throws Exception {
+    private ERDomainDTO setDatatype(ERDomainWithERDatatypeDTO param) throws Exception {
         log.debug("Set ER datatype of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
@@ -142,7 +141,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setDefaultValue(McpSyncServerExchange exchange, ERDomainWithDefaultValueDTO param) throws Exception {
+    private ERDomainDTO setDefaultValue(ERDomainWithDefaultValueDTO param) throws Exception {
         log.debug("Set default value of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
@@ -154,7 +153,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setLengthPrecision(McpSyncServerExchange exchange, ERDomainWithLengthPrecisionDTO param) throws Exception {
+    private ERDomainDTO setLengthPrecision(ERDomainWithLengthPrecisionDTO param) throws Exception {
         log.debug("Set length/precision of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
@@ -166,7 +165,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setLogicalName(McpSyncServerExchange exchange, ERDomainWithLogicalNameDTO param) throws Exception {
+    private ERDomainDTO setLogicalName(ERDomainWithLogicalNameDTO param) throws Exception {
         log.debug("Set logical name of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
@@ -178,7 +177,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setPhysicalName(McpSyncServerExchange exchange, ERDomainWithPhysicalNameDTO param) throws Exception {
+    private ERDomainDTO setPhysicalName(ERDomainWithPhysicalNameDTO param) throws Exception {
         log.debug("Set physical name of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
@@ -190,7 +189,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setNotNull(McpSyncServerExchange exchange, ERDomainWithNotNullDTO param) throws Exception {
+    private ERDomainDTO setNotNull(ERDomainWithNotNullDTO param) throws Exception {
         log.debug("Set not null of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
@@ -202,7 +201,7 @@ public class ERDomainTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
-    private ERDomainDTO setParentERDomain(McpSyncServerExchange exchange, ERDomainWithParentERDomainDTO param) throws Exception {
+    private ERDomainDTO setParentERDomain(ERDomainWithParentERDomainDTO param) throws Exception {
         log.debug("Set parent ER domain of ER domain: {}", param);
 
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());

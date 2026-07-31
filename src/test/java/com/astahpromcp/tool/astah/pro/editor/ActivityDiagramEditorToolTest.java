@@ -18,7 +18,6 @@ import com.change_vision.jude.api.inf.model.IDependency;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,140 +83,120 @@ public class ActivityDiagramEditorToolTest {
         createAcceptEventAction = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createAcceptEventAction",
-            McpSyncServerExchange.class,
             NewAcceptEventActionDTO.class);
 
         // createAcceptTimeEventAction() method
         createAcceptTimeEventAction = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createAcceptTimeEventAction",
-            McpSyncServerExchange.class,
             NewAcceptTimeEventActionDTO.class);
 
         // createAction() method
         createAction = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createAction",
-            McpSyncServerExchange.class,
             NewActionDTO.class);
 
         // createActivityDiagram() method
         createActivityDiagram = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createActivityDiagram",
-            McpSyncServerExchange.class,
             NewActivityDiagramDTO.class);
 
         // createActivityParameterNode() method
         createActivityParameterNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createActivityParameterNode",
-            McpSyncServerExchange.class,
             NewActivityParameterNodeDTO.class);
 
         // createCallBehaviorAction() method
         createCallBehaviorAction = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createCallBehaviorAction",
-            McpSyncServerExchange.class,
             NewCallBehaviorActionDTO.class);
 
         // createConnector() method
         createConnector = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createConnector",
-            McpSyncServerExchange.class,
             NewConnectorDTO.class);
 
         // createDecisionMergeNode() method
         createDecisionMergeNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createDecisionMergeNode",
-            McpSyncServerExchange.class,
             NewDecisionMergeNodeDTO.class);
 
         // createDependency() method
         createDependency = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createDependency",
-            McpSyncServerExchange.class,
             NewDependencyDTO.class);
 
         // createFinalNode() method
         createFinalNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createFinalNode",
-            McpSyncServerExchange.class,
             NewFinalNodeDTO.class);
 
         // createFlow() method
         createFlow = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createFlow",
-            McpSyncServerExchange.class,
             NewFlowDTO.class);
 
         // createFlowFinalNode() method
         createFlowFinalNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createFlowFinalNode",
-            McpSyncServerExchange.class,
             NewFlowFinalNodeDTO.class);
 
         // createForkNode() method
         createForkNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createForkNode",
-            McpSyncServerExchange.class,
             NewForkNodeDTO.class);
 
         // createInitialNode() method
         createInitialNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createInitialNode",
-            McpSyncServerExchange.class,
             NewInitialNodeDTO.class);
 
         // createJoinNode() method
         createJoinNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createJoinNode",
-            McpSyncServerExchange.class,
             NewJoinNodeDTO.class);
 
         // createObjectNode() method
         createObjectNode = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createObjectNode",
-            McpSyncServerExchange.class,
             NewObjectNodeDTO.class);
 
         // createPartition() method
         createPartition = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createPartition",
-            McpSyncServerExchange.class,
             NewPartitionDTO.class);
 
         // createPin() method
         createPin = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createPin",
-            McpSyncServerExchange.class,
             NewPinWithBaseClassAndParentActionDTO.class);
 
         // createProcess() method
         createProcess = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createProcess",
-            McpSyncServerExchange.class,
             NewProcessDTO.class);
 
         // createSendSignalAction() method
         createSendSignalAction = TestSupport.getAccessibleMethod(
             ActivityDiagramEditorTool.class,
             "createSendSignalAction",
-            McpSyncServerExchange.class,
             NewSendSignalActionDTO.class);
     }
 

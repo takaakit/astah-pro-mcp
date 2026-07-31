@@ -13,7 +13,6 @@ import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IEntity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IProjectViewManager;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ public class ProjectViewManagerTool implements ToolProvider {
         return List.of();
     }
 
-    private ElementListDTO getSelectedElements(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private ElementListDTO getSelectedElements(NoInputDTO param) throws Exception {
         log.debug("Get selected elements: {}", param);
 
         List<ElementDTO> elementDTOs = new ArrayList<>();
@@ -103,7 +102,7 @@ public class ProjectViewManagerTool implements ToolProvider {
         return new ElementListDTO(elementDTOs);
     }
 
-    private ElementDTO showInPropertyView(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ElementDTO showInPropertyView(IdDTO param) throws Exception {
         log.debug("Show in property view: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());
@@ -117,7 +116,7 @@ public class ProjectViewManagerTool implements ToolProvider {
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
-    private ElementDTO showInStructureTree(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ElementDTO showInStructureTree(IdDTO param) throws Exception {
         log.debug("Show in structure tree: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());

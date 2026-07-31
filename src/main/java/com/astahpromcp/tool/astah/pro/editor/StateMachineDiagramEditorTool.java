@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -177,7 +176,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> addRegion(McpSyncServerExchange exchange, NewRegionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> addRegion(NewRegionDTO param) throws Exception {
         log.debug("Add region: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -198,7 +197,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteRegion(McpSyncServerExchange exchange, DeleteRegionDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteRegion(DeleteRegionDTO param) throws Exception {
         log.debug("Delete region: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -219,7 +218,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfState(McpSyncServerExchange exchange, ChangeParentStateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfState(ChangeParentStateDTO param) throws Exception {
         log.debug("Change parent of state: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -247,7 +246,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createChoicePseudostate(McpSyncServerExchange exchange, NewChoicePseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createChoicePseudostate(NewChoicePseudostateDTO param) throws Exception {
         log.debug("Create choice pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -276,7 +275,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createDeepHistoryPseudostate(McpSyncServerExchange exchange, NewDeepHistoryPseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createDeepHistoryPseudostate(NewDeepHistoryPseudostateDTO param) throws Exception {
         log.debug("Create deep history pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -305,7 +304,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createShallowHistoryPseudostate(McpSyncServerExchange exchange, NewShallowHistoryPseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createShallowHistoryPseudostate(NewShallowHistoryPseudostateDTO param) throws Exception {
         log.debug("Create shallow history pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -334,7 +333,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalState(McpSyncServerExchange exchange, NewFinalStateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalState(NewFinalStateDTO param) throws Exception {
         log.debug("Create final state: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -363,7 +362,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkPseudostate(McpSyncServerExchange exchange, NewForkPseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkPseudostate(NewForkPseudostateDTO param) throws Exception {
         log.debug("Create fork pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -394,7 +393,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialPseudostate(McpSyncServerExchange exchange, NewInitialPseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialPseudostate(NewInitialPseudostateDTO param) throws Exception {
         log.debug("Create initial pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -423,7 +422,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinPseudostate(McpSyncServerExchange exchange, NewJoinPseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinPseudostate(NewJoinPseudostateDTO param) throws Exception {
         log.debug("Create join pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -454,7 +453,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJunctionPseudostate(McpSyncServerExchange exchange, NewJunctionPseudostateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createJunctionPseudostate(NewJunctionPseudostateDTO param) throws Exception {
         log.debug("Create junction pseudostate: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -483,7 +482,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createState(McpSyncServerExchange exchange, NewStateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createState(NewStateDTO param) throws Exception {
         log.debug("Create state: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -513,7 +512,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private DiagramDTO createStateMachineDiagram(McpSyncServerExchange exchange, NewStateMachineDiagramDTO param) throws Exception {
+    private DiagramDTO createStateMachineDiagram(NewStateMachineDiagramDTO param) throws Exception {
         log.debug("Create state machine diagram: {}", param);
 
         INamedElement astahParentNamedElement = astahProToolSupport.getNamedElement(param.parentNamedElementId());
@@ -527,7 +526,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(astahStateMachineDiagram);
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubMachineState(McpSyncServerExchange exchange, NewSubMachineStateDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubMachineState(NewSubMachineStateDTO param) throws Exception {
         log.debug("Create sub machine state: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
@@ -552,7 +551,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTransition(McpSyncServerExchange exchange, NewTransitionDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTransition(NewTransitionDTO param) throws Exception {
         log.debug("Create transition: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());

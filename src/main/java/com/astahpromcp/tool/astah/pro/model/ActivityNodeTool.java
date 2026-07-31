@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityNodeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActivityNodeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IActivityNode;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class ActivityNodeTool implements ToolProvider {
         return List.of();
     }
 
-    private ActivityNodeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ActivityNodeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get activity node information: {}", param);
 
         IActivityNode astahActivityNode = astahProToolSupport.getActivityNode(param.id());

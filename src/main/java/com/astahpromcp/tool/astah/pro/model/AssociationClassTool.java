@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationClassDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AssociationClassDTOAssembler;
 import com.change_vision.jude.api.inf.model.IAssociationClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class AssociationClassTool implements ToolProvider {
         return List.of();
     }
 
-    private AssociationClassDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private AssociationClassDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get association class information: {}", param);
 
         IAssociationClass astahAssociationClass = astahProToolSupport.getAssociationClass(param.id());

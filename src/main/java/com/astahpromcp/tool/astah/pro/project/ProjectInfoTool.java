@@ -17,7 +17,6 @@ import com.astahpromcp.tool.visualization.outputdto.PlantumlDTO;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.apache.commons.lang3.Strings;
 import lombok.extern.slf4j.Slf4j;
 
@@ -186,7 +185,7 @@ public class ProjectInfoTool implements ToolProvider {
         return List.of();
     }
 
-    private AllNameIdTypeInfoDTO getAllNamedElements(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private AllNameIdTypeInfoDTO getAllNamedElements(NoInputDTO param) throws Exception {
         log.debug("Get information of all named elements: {}", param);
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
@@ -221,7 +220,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new AllNameIdTypeInfoDTO(totalChunks, firstChunk);
     }
 
-    private NameIdTypeListDTO getNamedElementsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
+    private NameIdTypeListDTO getNamedElementsChunk(ChunkDTO param) throws Exception {
         log.debug("Get named elements chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();
@@ -242,7 +241,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new NameIdTypeListDTO(chunk);
     }
 
-    private AllDefinitionNameIdTypeDTO getAllDefinitions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private AllDefinitionNameIdTypeDTO getAllDefinitions(NoInputDTO param) throws Exception {
         log.debug("Get information of all definitions: {}", param);
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
@@ -277,7 +276,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new AllDefinitionNameIdTypeDTO(totalChunks, firstChunk);
     }
 
-    private DefinitionNameIdTypeListDTO getDefinitionsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
+    private DefinitionNameIdTypeListDTO getDefinitionsChunk(ChunkDTO param) throws Exception {
         log.debug("Get definitions chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();
@@ -298,7 +297,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new DefinitionNameIdTypeListDTO(chunk);
     }
 
-    private AllLabelIdTypeInfoDTO getAllPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private AllLabelIdTypeInfoDTO getAllPresentations(NoInputDTO param) throws Exception {
         log.debug("Get information of all presentations: {}", param);
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(IDiagram.class);
@@ -338,7 +337,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new AllLabelIdTypeInfoDTO(totalChunks, firstChunk);
     }
 
-    private LabelIdTypeListDTO getPresentationsChunk(McpSyncServerExchange exchange, ChunkDTO param) throws Exception {
+    private LabelIdTypeListDTO getPresentationsChunk(ChunkDTO param) throws Exception {
         log.debug("Get presentations chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();
@@ -359,7 +358,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new LabelIdTypeListDTO(chunk);
     }
 
-    private LabelIdTypeListDTO getAllPresentationsOnDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private LabelIdTypeListDTO getAllPresentationsOnDiagram(IdDTO param) throws Exception {
         log.debug("Get information of all presentations on diagram: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
@@ -377,7 +376,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new LabelIdTypeListDTO(labelIdTypeDTOs);
     }
 
-    private ReportDTO getAllConstraintsAndConditions(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private ReportDTO getAllConstraintsAndConditions(NoInputDTO param) throws Exception {
         log.debug("Get all constraints and conditions: {}", param);
 
         StringBuilder contents = new StringBuilder();
@@ -422,7 +421,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new ReportDTO(contents.toString());
     }
 
-    private SourceTargetNameIdTypeListDTO retrieveClassifiersThatReferenceOrBeReferencedBy(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private SourceTargetNameIdTypeListDTO retrieveClassifiersThatReferenceOrBeReferencedBy(IdDTO param) throws Exception {
         log.debug("Retrieve classifiers that reference or are referenced by: {}", param);
 
         IClass astahTargetClass = astahProToolSupport.getClass(param.id());
@@ -660,7 +659,7 @@ public class ProjectInfoTool implements ToolProvider {
                 new ArrayList<>(typeUsageTargetClassifier));
     }
 
-    private NameIdTypeDefinitionListDTO searchWithinNamedElements(McpSyncServerExchange exchange, SearchDTO param) throws Exception {
+    private NameIdTypeDefinitionListDTO searchWithinNamedElements(SearchDTO param) throws Exception {
         log.debug("Search within named elements: {}", param);
 
         // An empty search string targets all named elements
@@ -680,7 +679,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new NameIdTypeDefinitionListDTO(nameIdTypeDefinitionDTOs);
     }
 
-    private LabelIdTypeListDTO searchWithinPresentations(McpSyncServerExchange exchange, SearchDTO param) throws Exception {
+    private LabelIdTypeListDTO searchWithinPresentations(SearchDTO param) throws Exception {
         log.debug("Search within presentations: {}", param);
 
         // An empty search string targets all presentations
@@ -702,7 +701,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new LabelIdTypeListDTO(labelIdTypeDTOs);
     }
 
-    private NameIdTypeNamespaceListDTO retrieveClassifiersWithinPackage(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NameIdTypeNamespaceListDTO retrieveClassifiersWithinPackage(IdDTO param) throws Exception {
         log.debug("Retrieve classifiers within package: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.id());
@@ -724,7 +723,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new NameIdTypeNamespaceListDTO(nameIdTypeNamespaceDTOs);
     }
 
-    private PlantumlDTO retrievePackageStructureAsPlantuml(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private PlantumlDTO retrievePackageStructureAsPlantuml(NoInputDTO param) throws Exception {
         log.debug("Retrieve package structure as PlantUML: {}", param);
 
         IModel astahProject;
@@ -787,7 +786,7 @@ public class ProjectInfoTool implements ToolProvider {
         return plantumlCode.toString();
     }
 
-    private PlantumlDTO retrieveClassifiersRelationshipsAsPlantuml(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private PlantumlDTO retrieveClassifiersRelationshipsAsPlantuml(NoInputDTO param) throws Exception {
         log.debug("Retrieve classifiers relationships as PlantUML: {}", param);
 
         StringBuilder plantumlCode = new StringBuilder();
@@ -865,7 +864,7 @@ public class ProjectInfoTool implements ToolProvider {
         return new PlantumlDTO(plantumlCode.toString());
     }
 
-    private PlantumlDTO getRelationshipsAsPlantumlCode(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private PlantumlDTO getRelationshipsAsPlantumlCode(NoInputDTO param) throws Exception {
         log.debug("Get relationships as PlantUML code: {}", param);
 
         StringBuilder plantumlCode = new StringBuilder("@startuml\n");

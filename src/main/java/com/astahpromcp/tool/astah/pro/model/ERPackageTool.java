@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ERPackageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERPackageDTOAssembler;
 import com.change_vision.jude.api.inf.model.IERPackage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class ERPackageTool implements ToolProvider {
         return List.of();
     }
 
-    private ERPackageDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERPackageDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER package information: {}", param);
 
         IERPackage astahERPackage = astahProToolSupport.getERPackage(param.id());

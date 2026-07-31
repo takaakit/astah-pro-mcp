@@ -12,7 +12,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERSubtypeRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,35 +50,30 @@ public class ERSubtypeRelationshipToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERSubtypeRelationshipTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setConclusive() method
         setConclusive = TestSupport.getAccessibleMethod(
             ERSubtypeRelationshipTool.class,
             "setConclusive",
-            McpSyncServerExchange.class,
             ERSubtypeRelationshipWithConclusiveDTO.class);
 
         // setDiscriminatorAttr() method
         setDiscriminatorAttr = TestSupport.getAccessibleMethod(
             ERSubtypeRelationshipTool.class,
             "setDiscriminatorAttr",
-            McpSyncServerExchange.class,
             ERSubtypeRelationshipWithDiscriminatorAttrDTO.class);
 
         // setLogicalName() method
         setLogicalName = TestSupport.getAccessibleMethod(
             ERSubtypeRelationshipTool.class,
             "setLogicalName",
-            McpSyncServerExchange.class,
             ERSubtypeRelationshipWithLogicalNameDTO.class);
 
         // setPhysicalName() method
         setPhysicalName = TestSupport.getAccessibleMethod(
             ERSubtypeRelationshipTool.class,
             "setPhysicalName",
-            McpSyncServerExchange.class,
             ERSubtypeRelationshipWithPhysicalNameDTO.class);
     }
 

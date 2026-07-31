@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.CommentDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.CommentDTOAssembler;
 import com.change_vision.jude.api.inf.model.IComment;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class CommentTool implements ToolProvider {
         return List.of();
     }
 
-    private CommentDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private CommentDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get comment information: {}", param);
 
         IComment astahComment = astahProToolSupport.getComment(param.id());

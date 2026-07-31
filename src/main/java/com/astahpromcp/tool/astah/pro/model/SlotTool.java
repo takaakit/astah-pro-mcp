@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.SlotDTOAssembler;
 import com.change_vision.jude.api.inf.model.ISlot;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class SlotTool implements ToolProvider {
         );
     }
 
-    private SlotDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private SlotDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get slot information: {}", param);
 
         ISlot astahSlot = astahProToolSupport.getSlot(param.id());
@@ -80,7 +79,7 @@ public class SlotTool implements ToolProvider {
         return SlotDTOAssembler.toDTO(astahSlot);
     }
 
-    private SlotDTO setValue(McpSyncServerExchange exchange, SlotWithValueDTO param) throws Exception {
+    private SlotDTO setValue(SlotWithValueDTO param) throws Exception {
         log.debug("Set value of slot: {}", param);
 
         ISlot astahSlot = astahProToolSupport.getSlot(param.targetSlotId());

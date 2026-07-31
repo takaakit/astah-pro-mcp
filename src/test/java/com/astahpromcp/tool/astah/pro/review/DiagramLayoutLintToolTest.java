@@ -12,7 +12,6 @@ import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,6 @@ public class DiagramLayoutLintToolTest {
         detectOverlap = TestSupport.getAccessibleMethod(
                 DiagramLayoutLintTool.class,
                 "detectOverlap",
-                McpSyncServerExchange.class,
                 IdDTO.class);
     }
 

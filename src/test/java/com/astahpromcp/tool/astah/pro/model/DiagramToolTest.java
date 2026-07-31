@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,28 +61,24 @@ public class DiagramToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             DiagramTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getDiagramBoundRect() method
         getDiagramBoundRect = TestSupport.getAccessibleMethod(
             DiagramTool.class,
             "getDiagramBoundRect",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getPresentationsOnDiagram() method
         getPresentationsOnDiagram = TestSupport.getAccessibleMethod(
             DiagramTool.class,
             "getPresentationsOnDiagram",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // exportPngImage() method
         exportPngImage = TestSupport.getAccessibleMethod(
             DiagramTool.class,
             "exportPngImage",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

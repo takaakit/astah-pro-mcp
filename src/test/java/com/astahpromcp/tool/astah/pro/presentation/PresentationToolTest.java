@@ -12,7 +12,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,35 +58,30 @@ public class PresentationToolTest {
         getElement = TestSupport.getAccessibleMethod(
             PresentationTool.class,
             "getElement",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setLabel() method
         setLabel = TestSupport.getAccessibleMethod(
             PresentationTool.class,
             "setLabel",
-            McpSyncServerExchange.class,
             PresentationWithLabelDTO.class);
 
         // changeFillColor() method
         changeFillColor = TestSupport.getAccessibleMethod(
             PresentationTool.class,
             "changeFillColor",
-            McpSyncServerExchange.class,
             PresentationWithColorDTO.class);
 
         // changeLineColor() method
         changeLineColor = TestSupport.getAccessibleMethod(
             PresentationTool.class,
             "changeLineColor",
-            McpSyncServerExchange.class,
             PresentationWithColorDTO.class);
 
         // changeFontColor() method
         changeFontColor = TestSupport.getAccessibleMethod(
             PresentationTool.class,
             "changeFontColor",
-            McpSyncServerExchange.class,
             PresentationWithColorDTO.class);
     }
 

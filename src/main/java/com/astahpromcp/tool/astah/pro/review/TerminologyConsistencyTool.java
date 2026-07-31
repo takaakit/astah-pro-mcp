@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.StepsDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
@@ -54,18 +53,16 @@ public class TerminologyConsistencyTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "terminology_consistency_maintenance_steps",
-                "Return the steps that MCP client (you) MUST follow to maintain terminology consistency. When you need to eliminate terminology inconsistencies and ensure consistent terminology across model elements and diagrams, call this tool and then perform the work in strict accordance with the returned steps.",
+                "Return the steps that the MCP client (you) MUST follow to maintain terminology consistency. When you need to eliminate terminology inconsistencies and ensure consistent terminology across model elements and diagrams, call this tool and perform the work in strict accordance with the returned steps.",
                 this::getSteps,
                 NoInputDTO.class,
                 StepsDTO.class));
     }
 
-    private StepsDTO getSteps(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private StepsDTO getSteps(NoInputDTO param) throws Exception {
         log.debug("Get terminology consistency maintenance steps: {}", param);
 
         String contents = """
-If you have sub-agent capability, you MUST assign all of the following steps to a sub-agent. If the sub-agent makes any corrections, it MUST report the correction details back to the main agent.
-
 Follow these steps to maintain terminology consistency across model elements and diagrams:
 
 1. Load any existing terminology resource that defines the agreed vocabulary for the target domain, if one is available — for example, a glossary, terminology dictionary, ontology, data dictionary, or naming convention document, whether it is a prose document or structured data. Treat it as the preferred terminology in the subsequent steps. If no such resource exists, skip this step.

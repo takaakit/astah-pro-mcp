@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.PartitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PartitionDTOAssembler;
 import com.change_vision.jude.api.inf.model.IPartition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class PartitionTool implements ToolProvider {
         return List.of();
     }
 
-    private PartitionDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PartitionDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get partition information: {}", param);
 
         IPartition astahPartition = astahProToolSupport.getPartition(param.id());

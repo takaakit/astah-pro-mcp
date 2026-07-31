@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.StateDTOAssembler;
 import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -103,7 +102,7 @@ public class StateTool implements ToolProvider {
         );
     }
 
-    private StateDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private StateDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get state information: {}", param);
 
         IState astahState = astahProToolSupport.getState(param.id());
@@ -111,7 +110,7 @@ public class StateTool implements ToolProvider {
         return StateDTOAssembler.toDTO(astahState);
     }
 
-    private StateDTO addInternalTransition(McpSyncServerExchange exchange, StateWithInternalTransitionDTO param) throws Exception {
+    private StateDTO addInternalTransition(StateWithInternalTransitionDTO param) throws Exception {
         log.debug("Add internal transition to state: {}", param);
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
@@ -126,7 +125,7 @@ public class StateTool implements ToolProvider {
         return StateDTOAssembler.toDTO(astahState);
     }
 
-    private StateDTO deleteAllInternalTransitions(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private StateDTO deleteAllInternalTransitions(IdDTO param) throws Exception {
         log.debug("Delete all internal transitions from state: {}", param);
 
         IState astahState = astahProToolSupport.getState(param.id());
@@ -138,7 +137,7 @@ public class StateTool implements ToolProvider {
         return StateDTOAssembler.toDTO(astahState);
     }
 
-    private StateDTO setEntry(McpSyncServerExchange exchange, StateWithEntryDTO param) throws Exception {
+    private StateDTO setEntry(StateWithEntryDTO param) throws Exception {
         log.debug("Set entry of state: {}", param);
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
@@ -150,7 +149,7 @@ public class StateTool implements ToolProvider {
         return StateDTOAssembler.toDTO(astahState);
     }
 
-    private StateDTO setDoActivity(McpSyncServerExchange exchange, StateWithDoActivityDTO param) throws Exception {
+    private StateDTO setDoActivity(StateWithDoActivityDTO param) throws Exception {
         log.debug("Set doActivity of state: {}", param);
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());
@@ -162,7 +161,7 @@ public class StateTool implements ToolProvider {
         return StateDTOAssembler.toDTO(astahState);
     }
 
-    private StateDTO setExit(McpSyncServerExchange exchange, StateWithExitDTO param) throws Exception {
+    private StateDTO setExit(StateWithExitDTO param) throws Exception {
         log.debug("Set exit of state: {}", param);
 
         IState astahState = astahProToolSupport.getState(param.targetStateId());

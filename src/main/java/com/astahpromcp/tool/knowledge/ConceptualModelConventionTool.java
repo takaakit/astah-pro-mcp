@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -62,7 +61,7 @@ public class ConceptualModelConventionTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getConceptualModelConventionInfo(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getConceptualModelConventionInfo(NoInputDTO param) throws IOException {
         log.debug("Get Conceptual Model Conventions: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -102,7 +101,7 @@ public class ConceptualModelConventionTool implements ToolProvider {
         return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
-    private DocumentChunkDTO getConceptualModelConventionChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getConceptualModelConventionChunk(ChunkDTO param) {
         log.debug("Get Conceptual Model Conventions chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

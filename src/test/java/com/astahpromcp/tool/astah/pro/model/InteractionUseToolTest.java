@@ -10,7 +10,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IInteractionUse;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,21 +46,18 @@ public class InteractionUseToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             InteractionUseTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setArgument() method
         setArgument = TestSupport.getAccessibleMethod(
             InteractionUseTool.class,
             "setArgument",
-            McpSyncServerExchange.class,
             InteractionUseWithArgumentDTO.class);
 
         // setSequenceDiagram() method
         setSequenceDiagram = TestSupport.getAccessibleMethod(
             InteractionUseTool.class,
             "setSequenceDiagram",
-            McpSyncServerExchange.class,
             InteractionUseWithSequenceDiagramDTO.class);
     }
 

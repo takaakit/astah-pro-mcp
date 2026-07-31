@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyUtil;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public class CombinedFragmentTool implements ToolProvider {
         );
     }
 
-    private CombinedFragmentDTO addInteractionOperand(McpSyncServerExchange exchange, NewInteractionOperandDTO param) throws Exception {
+    private CombinedFragmentDTO addInteractionOperand(NewInteractionOperandDTO param) throws Exception {
         log.debug("Add interaction operand: {}", param);
 
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
@@ -99,7 +98,7 @@ public class CombinedFragmentTool implements ToolProvider {
         return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);
     }
 
-    private CombinedFragmentDTO setCombinedFragmentKind(McpSyncServerExchange exchange, CombinedFragmentWithKindDTO param) throws Exception {
+    private CombinedFragmentDTO setCombinedFragmentKind(CombinedFragmentWithKindDTO param) throws Exception {
         log.debug("Set combined fragment kind: {}", param);
 
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
@@ -111,7 +110,7 @@ public class CombinedFragmentTool implements ToolProvider {
         return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);
     }
 
-    private NodePresentationDTO setHeightOfInteractionOperand(McpSyncServerExchange exchange, InteractionOperandIndexWithHeightDTO param) throws Exception {
+    private NodePresentationDTO setHeightOfInteractionOperand(InteractionOperandIndexWithHeightDTO param) throws Exception {
         log.debug("Set height of interaction operand: {}", param);
 
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());

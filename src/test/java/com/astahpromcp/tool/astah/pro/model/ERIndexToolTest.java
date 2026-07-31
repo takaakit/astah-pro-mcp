@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,35 +49,30 @@ public class ERIndexToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERIndexTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // addERAttribute() method
         addERAttribute = TestSupport.getAccessibleMethod(
             ERIndexTool.class,
             "addERAttribute",
-            McpSyncServerExchange.class,
             ERIndexWithERAttributeDTO.class);
 
         // removeERAttribute() method
         removeERAttribute = TestSupport.getAccessibleMethod(
             ERIndexTool.class,
             "removeERAttribute",
-            McpSyncServerExchange.class,
             ERIndexWithERAttributeDTO.class);
 
         // setKey() method
         setKey = TestSupport.getAccessibleMethod(
             ERIndexTool.class,
             "setKey",
-            McpSyncServerExchange.class,
             ERIndexWithKeyDTO.class);
 
         // setUnique() method
         setUnique = TestSupport.getAccessibleMethod(
             ERIndexTool.class,
             "setUnique",
-            McpSyncServerExchange.class,
             ERIndexWithUniqueDTO.class);
     }
 

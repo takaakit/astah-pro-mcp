@@ -9,7 +9,6 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +46,7 @@ public class DiagramLayoutGuideTool implements ToolProvider {
         );
     }
 
-    private List<McpSchema.Content> getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private List<McpSchema.Content> getGuide(NoInputDTO param) throws Exception {
         log.debug("Get diagram layout guide: {}", param);
 
         String content = """
@@ -120,7 +119,7 @@ Required adjustments after layout:
         return contents;
     }
 
-    private List<McpSchema.Content> getAntiPatterns(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private List<McpSchema.Content> getAntiPatterns(NoInputDTO param) throws Exception {
         log.debug("Get diagram layout anti-patterns: {}", param);
 
         List<McpSchema.Content> contents = new ArrayList<>();

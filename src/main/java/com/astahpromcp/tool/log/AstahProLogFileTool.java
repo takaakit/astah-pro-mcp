@@ -5,7 +5,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.log.outputdto.LogFileDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class AstahProLogFileTool implements ToolProvider {
         }
     }
 
-    private LogFileDTO getAstahProLogFile(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private LogFileDTO getAstahProLogFile(NoInputDTO param) throws IOException {
         log.debug("Get information of astah pro log: {}", param);
         
         String userHome = System.getProperty("user.home");

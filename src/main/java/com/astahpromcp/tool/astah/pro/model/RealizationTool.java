@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.RealizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.RealizationDTOAssembler;
 import com.change_vision.jude.api.inf.model.IRealization;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class RealizationTool implements ToolProvider {
         return List.of();
     }
 
-    private RealizationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private RealizationDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get realization information: {}", param);
 
         IRealization astahRealization = astahProToolSupport.getRealization(param.id());

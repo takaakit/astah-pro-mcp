@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActionDTOAssembl
 import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IActivity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class ActionTool implements ToolProvider {
         );
     }
 
-    private ActionDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ActionDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get action information: {}", param);
 
         IAction astahAction = astahProToolSupport.getAction(param.id());
@@ -81,7 +80,7 @@ public class ActionTool implements ToolProvider {
         return ActionDTOAssembler.toDTO(astahAction);
     }
 
-    private ActionDTO setCallingActivity(McpSyncServerExchange exchange, ActionWithCallingActivityDTO param) throws Exception {
+    private ActionDTO setCallingActivity(ActionWithCallingActivityDTO param) throws Exception {
         log.debug("Set calling activity of action: {}", param);
 
         IAction astahAction = astahProToolSupport.getAction(param.targetActionId());

@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.LinkEndDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,21 +45,18 @@ public class LinkEndToolTest {
         setAggregation = TestSupport.getAccessibleMethod(
             LinkEndTool.class,
             "setAggregation",
-            McpSyncServerExchange.class,
             LinkEndWithAggregationDTO.class);
 
         // setComposition() method
         setComposition = TestSupport.getAccessibleMethod(
             LinkEndTool.class,
             "setComposition",
-            McpSyncServerExchange.class,
             LinkEndWithCompositionDTO.class);
 
         // setNavigation() method
         setNavigation = TestSupport.getAccessibleMethod(
             LinkEndTool.class,
             "setNavigation",
-            McpSyncServerExchange.class,
             LinkEndWithNavigationDTO.class);
     }
 

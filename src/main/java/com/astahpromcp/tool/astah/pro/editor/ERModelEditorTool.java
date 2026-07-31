@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -152,7 +151,7 @@ public class ERModelEditorTool implements ToolProvider {
         );
     }
 
-    private ERModelDTO createERModel(McpSyncServerExchange exchange, NewERModelDTO param) throws Exception {
+    private ERModelDTO createERModel(NewERModelDTO param) throws Exception {
         log.debug("Create ER model: {}", param);
 
         IModel astahProject = projectAccessor.getProject();
@@ -166,7 +165,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERModelDTOAssembler.toDTO(astahERModel);
     }
 
-    private ERPackageDTO createERPackage(McpSyncServerExchange exchange, NewERPackageInERPackageDTO param) throws Exception {
+    private ERPackageDTO createERPackage(NewERPackageInERPackageDTO param) throws Exception {
         log.debug("Create ER package: {}", param);
 
         IERPackage parentERPackage = astahProToolSupport.getERPackage(param.parentERPackageId());
@@ -180,7 +179,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERPackageDTOAssembler.toDTO(createdERPackage);
     }
 
-    private EREntityDTO createEREntity(McpSyncServerExchange exchange, NewEREntityInERPackageDTO param) throws Exception {
+    private EREntityDTO createEREntity(NewEREntityInERPackageDTO param) throws Exception {
         log.debug("Create ER entity: {}", param);
 
         IERPackage parentERPackage = astahProToolSupport.getERPackage(param.parentERPackageId());
@@ -195,7 +194,7 @@ public class ERModelEditorTool implements ToolProvider {
         return EREntityDTOAssembler.toDTO(createdEREntity);
     }
 
-    private ERAttributeDTO createERAttribute(McpSyncServerExchange exchange, NewERAttributeInEREntityDTO param) throws Exception {
+    private ERAttributeDTO createERAttribute(NewERAttributeInEREntityDTO param) throws Exception {
         log.debug("Create ER attribute: {}", param);
 
         IEREntity targetEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
@@ -212,7 +211,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERAttributeDTOAssembler.toDTO(createdERAttribute);
     }
 
-    private ERDatatypeDTO createERDatatype(McpSyncServerExchange exchange, NewERDatatypeInERModelDTO param) throws Exception {
+    private ERDatatypeDTO createERDatatype(NewERDatatypeInERModelDTO param) throws Exception {
         log.debug("Create ER datatype: {}", param);
 
         IERModel erModel = astahProToolSupport.getERModel(param.targetERModelId());
@@ -226,7 +225,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERDatatypeDTOAssembler.toDTO(createdERDatatype);
     }
 
-    private ERDomainDTO createERDomainInERModel(McpSyncServerExchange exchange, NewERDomainInERModelDTO param) throws Exception {
+    private ERDomainDTO createERDomainInERModel(NewERDomainInERModelDTO param) throws Exception {
         log.debug("Create ER domain in ER model: {}", param);
 
         IERModel erModel = astahProToolSupport.getERModel(param.targetERModelId());
@@ -244,7 +243,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(createdERDomain);
     }
 
-    private ERDomainDTO createERDomainInERDomain(McpSyncServerExchange exchange, NewERDomainInERDomainDTO param) throws Exception {
+    private ERDomainDTO createERDomainInERDomain(NewERDomainInERDomainDTO param) throws Exception {
         log.debug("Create ER domain in ER domain: {}", param);
 
         IERDomain parentERDomain = astahProToolSupport.getERDomain(param.parentERDomainId());
@@ -262,7 +261,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERDomainDTOAssembler.toDTO(createdERDomain);
     }
 
-    private ERRelationshipDTO createIdentifyingRelationship(McpSyncServerExchange exchange, NewIdentifyingRelationshipDTO param) throws Exception {
+    private ERRelationshipDTO createIdentifyingRelationship(NewIdentifyingRelationshipDTO param) throws Exception {
         log.debug("Create identifying relationship: {}", param);
 
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
@@ -279,7 +278,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
     }
 
-    private ERRelationshipDTO createNonIdentifyingRelationship(McpSyncServerExchange exchange, NewNonIdentifyingRelationshipDTO param) throws Exception {
+    private ERRelationshipDTO createNonIdentifyingRelationship(NewNonIdentifyingRelationshipDTO param) throws Exception {
         log.debug("Create non-identifying relationship: {}", param);
 
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
@@ -296,7 +295,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
     }
 
-    private ERRelationshipDTO createManyToManyRelationship(McpSyncServerExchange exchange, NewManyToManyRelationshipDTO param) throws Exception {
+    private ERRelationshipDTO createManyToManyRelationship(NewManyToManyRelationshipDTO param) throws Exception {
         log.debug("Create many-to-many relationship: {}", param);
 
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
@@ -313,7 +312,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERRelationshipDTOAssembler.toDTO(createdERRelationship);
     }
 
-    private ERSubtypeRelationshipDTO createSubtypeRelationship(McpSyncServerExchange exchange, NewSubtypeRelationshipDTO param) throws Exception {
+    private ERSubtypeRelationshipDTO createSubtypeRelationship(NewSubtypeRelationshipDTO param) throws Exception {
         log.debug("Create subtype relationship: {}", param);
 
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
@@ -330,7 +329,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERSubtypeRelationshipDTOAssembler.toDTO(createdSubtypeRelationship);
     }
 
-    private ERIndexDTO createERIndex(McpSyncServerExchange exchange, NewERIndexDTO param) throws Exception {
+    private ERIndexDTO createERIndex(NewERIndexDTO param) throws Exception {
         log.debug("Create ER index: {}", param);
 
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
@@ -352,7 +351,7 @@ public class ERModelEditorTool implements ToolProvider {
         return ERIndexDTOAssembler.toDTO(createdERIndex);
     }
 
-    private ElementDTO delete(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ElementDTO delete(IdDTO param) throws Exception {
         log.debug("Delete ER model or ER element: {}", param);
 
         IElement astahElement = astahProToolSupport.getElement(param.id());

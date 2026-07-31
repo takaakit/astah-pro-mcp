@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ParameterDTOAsse
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IParameter;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class ParameterTool implements ToolProvider {
         );
     }
 
-    private ParameterDTO setType(McpSyncServerExchange exchange, ParameterWithTypeDTO param) throws Exception {
+    private ParameterDTO setType(ParameterWithTypeDTO param) throws Exception {
         log.debug("Set type of parameter: {}", param);
 
         IParameter astahParameter = astahProToolSupport.getParameter(param.targetParameterId());
@@ -86,7 +85,7 @@ public class ParameterTool implements ToolProvider {
         return ParameterDTOAssembler.toDTO(astahParameter);
     }
 
-    private ParameterDTO setTypeExpression(McpSyncServerExchange exchange, ParameterWithTypeExpressionDTO param) throws Exception {
+    private ParameterDTO setTypeExpression(ParameterWithTypeExpressionDTO param) throws Exception {
         log.debug("Set type expression of parameter: {}", param);
 
         IParameter astahParameter = astahProToolSupport.getParameter(param.targetParameterId());

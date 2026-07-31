@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.TestCaseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.TestCaseDTOAssembler;
 import com.change_vision.jude.api.inf.model.ITestCase;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class TestCaseTool implements ToolProvider {
         return List.of();
     }
 
-    private TestCaseDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private TestCaseDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get test case information: {}", param);
 
         ITestCase astahTestCase = astahProToolSupport.getTestCase(param.id());

@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.PortDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IPort;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,21 +45,18 @@ public class PortToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             PortTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setBehavior() method
         setBehavior = TestSupport.getAccessibleMethod(
             PortTool.class,
             "setBehavior",
-            McpSyncServerExchange.class,
             PortWithBehaviorDTO.class);
 
         // setService() method
         setService = TestSupport.getAccessibleMethod(
             PortTool.class,
             "setService",
-            McpSyncServerExchange.class,
             PortWithServiceDTO.class);
     }
 

@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,91 +59,78 @@ public class ERModelEditorToolTest {
         createERModel = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERModel",
-            McpSyncServerExchange.class,
             NewERModelDTO.class);
 
         // createERPackage() method
         createERPackage = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERPackage",
-            McpSyncServerExchange.class,
             NewERPackageInERPackageDTO.class);
 
         // createEREntity() method
         createEREntity = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createEREntity",
-            McpSyncServerExchange.class,
             NewEREntityInERPackageDTO.class);
 
         // createERAttribute() method
         createERAttribute = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERAttribute",
-            McpSyncServerExchange.class,
             NewERAttributeInEREntityDTO.class);
 
         // createERDatatype() method
         createERDatatype = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERDatatype",
-            McpSyncServerExchange.class,
             NewERDatatypeInERModelDTO.class);
 
         // createERDomainInERModel() method
         createERDomainInERModel = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERDomainInERModel",
-            McpSyncServerExchange.class,
             NewERDomainInERModelDTO.class);
 
         // createERDomainInERDomain() method
         createERDomainInERDomain = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERDomainInERDomain",
-            McpSyncServerExchange.class,
             NewERDomainInERDomainDTO.class);
 
         // createIdentifyingRelationship() method
         createIdentifyingRelationship = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createIdentifyingRelationship",
-            McpSyncServerExchange.class,
             NewIdentifyingRelationshipDTO.class);
 
         // createNonIdentifyingRelationship() method
         createNonIdentifyingRelationship = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createNonIdentifyingRelationship",
-            McpSyncServerExchange.class,
             NewNonIdentifyingRelationshipDTO.class);
 
         // createManyToManyRelationship() method
         createManyToManyRelationship = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createManyToManyRelationship",
-            McpSyncServerExchange.class,
             NewManyToManyRelationshipDTO.class);
 
         // createSubtypeRelationship() method
         createSubtypeRelationship = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createSubtypeRelationship",
-            McpSyncServerExchange.class,
             NewSubtypeRelationshipDTO.class);
 
         // createERIndex() method
         createERIndex = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "createERIndex",
-            McpSyncServerExchange.class,
             NewERIndexDTO.class);
 
         // delete() method
         delete = TestSupport.getAccessibleMethod(
             ERModelEditorTool.class,
             "delete",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

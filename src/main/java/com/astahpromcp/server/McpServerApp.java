@@ -191,7 +191,7 @@ public final class McpServerApp {
                 .serverInfo(McpSchema.Implementation.builder(getArtifactId(), getVersion())
                         .title("Astah Pro MCP")
                         .build())
-                .instructions("This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call 'uml_and_modeling_insights' tool function before creating, editing, or reviewing a UML model to recall insights on UML and modeling.")
+                .instructions("This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call the 'uml_and_modeling_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. You MUST also ensure that these tool invocation requirements are imposed on and followed by any subagents you launch.")
                 .capabilities(capabilities);
 
         log.info("Register all tools");

@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.OperationDTOAsse
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -143,7 +142,7 @@ public class OperationTool implements ToolProvider {
         );
     }
 
-    private OperationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private OperationDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get operation information: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.id());
@@ -151,7 +150,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO setAbstract(McpSyncServerExchange exchange, OperationWithAbstractDTO param) throws Exception {
+    private OperationDTO setAbstract(OperationWithAbstractDTO param) throws Exception {
         log.debug("Set abstract of operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -163,7 +162,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO setLeaf(McpSyncServerExchange exchange, OperationWithLeafDTO param) throws Exception {
+    private OperationDTO setLeaf(OperationWithLeafDTO param) throws Exception {
         log.debug("Set leaf of operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -175,7 +174,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO setStatic(McpSyncServerExchange exchange, OperationWithStaticDTO param) throws Exception {
+    private OperationDTO setStatic(OperationWithStaticDTO param) throws Exception {
         log.debug("Set static of operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -187,7 +186,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO setReturnType(McpSyncServerExchange exchange, OperationWithReturnTypeDTO param) throws Exception {
+    private OperationDTO setReturnType(OperationWithReturnTypeDTO param) throws Exception {
         log.debug("Set return type of operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -200,7 +199,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO setReturnTypeExpression(McpSyncServerExchange exchange, OperationWithReturnTypeExpressionDTO param) throws Exception {
+    private OperationDTO setReturnTypeExpression(OperationWithReturnTypeExpressionDTO param) throws Exception {
         log.debug("Set return type expression of operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -212,7 +211,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO addPrecondition(McpSyncServerExchange exchange, OperationWithPreconditionDTO param) throws Exception {
+    private OperationDTO addPrecondition(OperationWithPreconditionDTO param) throws Exception {
         log.debug("Add precondition to operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -224,7 +223,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO addPostcondition(McpSyncServerExchange exchange, OperationWithPostconditionDTO param) throws Exception {
+    private OperationDTO addPostcondition(OperationWithPostconditionDTO param) throws Exception {
         log.debug("Add postcondition to operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -236,7 +235,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO setBodyCondition(McpSyncServerExchange exchange, OperationWithBodyConditionDTO param) throws Exception {
+    private OperationDTO setBodyCondition(OperationWithBodyConditionDTO param) throws Exception {
         log.debug("Set body condition of operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -248,7 +247,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO removePrecondition(McpSyncServerExchange exchange, OperationWithPreconditionDTO param) throws Exception {
+    private OperationDTO removePrecondition(OperationWithPreconditionDTO param) throws Exception {
         log.debug("Remove precondition from operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -260,7 +259,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO removePostcondition(McpSyncServerExchange exchange, OperationWithPostconditionDTO param) throws Exception {
+    private OperationDTO removePostcondition(OperationWithPostconditionDTO param) throws Exception {
         log.debug("Remove postcondition from operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
@@ -272,7 +271,7 @@ public class OperationTool implements ToolProvider {
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
-    private OperationDTO removeBodyCondition(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private OperationDTO removeBodyCondition(IdDTO param) throws Exception {
         log.debug("Remove body condition from operation: {}", param);
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.id());

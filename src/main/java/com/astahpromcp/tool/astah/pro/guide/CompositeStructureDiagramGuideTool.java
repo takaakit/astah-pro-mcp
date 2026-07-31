@@ -5,7 +5,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -34,12 +33,21 @@ public class CompositeStructureDiagramGuideTool implements ToolProvider {
         }
     }
 
-    private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private GuideDTO getGuide(NoInputDTO param) throws Exception {
         log.debug("Get composite structure diagram guide: {}", param);
         
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * In the definition below, StructuredClassifier and EncapsulatedClassifier correspond to the Class element in Astah. Therefore, understand StructuredClassifier as Class.
+* Draw a composite structure diagram in this order: (1) create a structured class presentation and set its width and height, (2) create attributes of the class and render them as part presentations, (3) create ports, (4) create provided and required interfaces, (5) create connectors.
+* A structured class presentation cannot be shrunk once it has part presentations inside. Therefore, decide its size before creating part presentations.
+* A part presentation is a rendering of an attribute of the structured class. Therefore, create the attribute first, and then render it as a part presentation.
+* The location of a part presentation is an absolute coordinate on the diagram, not a coordinate relative to its parent. Placing a part presentation outside its parent enlarges the parent so that it encloses the part.
+* Nesting a part presentation within another part presentation is not supported. The parent of a part presentation is always a structured class presentation.
+* A port of a part belongs to the class that types the part, not to the structured class enclosing the part.
+* The location of a port presentation must be a point on the border of the part presentation or structured class presentation that owns it. The port is snapped to the nearest border.
+* Creating a provided or required interface presentation for an interface that the port or part already has places only the interface symbol, without the line connecting it to the port or part. Therefore, to render the interfaces that a port already has, show them using tool functions.
+* Creating a connector as a model element requires each of its parts to be an association end, and rejects a plain attribute.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):

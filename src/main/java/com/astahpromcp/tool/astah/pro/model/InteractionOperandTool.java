@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionOperandDTOAssembler;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class InteractionOperandTool implements ToolProvider {
         );
     }
 
-    private InteractionOperandDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private InteractionOperandDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get interaction operand information: {}", param);
 
         IInteractionOperand astahInteractionOperand = astahProToolSupport.getInteractionOperand(param.id());
@@ -80,7 +79,7 @@ public class InteractionOperandTool implements ToolProvider {
         return InteractionOperandDTOAssembler.toDTO(astahInteractionOperand);
     }
 
-    private InteractionOperandDTO setGuard(McpSyncServerExchange exchange, InteractionOperandWithGuardDTO param) throws Exception {
+    private InteractionOperandDTO setGuard(InteractionOperandWithGuardDTO param) throws Exception {
         log.debug("Set guard of interaction operand: {}", param);
 
         IInteractionOperand astahInteractionOperand = astahProToolSupport.getInteractionOperand(param.targetInteractionOperandId());

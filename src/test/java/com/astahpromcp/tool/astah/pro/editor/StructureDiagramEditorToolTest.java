@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,14 +56,12 @@ public class StructureDiagramEditorToolTest {
         createNodePresentation = TestSupport.getAccessibleMethod(
             StructureDiagramEditorTool.class,
             "createNodePresentation",
-            McpSyncServerExchange.class,
             NewNodePresentationDTO.class);
 
         // createLinkPresentation() method
         createLinkPresentation = TestSupport.getAccessibleMethod(
             StructureDiagramEditorTool.class,
             "createLinkPresentation",
-            McpSyncServerExchange.class,
             NewLinkPresentationDTO.class);
     }
 

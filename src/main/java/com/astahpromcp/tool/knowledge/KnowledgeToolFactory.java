@@ -28,6 +28,7 @@ public class KnowledgeToolFactory {
         try {
             return List.of(
                     new UMLModelingArchitectureInsightsTool(workspaceDir),
+                    new ArchitecturalDesignSmellsTool(workspaceDir),
                     new DDDReferenceTool(workspaceDir),
                     new OCLSpecificationTool(workspaceDir),
                     new SystemsEngineeringKnowledgeTool(workspaceDir),

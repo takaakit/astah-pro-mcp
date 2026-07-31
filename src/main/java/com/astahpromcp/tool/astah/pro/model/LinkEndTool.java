@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.LinkEndDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LinkEndDTOAssembler;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class LinkEndTool implements ToolProvider {
         );
     }
 
-    private LinkEndDTO setAggregation(McpSyncServerExchange exchange, LinkEndWithAggregationDTO param) throws Exception {
+    private LinkEndDTO setAggregation(LinkEndWithAggregationDTO param) throws Exception {
         log.debug("Set aggregation of link end: {}", param);
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
@@ -92,7 +91,7 @@ public class LinkEndTool implements ToolProvider {
         return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
-    private LinkEndDTO setComposition(McpSyncServerExchange exchange, LinkEndWithCompositionDTO param) throws Exception {
+    private LinkEndDTO setComposition(LinkEndWithCompositionDTO param) throws Exception {
         log.debug("Set composition of link end: {}", param);
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
@@ -104,7 +103,7 @@ public class LinkEndTool implements ToolProvider {
         return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
-    private LinkEndDTO setNavigation(McpSyncServerExchange exchange, LinkEndWithNavigationDTO param) throws Exception {
+    private LinkEndDTO setNavigation(LinkEndWithNavigationDTO param) throws Exception {
         log.debug("Set navigation of link end: {}", param);
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());

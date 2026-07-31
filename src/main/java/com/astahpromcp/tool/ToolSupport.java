@@ -21,7 +21,7 @@ public final class ToolSupport {
     // Tool function returning DTO
     @FunctionalInterface
     public interface ToolFunctionReturningDto<INPUT_DTO, OUTPUT_DTO> {
-        OUTPUT_DTO apply(McpSyncServerExchange exchange, INPUT_DTO input) throws Exception;
+        OUTPUT_DTO apply(INPUT_DTO input) throws Exception;
     }
 
     // Create a tool definition returning DTO
@@ -40,8 +40,7 @@ public final class ToolSupport {
             outputDtoType);
         
         // Create a tool handler
-        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (exchange, request) -> toolHandlerReturningDto(
-            exchange,
+        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (ignoredExchange, request) -> toolHandlerReturningDto(
             request,
             name,
             function,
@@ -71,7 +70,6 @@ public final class ToolSupport {
 
     // Create a tool handler for tools returning DTO
     public static <INPUT_DTO, OUTPUT_DTO> McpSchema.CallToolResult toolHandlerReturningDto(
-            McpSyncServerExchange exchange,
             McpSchema.CallToolRequest request,
             String toolName,
             ToolFunctionReturningDto<INPUT_DTO, OUTPUT_DTO> function,
@@ -89,7 +87,7 @@ public final class ToolSupport {
                     .addArgument(toolName)
                     .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
                     .log();
-            OUTPUT_DTO outputDto = function.apply(exchange, inputDto);
+            OUTPUT_DTO outputDto = function.apply(inputDto);
             log.atDebug()
                     .setMessage("Tool output of {}: \n{}")
                     .addArgument(toolName)
@@ -115,7 +113,7 @@ public final class ToolSupport {
     // Tool function returning contents
     @FunctionalInterface
     public interface ToolFunctionReturningContents<INPUT_DTO> {
-        List<McpSchema.Content> apply(McpSyncServerExchange exchange, INPUT_DTO input) throws Exception;
+        List<McpSchema.Content> apply(INPUT_DTO input) throws Exception;
     }
 
     // Create a tool definition returning contents
@@ -132,8 +130,7 @@ public final class ToolSupport {
             inputDtoType);
         
         // Create a tool handler
-        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (exchange, request) -> toolHandlerReturningContents(
-            exchange,
+        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (ignoredExchange, request) -> toolHandlerReturningContents(
             request,
             name,
             function,
@@ -159,7 +156,6 @@ public final class ToolSupport {
 
     // Create a tool handler for tools returning contents
     public static <INPUT_DTO> McpSchema.CallToolResult toolHandlerReturningContents(
-            McpSyncServerExchange exchange,
             McpSchema.CallToolRequest request,
             String toolName,
             ToolFunctionReturningContents<INPUT_DTO> function,
@@ -177,7 +173,7 @@ public final class ToolSupport {
                     .addArgument(toolName)
                     .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
                     .log();
-            List<McpSchema.Content> contents = function.apply(exchange, inputDto);
+            List<McpSchema.Content> contents = function.apply(inputDto);
             log.atDebug()
                     .setMessage("Tool output of {}: \n{}")
                     .addArgument(toolName)
@@ -215,7 +211,7 @@ public final class ToolSupport {
     // Tool function returning DTO and contents
     @FunctionalInterface
     public interface ToolFunctionReturningDtoAndContents<INPUT_DTO, OUTPUT_DTO> {
-        Pair<OUTPUT_DTO, List<McpSchema.Content>> apply(McpSyncServerExchange exchange, INPUT_DTO input) throws Exception;
+        Pair<OUTPUT_DTO, List<McpSchema.Content>> apply(INPUT_DTO input) throws Exception;
     }
 
     // Create a tool definition returning DTO and contents
@@ -233,8 +229,7 @@ public final class ToolSupport {
             inputDtoType);
 
         // Create a tool handler
-        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (exchange, request) -> toolHandlerReturningDtoAndContents(
-            exchange,
+        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (ignoredExchange, request) -> toolHandlerReturningDtoAndContents(
             request,
             name,
             function,
@@ -260,7 +255,6 @@ public final class ToolSupport {
 
     // Create a tool handler for tools returning DTO and contents
     public static <INPUT_DTO, OUTPUT_DTO> McpSchema.CallToolResult toolHandlerReturningDtoAndContents(
-            McpSyncServerExchange exchange,
             McpSchema.CallToolRequest request,
             String toolName,
             ToolFunctionReturningDtoAndContents<INPUT_DTO, OUTPUT_DTO> function,
@@ -278,7 +272,7 @@ public final class ToolSupport {
                     .addArgument(toolName)
                     .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
                     .log();
-            Pair<OUTPUT_DTO, List<McpSchema.Content>> result = function.apply(exchange, inputDto);
+            Pair<OUTPUT_DTO, List<McpSchema.Content>> result = function.apply(inputDto);
             if (result == null || result.getLeft() == null) {
                 String msg = String.format("Failure @tool=%s", toolName);
                 log.error(msg);

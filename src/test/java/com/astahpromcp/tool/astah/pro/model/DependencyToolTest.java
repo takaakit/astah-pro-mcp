@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DependencyDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IDependency;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,6 @@ public class DependencyToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             DependencyTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

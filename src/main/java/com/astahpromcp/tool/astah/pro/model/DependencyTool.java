@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DependencyDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DependencyDTOAssembler;
 import com.change_vision.jude.api.inf.model.IDependency;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class DependencyTool implements ToolProvider {
         return List.of();
     }
 
-    private DependencyDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private DependencyDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get dependency information: {}", param);
 
         IDependency astahDependency = astahProToolSupport.getDependency(param.id());

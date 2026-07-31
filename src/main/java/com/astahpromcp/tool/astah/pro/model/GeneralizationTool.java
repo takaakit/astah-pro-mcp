@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.GeneralizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.GeneralizationDTOAssembler;
 import com.change_vision.jude.api.inf.model.IGeneralization;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class GeneralizationTool implements ToolProvider {
         return List.of();
     }
 
-    private GeneralizationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private GeneralizationDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get generalization information: {}", param);
 
         IGeneralization astahGeneralization = astahProToolSupport.getGeneralization(param.id());

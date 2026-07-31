@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,14 +43,12 @@ public class ActivityDiagramToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ActivityDiagramTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getActivity() method
         getActivity = TestSupport.getAccessibleMethod(
             ActivityDiagramTool.class,
             "getActivity",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

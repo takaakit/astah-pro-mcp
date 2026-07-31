@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,70 +52,60 @@ public class ProjectAccessorToolTest {
         createProject = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "createProject",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // openProject() method
         openProject = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "openProject",
-            McpSyncServerExchange.class,
             FilePathDTO.class);
 
         // getProject() method
         getProject = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "getProject",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // isProjectOpen() method
         isProjectOpen = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "isProjectOpen",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // isProjectModified() method
         isProjectModified = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "isProjectModified",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // findNamedElementsByName() method
         findNamedElementsByName = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "findNamedElementsByName",
-            McpSyncServerExchange.class,
             NameDTO.class);
 
         // saveProject() method
         saveProject = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "saveProject",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // saveProjectAs() method
         saveProjectAs = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "saveProjectAs",
-            McpSyncServerExchange.class,
             FilePathDTO.class);
 
         // closeProject() method
         closeProject = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "closeProject",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // getProjectPath() method
         getProjectPath = TestSupport.getAccessibleMethod(
             ProjectAccessorTool.class,
             "getProjectPath",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
     }
 
@@ -516,5 +505,34 @@ public class ProjectAccessorToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(outputDTO.projectPath(), projectAccessor.getProjectPath());
+    }
+
+    @Test
+    void getProjectPath_ok_returnsEmptyStringForUnsavedProject() throws Exception {
+        projectAccessor.close();
+        projectAccessor.create();
+
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getProjectPath,
+            tool,
+            new NoInputDTO(),
+            ProjectPathDTO.class);
+
+        assertNotNull(outputDTO);
+        assertEquals("", outputDTO.projectPath());
+    }
+
+    @Test
+    void getProjectPath_ng_returnsEmptyStringWhenNoProjectIsOpen() throws Exception {
+        projectAccessor.close();
+
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getProjectPath,
+            tool,
+            new NoInputDTO(),
+            ProjectPathDTO.class);
+
+        assertNotNull(outputDTO);
+        assertEquals("", outputDTO.projectPath());
     }
 }

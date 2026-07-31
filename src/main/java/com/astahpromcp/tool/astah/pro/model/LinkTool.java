@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.LinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LinkDTOAssembler;
 import com.change_vision.jude.api.inf.model.ILink;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class LinkTool implements ToolProvider {
         return List.of();
     }
 
-    private LinkDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private LinkDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get link information: {}", param);
 
         ILink astahLink = astahProToolSupport.getLink(param.id());

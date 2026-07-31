@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SchemaSupportTest {
 
     @Test
-    void generateSchema_marksAllInputPropertiesAsRequired() {
+    void generateSchema_ok_marksAllInputPropertiesAsRequired() {
         JsonNode schema = JsonSupport.OBJ_MAPPER.readTree(
             SchemaSupport.generateSchema(ClassWithAbstractDTO.class));
 
@@ -24,7 +24,7 @@ public class SchemaSupportTest {
     }
 
     @Test
-    void generateSchema_requiresIdProperty() {
+    void generateSchema_ok_requiresIdProperty() {
         JsonNode schema = JsonSupport.OBJ_MAPPER.readTree(
             SchemaSupport.generateSchema(IdDTO.class));
 
@@ -35,7 +35,7 @@ public class SchemaSupportTest {
     }
 
     @Test
-    void generateSchema_noRequiredForEmptyInput() {
+    void generateSchema_ok_noRequiredForEmptyInput() {
         JsonNode schema = JsonSupport.OBJ_MAPPER.readTree(
             SchemaSupport.generateSchema(NoInputDTO.class));
 
@@ -43,7 +43,7 @@ public class SchemaSupportTest {
     }
 
     @Test
-    void generateSchema_marksAllOutputPropertiesAsRequired() {
+    void generateSchema_ok_marksAllOutputPropertiesAsRequired() {
         JsonNode schema = JsonSupport.OBJ_MAPPER.readTree(
             SchemaSupport.generateSchema(ClassDTO.class));
 

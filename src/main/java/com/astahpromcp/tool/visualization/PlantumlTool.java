@@ -2,7 +2,6 @@ package com.astahpromcp.tool.visualization;
 
 import com.astahpromcp.tool.*;
 import com.astahpromcp.tool.visualization.inputdto.PlantumlDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.plantuml.FileFormat;
@@ -38,7 +37,7 @@ public class PlantumlTool implements ToolProvider {
         }
     }
 
-    private List<McpSchema.Content> generateDiagramImageFromPlantuml(McpSyncServerExchange exchange, PlantumlDTO param) throws Exception {
+    private List<McpSchema.Content> generateDiagramImageFromPlantuml(PlantumlDTO param) throws Exception {
         log.debug("Generate diagram image from PlantUML code: {}", param);
 
         McpSchema.ImageContent content = createPngImageContent(param.plantumlCode());

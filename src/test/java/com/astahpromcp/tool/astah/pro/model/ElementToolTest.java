@@ -12,7 +12,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,35 +51,30 @@ public class ElementToolTest {
         addStereotype = TestSupport.getAccessibleMethod(
             ElementTool.class,
             "addStereotype",
-            McpSyncServerExchange.class,
             ElementWithStereotypeDTO.class);
 
         // removeStereotype() method
         removeStereotype = TestSupport.getAccessibleMethod(
             ElementTool.class,
             "removeStereotype",
-            McpSyncServerExchange.class,
             ElementWithStereotypeDTO.class);
 
         // setTypeModifier() method
         setTypeModifier = TestSupport.getAccessibleMethod(
             ElementTool.class,
             "setTypeModifier",
-            McpSyncServerExchange.class,
             ElementWithTypeModifierDTO.class);
 
         // changeTaggedValue() method
         changeTaggedValue = TestSupport.getAccessibleMethod(
             ElementTool.class,
             "changeTaggedValue",
-            McpSyncServerExchange.class,
             ElementWithTaggedValueDTO.class);
 
         // getDiagramsOfElement() method
         getDiagramsOfElement = TestSupport.getAccessibleMethod(
             ElementTool.class,
             "getDiagramsOfElement",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

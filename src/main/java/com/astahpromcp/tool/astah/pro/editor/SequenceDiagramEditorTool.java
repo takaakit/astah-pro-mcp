@@ -19,7 +19,6 @@ import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -151,7 +150,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private SequenceDiagramDTO createSequenceDiagram(McpSyncServerExchange exchange, NewSequenceDiagramInPackageDTO param) throws Exception {
+    private SequenceDiagramDTO createSequenceDiagram(NewSequenceDiagramInPackageDTO param) throws Exception {
         log.debug("Create sequence diagram: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -165,7 +164,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return SequenceDiagramDTOAssembler.toDTO(createdAstahSequenceDiagram);
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createCombinedFragment(McpSyncServerExchange exchange, NewCombinedFragmentDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createCombinedFragment(NewCombinedFragmentDTO param) throws Exception {
         log.debug("Create combined fragment: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
@@ -190,23 +189,25 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createMessage(McpSyncServerExchange exchange, NewMessageDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createMessage(NewMessageDTO param) throws Exception {
         log.debug("Create message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
-        if (senderNode.getType() != Type.ACTIVATION.typeName
-            && senderNode.getType() != Type.LIFELINE.typeName
-            && senderNode.getType() != Type.INTERACTION_USE.typeName
-            && senderNode.getType() != Type.FRAME.typeName) {
+        String senderType = senderNode.getType();
+        if (!Type.ACTIVATION.matches(senderType)
+            && !Type.LIFELINE.matches(senderType)
+            && !Type.INTERACTION_USE.matches(senderType)
+            && !Type.FRAME.matches(senderType)) {
             throw new IllegalArgumentException("Message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
-        if (receiverNode.getType() != Type.LIFELINE.typeName
-            && receiverNode.getType() != Type.INTERACTION_USE.typeName
-            && receiverNode.getType() != Type.FRAME.typeName) {
+        String receiverType = receiverNode.getType();
+        if (!Type.LIFELINE.matches(receiverType)
+            && !Type.INTERACTION_USE.matches(receiverType)
+            && !Type.FRAME.matches(receiverType)) {
             throw new IllegalArgumentException("Message receiver node must be one of the following node presentation types: Lifeline, InteractionUse, or Frame.");
         }
 
@@ -227,21 +228,22 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createCreateMessage(McpSyncServerExchange exchange, NewCreateMessageDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createCreateMessage(NewCreateMessageDTO param) throws Exception {
         log.debug("Create create message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
-        if (senderNode.getType() != Type.ACTIVATION.typeName
-            && senderNode.getType() != Type.LIFELINE.typeName
-            && senderNode.getType() != Type.INTERACTION_USE.typeName
-            && senderNode.getType() != Type.FRAME.typeName) {
+        String senderType = senderNode.getType();
+        if (!Type.ACTIVATION.matches(senderType)
+            && !Type.LIFELINE.matches(senderType)
+            && !Type.INTERACTION_USE.matches(senderType)
+            && !Type.FRAME.matches(senderType)) {
             throw new IllegalArgumentException("Create message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
-        if (receiverNode.getType() != Type.LIFELINE.typeName) {
+        if (!Type.LIFELINE.matches(receiverNode.getType())) {
             throw new IllegalArgumentException("Create message receiver node must be one of the following node presentation types: Lifeline.");
         }
 
@@ -262,21 +264,22 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDestroyMessage(McpSyncServerExchange exchange, NewDestroyMessageDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDestroyMessage(NewDestroyMessageDTO param) throws Exception {
         log.debug("Create destroy message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
-        if (senderNode.getType() != Type.ACTIVATION.typeName
-            && senderNode.getType() != Type.LIFELINE.typeName
-            && senderNode.getType() != Type.INTERACTION_USE.typeName
-            && senderNode.getType() != Type.FRAME.typeName) {
+        String senderType = senderNode.getType();
+        if (!Type.ACTIVATION.matches(senderType)
+            && !Type.LIFELINE.matches(senderType)
+            && !Type.INTERACTION_USE.matches(senderType)
+            && !Type.FRAME.matches(senderType)) {
             throw new IllegalArgumentException("Destroy message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
-        if (receiverNode.getType() != Type.LIFELINE.typeName) {
+        if (!Type.LIFELINE.matches(receiverNode.getType())) {
             throw new IllegalArgumentException("Destroy message receiver node must be one of the following node presentation types: Lifeline.");
         }
 
@@ -297,13 +300,13 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createReturnMessage(McpSyncServerExchange exchange, NewReturnMessageDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createReturnMessage(NewReturnMessageDTO param) throws Exception {
         log.debug("Create return message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
         ILinkPresentation targetMessage = astahProToolSupport.getLinkPresentation(param.targetMessageId());
-        if (targetMessage.getType() != Type.MESSAGE.typeName) {
+        if (!Type.MESSAGE.matches(targetMessage.getType())) {
             throw new IllegalArgumentException("Target message for return message must be one of the following link presentation types: Message.");
         }
 
@@ -322,16 +325,17 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(McpSyncServerExchange exchange, NewLostMessageDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(NewLostMessageDTO param) throws Exception {
         log.debug("Create lost message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
-        if (senderNode.getType() != Type.ACTIVATION.typeName
-            && senderNode.getType() != Type.LIFELINE.typeName
-            && senderNode.getType() != Type.INTERACTION_USE.typeName
-            && senderNode.getType() != Type.FRAME.typeName) {
+        String senderType = senderNode.getType();
+        if (!Type.ACTIVATION.matches(senderType)
+            && !Type.LIFELINE.matches(senderType)
+            && !Type.INTERACTION_USE.matches(senderType)
+            && !Type.FRAME.matches(senderType)) {
             throw new IllegalArgumentException("Lost message sender node must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.");
         }
 
@@ -351,15 +355,16 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFoundMessage(McpSyncServerExchange exchange, NewFoundMessageDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFoundMessage(NewFoundMessageDTO param) throws Exception {
         log.debug("Create found message: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
-        if (receiverNode.getType() != Type.LIFELINE.typeName
-            && receiverNode.getType() != Type.INTERACTION_USE.typeName
-            && receiverNode.getType() != Type.FRAME.typeName) {
+        String receiverType = receiverNode.getType();
+        if (!Type.LIFELINE.matches(receiverType)
+            && !Type.INTERACTION_USE.matches(receiverType)
+            && !Type.FRAME.matches(receiverType)) {
             throw new IllegalArgumentException("Found message receiver node must be one of the following node presentation types: Lifeline, InteractionUse, or Frame.");
         }
 
@@ -379,7 +384,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInteractionUse(McpSyncServerExchange exchange, NewInteractionUseDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInteractionUse(NewInteractionUseDTO param) throws Exception {
         log.debug("Create interaction use: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
@@ -405,7 +410,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createLifeline(McpSyncServerExchange exchange, NewLifelineDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createLifeline(NewLifelineDTO param) throws Exception {
         log.debug("Create lifeline: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
@@ -425,7 +430,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createTermination(McpSyncServerExchange exchange, NewTerminationDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createTermination(NewTerminationDTO param) throws Exception {
         log.debug("Create termination: {}", param);
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());

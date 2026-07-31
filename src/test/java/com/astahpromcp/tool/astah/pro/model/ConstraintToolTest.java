@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,14 +44,12 @@ public class ConstraintToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ConstraintTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setSpecification() method
         setSpecification = TestSupport.getAccessibleMethod(
             ConstraintTool.class,
             "setSpecification",
-            McpSyncServerExchange.class,
             ConstraintWithSpecificationDTO.class);
     }
 

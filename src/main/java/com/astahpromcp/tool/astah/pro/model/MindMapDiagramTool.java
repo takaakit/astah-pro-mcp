@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.MindMapDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.MindMapDiagramDTOAssembler;
 import com.change_vision.jude.api.inf.model.IMindMapDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class MindMapDiagramTool implements ToolProvider {
         return List.of();
     }
 
-    private MindMapDiagramDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private MindMapDiagramDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get mind map diagram information: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.id());

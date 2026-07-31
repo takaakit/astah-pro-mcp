@@ -26,6 +26,10 @@ public final class McpServerConfig {
     // from the same User-Agent are approved automatically without a dialog.
     public static final long APPROVAL_GRACE_PERIOD_MS = 30_000;
 
+    // Maximum time an initialize request waits for the approval dialog of another initialize request on the same port to be answered.
+    // Kept below JETTY_IDLE_TIMEOUT_MS so that the rejection still reaches a client whose connection has not been dropped yet.
+    public static final long APPROVAL_DIALOG_WAIT_TIMEOUT_SECONDS = 180;
+
     // Maximum time a tool call waits to acquire exclusive access to the Astah API
     public static final long ASTAH_API_LOCK_TIMEOUT_SECONDS = 30;
 
@@ -33,7 +37,8 @@ public final class McpServerConfig {
     public static final long EDT_FLUSH_TIMEOUT_SECONDS = 20;
 
     // Maximum time a script run may execute.
-    public static final long SCRIPT_EXECUTION_TIMEOUT_SECONDS = 60;
+    // Kept below the tool call timeout of typical MCP clients (around 30 seconds) so that the timeout response actually reaches the AI agent instead of the client giving up first.
+    public static final long SCRIPT_EXECUTION_TIMEOUT_SECONDS = 20;
 
     // Maximum time to establish a connection when fetching knowledge documents from the web.
     public static final long KNOWLEDGE_FETCH_CONNECT_TIMEOUT_SECONDS = 10;

@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.script;
 
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.tool.astah.pro.AstahApiLock;
 import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +54,15 @@ public class AstahScriptExecutor {
     }
 
     private final ProjectAccessor projectAccessor;
+    private final long timeoutSeconds;
 
     public AstahScriptExecutor(ProjectAccessor projectAccessor) {
+        this(projectAccessor, McpServerConfig.SCRIPT_EXECUTION_TIMEOUT_SECONDS);
+    }
+
+    public AstahScriptExecutor(ProjectAccessor projectAccessor, long timeoutSeconds) {
         this.projectAccessor = projectAccessor;
+        this.timeoutSeconds = timeoutSeconds;
     }
 
     // Evaluates the script on a dedicated thread with a bounded timeout.
@@ -68,24 +75,28 @@ public class AstahScriptExecutor {
         runner.start();
 
         try {
-            return task.get(McpServerConfig.SCRIPT_EXECUTION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            return task.get(timeoutSeconds, TimeUnit.SECONDS);
 
         } catch (TimeoutException e) {
-            // The runner may be stuck in a blocking Astah API call; interrupt is best effort.
+            // Best effort: a script blocked in an interruptible call (sleep/wait/IO) stops here.
+            // A script stuck in a plain computation loop cannot be stopped at all: Java has no way to terminate a thread, and killing one mid-transaction would corrupt the model anyway.
             runner.interrupt();
-            StringWriter errorOutput = new StringWriter();
-            abortDanglingTransaction(errorOutput);
+
             String message = String.format(
-                "Script execution timed out after %d seconds and its thread was interrupted. Keep scripts short and avoid blocking operations.",
-                McpServerConfig.SCRIPT_EXECUTION_TIMEOUT_SECONDS);
+                "Script execution timed out after %d seconds. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops. Wait and retry; restart Astah if it never stops. Keep scripts short and avoid blocking operations.",
+                timeoutSeconds);
             log.warn(message);
-            
+
+            // The abandoned thread may still be calling the Astah API, so no tool may run until it terminates. Only the fact is recorded here: whether waiting helps or Astah must be restarted depends on whether the thread honours the interrupt, which is not known yet and is diagnosed by AstahApiLock when a later tool call is refused.
+            AstahApiLock.suspend(runner, String.format(
+                "a script that timed out after %d seconds is still running", timeoutSeconds));
+
             return Result.failure(
                 message,
                 -1,
                 -1,
                 "",
-                errorOutput.toString());
+                "");
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.PackageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PackageDTOAssembler;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class PackageTool implements ToolProvider {
         return List.of();
     }
 
-    private PackageDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PackageDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get package information: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.id());

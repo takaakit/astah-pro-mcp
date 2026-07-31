@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.project;
 
+import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
@@ -18,17 +19,20 @@ import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
 @Slf4j
 public class ProjectAccessorTool implements ToolProvider {
+
+    private static final String UNSAVED_PROJECT_PATH = "no_title";
 
     private final ProjectAccessor projectAccessor;
     private final AstahProToolSupport astahProToolSupport;
@@ -138,12 +142,27 @@ public class ProjectAccessorTool implements ToolProvider {
         );
     }
 
-    private NamedElementDTO createProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private NamedElementDTO createProject(NoInputDTO param) throws Exception {
         log.debug("Create project (root package): {}", param);
 
         // Check if the current project is modified
         if (projectAccessor.hasProject() && projectAccessor.isProjectModified()) {
-            throw new RuntimeException("The existing project needs to be saved before creating a new project.");
+            if (!"no_title".equals(projectAccessor.getProjectPath())) {
+                // For a modified project
+                throw new RuntimeException("The existing project needs to be saved before creating a new project.");
+
+            } else {
+                // For a new unsaved project, create and delete a dummy project before continuing to avoid showing the save confirmation dialog.
+                try {
+                    Path tempProjectPath = McpServerConfig.WORKSPACE_DIR.resolve("dummy.asta");
+                    Files.createDirectories(tempProjectPath.getParent());
+                    Files.deleteIfExists(tempProjectPath);
+                    projectAccessor.saveAs(tempProjectPath.toString());
+                    Files.deleteIfExists(tempProjectPath);
+                } catch (Exception e) {
+                    // do nothing
+                }
+            }
         }
 
         try {
@@ -162,12 +181,27 @@ public class ProjectAccessorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
-    private NamedElementDTO openProject(McpSyncServerExchange exchange, FilePathDTO param) throws Exception {
+    private NamedElementDTO openProject(FilePathDTO param) throws Exception {
         log.debug("Open project: {}", param);
 
         // Check if the current project is modified
         if (projectAccessor.hasProject() && projectAccessor.isProjectModified()) {
-            throw new RuntimeException("The existing project needs to be saved before opening a new project.");
+            if (!"no_title".equals(projectAccessor.getProjectPath())) {
+                // For a modified project
+                throw new RuntimeException("The existing project needs to be saved before opening a new project.");
+
+            } else {
+                // For a new unsaved project, create and delete a dummy project before continuing to avoid showing the save confirmation dialog.
+                try {
+                    Path tempProjectPath = McpServerConfig.WORKSPACE_DIR.resolve("dummy.asta");
+                    Files.createDirectories(tempProjectPath.getParent());
+                    Files.deleteIfExists(tempProjectPath);
+                    projectAccessor.saveAs(tempProjectPath.toString());
+                    Files.deleteIfExists(tempProjectPath);
+                } catch (Exception e) {
+                    // do nothing
+                }
+            }
         }
 
         try {
@@ -186,7 +220,7 @@ public class ProjectAccessorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
-    private NamedElementDTO getProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private NamedElementDTO getProject(NoInputDTO param) throws Exception {
         log.debug("Get project (root package): {}", param);
 
         IModel astahProject;
@@ -199,19 +233,19 @@ public class ProjectAccessorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
-    private BooleanDTO isProjectOpen(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private BooleanDTO isProjectOpen(NoInputDTO param) throws Exception {
         log.debug("Is project opened: {}", param);
 
         return new BooleanDTO(projectAccessor.hasProject());
     }
 
-    private BooleanDTO isProjectModified(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private BooleanDTO isProjectModified(NoInputDTO param) throws Exception {
         log.debug("Is project modified: {}", param);
 
         return new BooleanDTO(projectAccessor.isProjectModified());
     }
 
-    private NameIdTypeListDTO findNamedElementsByName(McpSyncServerExchange exchange, NameDTO param) throws Exception {
+    private NameIdTypeListDTO findNamedElementsByName(NameDTO param) throws Exception {
         log.debug("Find named elements by name: {}", param);
 
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
@@ -226,7 +260,7 @@ public class ProjectAccessorTool implements ToolProvider {
         return new NameIdTypeListDTO(namedIdTypeDTOs);
     }
 
-    private ProjectPathDTO saveProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private ProjectPathDTO saveProject(NoInputDTO param) throws Exception {
         log.debug("Save project: {}", param);
 
         // Check if the current project is created
@@ -254,7 +288,7 @@ public class ProjectAccessorTool implements ToolProvider {
         return new ProjectPathDTO(projectAccessor.getProjectPath());
     }
 
-    private ProjectPathDTO saveProjectAs(McpSyncServerExchange exchange, FilePathDTO param) throws Exception {
+    private ProjectPathDTO saveProjectAs(FilePathDTO param) throws Exception {
         log.debug("Save project as: {}", param);
 
         // Check that the parent directory of the file path exists
@@ -282,7 +316,7 @@ public class ProjectAccessorTool implements ToolProvider {
         return new ProjectPathDTO(projectAccessor.getProjectPath());
     }
 
-    private NamedElementDTO closeProject(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private NamedElementDTO closeProject(NoInputDTO param) throws Exception {
         log.debug("Close project: {}", param);
 
         IModel astahProject;
@@ -301,11 +335,19 @@ public class ProjectAccessorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
-    private ProjectPathDTO getProjectPath(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private ProjectPathDTO getProjectPath(NoInputDTO param) throws Exception {
         log.debug("Get project path: {}", param);
 
         try {
-            return new ProjectPathDTO(projectAccessor.getProjectPath());
+            String projectPath = projectAccessor.getProjectPath();
+            if (projectPath == null
+                || projectPath.isBlank()
+                || UNSAVED_PROJECT_PATH.equals(projectPath)) {
+                return new ProjectPathDTO("");
+            }
+
+            return new ProjectPathDTO(projectPath);
+            
         } catch (ProjectNotFoundException e) {
             return new ProjectPathDTO("");
         }

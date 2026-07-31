@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.RequirementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.RequirementDTOAssembler;
 import com.change_vision.jude.api.inf.model.IRequirement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class RequirementTool implements ToolProvider {
         );
     }
 
-    private RequirementDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private RequirementDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get requirement information: {}", param);
 
         IRequirement astahRequirement = astahProToolSupport.getRequirement(param.id());
@@ -88,7 +87,7 @@ public class RequirementTool implements ToolProvider {
         return RequirementDTOAssembler.toDTO(astahRequirement);
     }
 
-    private RequirementDTO setRequirementId(McpSyncServerExchange exchange, RequirementWithIdDTO param) throws Exception {
+    private RequirementDTO setRequirementId(RequirementWithIdDTO param) throws Exception {
         log.debug("Set requirement identifier: {}", param);
 
         IRequirement astahRequirement = astahProToolSupport.getRequirement(param.id());
@@ -100,7 +99,7 @@ public class RequirementTool implements ToolProvider {
         return RequirementDTOAssembler.toDTO(astahRequirement);
     }
 
-    private RequirementDTO setRequirementText(McpSyncServerExchange exchange, RequirementWithTextDTO param) throws Exception {
+    private RequirementDTO setRequirementText(RequirementWithTextDTO param) throws Exception {
         log.debug("Set requirement text: {}", param);
 
         IRequirement astahRequirement = astahProToolSupport.getRequirement(param.id());

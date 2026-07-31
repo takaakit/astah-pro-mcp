@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ExtendDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ExtendDTOAssembler;
 import com.change_vision.jude.api.inf.model.IExtend;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class ExtendTool implements ToolProvider {
         return List.of();
     }
 
-    private ExtendDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ExtendDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get extend information: {}", param);
 
         IExtend astahExtend = astahProToolSupport.getExtend(param.id());

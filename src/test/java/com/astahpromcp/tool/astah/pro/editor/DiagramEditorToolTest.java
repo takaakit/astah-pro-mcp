@@ -19,7 +19,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,49 +74,42 @@ public class DiagramEditorToolTest {
         insertSvgImage = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "insertSvgImage",
-            McpSyncServerExchange.class,
             NewSvgImageWithPointDTO.class);
 
         // insertPngImage() method
         insertPngImage = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "insertPngImage",
-            McpSyncServerExchange.class,
             NewPngImageWithPointDTO.class);
 
         // insertJpgImage() method
         insertJpgImage = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "insertJpgImage",
-            McpSyncServerExchange.class,
             NewJpgImageWithPointDTO.class);
 
         // insertRect() method
         insertRect = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "insertRect",
-            McpSyncServerExchange.class,
             NewRectDTO.class);
 
         // insertText() method
         insertText = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "insertText",
-            McpSyncServerExchange.class,
             NewTextWithPointDTO.class);
 
         // deleteDiagram() method
         deleteDiagram = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "deleteDiagram",
-            McpSyncServerExchange.class,
             DeleteDiagramDTO.class);
 
         // deletePresentation() method
         deletePresentation = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
             "deletePresentation",
-            McpSyncServerExchange.class,
             DeletePresentationDTO.class);
     }
 

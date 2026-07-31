@@ -15,7 +15,6 @@ import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,91 +74,76 @@ public class StateMachineDiagramEditorToolTest {
         addRegion = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "addRegion",
-            McpSyncServerExchange.class,
             NewRegionDTO.class);
 
         deleteRegion = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "deleteRegion",
-            McpSyncServerExchange.class,
             DeleteRegionDTO.class);
 
         changeParentOfState = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "changeParentOfState",
-            McpSyncServerExchange.class,
             ChangeParentStateDTO.class);
 
         createChoicePseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createChoicePseudostate",
-            McpSyncServerExchange.class,
             NewChoicePseudostateDTO.class);
 
         createDeepHistoryPseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createDeepHistoryPseudostate",
-            McpSyncServerExchange.class,
             NewDeepHistoryPseudostateDTO.class);
 
         createShallowHistoryPseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createShallowHistoryPseudostate",
-            McpSyncServerExchange.class,
             NewShallowHistoryPseudostateDTO.class);
 
         createFinalState = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createFinalState",
-            McpSyncServerExchange.class,
             NewFinalStateDTO.class);
 
         createForkPseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createForkPseudostate",
-            McpSyncServerExchange.class,
             NewForkPseudostateDTO.class);
 
         createInitialPseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createInitialPseudostate",
-            McpSyncServerExchange.class,
             NewInitialPseudostateDTO.class);
 
         createJoinPseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createJoinPseudostate",
-            McpSyncServerExchange.class,
             NewJoinPseudostateDTO.class);
 
         createJunctionPseudostate = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createJunctionPseudostate",
-            McpSyncServerExchange.class,
             NewJunctionPseudostateDTO.class);
 
         createState = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createState",
-            McpSyncServerExchange.class,
             NewStateDTO.class);
 
         createStateMachineDiagram = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createStateMachineDiagram",
-            McpSyncServerExchange.class,
             NewStateMachineDiagramDTO.class);
 
         createSubMachineState = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createSubMachineState",
-            McpSyncServerExchange.class,
             NewSubMachineStateDTO.class);
 
         createTransition = TestSupport.getAccessibleMethod(
             StateMachineDiagramEditorTool.class,
             "createTransition",
-            McpSyncServerExchange.class,
             NewTransitionDTO.class);
     }
 

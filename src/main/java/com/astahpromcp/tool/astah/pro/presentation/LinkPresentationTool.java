@@ -14,7 +14,6 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPrese
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -88,7 +87,7 @@ public class LinkPresentationTool implements ToolProvider {
         );
     }
 
-    private LinkPresentationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private LinkPresentationDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get link presentation information: {}", param);
 
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.id());
@@ -96,7 +95,7 @@ public class LinkPresentationTool implements ToolProvider {
         return LinkPresentationDTOAssembler.toDTO(linkPresentation);
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> setAllPoints(McpSyncServerExchange exchange, LinkPresentationWithPointsDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> setAllPoints(LinkPresentationWithPointsDTO param) throws Exception {
         log.debug("Set points of link presentation: {}", param);
 
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());
@@ -118,7 +117,7 @@ public class LinkPresentationTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> setLineStyle(McpSyncServerExchange exchange, LinkPresentationWithLineStyleDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> setLineStyle(LinkPresentationWithLineStyleDTO param) throws Exception {
         log.debug("Set line style of link presentation: {}", param);
 
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());

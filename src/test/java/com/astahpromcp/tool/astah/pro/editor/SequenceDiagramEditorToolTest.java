@@ -15,7 +15,6 @@ import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,77 +69,66 @@ public class SequenceDiagramEditorToolTest {
         createSequenceDiagram = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createSequenceDiagram",
-            McpSyncServerExchange.class,
             NewSequenceDiagramInPackageDTO.class);
 
         // createCombinedFragment() method
         createCombinedFragment = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createCombinedFragment",
-            McpSyncServerExchange.class,
             NewCombinedFragmentDTO.class);
 
         // createMessage() method
         createMessage = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createMessage",
-            McpSyncServerExchange.class,
             NewMessageDTO.class);
 
         // createCreateMessage() method
         createCreateMessage = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createCreateMessage",
-            McpSyncServerExchange.class,
             NewCreateMessageDTO.class);
 
         // createDestroyMessage() method
         createDestroyMessage = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createDestroyMessage",
-            McpSyncServerExchange.class,
             NewDestroyMessageDTO.class);
 
         // createReturnMessage() method
         createReturnMessage = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createReturnMessage",
-            McpSyncServerExchange.class,
             NewReturnMessageDTO.class);
 
         // createLostMessage() method
         createLostMessage = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createLostMessage",
-            McpSyncServerExchange.class,
             NewLostMessageDTO.class);
 
         // createFoundMessage() method
         createFoundMessage = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createFoundMessage",
-            McpSyncServerExchange.class,
             NewFoundMessageDTO.class);
 
         // createInteractionUse() method
         createInteractionUse = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createInteractionUse",
-            McpSyncServerExchange.class,
             NewInteractionUseDTO.class);
 
         // createLifeline() method
         createLifeline = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createLifeline",
-            McpSyncServerExchange.class,
             NewLifelineDTO.class);
 
         // createTermination() method
         createTermination = TestSupport.getAccessibleMethod(
             SequenceDiagramEditorTool.class,
             "createTermination",
-            McpSyncServerExchange.class,
             NewTerminationDTO.class);
     }
 

@@ -5,7 +5,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -34,7 +33,7 @@ public class UseCaseDiagramGuideTool implements ToolProvider {
         }
     }
 
-    private GuideDTO getGuide(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private GuideDTO getGuide(NoInputDTO param) throws Exception {
         log.debug("Get usecase diagram guide: {}", param);
         
         String contents = """

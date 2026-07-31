@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,84 +54,72 @@ public class OperationToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setAbstract() method
         setAbstract = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "setAbstract",
-            McpSyncServerExchange.class,
             OperationWithAbstractDTO.class);
 
         // setLeaf() method
         setLeaf = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "setLeaf",
-            McpSyncServerExchange.class,
             OperationWithLeafDTO.class);
 
         // setStatic() method
         setStatic = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "setStatic",
-            McpSyncServerExchange.class,
             OperationWithStaticDTO.class);
 
         // setReturnType() method
         setReturnType = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "setReturnType",
-            McpSyncServerExchange.class,
             OperationWithReturnTypeDTO.class);
 
         // setReturnTypeExpression() method
         setReturnTypeExpression = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "setReturnTypeExpression",
-            McpSyncServerExchange.class,
             OperationWithReturnTypeExpressionDTO.class);
 
         // addPrecondition() method
         addPrecondition = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "addPrecondition",
-            McpSyncServerExchange.class,
             OperationWithPreconditionDTO.class);
 
         // addPostcondition() method
         addPostcondition = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "addPostcondition",
-            McpSyncServerExchange.class,
             OperationWithPostconditionDTO.class);
 
         // setBodyCondition() method
         setBodyCondition = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "setBodyCondition",
-            McpSyncServerExchange.class,
             OperationWithBodyConditionDTO.class);
 
         // removePrecondition() method
         removePrecondition = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "removePrecondition",
-            McpSyncServerExchange.class,
             OperationWithPreconditionDTO.class);
 
         // removePostcondition() method
         removePostcondition = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "removePostcondition",
-            McpSyncServerExchange.class,
             OperationWithPostconditionDTO.class);
 
         // removeBodyCondition() method
         removeBodyCondition = TestSupport.getAccessibleMethod(
             OperationTool.class,
             "removeBodyCondition",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public class UseCaseModelEditorTool implements ToolProvider {
         );
     }
 
-    private ClassDTO createActor(McpSyncServerExchange exchange, NewActorDTO param) throws Exception {
+    private ClassDTO createActor(NewActorDTO param) throws Exception {
         log.debug("Create actor: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
@@ -109,7 +108,7 @@ public class UseCaseModelEditorTool implements ToolProvider {
         return ClassDTOAssembler.toDTO(astahActor);
     }
 
-    private IncludeDTO createInclude(McpSyncServerExchange exchange, NewIncludeDTO param) throws Exception {
+    private IncludeDTO createInclude(NewIncludeDTO param) throws Exception {
         log.debug("Create include: {}", param);
 
         IUseCase astahUsecase = astahProToolSupport.getUseCase(param.includingUsecaseId());
@@ -125,7 +124,7 @@ public class UseCaseModelEditorTool implements ToolProvider {
         return IncludeDTOAssembler.toDTO(astahInclude);
     }
 
-    private ExtendDTO createExtend(McpSyncServerExchange exchange, NewExtendDTO param) throws Exception {
+    private ExtendDTO createExtend(NewExtendDTO param) throws Exception {
         log.debug("Create extend: {}", param);
 
         IUseCase astahUsecase = astahProToolSupport.getUseCase(param.extendingUsecaseId());
@@ -141,7 +140,7 @@ public class UseCaseModelEditorTool implements ToolProvider {
         return ExtendDTOAssembler.toDTO(astahExtend);
     }
 
-    private NamedElementDTO createExtensionPoint(McpSyncServerExchange exchange, NewExtensionPointDTO param) throws Exception {
+    private NamedElementDTO createExtensionPoint(NewExtensionPointDTO param) throws Exception {
         log.debug("Create extension point: {}", param);
 
         IUseCase astahUsecase = astahProToolSupport.getUseCase(param.targetUsecaseId());
@@ -155,7 +154,7 @@ public class UseCaseModelEditorTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahExtensionPoint);
     }
 
-    private UseCaseDTO createUseCase(McpSyncServerExchange exchange, NewUseCaseDTO param) throws Exception {
+    private UseCaseDTO createUseCase(NewUseCaseDTO param) throws Exception {
         log.debug("Create usecase: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -17,9 +18,16 @@ import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,8 +51,12 @@ class McpClientApprovalServletTest {
 
     // Stub the request body; POST bodies are read through getInputStream by the servlet
     private void stubBody(String body) throws Exception {
+        stubBody(request, body);
+    }
+
+    private void stubBody(HttpServletRequest target, String body) throws Exception {
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        when(request.getInputStream()).thenReturn(new ServletInputStream() {
+        when(target.getInputStream()).thenReturn(new ServletInputStream() {
             private final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
             @Override
@@ -255,5 +267,95 @@ class McpClientApprovalServletTest {
 
         verify(delegate).service(eq(request), ArgumentMatchers.any(HttpServletResponse.class));
         verify(response, never()).sendError(anyInt(), anyString());
+    }
+
+    @Test
+    @Timeout(30)
+    void service_ok_parallelInitializeWaitsForTheDialogOnScreen() throws Exception {
+        // Clients such as Codex CLI open several connections at once and give up on the first refusal, so an initialize arriving while the dialog is on screen must wait for its turn, not be rejected.
+        // The dialogs must not overlap either: for a single servlet, that is for a single port, at most one may be on screen at a time.
+        McpClientApprovalServlet spyServlet = spy(servlet);
+        AtomicInteger inDialog = new AtomicInteger();
+        AtomicInteger maxInDialog = new AtomicInteger();
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        CountDownLatch dialogShown = new CountDownLatch(1);
+        CountDownLatch releaseDialog = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            maxInDialog.accumulateAndGet(inDialog.incrementAndGet(), Math::max);
+            try {
+                dialogShown.countDown();
+                assertTrue(releaseDialog.await(10, TimeUnit.SECONDS), "Dialog was never released");
+                return true;
+
+            } finally {
+                inDialog.decrementAndGet();
+            }
+        }).when(spyServlet).promptUserForApproval(any());
+        HttpServletResponse secondResponse = mock(HttpServletResponse.class);
+
+        Thread first = startService(spyServlet, newInitializeRequest(51325), mock(HttpServletResponse.class), failure);
+        assertTrue(dialogShown.await(5, TimeUnit.SECONDS), "Dialog was never shown");
+        Thread second = startService(spyServlet, newInitializeRequest(51336), secondResponse, failure);
+        awaitQueuedOnDialog(second);
+
+        // Neither request may reach the transport while the dialog of the first one is still on screen
+        verify(delegate, never()).service(any(), any());
+
+        releaseDialog.countDown();
+        assertTrue(first.join(Duration.ofSeconds(10)), "The first initialize never finished");
+        assertTrue(second.join(Duration.ofSeconds(10)), "The second initialize never finished");
+
+        if (failure.get() != null) {
+            fail("An initialize request failed", failure.get());
+        }
+        assertEquals(1, maxInDialog.get(), "Two approval dialogs were on screen at the same time");
+        verify(secondResponse, never()).sendError(anyInt(), anyString());
+        verify(delegate, times(2)).service(any(), any());
+    }
+
+    // Build a fully stubbed initialize POST coming from the given client port
+    private HttpServletRequest newInitializeRequest(int remotePort) throws Exception {
+        HttpServletRequest initializeRequest = mock(HttpServletRequest.class);
+        when(initializeRequest.getHeader("Origin")).thenReturn(null);
+        when(initializeRequest.getHeader("Mcp-Session-Id")).thenReturn(null);
+        when(initializeRequest.getHeader("User-Agent")).thenReturn("Test-Agent");
+        when(initializeRequest.getMethod()).thenReturn("POST");
+        when(initializeRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(initializeRequest.getRemotePort()).thenReturn(remotePort);
+        when(initializeRequest.getRemoteHost()).thenReturn("localhost");
+        stubBody(initializeRequest, "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{}}");
+        return initializeRequest;
+    }
+
+    private Thread startService(McpClientApprovalServlet target,
+                                HttpServletRequest req,
+                                HttpServletResponse resp,
+                                AtomicReference<Throwable> failure) {
+        Thread thread = new Thread(() -> {
+            try {
+                target.service(req, resp);
+            } catch (Throwable t) {
+                // Reported by the test thread; throwing here would only reach stderr
+                failure.compareAndSet(null, t);
+            }
+        });
+        // Daemon so that a regression which never releases the dialog lock fails the test instead of hanging the build
+        thread.setDaemon(true);
+        thread.start();
+        return thread;
+    }
+
+    // Wait until the thread has queued up behind the approval dialog
+    private void awaitQueuedOnDialog(Thread thread) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (System.nanoTime() < deadline) {
+            // The dialog lock is acquired with a timeout, so a queued thread parks in TIMED_WAITING
+            Thread.State state = thread.getState();
+            if (state == Thread.State.WAITING || state == Thread.State.TIMED_WAITING) {
+                return;
+            }
+            Thread.sleep(5);
+        }
+        fail("The second initialize never queued up behind the approval dialog (thread state: " + thread.getState() + ")");
     }
 }

@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -62,7 +61,7 @@ public class ORImpedanceMismatchKnowledgeTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getORImpedanceMismatchKnowledgeInfo(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getORImpedanceMismatchKnowledgeInfo(NoInputDTO param) throws IOException {
         log.debug("Get Object-Relational Impedance Mismatch knowledge: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -102,7 +101,7 @@ public class ORImpedanceMismatchKnowledgeTool implements ToolProvider {
         return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
-    private DocumentChunkDTO getORImpedanceMismatchKnowledgeChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getORImpedanceMismatchKnowledgeChunk(ChunkDTO param) {
         log.debug("Get Object-Relational Impedance Mismatch knowledge chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

@@ -15,7 +15,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,56 +56,48 @@ public class ERRelationshipToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setCardinality() method
         setCardinality = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setCardinality",
-            McpSyncServerExchange.class,
             ERRelationshipWithCardinalityDTO.class);
 
         // setERIndex() method
         setERIndex = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setERIndex",
-            McpSyncServerExchange.class,
             ERRelationshipWithERIndexDTO.class);
 
         // setLogicalName() method
         setLogicalName = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setLogicalName",
-            McpSyncServerExchange.class,
             ERRelationshipWithLogicalNameDTO.class);
 
         // setPhysicalName() method
         setPhysicalName = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setPhysicalName",
-            McpSyncServerExchange.class,
             ERRelationshipWithPhysicalNameDTO.class);
 
         // setParentRequired() method
         setParentRequired = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setParentRequired",
-            McpSyncServerExchange.class,
             ERRelationshipWithParentRequiredDTO.class);
 
         // setVerbPhraseParent() method
         setVerbPhraseParent = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setVerbPhraseParent",
-            McpSyncServerExchange.class,
             ERRelationshipWithParentVerbPhraseDTO.class);
 
         // setVerbPhraseChild() method
         setVerbPhraseChild = TestSupport.getAccessibleMethod(
             ERRelationshipTool.class,
             "setVerbPhraseChild",
-            McpSyncServerExchange.class,
             ERRelationshipWithChildVerbPhraseDTO.class);
     }
 

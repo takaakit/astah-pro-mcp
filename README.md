@@ -44,7 +44,7 @@ Diagrams created in the videos above: The diagram layouts were manually adjusted
 - AI agents
   - For the full (query + edit) tool version:
 
-    With over **300** tools exposed in this version, use the AI agents listed below. Other AI agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
+    With around **400** tools exposed in this version, use the AI agents listed below. Other AI agents may fail to connect due to the large number of tools, or may connect but only recognize a subset.
     - **Claude Code**
     - **Codex CLI**
     - **Grok Build**
@@ -52,7 +52,7 @@ Diagrams created in the videos above: The diagram layouts were manually adjusted
 
   - For the query-only tool version:
 
-    This version exposes around **125** tools, so many AI agents will likely be able to use it. Note that the AI agent can only reference information about model elements and diagrams.
+    This version exposes around **150** tools, so many AI agents will likely be able to use it. Note that the AI agent can only reference information about model elements and diagrams.
 
   <br>
 
@@ -147,6 +147,24 @@ Create `.agents/mcp_config.json` under your project directory, or create `~/.gem
 }
 ```
 
+If the direct connection above does not work, fall back to the following configuration using mcp-remote:
+
+```json
+{
+  "mcpServers": {
+    "astah-pro-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "http://127.0.0.1:8888/mcp",
+        "--allow-http"
+      ]
+    }
+  }
+}
+```
+
 
 <br>
 
@@ -160,6 +178,8 @@ Create `.agents/mcp_config.json` under your project directory, or create `~/.gem
 
    On the first connection to the Astah Pro MCP server, you will be asked to confirm. Review the details and click **'Connect'**.  
   ![Connection Request](img/mcp-connection-request.png)
+
+   > *Note:* As of July 31, 2026, the latest version of Codex CLI shows this confirmation dialog twice.
 
 3. Send prompts to the AI agents
 
@@ -217,6 +237,10 @@ As with source code, AI agents can make mistakes or misinterpret model elements 
 ## License
 
 Some tool functions provided by this MCP server return excerpts from the [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF), [OMG SysML 1.7](https://www.omg.org/spec/SysML/1.7/PDF) specifications, and [FIPS PUB 184 IDEF1X](https://www.govinfo.gov/app/details/GOVPUB-C13-986bf8b12a4fed44eb78fca0bb55d668). The OMG UML/SysML specifications are licensed as stated at the beginning of each document. FIPS PUB 184 IDEF1X is a U.S. Government work (NIST) and is not subject to copyright protection in the United States (17 U.S.C. §105), but may be subject to foreign copyright. When content from these specifications/documents is returned by tool functions, it is explicitly indicated as an excerpt. "Mind Map" is a registered trademark of The Buzan Organisation Limited.
+
+One tool function returns UML diagram consistency rules quoted from the papers below. Copyright of these rule statements remains with their authors and publishers; they are quoted with attribution and explicitly indicated as excerpts.
+- Torre, Damiano, et al. "A systematic identification of consistency rules for UML diagrams." Journal of Systems and Software 144 (2018): 121-142.
+- Torre, Damiano, et al. "How consistency is handled in model-driven software engineering and UML: an expert opinion survey." Software Quality Journal 31.1 (2023): 1-54.
 
 All other works, including source code, are copyrighted by **Takaaki Teshima** and released under the **MIT-0** license.  
 [![License: MIT-0](https://img.shields.io/badge/License-MIT--0-blue.svg)](https://opensource.org/licenses/MIT-0)

@@ -17,7 +17,6 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -86,7 +85,7 @@ public class LifelineTool implements ToolProvider {
         );
     }
 
-    private LifelineDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private LifelineDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get lifeline information: {}", param);
 
         ILifeline astahLifeline = astahProToolSupport.getLifeline(param.id());
@@ -94,7 +93,7 @@ public class LifelineTool implements ToolProvider {
         return LifelineDTOAssembler.toDTO(astahLifeline);
     }
 
-    private LifelineDTO setBaseClass(McpSyncServerExchange exchange, LifelineWithBaseClassDTO param) throws Exception {
+    private LifelineDTO setBaseClass(LifelineWithBaseClassDTO param) throws Exception {
         log.debug("Set base class of lifeline: {}", param);
 
         ILifeline astahLifeline = astahProToolSupport.getLifeline(param.targetLifelineId());
@@ -107,7 +106,7 @@ public class LifelineTool implements ToolProvider {
         return LifelineDTOAssembler.toDTO(astahLifeline);
     }
 
-    private NodePresentationDTO setLength(McpSyncServerExchange exchange, LifelineWithLengthDTO param) throws Exception {
+    private NodePresentationDTO setLength(LifelineWithLengthDTO param) throws Exception {
         log.debug("Set length of lifeline: {}", param);
 
         ILifeline astahLifeline = astahProToolSupport.getLifeline(param.targetLifelineId());

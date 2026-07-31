@@ -23,7 +23,6 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -106,7 +105,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private DiagramDTO createClassDiagram(McpSyncServerExchange exchange, NewDiagramInPackageDTO param) throws Exception {
+    private DiagramDTO createClassDiagram(NewDiagramInPackageDTO param) throws Exception {
         log.debug("Create class diagram: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
@@ -118,7 +117,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(createdAstahClassDiagram);
     }
 
-    private Pair<PresentationListDTO, List<McpSchema.Content>> createAssociationClassPresentation(McpSyncServerExchange exchange, NewAssociationClassPresentationDTO param) throws Exception {
+    private Pair<PresentationListDTO, List<McpSchema.Content>> createAssociationClassPresentation(NewAssociationClassPresentationDTO param) throws Exception {
         log.debug("Create association class presentation: {}", param);
 
         IClassDiagram astahClassDiagram = astahProToolSupport.getClassDiagram(param.targetDiagramId());
@@ -147,7 +146,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInstanceSpecification(McpSyncServerExchange exchange, NewInstanceWithPointDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createInstanceSpecification(NewInstanceWithPointDTO param) throws Exception {
         log.debug("Create instance specification: {}", param);
 
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
@@ -174,7 +173,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createInstanceSpecificationLink(McpSyncServerExchange exchange, NewLinkSourceAndTargetDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createInstanceSpecificationLink(NewLinkSourceAndTargetDTO param) throws Exception {
         log.debug("Create instance specification link: {}", param);
 
         INodePresentation astahSourceNode = astahProToolSupport.getNodePresentation(param.sourceNodePresentationId());

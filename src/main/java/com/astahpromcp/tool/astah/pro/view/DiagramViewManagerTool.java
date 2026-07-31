@@ -20,7 +20,6 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IDiagramViewManager;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
@@ -201,7 +200,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         );
     }
 
-    private DiagramDTO openDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private DiagramDTO openDiagram(IdDTO param) throws Exception {
         log.debug("Open diagram: {}", param);
 
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
@@ -215,7 +214,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(diagram);
     }
 
-    private DiagramDTO closeDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private DiagramDTO closeDiagram(IdDTO param) throws Exception {
         log.debug("Close diagram: {}", param);
 
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
@@ -246,13 +245,13 @@ public class DiagramViewManagerTool implements ToolProvider {
         return currentDiagram;
     }
 
-    private DiagramDTO getCurrentDiagram(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private DiagramDTO getCurrentDiagram(NoInputDTO param) throws Exception {
         log.debug("Get current diagram: {}", param);
 
         return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
-    private PresentationListDTO getSelectedPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private PresentationListDTO getSelectedPresentations(NoInputDTO param) throws Exception {
         log.debug("Get selected presentations: {}", param);
 
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
@@ -263,7 +262,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return new PresentationListDTO(presentationDTOs);
     }
 
-    private PresentationListDTO selectPresentations(McpSyncServerExchange exchange, IdListDTO param) throws Exception {
+    private PresentationListDTO selectPresentations(IdListDTO param) throws Exception {
         log.debug("Select presentations: {}", param);
 
         List<IPresentation> presentations = new ArrayList<>();
@@ -286,7 +285,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return new PresentationListDTO(presentationDTOs);
     }
 
-    private PresentationListDTO selectAllPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private PresentationListDTO selectAllPresentations(NoInputDTO param) throws Exception {
         log.debug("Select all presentations: {}", param);
 
         try {
@@ -303,7 +302,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return new PresentationListDTO(presentationDTOs);
     }
 
-    private DiagramDTO unselectAllPresentations(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private DiagramDTO unselectAllPresentations(NoInputDTO param) throws Exception {
         log.debug("Unselect all presentations: {}", param);
 
         try {
@@ -315,7 +314,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
-    private PresentationDTO centerPresentationInDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PresentationDTO centerPresentationInDiagram(IdDTO param) throws Exception {
         log.debug("Center presentation in diagram: {}", param);
 
         IPresentation presentation = astahProToolSupport.getPresentation(param.id());
@@ -329,7 +328,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return PresentationDTOAssembler.toDTO(presentation);
     }
 
-    private DiagramDTO autoLayout(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private DiagramDTO autoLayout(NoInputDTO param) throws Exception {
         log.debug("Auto layout: {}", param);
 
         IDiagram currentDiagram = requireCurrentDiagram();
@@ -342,13 +341,13 @@ public class DiagramViewManagerTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(currentDiagram);
     }
 
-    private com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO getZoomFactor(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO getZoomFactor(NoInputDTO param) throws Exception {
         log.debug("Get zoom factor: {}", param);
 
         return new com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO(diagramViewManager.getZoomFactor());
     }
 
-    private DiagramDTO zoom(McpSyncServerExchange exchange, com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO param) throws Exception {
+    private DiagramDTO zoom(com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO param) throws Exception {
         log.debug("Zoom: {}", param);
 
         try {
@@ -360,7 +359,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
-    private DiagramDTO zoomFit(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private DiagramDTO zoomFit(NoInputDTO param) throws Exception {
         log.debug("Zoom fit: {}", param);
 
         IDiagram currentDiagram = requireCurrentDiagram();
@@ -466,7 +465,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return null;
     }
 
-    private PresentationDTO highlightPresentation(McpSyncServerExchange exchange, PresentationWithHighlightColorDTO param) throws Exception {
+    private PresentationDTO highlightPresentation(PresentationWithHighlightColorDTO param) throws Exception {
         log.debug("Highlight presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
@@ -484,7 +483,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return PresentationDTOAssembler.toDTO(astahPresentation);
     }
 
-    private PresentationDTO unhighlightPresentation(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PresentationDTO unhighlightPresentation(IdDTO param) throws Exception {
         log.debug("Unhighlight presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.id());
@@ -497,7 +496,7 @@ public class DiagramViewManagerTool implements ToolProvider {
         return PresentationDTOAssembler.toDTO(astahPresentation);
     }
 
-    private PresentationListDTO getHighlightedPresentationsWithinDiagram(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private PresentationListDTO getHighlightedPresentationsWithinDiagram(IdDTO param) throws Exception {
         log.debug("Get highlighted presentations within diagram: {}", param);
 
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
@@ -514,13 +513,13 @@ public class DiagramViewManagerTool implements ToolProvider {
         return new PresentationListDTO(presentationDTOs);
     }
 
-    private PresentationListDTO bringPresentationsToFront(McpSyncServerExchange exchange, IdListDTO param) throws Exception {
+    private PresentationListDTO bringPresentationsToFront(IdListDTO param) throws Exception {
         log.debug("Bring presentations to front: {}", param);
 
         return arrangeDepthOfPresentations(param, BRING_TO_FRONT_MENU_ITEM_NAME);
     }
 
-    private PresentationListDTO sendPresentationsToBack(McpSyncServerExchange exchange, IdListDTO param) throws Exception {
+    private PresentationListDTO sendPresentationsToBack(IdListDTO param) throws Exception {
         log.debug("Send presentations to back: {}", param);
 
         return arrangeDepthOfPresentations(param, SEND_TO_BACK_MENU_ITEM_NAME);

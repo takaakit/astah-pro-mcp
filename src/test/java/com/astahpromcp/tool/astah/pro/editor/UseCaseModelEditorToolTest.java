@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.model.IExtend;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IUseCase;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,35 +52,30 @@ public class UseCaseModelEditorToolTest {
         createActor = TestSupport.getAccessibleMethod(
             UseCaseModelEditorTool.class,
             "createActor",
-            McpSyncServerExchange.class,
             NewActorDTO.class);
 
         // createUseCase() method
         createUseCase = TestSupport.getAccessibleMethod(
             UseCaseModelEditorTool.class,
             "createUseCase",
-            McpSyncServerExchange.class,
             NewUseCaseDTO.class);
 
         // createInclude() method
         createInclude = TestSupport.getAccessibleMethod(
             UseCaseModelEditorTool.class,
             "createInclude",
-            McpSyncServerExchange.class,
             NewIncludeDTO.class);
 
         // createExtend() method
         createExtend = TestSupport.getAccessibleMethod(
             UseCaseModelEditorTool.class,
             "createExtend",
-            McpSyncServerExchange.class,
             NewExtendDTO.class);
 
         // createExtensionPoint() method
         createExtensionPoint = TestSupport.getAccessibleMethod(
             UseCaseModelEditorTool.class,
             "createExtensionPoint",
-            McpSyncServerExchange.class,
             NewExtensionPointDTO.class);
     }
 

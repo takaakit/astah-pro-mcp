@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERIndexDTOAssemb
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class ERIndexTool implements ToolProvider {
         );
     }
 
-    private ERIndexDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ERIndexDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get ER index information: {}", param);
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.id());
@@ -104,7 +103,7 @@ public class ERIndexTool implements ToolProvider {
         return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
-    private ERIndexDTO addERAttribute(McpSyncServerExchange exchange, ERIndexWithERAttributeDTO param) throws Exception {
+    private ERIndexDTO addERAttribute(ERIndexWithERAttributeDTO param) throws Exception {
         log.debug("Add ER attribute to ER index: {}", param);
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
@@ -117,7 +116,7 @@ public class ERIndexTool implements ToolProvider {
         return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
-    private ERIndexDTO removeERAttribute(McpSyncServerExchange exchange, ERIndexWithERAttributeDTO param) throws Exception {
+    private ERIndexDTO removeERAttribute(ERIndexWithERAttributeDTO param) throws Exception {
         log.debug("Remove ER attribute from ER index: {}", param);
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
@@ -130,7 +129,7 @@ public class ERIndexTool implements ToolProvider {
         return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
-    private ERIndexDTO setKey(McpSyncServerExchange exchange, ERIndexWithKeyDTO param) throws Exception {
+    private ERIndexDTO setKey(ERIndexWithKeyDTO param) throws Exception {
         log.debug("Set key of ER index: {}", param);
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
@@ -142,7 +141,7 @@ public class ERIndexTool implements ToolProvider {
         return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
-    private ERIndexDTO setUnique(McpSyncServerExchange exchange, ERIndexWithUniqueDTO param) throws Exception {
+    private ERIndexDTO setUnique(ERIndexWithUniqueDTO param) throws Exception {
         log.debug("Set unique of ER index: {}", param);
 
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());

@@ -6,7 +6,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.config.outputdto.WorkspaceDirectoryPathDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class ConfigTool implements ToolProvider {
         );
     }
 
-    private WorkspaceDirectoryPathDTO getWorkspaceDirectoryPath(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private WorkspaceDirectoryPathDTO getWorkspaceDirectoryPath(NoInputDTO param) throws Exception {
         log.debug("Get workspace directory path: {}", param);
 
         return new WorkspaceDirectoryPathDTO(McpServerConfig.WORKSPACE_DIR.toString());

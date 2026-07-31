@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ConnectorDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IConnector;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,6 @@ public class ConnectorToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             ConnectorTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 
@@ -59,7 +57,7 @@ public class ConnectorToolTest {
         IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
             IConnector.class,
             "connector0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(connector.getId());
 
@@ -75,5 +73,119 @@ public class ConnectorToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(connector.getId(), outputDTO.namedElement().element().id());
+    }
+
+    @Test
+    void getInfo_ok_portToPort() throws Exception {
+        // Get connector
+        IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
+            IConnector.class,
+            "connector0");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(connector.getId());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        ConnectorDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            inputDTO,
+            ConnectorDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertFalse(outputDTO.ports().get(0).id().isEmpty());
+        assertFalse(outputDTO.ports().get(1).id().isEmpty());
+        assertTrue(outputDTO.parts().get(0).id().isEmpty());
+        assertTrue(outputDTO.parts().get(1).id().isEmpty());
+        assertFalse(outputDTO.partsWithPort().get(0).id().isEmpty());
+        assertFalse(outputDTO.partsWithPort().get(1).id().isEmpty());
+    }
+
+    @Test
+    void getInfo_ok_portToPart() throws Exception {
+        // Get connector
+        IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
+            IConnector.class,
+            "connector1");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(connector.getId());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        ConnectorDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            inputDTO,
+            ConnectorDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertFalse(outputDTO.ports().get(0).id().isEmpty());
+        assertTrue(outputDTO.ports().get(1).id().isEmpty());
+        assertTrue(outputDTO.parts().get(0).id().isEmpty());
+        assertFalse(outputDTO.parts().get(1).id().isEmpty());
+        assertFalse(outputDTO.partsWithPort().get(0).id().isEmpty());
+        assertTrue(outputDTO.partsWithPort().get(1).id().isEmpty());
+    }
+
+    @Test
+    void getInfo_ok_partToPort() throws Exception {
+        // Get connector
+        IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
+            IConnector.class,
+            "connector2");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(connector.getId());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        ConnectorDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            inputDTO,
+            ConnectorDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.ports().get(0).id().isEmpty());
+        assertFalse(outputDTO.ports().get(1).id().isEmpty());
+        assertFalse(outputDTO.parts().get(0).id().isEmpty());
+        assertTrue(outputDTO.parts().get(1).id().isEmpty());
+        assertTrue(outputDTO.partsWithPort().get(0).id().isEmpty());
+        assertFalse(outputDTO.partsWithPort().get(1).id().isEmpty());
+    }
+
+    @Test
+    void getInfo_ok_partToPart() throws Exception {
+        // Get connector
+        IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
+            IConnector.class,
+            "connector3");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(connector.getId());
+
+        // Call getInfo()
+        ConnectorDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            inputDTO,
+            ConnectorDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.ports().get(0).id().isEmpty());
+        assertTrue(outputDTO.ports().get(1).id().isEmpty());
+        assertFalse(outputDTO.parts().get(0).id().isEmpty());
+        assertFalse(outputDTO.parts().get(1).id().isEmpty());
+        assertTrue(outputDTO.partsWithPort().get(0).id().isEmpty());
+        assertTrue(outputDTO.partsWithPort().get(1).id().isEmpty());
     }
 }

@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ConstraintDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ConstraintDTOAssembler;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class ConstraintTool implements ToolProvider {
         );
     }
 
-    private ConstraintDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ConstraintDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get constraint information: {}", param);
 
         IConstraint astahConstraint = astahProToolSupport.getConstraint(param.id());
@@ -80,7 +79,7 @@ public class ConstraintTool implements ToolProvider {
         return ConstraintDTOAssembler.toDTO(astahConstraint);
     }
 
-    private ConstraintDTO setSpecification(McpSyncServerExchange exchange, ConstraintWithSpecificationDTO param) throws Exception {
+    private ConstraintDTO setSpecification(ConstraintWithSpecificationDTO param) throws Exception {
         log.debug("Set specification: {}", param);
 
         IConstraint astahConstraint = astahProToolSupport.getConstraint(param.id());

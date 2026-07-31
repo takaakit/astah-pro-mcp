@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -54,7 +53,7 @@ public class DDDReferenceTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getDDDReference(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getDDDReference(NoInputDTO param) throws IOException {
         log.debug("Get DDD reference: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -79,7 +78,7 @@ public class DDDReferenceTool implements ToolProvider {
         }
     }
 
-    private DocumentChunkDTO getDDDReferenceChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getDDDReferenceChunk(ChunkDTO param) {
         log.debug("Get DDD reference chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

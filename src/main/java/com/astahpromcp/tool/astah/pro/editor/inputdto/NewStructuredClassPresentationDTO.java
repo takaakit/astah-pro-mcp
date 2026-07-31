@@ -6,8 +6,8 @@ public record NewStructuredClassPresentationDTO(
     @JsonPropertyDescription("Target composite structure diagram identifier")
     String targetCompositeStructureDiagramId,
 
-    @JsonPropertyDescription("Target element identifier")
-    String targetElementId,
+    @JsonPropertyDescription("Target class identifier")
+    String targetClassId,
 
     @JsonPropertyDescription("Location X coordinate")
     int locationX,

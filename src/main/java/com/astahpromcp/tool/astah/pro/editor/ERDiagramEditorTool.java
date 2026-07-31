@@ -22,7 +22,6 @@ import com.change_vision.jude.api.inf.model.IERPackage;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -105,7 +104,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         );
     }
 
-    private ERDiagramDTO createERDiagram(McpSyncServerExchange exchange, NewERDiagramDTO param) throws Exception {
+    private ERDiagramDTO createERDiagram(NewERDiagramDTO param) throws Exception {
         log.debug("Create ER diagram: {}", param);
 
         IERPackage astahERPackage = astahProToolSupport.getERPackage(param.targetERPackageId());
@@ -119,7 +118,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         return ERDiagramDTOAssembler.toDTO(createdAstahERDiagram);
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(McpSyncServerExchange exchange, NewNodePresentationOnERDiagramDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(NewNodePresentationOnERDiagramDTO param) throws Exception {
         log.debug("Create node presentation on ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -142,7 +141,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(McpSyncServerExchange exchange, NewLinkPresentationOnERDiagramDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(NewLinkPresentationOnERDiagramDTO param) throws Exception {
         log.debug("Create link presentation on ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
@@ -166,7 +165,7 @@ public class ERDiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubtypeRelationshipGroup(McpSyncServerExchange exchange, NewSubtypeRelationshipGroupOnERDiagramDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubtypeRelationshipGroup(NewSubtypeRelationshipGroupOnERDiagramDTO param) throws Exception {
         log.debug("Create subtype relationship group on ER diagram: {}", param);
 
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());

@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,42 +48,36 @@ public class NamedElementToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             NamedElementTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setName() method
         setName = TestSupport.getAccessibleMethod(
             NamedElementTool.class,
             "setName",
-            McpSyncServerExchange.class,
             NamedElementWithNameDTO.class);
 
         // setAlias1() method
         setAlias1 = TestSupport.getAccessibleMethod(
             NamedElementTool.class,
             "setAlias1",
-            McpSyncServerExchange.class,
             NamedElementWithAlias1DTO.class);
 
         // setAlias2() method
         setAlias2 = TestSupport.getAccessibleMethod(
             NamedElementTool.class,
             "setAlias2",
-            McpSyncServerExchange.class,
             NamedElementWithAlias2DTO.class);
 
         // setDefinition() method
         setDefinition = TestSupport.getAccessibleMethod(
             NamedElementTool.class,
             "setDefinition",
-            McpSyncServerExchange.class,
             NamedElementWithDefinitionDTO.class);
 
         // setVisibility() method
         setVisibility = TestSupport.getAccessibleMethod(
             NamedElementTool.class,
             "setVisibility",
-            McpSyncServerExchange.class,
             NamedElementWithVisibilityDTO.class);
     }
 

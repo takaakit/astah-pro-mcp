@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
 import com.astahpromcp.tool.common.inputdto.TextContentsDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.InsightsDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
@@ -58,7 +57,7 @@ public class UMLModelingArchitectureInsightsTool implements ToolProvider {
         }
     }
 
-    private GuideDTO recallInsights(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private GuideDTO recallInsights(NoInputDTO param) throws Exception {
         log.debug("Recall UML, modeling, and architecture insights: {}", param);
 
         Path insightsFile = workspaceDir.resolve(INSIGHTS_FILE_NAME);
@@ -96,7 +95,7 @@ Follow these steps to recall insights on UML, modeling, and architecture:
         }
     }
 
-    private AbsoluteFilePathDTO storeInsights(McpSyncServerExchange exchange, TextContentsDTO param) throws Exception {
+    private AbsoluteFilePathDTO storeInsights(TextContentsDTO param) throws Exception {
         log.debug("Store UML, modeling, and architecture insights: {}", param);
 
         Path insightsFile = workspaceDir.resolve(INSIGHTS_FILE_NAME);
@@ -112,7 +111,7 @@ Follow these steps to recall insights on UML, modeling, and architecture:
         return new AbsoluteFilePathDTO(absolutePath);
     }
 
-    private InsightsDTO readInsights(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private InsightsDTO readInsights(NoInputDTO param) throws Exception {
         log.debug("Read UML, modeling, and architecture insights: {}", param);
 
         Path insightsFile = workspaceDir.resolve(INSIGHTS_FILE_NAME);

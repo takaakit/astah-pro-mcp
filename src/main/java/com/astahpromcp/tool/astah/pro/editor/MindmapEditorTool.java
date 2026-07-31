@@ -31,7 +31,6 @@ import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -180,7 +179,7 @@ public class MindmapEditorTool implements ToolProvider {
         );
     }
 
-    private DiagramDTO createMindmapDiagram(McpSyncServerExchange exchange, NewDiagramInPackageDTO param) throws Exception {
+    private DiagramDTO createMindmapDiagram(NewDiagramInPackageDTO param) throws Exception {
         log.debug("Create mind map diagram: {}", param);
 
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
@@ -192,7 +191,7 @@ public class MindmapEditorTool implements ToolProvider {
         return DiagramDTOAssembler.toDTO(createdAstahMindmapDiagram);
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> changeToFloatingTopic(McpSyncServerExchange exchange, ChangeToFloatingTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> changeToFloatingTopic(ChangeToFloatingTopicDTO param) throws Exception {
         log.debug("Change to floating topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -211,7 +210,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFloatingTopic(McpSyncServerExchange exchange, NewFloatingTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createFloatingTopic(NewFloatingTopicDTO param) throws Exception {
         log.debug("Create floating topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -233,7 +232,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createTopic(McpSyncServerExchange exchange, NewTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createTopic(NewTopicDTO param) throws Exception {
         log.debug("Create topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -252,7 +251,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTopicLink(McpSyncServerExchange exchange, NewLinkBetweenTopicsDTO param) throws Exception {
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTopicLink(NewLinkBetweenTopicsDTO param) throws Exception {
         log.debug("Create topic link: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -272,7 +271,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfTopic(McpSyncServerExchange exchange, ChangeParentOfTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfTopic(ChangeParentOfTopicDTO param) throws Exception {
         log.debug("Change parent of topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -292,7 +291,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> moveTopicWithinSiblingOrder(McpSyncServerExchange exchange, MoveTopicWithinSiblingOrderDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> moveTopicWithinSiblingOrder(MoveTopicWithinSiblingOrderDTO param) throws Exception {
         log.debug("Move topic within sibling order: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -315,7 +314,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertSvgImageIntoTopic(McpSyncServerExchange exchange, NewSvgImageIntoTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertSvgImageIntoTopic(NewSvgImageIntoTopicDTO param) throws Exception {
         log.debug("Insert SVG image into topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -336,7 +335,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(diagramImage));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertPngImageIntoTopic(McpSyncServerExchange exchange, NewPngImageIntoTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertPngImageIntoTopic(NewPngImageIntoTopicDTO param) throws Exception {
         log.debug("Insert PNG image into topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -357,7 +356,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(diagramImage));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertJpgImageIntoTopic(McpSyncServerExchange exchange, NewJpgImageIntoTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertJpgImageIntoTopic(NewJpgImageIntoTopicDTO param) throws Exception {
         log.debug("Insert JPG image into topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -378,7 +377,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(diagramImage));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteChildTopics(McpSyncServerExchange exchange, DeleteChildTopicsDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteChildTopics(DeleteChildTopicsDTO param) throws Exception {
         log.debug("Delete child topics: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -397,7 +396,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteImageFromTopic(McpSyncServerExchange exchange, DeleteImageFromTopicDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteImageFromTopic(DeleteImageFromTopicDTO param) throws Exception {
         log.debug("Delete image from topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
@@ -416,7 +415,7 @@ public class MindmapEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> setBoundaryOfTopic(McpSyncServerExchange exchange, TopicWithBoundaryVisibilityDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> setBoundaryOfTopic(TopicWithBoundaryVisibilityDTO param) throws Exception {
         log.debug("Set boundary of topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());

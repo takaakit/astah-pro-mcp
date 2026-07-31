@@ -21,7 +21,6 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,28 +70,24 @@ public class ERDiagramEditorToolTest {
         createERDiagram = TestSupport.getAccessibleMethod(
             ERDiagramEditorTool.class,
             "createERDiagram",
-            McpSyncServerExchange.class,
             NewERDiagramDTO.class);
 
         // createNodePresentation() method
         createNodePresentation = TestSupport.getAccessibleMethod(
             ERDiagramEditorTool.class,
             "createNodePresentation",
-            McpSyncServerExchange.class,
             NewNodePresentationOnERDiagramDTO.class);
 
         // createLinkPresentation() method
         createLinkPresentation = TestSupport.getAccessibleMethod(
             ERDiagramEditorTool.class,
             "createLinkPresentation",
-            McpSyncServerExchange.class,
             NewLinkPresentationOnERDiagramDTO.class);
 
         // createSubtypeRelationshipGroup() method
         createSubtypeRelationshipGroup = TestSupport.getAccessibleMethod(
             ERDiagramEditorTool.class,
             "createSubtypeRelationshipGroup",
-            McpSyncServerExchange.class,
             NewSubtypeRelationshipGroupOnERDiagramDTO.class);
     }
 

@@ -10,7 +10,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,28 +47,24 @@ public class TransitionToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             TransitionTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setAction() method
         setAction = TestSupport.getAccessibleMethod(
             TransitionTool.class,
             "setAction",
-            McpSyncServerExchange.class,
             TransitionWithActionDTO.class);
 
         // setEvent() method
         setEvent = TestSupport.getAccessibleMethod(
             TransitionTool.class,
             "setEvent",
-            McpSyncServerExchange.class,
             TransitionWithEventDTO.class);
 
         // setGuard() method
         setGuard = TestSupport.getAccessibleMethod(
             TransitionTool.class,
             "setGuard",
-            McpSyncServerExchange.class,
             TransitionWithGuardDTO.class);
     }
 

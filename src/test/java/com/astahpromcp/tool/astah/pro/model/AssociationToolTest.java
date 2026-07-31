@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,91 +55,78 @@ public class AssociationToolTest {
         getAssociationInfo = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "getAssociationInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getAssociationEndAInfo() method
         getAssociationEndAInfo = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "getAssociationEndAInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // getAssociationEndBInfo() method
         getAssociationEndBInfo = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "getAssociationEndBInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setInitialValueOfAssociationEndA() method
         setInitialValueOfAssociationEndA = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setInitialValueOfAssociationEndA",
-            McpSyncServerExchange.class,
             AttributeWithInitialValueDTO.class);
 
         // setInitialValueOfAssociationEndB() method
         setInitialValueOfAssociationEndB = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setInitialValueOfAssociationEndB",
-            McpSyncServerExchange.class,
             AttributeWithInitialValueDTO.class);
 
         // setStaticOfAssociationEndA() method
         setStaticOfAssociationEndA = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setStaticOfAssociationEndA",
-            McpSyncServerExchange.class,
             AttributeWithStaticDTO.class);
 
         // setStaticOfAssociationEndB() method
         setStaticOfAssociationEndB = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setStaticOfAssociationEndB",
-            McpSyncServerExchange.class,
             AttributeWithStaticDTO.class);
 
         // setMultiplicityOfAssociationEndA() method
         setMultiplicityOfAssociationEndA = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setMultiplicityOfAssociationEndA",
-            McpSyncServerExchange.class,
             AttributeWithMultiplicityDTO.class);
 
         // setMultiplicityOfAssociationEndB() method
         setMultiplicityOfAssociationEndB = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setMultiplicityOfAssociationEndB",
-            McpSyncServerExchange.class,
             AttributeWithMultiplicityDTO.class);
 
         // setAggregationKindOfAssociationEndA() method
         setAggregationKindOfAssociationEndA = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setAggregationKindOfAssociationEndA",
-            McpSyncServerExchange.class,
             AssociationEndWithAggregationKindDTO.class);
 
         // setAggregationKindOfAssociationEndB() method
         setAggregationKindOfAssociationEndB = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setAggregationKindOfAssociationEndB",
-            McpSyncServerExchange.class,
             AssociationEndWithAggregationKindDTO.class);
 
         // setNavigabilityOfAssociationEndA() method
         setNavigabilityOfAssociationEndA = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setNavigabilityOfAssociationEndA",
-            McpSyncServerExchange.class,
             AssociationEndWithNavigabilityDTO.class);
 
         // setNavigabilityOfAssociationEndB() method
         setNavigabilityOfAssociationEndB = TestSupport.getAccessibleMethod(
             AssociationTool.class,
             "setNavigabilityOfAssociationEndB",
-            McpSyncServerExchange.class,
             AssociationEndWithNavigabilityDTO.class);
     }
 

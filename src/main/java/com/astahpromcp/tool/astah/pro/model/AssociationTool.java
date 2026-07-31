@@ -13,7 +13,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AttributeDTOAsse
 import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -152,7 +151,7 @@ public class AssociationTool implements ToolProvider {
         );
     }
 
-    private AssociationDTO getAssociationInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private AssociationDTO getAssociationInfo(IdDTO param) throws Exception {
         log.debug("Get association information: {}", param);
 
         IAssociation astahAssociation = astahProToolSupport.getAssociation(param.id());
@@ -160,7 +159,7 @@ public class AssociationTool implements ToolProvider {
         return AssociationDTOAssembler.toDTO(astahAssociation);
     }
 
-    private AttributeDTO getAssociationEndAInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private AttributeDTO getAssociationEndAInfo(IdDTO param) throws Exception {
         log.debug("Get association end A information: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.id());
@@ -168,7 +167,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO getAssociationEndBInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private AttributeDTO getAssociationEndBInfo(IdDTO param) throws Exception {
         log.debug("Get association end B information: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.id());
@@ -176,7 +175,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
-    private AttributeDTO setInitialValueOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithInitialValueDTO param) throws Exception {
+    private AttributeDTO setInitialValueOfAssociationEndA(AttributeWithInitialValueDTO param) throws Exception {
         log.debug("Set initial value of association end A: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
@@ -188,7 +187,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO setInitialValueOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithInitialValueDTO param) throws Exception {
+    private AttributeDTO setInitialValueOfAssociationEndB(AttributeWithInitialValueDTO param) throws Exception {
         log.debug("Set initial value of association end B: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
@@ -200,7 +199,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
-    private AttributeDTO setStaticOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithStaticDTO param) throws Exception {
+    private AttributeDTO setStaticOfAssociationEndA(AttributeWithStaticDTO param) throws Exception {
         log.debug("Set static of association end A: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
@@ -212,7 +211,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO setStaticOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithStaticDTO param) throws Exception {
+    private AttributeDTO setStaticOfAssociationEndB(AttributeWithStaticDTO param) throws Exception {
         log.debug("Set static of association end B: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
@@ -224,7 +223,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
-    private AttributeDTO setMultiplicityOfAssociationEndA(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
+    private AttributeDTO setMultiplicityOfAssociationEndA(AttributeWithMultiplicityDTO param) throws Exception {
         log.debug("Set multiplicity of association end A: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
@@ -251,7 +250,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO setMultiplicityOfAssociationEndB(McpSyncServerExchange exchange, AttributeWithMultiplicityDTO param) throws Exception {
+    private AttributeDTO setMultiplicityOfAssociationEndB(AttributeWithMultiplicityDTO param) throws Exception {
         log.debug("Set multiplicity of association end B: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
@@ -278,7 +277,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
-    private AttributeDTO setAggregationKindOfAssociationEndA(McpSyncServerExchange exchange, AssociationEndWithAggregationKindDTO param) throws Exception {
+    private AttributeDTO setAggregationKindOfAssociationEndA(AssociationEndWithAggregationKindDTO param) throws Exception {
         log.debug("Set aggregation kind of association end A: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
@@ -290,7 +289,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO setAggregationKindOfAssociationEndB(McpSyncServerExchange exchange, AssociationEndWithAggregationKindDTO param) throws Exception {
+    private AttributeDTO setAggregationKindOfAssociationEndB(AssociationEndWithAggregationKindDTO param) throws Exception {
         log.debug("Set aggregation kind of association end B: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
@@ -302,7 +301,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
-    private AttributeDTO setNavigabilityOfAssociationEndA(McpSyncServerExchange exchange, AssociationEndWithNavigabilityDTO param) throws Exception {
+    private AttributeDTO setNavigabilityOfAssociationEndA(AssociationEndWithNavigabilityDTO param) throws Exception {
         log.debug("Set navigability of association end A: {}", param);
 
         IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
@@ -314,7 +313,7 @@ public class AssociationTool implements ToolProvider {
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
-    private AttributeDTO setNavigabilityOfAssociationEndB(McpSyncServerExchange exchange, AssociationEndWithNavigabilityDTO param) throws Exception {
+    private AttributeDTO setNavigabilityOfAssociationEndB(AssociationEndWithNavigabilityDTO param) throws Exception {
         log.debug("Set navigability of association end B: {}", param);
 
         IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());

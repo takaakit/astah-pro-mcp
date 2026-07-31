@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -63,7 +62,7 @@ public class ColorPaletteGuideTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getColorPaletteGuideInfo(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getColorPaletteGuideInfo(NoInputDTO param) throws IOException {
         log.debug("Get Color Palette guide: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -103,7 +102,7 @@ public class ColorPaletteGuideTool implements ToolProvider {
         return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
-    private DocumentChunkDTO getColorPaletteGuideChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getColorPaletteGuideChunk(ChunkDTO param) {
         log.debug("Get Color Palette guide chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

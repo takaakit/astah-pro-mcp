@@ -6,7 +6,6 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.info.outputdto.AstahProMcpVersionDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class InfoTool implements ToolProvider {
         );
     }
 
-    private AstahProMcpVersionDTO getAstahProMcpVersion(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private AstahProMcpVersionDTO getAstahProMcpVersion(NoInputDTO param) throws Exception {
         log.debug("Get Astah Pro MCP version: {}", param);
 
         return new AstahProMcpVersionDTO(McpServerInfo.VERSION);

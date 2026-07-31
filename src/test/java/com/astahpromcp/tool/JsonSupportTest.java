@@ -16,7 +16,7 @@ public class JsonSupportTest {
     }
 
     @Test
-    void nullFieldsAreSerializedWithKeysPresent() {
+    void writeValueAsString_ok_nullFieldsAreSerializedWithKeysPresent() {
         String json = JsonSupport.OBJ_MAPPER.writeValueAsString(new DtoWithNullableFields(null, null));
         JsonNode node = JsonSupport.OBJ_MAPPER.readTree(json);
 

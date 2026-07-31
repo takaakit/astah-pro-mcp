@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ObjectNodeDTOAss
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IObjectNode;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class ObjectNodeTool implements ToolProvider {
         );
     }
 
-    private ObjectNodeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private ObjectNodeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get object node information: {}", param);
 
         IObjectNode astahObjectNode = astahProToolSupport.getObjectNode(param.id());
@@ -79,7 +78,7 @@ public class ObjectNodeTool implements ToolProvider {
         return ObjectNodeDTOAssembler.toDTO(astahObjectNode);
     }
 
-    private ObjectNodeDTO setBase(McpSyncServerExchange exchange, ObjectNodeWithBaseDTO param) throws Exception {
+    private ObjectNodeDTO setBase(ObjectNodeWithBaseDTO param) throws Exception {
         log.debug("Set base class of object node: {}", param);
 
         IObjectNode astahObjectNode = astahProToolSupport.getObjectNode(param.targetObjectNodeId());

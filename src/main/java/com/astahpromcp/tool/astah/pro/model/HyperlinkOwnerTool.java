@@ -21,7 +21,6 @@ import com.change_vision.jude.api.inf.model.IHyperlinkOwner;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
@@ -156,7 +155,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
             );
     }
 
-    private NamedElementDTO addUrlHyperlinkToNamedElement(McpSyncServerExchange exchange, NamedElementWithUrlHyperlinkDTO param) throws Exception {
+    private NamedElementDTO addUrlHyperlinkToNamedElement(NamedElementWithUrlHyperlinkDTO param) throws Exception {
         log.debug("Add URL hyperlink to named element: {}", param);
 
         String url = param.url();
@@ -173,7 +172,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO addFilePathHyperlinkToNamedElement(McpSyncServerExchange exchange, NamedElementWithFilePathHyperlinkDTO param) throws Exception {
+    private NamedElementDTO addFilePathHyperlinkToNamedElement(NamedElementWithFilePathHyperlinkDTO param) throws Exception {
         log.debug("Add file path hyperlink to named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
@@ -189,7 +188,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO addNamedElementHyperlinkToNamedElement(McpSyncServerExchange exchange, NamedElementWithNamedElementHyperlinkDTO param) throws Exception {
+    private NamedElementDTO addNamedElementHyperlinkToNamedElement(NamedElementWithNamedElementHyperlinkDTO param) throws Exception {
         log.debug("Add named element hyperlink to named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
@@ -204,7 +203,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO removeAllUrlHyperlinksFromNamedElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NamedElementDTO removeAllUrlHyperlinksFromNamedElement(IdDTO param) throws Exception {
         log.debug("Remove all URL hyperlinks from named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
@@ -221,7 +220,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO removeAllFilePathHyperlinksFromNamedElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NamedElementDTO removeAllFilePathHyperlinksFromNamedElement(IdDTO param) throws Exception {
         log.debug("Remove all file path hyperlinks from named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
@@ -238,7 +237,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
-    private NamedElementDTO removeAllNamedElementHyperlinksFromNamedElement(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NamedElementDTO removeAllNamedElementHyperlinksFromNamedElement(IdDTO param) throws Exception {
         log.debug("Remove all named element hyperlinks from named element: {}", param);
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
@@ -266,7 +265,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return hyperlinkOwner;
     }
 
-    private NodePresentationDTO addUrlHyperlinkToNodePresentation(McpSyncServerExchange exchange, NodePresentationWithUrlHyperlinkDTO param) throws Exception {
+    private NodePresentationDTO addUrlHyperlinkToNodePresentation(NodePresentationWithUrlHyperlinkDTO param) throws Exception {
         log.debug("Add URL hyperlink to node presentation: {}", param);
 
         String url = param.url();
@@ -284,7 +283,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
-    private NodePresentationDTO addFilePathHyperlinkToNodePresentation(McpSyncServerExchange exchange, NodePresentationWithFilePathHyperlinkDTO param) throws Exception {
+    private NodePresentationDTO addFilePathHyperlinkToNodePresentation(NodePresentationWithFilePathHyperlinkDTO param) throws Exception {
         log.debug("Add file path hyperlink to node presentation: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
@@ -302,7 +301,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
-    private NodePresentationDTO addNamedElementHyperlinkToNodePresentation(McpSyncServerExchange exchange, NodePresentationWithNamedElementHyperlinkDTO param) throws Exception {
+    private NodePresentationDTO addNamedElementHyperlinkToNodePresentation(NodePresentationWithNamedElementHyperlinkDTO param) throws Exception {
         log.debug("Add named element hyperlink to node presentation: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
@@ -319,7 +318,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
-    private NodePresentationDTO removeAllUrlHyperlinksFromNodePresentation(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NodePresentationDTO removeAllUrlHyperlinksFromNodePresentation(IdDTO param) throws Exception {
         log.debug("Remove all URL hyperlinks from node presentation: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
@@ -337,7 +336,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
-    private NodePresentationDTO removeAllFilePathHyperlinksFromNodePresentation(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NodePresentationDTO removeAllFilePathHyperlinksFromNodePresentation(IdDTO param) throws Exception {
         log.debug("Remove all file path hyperlinks from node presentation: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
@@ -355,7 +354,7 @@ public class HyperlinkOwnerTool implements ToolProvider {
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
-    private NodePresentationDTO removeAllNamedElementHyperlinksFromNodePresentation(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private NodePresentationDTO removeAllNamedElementHyperlinksFromNodePresentation(IdDTO param) throws Exception {
         log.debug("Remove all named element hyperlinks from node presentation: {}", param);
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());

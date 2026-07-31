@@ -7,7 +7,6 @@ import com.astahpromcp.tool.astah.pro.image.inputdto.DiagramWithImageRegionDTO;
 import com.astahpromcp.tool.astah.pro.image.inputdto.DiagramWithCropAreaDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +48,7 @@ public class ImageCaptureTool implements ToolProvider {
         );
     }
 
-    private List<McpSchema.Content> captureDiagramImage(McpSyncServerExchange exchange, DiagramWithImageRegionDTO param) throws Exception {
+    private List<McpSchema.Content> captureDiagramImage(DiagramWithImageRegionDTO param) throws Exception {
         log.debug("Capture diagram image: {}", param);
 
         McpSchema.ImageContent content = imageCaptureSupport.createLargeImageContent(param.targetDiagramId(), param.region());
@@ -59,7 +58,7 @@ public class ImageCaptureTool implements ToolProvider {
         return contents;
     }
 
-    private List<McpSchema.Content> cropDiagramImage(McpSyncServerExchange exchange, DiagramWithCropAreaDTO param) throws Exception {
+    private List<McpSchema.Content> cropDiagramImage(DiagramWithCropAreaDTO param) throws Exception {
         log.debug("Crop diagram image: {}", param);
 
         McpSchema.ImageContent content = imageCaptureSupport.createCroppedImageContent(
@@ -70,7 +69,7 @@ public class ImageCaptureTool implements ToolProvider {
         return contents;
     }
 
-    private List<McpSchema.Content> captureAstahWindowImage(McpSyncServerExchange exchange, NoInputDTO param) throws Exception {
+    private List<McpSchema.Content> captureAstahWindowImage(NoInputDTO param) throws Exception {
         log.debug("Capture Astah window image");
 
         JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();

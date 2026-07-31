@@ -8,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.ISlot;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,14 +43,12 @@ public class SlotToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             SlotTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setValue() method
         setValue = TestSupport.getAccessibleMethod(
             SlotTool.class,
             "setValue",
-            McpSyncServerExchange.class,
             SlotWithValueDTO.class);
     }
 

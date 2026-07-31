@@ -11,7 +11,6 @@ import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IProjectViewManager;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -52,21 +51,18 @@ public class ProjectViewManagerToolTest {
         getSelectedElements = TestSupport.getAccessibleMethod(
             ProjectViewManagerTool.class,
             "getSelectedElements",
-            McpSyncServerExchange.class,
             NoInputDTO.class);
 
         // showInPropertyView() method
         showInPropertyView = TestSupport.getAccessibleMethod(
             ProjectViewManagerTool.class,
             "showInPropertyView",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // showInStructureTree() method
         showInStructureTree = TestSupport.getAccessibleMethod(
             ProjectViewManagerTool.class,
             "showInStructureTree",
-            McpSyncServerExchange.class,
             IdDTO.class);
     }
 

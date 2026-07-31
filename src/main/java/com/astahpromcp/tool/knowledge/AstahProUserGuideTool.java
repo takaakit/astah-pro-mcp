@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -62,7 +61,7 @@ public class AstahProUserGuideTool implements ToolProvider {
         }
     }
 
-    private DocumentDTO getAstahProUserGuide(McpSyncServerExchange exchange, NoInputDTO param) throws IOException {
+    private DocumentDTO getAstahProUserGuide(NoInputDTO param) throws IOException {
         log.debug("Get astah pro user guide: {}", param);
 
         if (!contentCache.isEmpty()) {
@@ -102,7 +101,7 @@ public class AstahProUserGuideTool implements ToolProvider {
         return KnowledgeToolSupport.chunkAndCache(allTextContentString, contentCache);
     }
 
-    private DocumentChunkDTO getAstahProUserGuideChunk(McpSyncServerExchange exchange, ChunkDTO param) {
+    private DocumentChunkDTO getAstahProUserGuideChunk(ChunkDTO param) {
         log.debug("Get astah pro user guide chunk: {}", param);
 
         int chunkIndex = param.chunkIndex();

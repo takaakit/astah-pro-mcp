@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.IncludeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.IncludeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IInclude;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class IncludeTool implements ToolProvider {
         return List.of();
     }
 
-    private IncludeDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private IncludeDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get include information: {}", param);
 
         IInclude astahInclude = astahProToolSupport.getInclude(param.id());

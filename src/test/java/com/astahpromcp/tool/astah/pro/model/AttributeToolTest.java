@@ -9,7 +9,6 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,42 +50,36 @@ public class AttributeToolTest {
         getInfo = TestSupport.getAccessibleMethod(
             AttributeTool.class,
             "getInfo",
-            McpSyncServerExchange.class,
             IdDTO.class);
 
         // setInitialValue() method
         setInitialValue = TestSupport.getAccessibleMethod(
             AttributeTool.class,
             "setInitialValue",
-            McpSyncServerExchange.class,
             AttributeWithInitialValueDTO.class);
 
         // setStatic() method
         setStatic = TestSupport.getAccessibleMethod(
             AttributeTool.class,
             "setStatic",
-            McpSyncServerExchange.class,
             AttributeWithStaticDTO.class);
 
         // setType() method
         setType = TestSupport.getAccessibleMethod(
             AttributeTool.class,
             "setType",
-            McpSyncServerExchange.class,
             AttributeWithTypeDTO.class);
 
         // setTypeExpression() method
         setTypeExpression = TestSupport.getAccessibleMethod(
             AttributeTool.class,
             "setTypeExpression",
-            McpSyncServerExchange.class,
             AttributeWithTypeExpressionDTO.class);
 
         // setMultiplicity() method
         setMultiplicity = TestSupport.getAccessibleMethod(
             AttributeTool.class,
             "setMultiplicity",
-            McpSyncServerExchange.class,
             AttributeWithMultiplicityDTO.class);
     }
 

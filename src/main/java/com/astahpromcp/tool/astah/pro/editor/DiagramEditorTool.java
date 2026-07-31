@@ -28,7 +28,6 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -139,7 +138,7 @@ public class DiagramEditorTool implements ToolProvider {
         );
     }
 
-    private Pair<RectangleDTO, List<McpSchema.Content>> insertSvgImage(McpSyncServerExchange exchange, NewSvgImageWithPointDTO param) throws Exception {
+    private Pair<RectangleDTO, List<McpSchema.Content>> insertSvgImage(NewSvgImageWithPointDTO param) throws Exception {
         log.debug("Insert SVG image: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -218,7 +217,7 @@ public class DiagramEditorTool implements ToolProvider {
         return null;
     }
 
-    private Pair<RectangleDTO, List<McpSchema.Content>> insertPngImage(McpSyncServerExchange exchange, NewPngImageWithPointDTO param) throws Exception {
+    private Pair<RectangleDTO, List<McpSchema.Content>> insertPngImage(NewPngImageWithPointDTO param) throws Exception {
         log.debug("Insert PNG image: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -254,7 +253,7 @@ public class DiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(diagramImage));
     }
 
-    private Pair<RectangleDTO, List<McpSchema.Content>> insertJpgImage(McpSyncServerExchange exchange, NewJpgImageWithPointDTO param) throws Exception {
+    private Pair<RectangleDTO, List<McpSchema.Content>> insertJpgImage(NewJpgImageWithPointDTO param) throws Exception {
         log.debug("Insert JPG image: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -290,7 +289,7 @@ public class DiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(diagramImage));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertRect(McpSyncServerExchange exchange, NewRectDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertRect(NewRectDTO param) throws Exception {
         log.debug("Insert rectangle: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -320,7 +319,7 @@ public class DiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertText(McpSyncServerExchange exchange, NewTextWithPointDTO param) throws Exception {
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertText(NewTextWithPointDTO param) throws Exception {
         log.debug("Insert text: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -349,7 +348,7 @@ public class DiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(image));
     }
 
-    private DiagramDTO deleteDiagram(McpSyncServerExchange exchange, DeleteDiagramDTO param) throws Exception {
+    private DiagramDTO deleteDiagram(DeleteDiagramDTO param) throws Exception {
         log.debug("Deleting diagram: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
@@ -373,7 +372,7 @@ public class DiagramEditorTool implements ToolProvider {
         return diagramDTO;
     }
 
-    private Pair<PresentationDTO, List<McpSchema.Content>> deletePresentation(McpSyncServerExchange exchange, DeletePresentationDTO param) throws Exception {
+    private Pair<PresentationDTO, List<McpSchema.Content>> deletePresentation(DeletePresentationDTO param) throws Exception {
         log.debug("Deleting presentation: {}", param);
 
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.targetPresentationId());

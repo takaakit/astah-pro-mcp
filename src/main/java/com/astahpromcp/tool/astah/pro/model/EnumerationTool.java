@@ -9,7 +9,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.EnumerationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.EnumerationDTOAssembler;
 import com.change_vision.jude.api.inf.model.IEnumeration;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -65,7 +64,7 @@ public class EnumerationTool implements ToolProvider {
         return List.of();
     }
 
-    private EnumerationDTO getInfo(McpSyncServerExchange exchange, IdDTO param) throws Exception {
+    private EnumerationDTO getInfo(IdDTO param) throws Exception {
         log.debug("Get enumeration information: {}", param);
 
         IEnumeration astahEnumeration = astahProToolSupport.getEnumeration(param.id());
