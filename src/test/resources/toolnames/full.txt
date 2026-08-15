@@ -148,6 +148,8 @@ get_activity_info
 get_activity_node_info
 get_activity_of_activity_dgm
 get_all_constraints_and_conditions
+get_all_named_element_types
+get_all_prst_types
 get_asso_class_info
 get_asso_end_a_info
 get_asso_end_b_info
@@ -166,6 +168,7 @@ get_chunk_of_ocl_spec
 get_chunk_of_puml_guide
 get_chunk_of_systems_engineering
 get_class_info
+get_combined_fragment_info
 get_comment_info
 get_communication_dgm_info
 get_connector_info
@@ -214,6 +217,7 @@ get_interaction_operand_info
 get_interaction_use_info
 get_lifeline_info
 get_lifeline_link_info
+get_link_end_info
 get_link_info
 get_link_prst_info
 get_mind_map_dgm_info
@@ -231,8 +235,8 @@ get_proj_path
 get_prsts_on_dgm
 get_pseudostate_info
 get_real_info
-get_relationships_as_puml_code
 get_req_info
+get_seq_dgm_info
 get_slot_info
 get_state_info
 get_state_machine_dgm_info
@@ -256,6 +260,8 @@ is_proj_opened
 mind_map_guide
 move_topic_within_sibling_order
 open_proj
+overlay_svg_img_on_dgm_img
+preliminary_layout_steps
 read_architectural_design_smells
 read_uml_modeling_architecture_insights
 remove_all_file_path_hyperlinks_from_named_elem
@@ -270,10 +276,10 @@ remove_ope_postcond
 remove_ope_precond
 remove_stereotype
 req_dgm_guide
-retrieve_classifier_relationships_as_puml
 retrieve_classifiers_that_ref_or_be_refed_by
 retrieve_classifiers_within_pkg
 retrieve_pkg_structure_as_puml
+retrieve_relationships_as_puml
 run_astah_script
 save_proj
 save_proj_as

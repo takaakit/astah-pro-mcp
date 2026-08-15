@@ -6,8 +6,8 @@ public record NewReturnMessageDTO(
     @JsonPropertyDescription("Target sequence diagram identifier")
     String targetSequenceDiagramId,
     
-    @JsonPropertyDescription("Target message identifier corresponding to the return message")
-    String targetMessageId,
+    @JsonPropertyDescription("Target message link presentation identifier corresponding to the return message")
+    String targetMessageLinkPresentationId,
     
     @JsonPropertyDescription("New return message name")
     String newReturnMessageName

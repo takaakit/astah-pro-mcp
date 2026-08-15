@@ -4,6 +4,7 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandIndexWithHeightDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
@@ -57,7 +58,14 @@ public class CombinedFragmentTool implements ToolProvider {
     }
 
     private List<ToolDefinition> createQueryTools() {
-        return List.of();
+        return List.of(
+            ToolSupport.toolDefinitionReturningDto(
+                "get_combined_fragment_info",
+                "Return model element information about the specified combined fragment (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                CombinedFragmentDTO.class)
+        );
     }
 
     private List<ToolDefinition> createEditTools() {
@@ -86,13 +94,27 @@ public class CombinedFragmentTool implements ToolProvider {
         );
     }
 
+    private CombinedFragmentDTO getInfo(IdDTO param) throws Exception {
+        log.debug("Get combined fragment information: {}", param);
+
+        ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.id());
+
+        return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);
+    }
+
     private CombinedFragmentDTO addInteractionOperand(NewInteractionOperandDTO param) throws Exception {
         log.debug("Add interaction operand: {}", param);
 
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
 
         txnAstah.run( () -> {
-            astahCombinedFragment.addInteractionOperand(param.newInteractionOperandName(), param.guard());
+            try {
+                astahCombinedFragment.addInteractionOperand(param.newInteractionOperandName(), param.guard());
+            } catch (Exception e) {
+                throw new RuntimeException(String.format(
+                    "Failed to add an interaction operand (%s). Some interaction operators allow only one interaction operand. If multiple interaction operands are needed, change the interaction operator of the combined fragment to one that allows them.",
+                    e.getMessage()), e);
+            }
         });
 
         return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);

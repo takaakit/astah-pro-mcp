@@ -16,7 +16,7 @@ public class DiagramEditorSupport {
         CLASS_DIAGRAM(IClassDiagram.class, ClassDiagramEditor.class),
         COMMUNICATION_DIAGRAM(ICommunicationDiagram.class, BehaviorDiagramEditor.class),
         COMPONENT_DIAGRAM(IComponentDiagram.class, StructureDiagramEditor.class),
-        COMPOSITE_STRUCTURE_DIAGRAM(ICompositeStructureDiagram.class, CompositeStructureDiagramEditor.class),
+        COMPOSITE_STRUCTURE_DIAGRAM(ICompositeStructureDiagram.class, ClassDiagramEditor.class),  // Note: DO NOT map this to CompositeStructureDiagramEditor, as it does not work as expected.
         DATA_FLOW_DIAGRAM(IDataFlowDiagram.class, BehaviorDiagramEditor.class),
         DEPLOYMENT_DIAGRAM(IDeploymentDiagram.class, StructureDiagramEditor.class),
         ER_DIAGRAM(IERDiagram.class, ERDiagramEditor.class),
@@ -80,7 +80,7 @@ public class DiagramEditorSupport {
             String errorMessage = "Unsupported diagram type: " + diagram.getClass().getName();
             throw new RuntimeException(errorMessage);
         }
-        
+
         // Look for an editor instance that matches
         for (DiagramEditor editor : diagramEditors) {
             // Check whether the editor is an instance of the required editor class
@@ -89,7 +89,7 @@ public class DiagramEditorSupport {
                 return editor;
             }
         }
-        
+
         // If no matching editor is found
         String errorMessage = "Corresponding diagram editor not found: " + requiredEditorClass.getName();
         throw new RuntimeException(errorMessage);

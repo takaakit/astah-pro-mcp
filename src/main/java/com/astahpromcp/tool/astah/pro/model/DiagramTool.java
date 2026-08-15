@@ -7,6 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ImageFileDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
@@ -37,13 +38,15 @@ public class DiagramTool implements ToolProvider {
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
+    private final SystemPropertySupport systemPropertySupport;
     private final Path imageOutputDir;
     private final boolean includeEditTools;
 
-    public DiagramTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, Path imageOutputDir, boolean includeEditTools) {
+    public DiagramTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport, Path imageOutputDir, boolean includeEditTools) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
+        this.systemPropertySupport = systemPropertySupport;
         this.imageOutputDir = imageOutputDir;
         this.includeEditTools = includeEditTools;
    }
@@ -151,7 +154,7 @@ public class DiagramTool implements ToolProvider {
         // Export an image using the Astah API
         String relativeImagePath;
         try {
-            relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", 96);
+            relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", systemPropertySupport.imageExportDpi());
         } catch (Exception e) {
             throw new Exception("Astah API exportImage method failed: " + e.getMessage());
         }

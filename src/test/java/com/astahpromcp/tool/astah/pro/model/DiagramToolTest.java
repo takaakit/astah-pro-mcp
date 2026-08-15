@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
@@ -54,6 +55,7 @@ public class DiagramToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
+            new SystemPropertySupport(),
             imageOutputDir,
             true);
 

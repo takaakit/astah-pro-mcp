@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithAggregationDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithCompositionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithNavigationDTO;
@@ -22,6 +23,7 @@ public class LinkEndToolTest {
 
     private ProjectAccessor projectAccessor;
     private LinkEndTool tool;
+    private Method getInfo;
     private Method setAggregation;
     private Method setComposition;
     private Method setNavigation;
@@ -40,6 +42,12 @@ public class LinkEndToolTest {
             transactionSupport,
             astahProToolSupport,
             true);
+
+        // getInfo() method
+        getInfo = TestSupport.getAccessibleMethod(
+            LinkEndTool.class,
+            "getInfo",
+            IdDTO.class);
 
         // setAggregation() method
         setAggregation = TestSupport.getAccessibleMethod(
@@ -65,6 +73,30 @@ public class LinkEndToolTest {
         if (projectAccessor != null) {
             projectAccessor.close();
         }
+    }
+
+    @Test
+    void getInfo_ok() throws Exception {
+        // Get link end
+        ILinkEnd linkEnd = (ILinkEnd) TestSupport.instance().getNamedElementByClassAndName(
+            ILinkEnd.class,
+            "fooLinkEnd");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(linkEnd.getId());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        LinkEndDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            inputDTO,
+            LinkEndDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(linkEnd.getId(), outputDTO.namedElement().element().id());
     }
 
     @Test

@@ -108,7 +108,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_return_msg",
-                "Create a new return message to the specified message (specified by ID) on the specified sequence diagram (specified by ID), and return the newly created link presentation of the return message along with the updated diagram image in low resolution.",
+                "Create a new return message to the specified message (specified by presentation ID) on the specified sequence diagram (specified by ID), and return the newly created link presentation of the return message along with the updated diagram image in low resolution. Note that the Y coordinate of the return message cannot be specified; it is automatically determined to be the end of the activation (ExecutionSpecification) of the target message.",
                 this::createReturnMessage,
                 NewReturnMessageDTO.class,
                 LinkPresentationDTO.class),
@@ -223,9 +223,17 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(message);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        List<McpSchema.Content> contents;
+        try {
+            contents = List.of(imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId()));
+        } catch (Exception e) {
+            log.warn("Edit succeeded, but failed to capture diagram image for {}: {}", param.targetSequenceDiagramId(), e.getMessage(), e);
+            contents = List.of(McpSchema.TextContent.builder(String.format(
+                "The edit succeeded, but generating the diagram preview image failed: %s. Retrieve the diagram image separately using another tool if needed.",
+                e.getMessage())).build());
+        }
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, contents);
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createCreateMessage(NewCreateMessageDTO param) throws Exception {
@@ -305,7 +313,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
 
-        ILinkPresentation targetMessage = astahProToolSupport.getLinkPresentation(param.targetMessageId());
+        ILinkPresentation targetMessage = astahProToolSupport.getLinkPresentation(param.targetMessageLinkPresentationId());
         if (!Type.MESSAGE.matches(targetMessage.getType())) {
             throw new IllegalArgumentException("Target message for return message must be one of the following link presentation types: Message.");
         }
@@ -320,9 +328,17 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(returnMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        List<McpSchema.Content> contents;
+        try {
+            contents = List.of(imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId()));
+        } catch (Exception e) {
+            log.warn("Edit succeeded, but failed to capture diagram image for {}: {}", param.targetSequenceDiagramId(), e.getMessage(), e);
+            contents = List.of(McpSchema.TextContent.builder(String.format(
+                "The edit succeeded, but generating the diagram preview image failed: %s. Retrieve the diagram image separately using another tool if needed.",
+                e.getMessage())).build());
+        }
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, contents);
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(NewLostMessageDTO param) throws Exception {

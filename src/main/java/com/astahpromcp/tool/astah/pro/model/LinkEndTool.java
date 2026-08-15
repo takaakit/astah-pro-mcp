@@ -4,6 +4,7 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithAggregationDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithCompositionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithNavigationDTO;
@@ -51,7 +52,14 @@ public class LinkEndTool implements ToolProvider {
     }
 
     private List<ToolDefinition> createQueryTools() {
-        return List.of();
+        return List.of(
+            ToolSupport.toolDefinitionReturningDto(
+                "get_link_end_info",
+                "Return model element information about the specified link end (specified by ID).",
+                this::getInfo,
+                IdDTO.class,
+                LinkEndDTO.class)
+        );
     }
 
     private List<ToolDefinition> createEditTools() {
@@ -77,6 +85,14 @@ public class LinkEndTool implements ToolProvider {
                 LinkEndWithNavigationDTO.class,
                 LinkEndDTO.class)
         );
+    }
+
+    private LinkEndDTO getInfo(IdDTO param) throws Exception {
+        log.debug("Get link end information: {}", param);
+
+        ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.id());
+
+        return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
     private LinkEndDTO setAggregation(LinkEndWithAggregationDTO param) throws Exception {

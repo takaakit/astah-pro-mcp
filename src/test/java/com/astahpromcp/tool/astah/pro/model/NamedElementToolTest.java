@@ -6,6 +6,8 @@ import com.astahpromcp.tool.astah.pro.common.VisibilityKind;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementTypeListDTO;
+import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
@@ -23,6 +26,7 @@ public class NamedElementToolTest {
     private ProjectAccessor projectAccessor;
     private NamedElementTool tool;
     private Method getInfo;
+    private Method getAllTypes;
     private Method setName;
     private Method setAlias1;
     private Method setAlias2;
@@ -49,6 +53,12 @@ public class NamedElementToolTest {
             NamedElementTool.class,
             "getInfo",
             IdDTO.class);
+
+        // getAllTypes() method
+        getAllTypes = TestSupport.getAccessibleMethod(
+            NamedElementTool.class,
+            "getAllTypes",
+            NoInputDTO.class);
 
         // setName() method
         setName = TestSupport.getAccessibleMethod(
@@ -114,6 +124,26 @@ public class NamedElementToolTest {
         assertEquals(".\\data\\sample1.xlsx", outputDTO.filePathHyperlinks().get(0).filePath());
         assertEquals("C:\\data\\sample2.xlsx", outputDTO.filePathHyperlinks().get(1).filePath());
         assertFalse(outputDTO.namedElementHyperlinks().get(0).namedElementId().isEmpty());
+    }
+
+    @Test
+    void getAllTypes_ok() throws Exception {
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call getAllTypes()
+        // ----------------------------------------
+        NamedElementTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getAllTypes,
+            tool,
+            inputDTO,
+            NamedElementTypeListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(NamedElementDTO.Type.values().length - 1, outputDTO.value().size());
+        assertFalse(outputDTO.value().contains("Unknown"));
     }
 
     @Test

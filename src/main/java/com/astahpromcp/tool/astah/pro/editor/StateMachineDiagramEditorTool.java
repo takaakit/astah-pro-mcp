@@ -85,7 +85,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_parent_state",
-                "Change the parent state (specified by ID) of the specified state (specified by ID) on the specified state machine diagram (specified by ID), and return the node presentation of the parent-changed state along with the updated diagram image in low resolution. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
+                "Change the parent state (specified by presentation ID) of the specified state (specified by presentation ID) on the specified state machine diagram (specified by ID), and return the node presentation of the parent-changed state along with the updated diagram image in low resolution. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
                 this::changeParentOfState,
                 ChangeParentStateDTO.class,
                 NodePresentationDTO.class),
@@ -169,7 +169,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_transition",
-                "Create a new transition between the specified source state (specified by ID) and the specified target state (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created link presentation of the transition along with the updated diagram image in low resolution.",
+                "Create a new transition between the specified source state (specified by presentation ID) and the specified target state (specified by presentation ID) on the specified state machine diagram (specified by ID), and return the newly created link presentation of the transition along with the updated diagram image in low resolution.",
                 this::createTransition,
                 NewTransitionDTO.class,
                 LinkPresentationDTO.class)

@@ -185,14 +185,14 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_partition",
-                "Create a new partition by specifying the super partition (specified by ID) and the previous partition (specified by ID) on the specified activity diagram (specified by ID), and return the newly created node presentation of the partition along with the updated diagram image in low resolution. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
+                "Create a new partition by specifying the super partition (specified by presentation ID) and the previous partition (specified by presentation ID) on the specified activity diagram (specified by ID), and return the newly created node presentation of the partition along with the updated diagram image in low resolution. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
                 this::createPartition,
                 NewPartitionDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_in_or_out_pin",
-                "Create a new input/output pin of the base class (specified by ID) on the specified parent action (specified by ID) on the specified activity diagram (specified by ID), and return the newly created node presentation of the pin along with the updated diagram image in low resolution. An empty string is not allowed as a pin name.",
+                "Create a new input/output pin of the base class (specified by ID) on the specified parent action (specified by presentation ID) on the specified activity diagram (specified by ID), and return the newly created node presentation of the pin along with the updated diagram image in low resolution. An empty string is not allowed as a pin name.",
                 this::createPin,
                 NewPinWithBaseClassAndParentActionDTO.class,
                 NodePresentationDTO.class),

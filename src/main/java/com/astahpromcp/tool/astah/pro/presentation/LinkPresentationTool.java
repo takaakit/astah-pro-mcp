@@ -107,7 +107,15 @@ public class LinkPresentationTool implements ToolProvider {
 		}
 
         txnAstah.run( () -> {
-            linkPresentation.setAllPoints(pointArray);
+            try {
+                linkPresentation.setAllPoints(pointArray);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format(
+                    "%s The points must be ordered from the source end (%s) to the target end (%s) of the link, and the first and last points must be inside the rectangles of those ends, not on their borders.",
+                    e.getMessage(),
+                    linkPresentation.getSourceEnd().getLabel(),
+                    linkPresentation.getTargetEnd().getLabel()), e);
+            }
         });
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);

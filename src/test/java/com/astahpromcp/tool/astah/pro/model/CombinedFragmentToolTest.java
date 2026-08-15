@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.model;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.CombinedFragmentKind;
+import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandIndexWithHeightDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
@@ -10,6 +11,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,7 @@ public class CombinedFragmentToolTest {
 
     private ProjectAccessor projectAccessor;
     private CombinedFragmentTool tool;
+    private Method getInfo;
     private Method addInteractionOperand;
     private Method setCombinedFragmentKind;
     private Method setHeightOfInteractionOperand;
@@ -42,6 +45,12 @@ public class CombinedFragmentToolTest {
             transactionSupport,
             astahProToolSupport,
             true);
+
+        // getInfo() method
+        getInfo = TestSupport.getAccessibleMethod(
+            CombinedFragmentTool.class,
+            "getInfo",
+            IdDTO.class);
 
         // addInteractionOperand() method
         addInteractionOperand = TestSupport.getAccessibleMethod(
@@ -67,6 +76,30 @@ public class CombinedFragmentToolTest {
         if (projectAccessor != null) {
             projectAccessor.close();
         }
+    }
+
+    @Test
+    void getInfo_ok() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(combinedFragment.getId());
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        CombinedFragmentDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            inputDTO,
+            CombinedFragmentDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(combinedFragment.getId(), outputDTO.namedElement().element().id());
     }
 
     @Test

@@ -113,7 +113,7 @@ Follow these steps to recall architectural smells and design smells that should 
         String absolutePath = smellsFile.toAbsolutePath().toString();
 
         if (!Files.exists(smellsFile)) {
-            throw new IllegalStateException("The file storing architectural and design smells does not exist: " + absolutePath);
+            throw new IllegalStateException("The file for storing architectural and design smells has not been created yet: " + absolutePath);
         }
 
         String contents = Files.readString(smellsFile);

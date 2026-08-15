@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.image;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -39,15 +40,17 @@ public class ImageCaptureSupport {
     }
 
     private final AstahProToolSupport astahProToolSupport;
+    private final SystemPropertySupport systemPropertySupport;
     private final Path imageOutputDir;
 
-    public ImageCaptureSupport(AstahProToolSupport astahProToolSupport, Path imageOutputDir) {
+    public ImageCaptureSupport(AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport, Path imageOutputDir) {
         this.astahProToolSupport = astahProToolSupport;
+        this.systemPropertySupport = systemPropertySupport;
         this.imageOutputDir = imageOutputDir;
     }
 
     // Bundles an exported diagram image with the metadata needed to map diagram coordinates onto the image's pixel coordinates.
-    private record ExportedImage(
+    record ExportedImage(
         BufferedImage image,
         String relativeImagePath,
         Rectangle2D boundRect
@@ -55,7 +58,7 @@ public class ImageCaptureSupport {
     }
 
     // Exports the specified diagram to a PNG file and reads it back into memory
-    private ExportedImage exportDiagramImage(String diagramId) throws Exception {
+    ExportedImage exportDiagramImage(String diagramId) throws Exception {
         IDiagram astahDiagram = astahProToolSupport.getDiagram(diagramId);
 
         // Ensure the output directory exists and create it when needed
@@ -74,7 +77,7 @@ public class ImageCaptureSupport {
         // Export an image using the Astah API
         String relativeImagePath;
         try {
-            relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", 96);
+            relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", systemPropertySupport.imageExportDpi());
         } catch (Exception e) {
             throw new Exception("Astah API exportImage method failed: " + e.getMessage());
         }

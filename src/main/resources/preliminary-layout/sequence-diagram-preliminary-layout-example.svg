@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="575" height="751" viewBox="32 -111 575 751">
+  <defs>
+    <marker id="arrow-open" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1"/>
+    </marker>
+    <marker id="arrow-filled" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#000" stroke="#000" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="52" y="-91" width="535" height="66"/>
+    <rect data-type="CombinedFragment" data-name="alt" x="184" y="178" width="388" height="364"/>
+    <rect data-type="Lifeline" data-name=" : Actor0" x="52" y="30" width="20" height="25"/>
+    <rect data-type="Lifeline" data-name=" : Class0" x="200" y="30" width="110" height="30"/>
+    <rect data-type="Lifeline" data-name="c100000000 : Class1" x="382" y="30" width="133" height="30"/>
+    <rect data-type="Activation" data-name=" : Actor0" x="57" y="95" width="10" height="503"/>
+    <rect data-type="Activation" data-name=" : Class0" x="250" y="95" width="10" height="483"/>
+    <rect data-type="Activation" data-name="c100000000 : Class1" x="443" y="128" width="10" height="25"/>
+    <rect data-type="Activation" data-name=" : Class0" x="260" y="246" width="10" height="25"/>
+    <rect data-type="Activation" data-name="c100000000 : Class1" x="443" y="341" width="10" height="96"/>
+    <rect data-type="Activation" data-name="c100000000 : Class1" x="453" y="392" width="10" height="25"/>
+    <rect data-type="InteractionUse" data-name="InteractionUse" x="216" y="456" width="134" height="60"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="Lifeline" data-name=" : Actor0" d="M62,55 L62,620"/>
+    <path data-type="Lifeline" data-name=" : Class0" d="M255,60 L255,620"/>
+    <path data-type="Lifeline" data-name="c100000000 : Class1" d="M448,60 L448,620"/>
+
+    <path data-type="Line" data-name="alt operand separator" d="M184,292 L572,292"/>
+
+    <path data-type="Message" data-name="Message0()" data-source=" : Actor0" data-target=" : Class0"
+          d="M67,95 L250,95" marker-end="url(#arrow-filled)"/>
+    <path data-type="Message" data-name="Message1()" data-source=" : Class0" data-target="c100000000 : Class1"
+          d="M260,128 L443,128" marker-end="url(#arrow-filled)"/>
+    <path data-type="Message" data-name="Message2()" data-source=" : Class0" data-target=" : Class0"
+          d="M260,226 L320,226 L320,246 L270,246" marker-end="url(#arrow-filled)"/>
+    <path data-type="Message" data-name="Message3()" data-source=" : Class0" data-target="c100000000 : Class1"
+          d="M260,341 L443,341" marker-end="url(#arrow-filled)"/>
+    <path data-type="Message" data-name="Message4()" data-source="c100000000 : Class1" data-target="c100000000 : Class1"
+          d="M453,372 L513,372 L513,392 L463,392" marker-end="url(#arrow-filled)"/>
+    <path data-type="Message" data-name="" data-source=" : Class0" data-target=" : Actor0"
+          d="M250,578 L67,578" marker-end="url(#arrow-open)"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="62" y="68" text-anchor="middle"> : Actor0</text>
+    <text x="255" y="46" text-anchor="middle"> : Class0</text>
+    <text x="448" y="46" text-anchor="middle">c100000000 : Class1</text>
+    <text x="190" y="194">alt</text>
+    <text x="283" y="472" text-anchor="middle">InteractionUse</text>
+    <text x="158" y="91" text-anchor="middle">Message0()</text>
+    <text x="351" y="124" text-anchor="middle">Message1()</text>
+    <text x="325" y="230">Message2()</text>
+    <text x="351" y="337" text-anchor="middle">Message3()</text>
+    <text x="518" y="376">Message4()</text>
+  </g>
+</svg>

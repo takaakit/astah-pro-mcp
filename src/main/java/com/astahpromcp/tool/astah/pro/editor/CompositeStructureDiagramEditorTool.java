@@ -96,21 +96,21 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_port_prst",
-                "Create a new port presentation of the specified part (specified by ID) or structured class (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the port along with the updated diagram image in low resolution.",
+                "Create a new port presentation of the specified part (specified by presentation ID) or structured class (specified by presentation ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the port along with the updated diagram image in low resolution.",
                 this::createPortPresentation,
                 NewPortPresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_provided_interface_prst",
-                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the provided interface along with the updated diagram image in low resolution. Note that if the specified interface is already a provided interface of the specified port or part, only the interface symbol is placed and no line connecting it to the port or part is drawn.",
+                "Create a new provided interface presentation of the specified interface (specified by ID) for the specified port (specified by presentation ID) or part (specified by presentation ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the provided interface along with the updated diagram image in low resolution. Note that if the specified interface is already a provided interface of the specified port or part, only the interface symbol is placed and no line connecting it to the port or part is drawn.",
                 this::createProvidedInterfacePresentation,
                 NewProvidedInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_required_interface_prst",
-                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by ID) or part (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the required interface along with the updated diagram image in low resolution. Note that if the specified interface is already a required interface of the specified port or part, only the interface symbol is placed and no line connecting it to the port or part is drawn.",
+                "Create a new required interface presentation of the specified interface (specified by ID) for the specified port (specified by presentation ID) or part (specified by presentation ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the required interface along with the updated diagram image in low resolution. Note that if the specified interface is already a required interface of the specified port or part, only the interface symbol is placed and no line connecting it to the port or part is drawn.",
                 this::createRequiredInterfacePresentation,
                 NewRequiredInterfacePresentationDTO.class,
                 NodePresentationDTO.class),
@@ -131,7 +131,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "show_interface_prsts_of_port",
-                "Show the provided and required interfaces that the specified port (specified by ID) already has, as interface presentations connected to the port at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created presentations along with the updated diagram image in low resolution. Since all the interface symbols are placed at the same point, use other tool function to move each of them afterwards. Note that nothing is created when the port has no interfaces or when its interfaces are already shown on the diagram.",
+                "Show the provided and required interfaces that the specified port (specified by presentation ID) already has, as interface presentations connected to the port at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created presentations along with the updated diagram image in low resolution. Since all the interface symbols are placed at the same point, use other tool function to move each of them afterwards. Note that nothing is created when the port has no interfaces or when its interfaces are already shown on the diagram.",
                 this::showInterfacePresentationsOfPort,
                 ShowInterfacePresentationsOfPortDTO.class,
                 PresentationListDTO.class)

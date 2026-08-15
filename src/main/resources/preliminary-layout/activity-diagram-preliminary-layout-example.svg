@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="581" height="770" viewBox="-20 -95 581 770">
+  <defs>
+    <marker id="arrow-filled" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#000" stroke="#000" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="0" y="-75" width="381" height="78"/>
+    <rect data-type="Partition" data-name="Partition0" x="0" y="50" width="175" height="605"/>
+    <rect data-type="Partition" data-name="Partition1" x="175" y="50" width="175" height="605"/>
+    <rect data-type="Partition" data-name="Partition2222222222222222222" x="350" y="50" width="191" height="605"/>
+    <rect data-type="InitialNode" data-name="InitialNode3" x="73" y="118" width="20" height="20"/>
+    <rect data-type="Action" data-name="Action0000&#10;0000&#10;0000" x="33" y="180" width="100" height="55"/>
+    <rect data-type="Decision Node &amp; Merge Node" data-name="Decision Node &amp; Merge Node0" x="68" y="277" width="30" height="20"/>
+    <rect data-type="Action" data-name="Action100000" x="207" y="275" width="113" height="23"/>
+    <rect data-type="ForkNode" data-name="ForkNode0" x="230" y="347" width="66" height="5"/>
+    <rect data-type="Action" data-name="Action2" x="223" y="401" width="80" height="23"/>
+    <rect data-type="Action" data-name="Action30000000&#10;00000000" x="382" y="393" width="127" height="39"/>
+    <rect data-type="JoinNode" data-name="JoinNode0" x="230" y="473" width="66" height="5"/>
+    <rect data-type="Decision Node &amp; Merge Node" data-name="Decision Node &amp; Merge Node1" x="68" y="523" width="30" height="20"/>
+    <rect data-type="ActivityFinal" data-name="ActivityFinal1" x="73" y="600" width="20" height="20"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="InitialNode3" data-target="Action0000&#10;0000&#10;0000"
+          d="M83,138 L83,180" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="Action0000&#10;0000&#10;0000" data-target="Decision Node &amp; Merge Node0"
+          d="M83,235 L83,277" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="[Yes]" data-source="Decision Node &amp; Merge Node0" data-target="Action100000"
+          d="M98,287 L207,287" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="Action100000" data-target="ForkNode0"
+          d="M263,298 L263,347" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="ForkNode0" data-target="Action2"
+          d="M263,352 L263,401" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="ForkNode0" data-target="Action30000000&#10;00000000"
+          d="M281,352 L281,378 L445,378 L445,393" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="Action2" data-target="JoinNode0"
+          d="M263,424 L263,473" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="Action30000000&#10;00000000" data-target="JoinNode0"
+          d="M445,432 L445,448 L284,448 L284,473" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="JoinNode0" data-target="Decision Node &amp; Merge Node1"
+          d="M263,478 L263,533 L98,533" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="[No]" data-source="Decision Node &amp; Merge Node0" data-target="Decision Node &amp; Merge Node1"
+          d="M83,297 L83,523" marker-end="url(#arrow-filled)"/>
+    <path data-type="ControlFlow/ObjectFlow" data-name="" data-source="Decision Node &amp; Merge Node1" data-target="ActivityFinal1"
+          d="M83,543 L83,600" marker-end="url(#arrow-filled)"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="87" y="66" text-anchor="middle">Partition0</text>
+    <text x="262" y="66" text-anchor="middle">Partition1</text>
+    <text x="445" y="66" text-anchor="middle">Partition2222222222222222222</text>
+    <text x="83" y="196" text-anchor="middle">Action0000</text>
+    <text x="83" y="211" text-anchor="middle">0000</text>
+    <text x="83" y="226" text-anchor="middle">0000</text>
+    <text x="263" y="291" text-anchor="middle">Action100000</text>
+    <text x="263" y="417" text-anchor="middle">Action2</text>
+    <text x="445" y="409" text-anchor="middle">Action30000000</text>
+    <text x="445" y="424" text-anchor="middle">00000000</text>
+    <text x="152" y="283" text-anchor="middle">[Yes]</text>
+    <text x="88" y="410">[No]</text>
+  </g>
+</svg>

@@ -118,7 +118,7 @@ Follow these steps to recall insights on UML, modeling, and architecture:
         String absolutePath = insightsFile.toAbsolutePath().toString();
 
         if (!Files.exists(insightsFile)) {
-            throw new IllegalStateException("The file storing insights on UML, modeling, and architecture does not exist: " + absolutePath);
+            throw new IllegalStateException("The file for storing insights on UML, modeling, and architecture has not been created yet: " + absolutePath);
         }
 
         String contents = Files.readString(insightsFile);

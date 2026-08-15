@@ -39,7 +39,7 @@ public class SequenceDiagramGuideTool implements ToolProvider {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * An ExecutionSpecification in the UML specification refers to the same thing as an Activation in Astah.
-* When creating a lifeline, if a corresponding base class exists, set that class as the type of the lifeline.
+* When creating a lifeline, if a corresponding base class exists, set that class as the type of the lifeline. Do not include the type name in the lifeline name, because the type name is automatically displayed after it.
 * When adding a message name, if a corresponding operation exists in the base class associated with the target lifeline of the message, assign that operation to the message. Otherwise, specify an arbitrary message name, arguments, and return value.
 * When creating a message, do not blindly specify a lifeline as the sender of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. Specifying the lifeline as the message sender instead will split the sender lifeline's activation (ExecutionSpecification).
 * It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.

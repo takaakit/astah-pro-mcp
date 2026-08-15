@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AttributeDTOAssembler;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -150,9 +151,16 @@ public class AttributeTool implements ToolProvider {
 
         IAttribute astahAttribute = astahProToolSupport.getAttribute(param.targetAttributeId());
 
-        txnAstah.run( () -> {
-            astahAttribute.setTypeExpression(param.typeExpression());
-        });
+        try {
+            txnAstah.run( () -> {
+                astahAttribute.setTypeExpression(param.typeExpression());
+            });
+
+        } catch (InvalidEditingException e) {
+            throw new InvalidEditingException(
+                e.getKey(),
+                e.getMessage() + " If the type is not a primitive type, create a model element for that type before setting it.");
+        }
 
         return AttributeDTOAssembler.toDTO(astahAttribute);
     }

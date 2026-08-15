@@ -79,7 +79,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_note_anchor",
-                "Create a new note anchor between the specified note (specified by ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation of the note anchor along with the updated diagram image in low resolution.",
+                "Create a new note anchor between the specified note (specified by presentation ID) and the specified target presentation (specified by ID) on the specified diagram (specified by ID), and return the newly created link presentation of the note anchor along with the updated diagram image in low resolution.",
                 this::createNoteAnchor,
                 NewNoteAnchorDTO.class,
                 LinkPresentationDTO.class)
@@ -114,6 +114,7 @@ public class BasicDiagramEditorTool implements ToolProvider {
                     notePresentation.setLocation(new Point2D.Double(param.locationX(), param.locationY()));
                 } catch (Exception e) {
                     // Some diagram types (e.g. sequence diagrams) do not support resizing note.
+                    throw new RuntimeException("The width of the note cannot be changed. Adjust the width of the note by inserting line breaks at appropriate positions in the content to be written in the note.", e);
                 }
             }
             return notePresentation;

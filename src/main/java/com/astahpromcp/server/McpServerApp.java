@@ -26,6 +26,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -119,7 +120,9 @@ public final class McpServerApp {
         HttpServletStreamableServerTransportProvider transport = HttpServletStreamableServerTransportProvider.builder()
                 .mcpEndpoint("/mcp")
                 .jsonMapper(JsonSupport.MCP_JSON_MAPPER)
+                .keepAliveInterval(Duration.ofSeconds(McpServerConfig.TRANSPORT_KEEP_ALIVE_INTERVAL_SECONDS))
                 .build();
+        log.info("Created transport with keep-alive interval: {} s", McpServerConfig.TRANSPORT_KEEP_ALIVE_INTERVAL_SECONDS);
         
         // Register the tool providers
         List<ToolProvider> providers = registerToolProviders(profile.includeEditorTools());
@@ -191,7 +194,7 @@ public final class McpServerApp {
                 .serverInfo(McpSchema.Implementation.builder(getArtifactId(), getVersion())
                         .title("Astah Pro MCP")
                         .build())
-                .instructions("This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call the 'uml_and_modeling_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. You MUST also ensure that these tool invocation requirements are imposed on and followed by any subagents you launch.")
+                .instructions("This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.")
                 .capabilities(capabilities);
 
         log.info("Register all tools");

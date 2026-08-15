@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.OperationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.OperationDTOAssembler;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -204,9 +205,16 @@ public class OperationTool implements ToolProvider {
 
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
-        txnAstah.run( () -> {
-            astahOperation.setReturnTypeExpression(param.returnTypeExpression());
-        });
+        try {
+            txnAstah.run( () -> {
+                astahOperation.setReturnTypeExpression(param.returnTypeExpression());
+            });
+
+        } catch (InvalidEditingException e) {
+            throw new InvalidEditingException(
+                e.getKey(),
+                e.getMessage() + " If the type is not a primitive type, create a model element for that type before setting it.");
+        }
 
         return OperationDTOAssembler.toDTO(astahOperation);
     }

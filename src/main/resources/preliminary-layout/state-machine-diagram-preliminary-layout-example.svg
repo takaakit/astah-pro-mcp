@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="529" height="702" viewBox="11 -118 529 702">
+  <defs>
+    <marker id="arrow-open" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="36" y="-98" width="369" height="89"/>
+    <rect data-type="State" data-name="State0" x="31" y="161" width="489" height="332"/>
+    <rect data-type="InitialPseudostate" data-name="InitialPseudostate0" x="122" y="55" width="20" height="20"/>
+    <rect data-type="State" data-name="State6" x="198" y="24" width="135" height="81"/>
+    <rect data-type="InitialPseudostate" data-name="InitialPseudostate1" x="78" y="230" width="20" height="20"/>
+    <rect data-type="State" data-name="State1" x="142" y="207" width="119" height="66"/>
+    <rect data-type="State" data-name="State2" x="360" y="215" width="119" height="51"/>
+    <rect data-type="State" data-name="State5" x="258" y="302" width="103" height="51"/>
+    <rect data-type="InitialPseudostate" data-name="InitialPseudostate2" x="78" y="417" width="20" height="20"/>
+    <rect data-type="State" data-name="State30000" x="180" y="409" width="81" height="36"/>
+    <rect data-type="State" data-name="State400000000" x="331" y="409" width="108" height="36"/>
+    <rect data-type="FinalState" data-name="FinalState0" x="265" y="544" width="20" height="20"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="Line" data-name="State0 region separator" d="M31,381 L520,381"/>
+
+    <path data-type="Transition" data-name="" data-source="InitialPseudostate0" data-target="State6"
+          d="M142,65 L198,65" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State6" data-target="State0"
+          d="M215,105 Q178,122 171,161" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State0" data-target="State6"
+          d="M359,161 Q356,121 324,105" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="" data-source="InitialPseudostate1" data-target="State1"
+          d="M98,240 L142,240" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State1" data-target="State2"
+          d="M261,228 Q314,207 360,228" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State2" data-target="State5"
+          d="M419,266 Q397,296 361,303" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State5" data-target="State1"
+          d="M258,310 Q228,300 216,273" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="" data-source="InitialPseudostate2" data-target="State30000"
+          d="M98,427 L180,427" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State30000" data-target="State400000000"
+          d="M261,418 Q298,382 331,418" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State400000000" data-target="State30000"
+          d="M331,436 Q299,472 261,436" marker-end="url(#arrow-open)"/>
+    <path data-type="Transition" data-name="Trigger" data-source="State0" data-target="FinalState0"
+          d="M275,493 L275,544" marker-end="url(#arrow-open)"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="275" y="177" text-anchor="middle">State0</text>
+    <text x="265" y="40" text-anchor="middle">State6</text>
+    <text x="201" y="223" text-anchor="middle">State1</text>
+    <text x="419" y="231" text-anchor="middle">State2</text>
+    <text x="309" y="318" text-anchor="middle">State5</text>
+    <text x="220" y="425" text-anchor="middle">State30000</text>
+    <text x="385" y="425" text-anchor="middle">State400000000</text>
+    <text x="181" y="128" text-anchor="end">Trigger</text>
+    <text x="353" y="127">Trigger</text>
+    <text x="312" y="214" text-anchor="middle">Trigger</text>
+    <text x="398" y="290">Trigger</text>
+    <text x="228" y="296" text-anchor="end">Trigger</text>
+    <text x="297" y="396" text-anchor="middle">Trigger</text>
+    <text x="297" y="466" text-anchor="middle">Trigger</text>
+    <text x="280" y="518">Trigger</text>
+  </g>
+</svg>

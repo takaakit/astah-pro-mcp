@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ParameterWithTypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ParameterWithTypeExpressionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ParameterDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ParameterDTOAssembler;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IParameter;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -90,9 +91,16 @@ public class ParameterTool implements ToolProvider {
 
         IParameter astahParameter = astahProToolSupport.getParameter(param.targetParameterId());
 
-        txnAstah.run( () -> {
-            astahParameter.setTypeExpression(param.typeExpression());
-        });
+        try {
+            txnAstah.run( () -> {
+                astahParameter.setTypeExpression(param.typeExpression());
+            });
+
+        } catch (InvalidEditingException e) {
+            throw new InvalidEditingException(
+                e.getKey(),
+                e.getMessage() + " If the type is not a primitive type, create a model element for that type before setting it.");
+        }
 
         return ParameterDTOAssembler.toDTO(astahParameter);
     }

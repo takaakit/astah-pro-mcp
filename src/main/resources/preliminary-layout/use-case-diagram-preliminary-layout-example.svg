@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="650" height="565" viewBox="20 -104 650 565">
+  <defs>
+    <marker id="arrow-open" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1"/>
+    </marker>
+    <marker id="triangle-hollow" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L13,7 L1,13 Z" fill="#fff" stroke="#000" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="40" y="-84" width="369" height="89"/>
+    <rect data-type="Rectangle" data-name="System0" x="175" y="50" width="318" height="391"/>
+    <rect data-type="Class" data-name="Actor0" x="40" y="125" width="40" height="55"/>
+    <rect data-type="Class" data-name="Actor1111111111" x="594" y="206" width="40" height="55"/>
+    <rect data-type="Class" data-name="Actor2" x="40" y="310" width="40" height="55"/>
+    <rect data-type="UseCase" data-name="UseCase000000000" x="237" y="104" width="173" height="40"/>
+    <rect data-type="UseCase" data-name="UseCase1" x="324" y="233" width="120" height="40"/>
+    <rect data-type="UseCase" data-name="UseCase20000000&#10;0000000&#10;0000000" x="209" y="355" width="209" height="64"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="Generalization" data-name="" data-source="Actor2" data-target="Actor0"
+          d="M60,310 L60,180" marker-end="url(#triangle-hollow)"/>
+    <path data-type="Association" data-name="" data-source="Actor0" data-target="UseCase000000000"
+          d="M80,151 L237,134"/>
+    <path data-type="Association" data-name="" data-source="Actor1111111111" data-target="UseCase000000000"
+          d="M594,226 L376,144"/>
+    <path data-type="Association" data-name="" data-source="Actor1111111111" data-target="UseCase20000000&#10;0000000&#10;0000000"
+          d="M594,244 L377,355"/>
+    <path data-type="Association" data-name="" data-source="Actor2" data-target="UseCase20000000&#10;0000000&#10;0000000"
+          d="M80,342 L209,367"/>
+    <path data-type="Include" data-name="" data-source="UseCase000000000" data-target="UseCase1"
+          d="M333,144 L375,233" marker-end="url(#arrow-open)"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="334" y="66" text-anchor="middle">System0</text>
+    <text x="84" y="176">Actor0</text>
+    <text x="614" y="274" text-anchor="middle">Actor1111111111</text>
+    <text x="60" y="378" text-anchor="middle">Actor2</text>
+    <text x="323" y="120" text-anchor="middle">UseCase000000000</text>
+    <text x="384" y="249" text-anchor="middle">UseCase1</text>
+    <text x="313" y="371" text-anchor="middle">UseCase20000000</text>
+    <text x="313" y="386" text-anchor="middle">0000000</text>
+    <text x="313" y="401" text-anchor="middle">0000000</text>
+  </g>
+</svg>

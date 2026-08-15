@@ -23,6 +23,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePrese
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.change_vision.jude.api.inf.editor.DiagramEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -152,18 +153,12 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        RasterizedSvgImage svgImage = imageConvertSupport.svgToRasterizedImage(
-                param.imageSvgCode(),
-                SVG_IMAGE_RASTERIZATION_SCALE);
-        Image image = svgImage.image();
-        INodePresentation astahImagePresentation = createImagePresentation(
+        INodePresentation astahImagePresentation = createSvgImagePresentation(
                 astahDiagram,
                 diagramEditor,
-                image,
+                param.imageSvgCode(),
                 param.locationX(),
-                param.locationY(),
-                svgImage.displayWidth(),
-                svgImage.displayHeight());
+                param.locationY());
 
         RectangleDTO dto = RectangleDTOAssembler.toDTO(astahImagePresentation.getRectangle());
 
@@ -172,26 +167,51 @@ public class DiagramEditorTool implements ToolProvider {
         return Pair.of(dto, List.of(diagramImage));
     }
 
-    private INodePresentation createImagePresentation(IDiagram astahDiagram, DiagramEditor diagramEditor, Image image, double locationX, double locationY, int displayWidth, int displayHeight) throws Exception {
+    private INodePresentation createSvgImagePresentation(IDiagram astahDiagram, DiagramEditor diagramEditor, String imageSvgCode, double locationX, double locationY) throws Exception {
 
+        RasterizedSvgImage svgImage = imageConvertSupport.svgToRasterizedImage(imageSvgCode, SVG_IMAGE_RASTERIZATION_SCALE);
+        int displayWidth = svgImage.displayWidth();
+        int displayHeight = svgImage.displayHeight();
         Set<String> beforePresentationIds = presentationIds(astahDiagram);
 
-        return txnAstah.call( () -> {
-            // Note: The return value of createImage() is null, so the newly created presentation is identified by diffing the diagram's presentation IDs.
-            INodePresentation createdPresentation = diagramEditor.createImage(
-                    image,
-                    new Point2D.Double(locationX, locationY));
+        try {
+            // Insert the high-resolution image and shrink only its display size, so that the image stays sharp when the diagram is zoomed in or exported.
+            return txnAstah.call( () -> {
+                // Note: The return value of createImage() is null, so the newly created presentation is identified by diffing the diagram's presentation IDs.
+                INodePresentation createdPresentation = diagramEditor.createImage(
+                        svgImage.image(),
+                        new Point2D.Double(locationX, locationY));
 
-            INodePresentation imagePresentation = createdPresentation != null ? createdPresentation : findNewNodePresentation(astahDiagram, beforePresentationIds);
-            if (imagePresentation == null) {
-                throw new RuntimeException("Failed to identify the created image presentation.");
-            }
+                INodePresentation imagePresentation = createdPresentation != null ? createdPresentation : findNewNodePresentation(astahDiagram, beforePresentationIds);
+                if (imagePresentation == null) {
+                    throw new RuntimeException("Failed to identify the created image presentation.");
+                }
 
-            imagePresentation.setWidth(displayWidth);
-            imagePresentation.setHeight(displayHeight);
+                imagePresentation.setWidth(displayWidth);
+                imagePresentation.setHeight(displayHeight);
 
-            return imagePresentation;
-        });
+                return imagePresentation;
+            });
+
+        } catch (InvalidEditingException e) {
+            // Note: Some diagrams (e.g. sequence diagrams) reject resizing of an image presentation.
+            log.info("Resizing an image presentation is not supported on {}. Inserting an image rasterized at {}x{} instead.", astahDiagram.getClass().getName(), displayWidth, displayHeight);
+
+            Image exactSizeImage = imageConvertSupport.svgToImage(imageSvgCode, displayWidth, displayHeight);
+
+            return txnAstah.call( () -> {
+                INodePresentation createdPresentation = diagramEditor.createImage(
+                        exactSizeImage,
+                        new Point2D.Double(locationX, locationY));
+
+                INodePresentation imagePresentation = createdPresentation != null ? createdPresentation : findNewNodePresentation(astahDiagram, beforePresentationIds);
+                if (imagePresentation == null) {
+                    throw new RuntimeException("Failed to identify the created image presentation.");
+                }
+
+                return imagePresentation;
+            });
+        }
     }
 
     private Set<String> presentationIds(IDiagram astahDiagram) throws Exception {

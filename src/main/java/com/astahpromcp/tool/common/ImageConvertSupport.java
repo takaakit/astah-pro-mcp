@@ -10,6 +10,7 @@ import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.Document;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -29,7 +30,15 @@ public class ImageConvertSupport {
 
     public Image svgToImage(String svgCode) {
         validateSvgCode(svgCode);
-        return transcodeSvg(svgCode, null);
+        return transcodeSvg(svgCode, null, null);
+    }
+
+    public Image svgToImage(String svgCode, int width, int height) {
+        validateSize(width, height);
+
+        validateSvgCode(svgCode);
+
+        return transcodeSvg(svgCode, (float) width, (float) height);
     }
 
     public RasterizedSvgImage svgToRasterizedImage(String svgCode, double scale) {
@@ -37,7 +46,7 @@ public class ImageConvertSupport {
 
         validateSvgCode(svgCode);
 
-        BufferedImage displayImage = transcodeSvg(svgCode, null);
+        BufferedImage displayImage = transcodeSvg(svgCode, null, null);
         int displayWidth = displayImage.getWidth();
         int displayHeight = displayImage.getHeight();
         double effectiveScale = Math.min(scale, maxAdditionalScale(displayWidth, displayHeight));
@@ -48,9 +57,15 @@ public class ImageConvertSupport {
         }
 
         // Only the width hint is passed; Batik derives the height from the SVG's aspect ratio.
-        BufferedImage rasterizedImage = transcodeSvg(svgCode, (float) rasterizedWidth);
+        BufferedImage rasterizedImage = transcodeSvg(svgCode, (float) rasterizedWidth, null);
 
         return new RasterizedSvgImage(rasterizedImage, displayWidth, displayHeight);
+    }
+
+    private void validateSize(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Width and height must be positive numbers");
+        }
     }
 
     private void validateScale(double scale) {
@@ -68,26 +83,70 @@ public class ImageConvertSupport {
         return Math.max(1.0, (double) MAX_RASTERIZED_IMAGE_DIMENSION / maxDisplayDimension);
     }
 
+    // The size the SVG renders at without any scaling, i.e. the size insert_svg_img_on_dgm gives the inserted image
+    // in diagram coordinates. Unlike svgToRasterizedImage this applies no cap, so callers that need an exact size may
+    // multiply it themselves and rasterize through svgToImage(svgCode, width, height).
+    public Dimension svgDisplaySizeOf(String svgCode) {
+        BufferedImage displayImage = (BufferedImage) svgToImage(svgCode);
+
+        return new Dimension(displayImage.getWidth(), displayImage.getHeight());
+    }
+
+    // Returns the viewBox min-x and min-y of the root <svg> element, or (0, 0) when no usable viewBox is declared.
+    public Point2D.Double svgViewBoxOriginOf(String svgCode) {
+        validateSvgCode(svgCode);
+
+        double[] viewBox = parseNumbers(parseSvg(svgCode).getDocumentElement().getAttribute("viewBox"));
+        if (viewBox == null || viewBox.length != 4) {
+            return new Point2D.Double(0, 0);
+        }
+
+        return new Point2D.Double(viewBox[0], viewBox[1]);
+    }
+
     private void validateSvgCode(String svgCode) {
         if (svgCode == null || svgCode.isBlank()) {
             throw new IllegalArgumentException("SVG code must not be null or blank");
         }
 
         // Validate SVG code
+        Document document = parseSvg(svgCode);
+        if (document == null || document.getDocumentElement() == null
+                || !"svg".equals(document.getDocumentElement().getLocalName())) {
+            throw new IllegalArgumentException("SVG code must have an <svg> root element");
+        }
+    }
+
+    private Document parseSvg(String svgCode) {
         String parser = XMLResourceDescriptor.getXMLParserClassName();
         SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
         try (StringReader reader = new StringReader(svgCode)) {
-            Document document = factory.createDocument("internal:svg", reader);
-            if (document == null || document.getDocumentElement() == null
-                    || !"svg".equals(document.getDocumentElement().getLocalName())) {
-                throw new IllegalArgumentException("SVG code must have an <svg> root element");
-            }
+            return factory.createDocument("internal:svg", reader);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid SVG markup", e);
         }
     }
 
-    private BufferedImage transcodeSvg(String svgCode, Float width) {
+    // The viewBox values are whitespace separated, but commas are allowed as separators too.
+    private static double[] parseNumbers(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        String[] tokens = value.trim().split("[\\s,]+");
+        double[] numbers = new double[tokens.length];
+        try {
+            for (int i = 0; i < tokens.length; i++) {
+                numbers[i] = Double.parseDouble(tokens[i]);
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        return numbers;
+    }
+
+    private BufferedImage transcodeSvg(String svgCode, Float width, Float height) {
         // Create ImageTranscoder
         final BufferedImage[] imageHolder = new BufferedImage[1];
         ImageTranscoder transcoder = new ImageTranscoder() {
@@ -105,6 +164,9 @@ public class ImageConvertSupport {
 
         if (width != null) {
             transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, width);
+        }
+        if (height != null) {
+            transcoder.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, height);
         }
 
         // Convert SVG to Image

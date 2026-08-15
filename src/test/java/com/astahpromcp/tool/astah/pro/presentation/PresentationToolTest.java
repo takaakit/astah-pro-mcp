@@ -8,6 +8,8 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithColorDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithLabelDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationTypeListDTO;
+import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -30,6 +33,7 @@ public class PresentationToolTest {
     private ProjectAccessor projectAccessor;
     private PresentationTool tool;
     private Method getElement;
+    private Method getAllTypes;
     private Method setLabel;
     private Method changeFillColor;
     private Method changeLineColor;
@@ -59,6 +63,12 @@ public class PresentationToolTest {
             PresentationTool.class,
             "getElement",
             IdDTO.class);
+
+        // getAllTypes() method
+        getAllTypes = TestSupport.getAccessibleMethod(
+            PresentationTool.class,
+            "getAllTypes",
+            NoInputDTO.class);
 
         // setLabel() method
         setLabel = TestSupport.getAccessibleMethod(
@@ -113,6 +123,26 @@ public class PresentationToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void getAllTypes_ok() throws Exception {
+        // Create input DTO
+        NoInputDTO inputDTO = new NoInputDTO();
+
+        // ----------------------------------------
+        // Call getAllTypes()
+        // ----------------------------------------
+        PresentationTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getAllTypes,
+            tool,
+            inputDTO,
+            PresentationTypeListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(PresentationDTO.Type.values().length - 1, outputDTO.value().size());
+        assertFalse(outputDTO.value().contains("Unknown"));
     }
 
     @Test

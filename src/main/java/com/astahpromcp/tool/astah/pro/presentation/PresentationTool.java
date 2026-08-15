@@ -11,7 +11,9 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ElementDTOAssemb
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithColorDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.PresentationWithLabelDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationTypeListDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
+import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
@@ -66,7 +69,14 @@ public class PresentationTool implements ToolProvider {
                 "Return the element that corresponds to the specified presentation (specified by ID).",
                 this::getElement,
                 IdDTO.class,
-                ElementDTO.class)
+                ElementDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "get_all_prst_types",
+                "Return the list of all presentation type names. Note that \"Unknown\" is excluded from the type names.",
+                this::getAllTypes,
+                NoInputDTO.class,
+                PresentationTypeListDTO.class)
         );
     }
 
@@ -114,6 +124,17 @@ public class PresentationTool implements ToolProvider {
         } else {
             throw new RuntimeException("No element exists that corresponds to the presentation.");
         }
+    }
+
+    private PresentationTypeListDTO getAllTypes(NoInputDTO param) throws Exception {
+        log.debug("Get all presentation types: {}", param);
+
+        List<String> typeNames = Arrays.stream(PresentationDTO.Type.values())
+                .filter(type -> type != PresentationDTO.Type.UNKNOWN)
+                .map(type -> type.typeName)
+                .toList();
+
+        return new PresentationTypeListDTO(typeNames);
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> setLabel(PresentationWithLabelDTO param) throws Exception {

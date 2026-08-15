@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="747" height="862" viewBox="20 -127 747 862">
+  <defs>
+    <marker id="arrow-open" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="61" y="-107" width="453" height="86"/>
+    <rect data-type="Requirement" data-name="Requirement0" x="240" y="11" width="181" height="123"/>
+    <rect data-type="Requirement" data-name="Requirement1" x="78" y="202" width="212" height="108"/>
+    <rect data-type="Requirement" data-name="Requirement2" x="396" y="202" width="112" height="76"/>
+    <rect data-type="Requirement" data-name="Requirement3" x="382" y="346" width="112" height="76"/>
+    <rect data-type="Requirement" data-name="Requirement4" x="593" y="346" width="154" height="122"/>
+    <rect data-type="TestCase" data-name="TestCase0" x="324" y="525" width="96" height="68"/>
+    <rect data-type="Class" data-name="UseCase0" x="40" y="514" width="120" height="40"/>
+    <rect data-type="Class" data-name="Class0" x="181" y="603" width="100" height="72"/>
+    <rect data-type="Class" data-name="Class1" x="428" y="628" width="127" height="87"/>
+    <rect data-type="Class" data-name="Class2" x="599" y="542" width="127" height="87"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="Containment" data-name="" data-source="Requirement0" data-target="Requirement1"
+          d="M281,134 L227,202"/>
+    <path data-type="Containment" data-name="" data-source="Requirement0" data-target="Requirement2"
+          d="M375,134 L424,202"/>
+    <path data-type="Containment" data-name="" data-source="Requirement2" data-target="Requirement3"
+          d="M448,278 L442,346"/>
+    <path data-type="Containment" data-name="" data-source="Requirement2" data-target="Requirement4"
+          d="M501,278 L593,349"/>
+    <path data-type="Verify" data-name="" data-source="TestCase0" data-target="Requirement3"
+          d="M385,525 L424,422" marker-end="url(#arrow-open)"/>
+    <path data-type="Refine" data-name="" data-source="UseCase0" data-target="Requirement1"
+          d="M106,514 L168,310" marker-end="url(#arrow-open)"/>
+    <path data-type="Satisfy" data-name="" data-source="Class0" data-target="Requirement1"
+          d="M227,603 L191,310" marker-end="url(#arrow-open)"/>
+    <path data-type="Satisfy" data-name="" data-source="Class1" data-target="Requirement3"
+          d="M483,628 L445,422" marker-end="url(#arrow-open)"/>
+    <path data-type="Satisfy" data-name="" data-source="Class2" data-target="Requirement4"
+          d="M664,542 L667,468" marker-end="url(#arrow-open)"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="330" y="27" text-anchor="middle">Requirement0</text>
+    <text x="184" y="218" text-anchor="middle">Requirement1</text>
+    <text x="452" y="218" text-anchor="middle">Requirement2</text>
+    <text x="438" y="362" text-anchor="middle">Requirement3</text>
+    <text x="670" y="362" text-anchor="middle">Requirement4</text>
+    <text x="372" y="541" text-anchor="middle">TestCase0</text>
+    <text x="100" y="530" text-anchor="middle">UseCase0</text>
+    <text x="231" y="619" text-anchor="middle">Class0</text>
+    <text x="491" y="644" text-anchor="middle">Class1</text>
+    <text x="662" y="558" text-anchor="middle">Class2</text>
+  </g>
+</svg>

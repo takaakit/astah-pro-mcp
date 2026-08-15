@@ -24,19 +24,41 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
+        // Both profiles need their own port, otherwise the second one fails to bind
+        if (McpServerConfig.PORT_FOR_FULL_TOOL == McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL) {
+            showPluginDisabledDialog("The astah-pro-mcp plugin is disabled because the same port ("
+                    + McpServerConfig.PORT_FOR_FULL_TOOL + ") is configured for both the full tool version ("
+                    + McpServerConfig.ENV_PORT_FOR_FULL_TOOL + ") and the query-only tool version ("
+                    + McpServerConfig.ENV_PORT_FOR_QUERY_ONLY_TOOL + ").");
+            
+            throw new IllegalStateException("The same port is configured for both profiles: " + McpServerConfig.PORT_FOR_FULL_TOOL);
+        }
+
         // Check port availability
         List<Integer> portsInUse = PortAvailabilityChecker.findPortsInUse(
                 McpServerConfig.HOST,
                 List.of(McpServerConfig.PORT_FOR_FULL_TOOL, McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL));
 
         if (!portsInUse.isEmpty()) {
-            showPluginDisabledDialog(portsInUse);
+            String ports = portsInUse.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            
+            showPluginDisabledDialog("The astah-pro-mcp plugin is disabled because the port(s) are already in use: "
+                    + ports + "\nThe ports can be changed with the environment variables "
+                    + McpServerConfig.ENV_PORT_FOR_FULL_TOOL + " and "
+                    + McpServerConfig.ENV_PORT_FOR_QUERY_ONLY_TOOL + ".");
+            
             throw new IllegalStateException("Port is already in use: " + portsInUse.get(0));
         }
 
         // Configure Logback
         LogbackConfig.configure(McpServerConfig.ROOT_OUTPUT_DIR);
-        
+
+        // Report how the ports were resolved
+        McpServerConfig.portResolutionWarnings().forEach(log::warn);
+        log.info("MCP ports: full tool={}, query-only tool={}", McpServerConfig.PORT_FOR_FULL_TOOL, McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL);
+
         log.info("MCP-BUNDLE: Starting bundle...");
 
         // The class loader must be switched to the Jetty bundle's class loader to prevent ClassNotFoundExceptions for Jetty classes.
@@ -68,15 +90,10 @@ public class Activator implements BundleActivator {
     }
 
     // Notify the user that the plugin has been disabled
-    private void showPluginDisabledDialog(List<Integer> portsInUse) {
+    private void showPluginDisabledDialog(String message) {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-
-        String ports = portsInUse.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(", "));
-        String message = "The astah-pro-mcp plugin is disabled because the port(s) are already in use:" + ports;
 
         SwingUtilities.invokeLater(() -> {
             JOptionPane optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);

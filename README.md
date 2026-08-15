@@ -95,7 +95,10 @@ Download [the plugin JAR file (astah-pro-mcp-x.x.x.jar)](https://github.com/taka
 
 To use the full tool version, specify port `8888`; to use the query-only tool version, specify port `8889`. Also, use `127.0.0.1` not `localhost`. Connections to `localhost` will fail.
 
-#### Claude Code
+If those ports are already taken on your machine, see [Changing the port numbers](#changing-the-port-numbers).
+
+<details>
+<summary><b>Claude Code</b></summary>
 
 Run this command for project scope in your project directory:
 ```bash
@@ -107,8 +110,11 @@ Or run this command for user scope:
 claude mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888/mcp
 ```
 
+</details>
 
-#### Codex CLI
+
+<details>
+<summary><b>Codex CLI</b></summary>
 
 Create `.codex/config.toml` under your project directory or your user directory with:
 
@@ -119,8 +125,11 @@ url = "http://127.0.0.1:8888/mcp"
 startup_timeout_sec = 10
 ```
 
+</details>
 
-#### Grok Build
+
+<details>
+<summary><b>Grok Build</b></summary>
 
 Run this command for project scope in your project directory:
 ```bash
@@ -132,8 +141,11 @@ Or run this command for user scope:
 grok mcp add --scope user --transport http astah-pro-mcp http://127.0.0.1:8888/mcp
 ```
 
+</details>
 
-#### Antigravity CLI
+
+<details>
+<summary><b>Antigravity CLI</b></summary>
 
 Create `.agents/mcp_config.json` under your project directory, or create `~/.gemini/antigravity-cli/mcp_config.json` for user scope.
 
@@ -165,6 +177,20 @@ If the direct connection above does not work, fall back to the following configu
 }
 ```
 
+</details>
+
+<br>
+
+## Changing the Port Numbers
+
+The plugin listens on `8888` (full tool version) and `8889` (query-only tool version) by default. Each port can be overridden with an environment variable:
+
+| Tool version | Environment variable |
+| --- | --- |
+| Full | `ASTAH_PRO_MCP_PORT_FOR_FULL` |
+| Query-only | `ASTAH_PRO_MCP_PORT_FOR_QUERY` |
+
+Remember to update your AI agent settings to the same port numbers.
 
 <br>
 

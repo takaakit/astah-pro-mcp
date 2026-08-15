@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -47,8 +48,7 @@ public class ProjectInfoToolTest {
     private Method searchWithinPresentations;
     private Method retrieveClassifiersWithinPackage;
     private Method retrievePackageStructureAsPlantuml;
-    private Method retrieveClassifiersRelationshipsAsPlantuml;
-    private Method getRelationshipsAsPlantumlCode;
+    private Method retrieveRelationshipsAsPlantuml;
     private Field nameIdTypeDTOChunksCacheUpdatedAtNanosField;
     private Field labelIdTypeDTOChunksCacheUpdatedAtNanosField;
     private Field definitionNameIdTypeDTOChunksCacheUpdatedAtNanosField;
@@ -138,16 +138,10 @@ public class ProjectInfoToolTest {
             "retrievePackageStructureAsPlantuml",
             NoInputDTO.class);
 
-        // retrieveClassifiersRelationshipsAsPlantuml() method
-        retrieveClassifiersRelationshipsAsPlantuml = TestSupport.getAccessibleMethod(
+        // retrieveRelationshipsAsPlantuml() method
+        retrieveRelationshipsAsPlantuml = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
-            "retrieveClassifiersRelationshipsAsPlantuml",
-            NoInputDTO.class);
-
-        // getRelationshipsAsPlantumlCode() method
-        getRelationshipsAsPlantumlCode = TestSupport.getAccessibleMethod(
-            ProjectInfoTool.class,
-            "getRelationshipsAsPlantumlCode",
+            "retrieveRelationshipsAsPlantuml",
             NoInputDTO.class);
 
         // nameIdTypeDTOChunksCacheUpdatedAtNanos field
@@ -777,38 +771,7 @@ public class ProjectInfoToolTest {
     }
 
     @Test
-    void retrieveClassifiersRelationshipsAsPlantuml_ok() throws Exception {
-        // Create input DTO
-        NoInputDTO inputDTO = new NoInputDTO();
-
-        // ----------------------------------------
-        // Call retrieveClassifiersRelationshipsAsPlantuml()
-        // ----------------------------------------
-        PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-            retrieveClassifiersRelationshipsAsPlantuml,
-            tool,
-            inputDTO,
-            PlantumlDTO.class);
-
-        // Check output DTO
-        assertNotNull(outputDTO);
-        assertNotNull(outputDTO.plantumlCode());
-        assertTrue(outputDTO.plantumlCode().contains("\"Quuy01\" --- \"Baz\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy02\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy03\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy04\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Quuy05\" --- \"Baz\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy06\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Quuy07\" --- \"Baz\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --> \"Quuy08\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" --|> \"Quuy09\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..> \"Quuy10\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..> \"Quuy11\""));
-        assertTrue(outputDTO.plantumlCode().contains("\"Baz\" ..|> \"Quuy16\""));
-    }
-
-    @Test
-    void getRelationshipsAsPlantumlCode_ok() throws Exception {
+    void retrieveRelationshipsAsPlantuml_ok() throws Exception {
         // Get classifiers used as endpoints of Baz's relationships
         IClass baz = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Baz");
         IClass quuy09 = (IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, "Quuy09");
@@ -827,10 +790,10 @@ public class ProjectInfoToolTest {
         NoInputDTO inputDTO = new NoInputDTO();
 
         // ----------------------------------------
-        // Call getRelationshipsAsPlantumlCode()
+        // Call retrieveRelationshipsAsPlantuml()
         // ----------------------------------------
         PlantumlDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-            getRelationshipsAsPlantumlCode,
+            retrieveRelationshipsAsPlantuml,
             tool,
             inputDTO,
             PlantumlDTO.class);
@@ -848,5 +811,57 @@ public class ProjectInfoToolTest {
         assertTrue(plantumlCode.contains("\"" + bazFqn + "\" ..|> \"" + quuy16Fqn + "\""));
         assertTrue(plantumlCode.contains("\"" + bazFqn + "\" ..> \"" + quuy10Fqn + "\""));
         assertTrue(plantumlCode.contains("\"" + bazFqn + "\" ..> \"" + quuy11Fqn + "\""));
+
+        // Associations without a navigable end are output using fully-qualified names
+        assertUndirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy01"));
+        assertUndirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy05"));
+        assertUndirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy07"));
+
+        // Associations whose end on the Quuy side is navigable get an arrowhead on that side
+        assertDirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy02"));
+        assertDirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy03"));
+        assertDirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy06"));
+        assertDirectedAssociation(plantumlCode, bazFqn, fullNameOf("Quuy08"));
+
+        // An association whose both ends are navigable is output as a single bidirectional relationship
+        assertBidirectionalAssociation(plantumlCode, bazFqn, fullNameOf("Quuy04"));
+
+        // Each association is reachable from the classes on both of its ends, but must be output only once
+        List<String> relationshipLines = plantumlCode.lines()
+            .filter(line -> !line.isBlank() && !line.startsWith("@"))
+            .toList();
+        assertEquals(
+            relationshipLines.size(),
+            new LinkedHashSet<>(relationshipLines).size(),
+            "The PlantUML code contains duplicated relationship lines: " + plantumlCode);
+    }
+
+    private static String fullNameOf(String className) throws Exception {
+        return ((IClass) TestSupport.instance().getNamedElementByClassAndName(IClass.class, className))
+            .getFullName(".");
+    }
+
+    // The direction of an association without a navigable end carries no meaning, so either orientation is correct
+    private static void assertUndirectedAssociation(String plantumlCode, String fqn1, String fqn2) {
+        assertTrue(
+            plantumlCode.contains("\"" + fqn1 + "\" --- \"" + fqn2 + "\"")
+                || plantumlCode.contains("\"" + fqn2 + "\" --- \"" + fqn1 + "\""),
+            "The association between " + fqn1 + " and " + fqn2 + " is not output: " + plantumlCode);
+    }
+
+    // An arrowhead on the target side is written either as "source --> target" or as "target <-- source"
+    private static void assertDirectedAssociation(String plantumlCode, String sourceFqn, String targetFqn) {
+        assertTrue(
+            plantumlCode.contains("\"" + sourceFqn + "\" --> \"" + targetFqn + "\"")
+                || plantumlCode.contains("\"" + targetFqn + "\" <-- \"" + sourceFqn + "\""),
+            "The association from " + sourceFqn + " to " + targetFqn + " is not output: " + plantumlCode);
+    }
+
+    // Arrowheads on both sides are written as "<-->", and either orientation is correct
+    private static void assertBidirectionalAssociation(String plantumlCode, String fqn1, String fqn2) {
+        assertTrue(
+            plantumlCode.contains("\"" + fqn1 + "\" <--> \"" + fqn2 + "\"")
+                || plantumlCode.contains("\"" + fqn2 + "\" <--> \"" + fqn1 + "\""),
+            "The bidirectional association between " + fqn1 + " and " + fqn2 + " is not output: " + plantumlCode);
     }
 }

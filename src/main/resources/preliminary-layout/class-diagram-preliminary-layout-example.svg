@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="562" height="535" viewBox="20 -111 562 535">
+  <defs>
+    <marker id="arrow-open" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1"/>
+    </marker>
+    <marker id="triangle-hollow" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L13,7 L1,13 Z" fill="#fff" stroke="#000" stroke-width="1"/>
+    </marker>
+    <marker id="diamond-filled" markerWidth="18" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,6 L9,1 L17,6 L9,11 Z" fill="#000" stroke="#000" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="40" y="-91" width="369" height="89"/>
+    <rect data-type="Class" data-name="Class3" x="40" y="50" width="127" height="118"/>
+    <rect data-type="Class" data-name="Class0" x="348" y="80" width="127" height="57"/>
+    <rect data-type="Class" data-name="Class1" x="264" y="245" width="127" height="57"/>
+    <rect data-type="Class" data-name="Class2" x="435" y="245" width="127" height="57"/>
+    <rect data-type="Class" data-name="Class4" x="54" y="261" width="100" height="72"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="Generalization" data-name="" data-source="Class1" data-target="Class0"
+          d="M328,245 L328,191 L412,191 L412,137" marker-end="url(#triangle-hollow)"/>
+    <path data-type="Generalization" data-name="" data-source="Class2" data-target="Class0"
+          d="M499,245 L499,191 L412,191 L412,137" marker-end="url(#triangle-hollow)"/>
+    <path data-type="Association" data-name="holds" data-source="Class3" data-target="Class4"
+          d="M104,168 L104,261" marker-start="url(#diamond-filled)"/>
+    <path data-type="Association" data-name="calls" data-source="Class3" data-target="Class0"
+          d="M167,109 L348,109" marker-end="url(#arrow-open)"/>
+    <path data-type="Dependency" data-name="uses" data-source="Class4" data-target="Class1"
+          d="M117,333 L117,367 L328,367 L328,302" marker-end="url(#arrow-open)"/>
+    <path data-type="Dependency" data-name="uses" data-source="Class4" data-target="Class2"
+          d="M89,333 L89,404 L499,404 L499,302" marker-end="url(#arrow-open)"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="104" y="66" text-anchor="middle">Class3</text>
+    <text x="412" y="96" text-anchor="middle">Class0</text>
+    <text x="328" y="261" text-anchor="middle">Class1</text>
+    <text x="498" y="261" text-anchor="middle">Class2</text>
+    <text x="104" y="277" text-anchor="middle">Class4</text>
+    <text x="110" y="215">holds</text>
+    <text x="258" y="105" text-anchor="middle">calls</text>
+    <text x="222" y="363" text-anchor="middle">uses</text>
+    <text x="294" y="400" text-anchor="middle">uses</text>
+  </g>
+</svg>

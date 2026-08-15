@@ -7,12 +7,15 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementTypeListDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
+import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
@@ -56,7 +59,14 @@ public class NamedElementTool implements ToolProvider {
                 "Return model element information of the specified named element (specified by ID).",
                 this::getInfo,
                 IdDTO.class,
-                NamedElementDTO.class)
+                NamedElementDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
+                "get_all_named_element_types",
+                "Return the list of all named element type names. Note that \"Unknown\" is excluded from the type names.",
+                this::getAllTypes,
+                NoInputDTO.class,
+                NamedElementTypeListDTO.class)
         );
     }
 
@@ -105,6 +115,17 @@ public class NamedElementTool implements ToolProvider {
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
+    }
+
+    private NamedElementTypeListDTO getAllTypes(NoInputDTO param) throws Exception {
+        log.debug("Get all named element types: {}", param);
+
+        List<String> typeNames = Arrays.stream(NamedElementDTO.Type.values())
+                .filter(type -> type != NamedElementDTO.Type.UNKNOWN)
+                .map(type -> type.typeName)
+                .toList();
+
+        return new NamedElementTypeListDTO(typeNames);
     }
 
     private NamedElementDTO setName(NamedElementWithNameDTO param) throws Exception {

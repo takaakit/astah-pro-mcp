@@ -166,16 +166,9 @@ public class ProjectInfoTool implements ToolProvider {
                 PlantumlDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
-                "retrieve_classifier_relationships_as_puml",
-                "Return the PlantUML code that represents the relationships between the classifiers within the project. When you need to know the relationships between classifiers across the entire project, use this tool. Note that the relationships returned by this tool include only the relationship types; for example, association role names, multiplicities, composition, aggregation, and association names are not included.",
-                this::retrieveClassifiersRelationshipsAsPlantuml,
-                NoInputDTO.class,
-                PlantumlDTO.class),
-
-            ToolSupport.toolDefinitionReturningDto(
-                "get_relationships_as_puml_code",
-                "Return the PlantUML code for a class diagram that shows only the relationships among NamedElements in the Astah project. However, do not include the role names, multiplicities, or composition types of the relationships. If you need that information, retrieve the detail information for each individual relationship. This tool is recommended when you want to understand the overall element relationships in the Astah project.",
-                this::getRelationshipsAsPlantumlCode,
+                "retrieve_relationships_as_puml",
+                "Return the PlantUML code for a class diagram that shows only the relationships among NamedElements in the Astah project. The relationships include associations, nested classes, generalizations, realizations, dependencies, and usages. However, this tool does not include the role names, multiplicities, aggregation kinds (composition and aggregation), or association names of the relationships. If you need that information, retrieve the detail information for each individual relationship. This tool is recommended when you want to understand the overall element relationships in the Astah project.",
+                this::retrieveRelationshipsAsPlantuml,
                 NoInputDTO.class,
                 PlantumlDTO.class)
         );
@@ -305,12 +298,6 @@ public class ProjectInfoTool implements ToolProvider {
         for (INamedElement astahNamedElement : astahNamedElements) {
             IDiagram astahDiagram = (IDiagram) astahNamedElement;
             for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
-                if (astahPresentation.getLabel() == null
-                        || astahPresentation.getID() == null
-                        || astahPresentation.getID().isEmpty()) {
-                    log.debug("Label or ID is invalid: Label={}, ID={}", astahPresentation.getLabel(), astahPresentation.getID());
-                    continue;
-                }
                 labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
             }
         }
@@ -364,12 +351,6 @@ public class ProjectInfoTool implements ToolProvider {
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
         List<LabelIdTypeDTO> labelIdTypeDTOs = new ArrayList<>();
         for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
-            if (astahPresentation.getLabel() == null
-                    || astahPresentation.getID() == null
-                    || astahPresentation.getID().isEmpty()) {
-                log.debug("Label or ID is invalid: Label={}, ID={}", astahPresentation.getLabel(), astahPresentation.getID());
-                continue;
-            }
             labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
         }
 
@@ -786,91 +767,17 @@ public class ProjectInfoTool implements ToolProvider {
         return plantumlCode.toString();
     }
 
-    private PlantumlDTO retrieveClassifiersRelationshipsAsPlantuml(NoInputDTO param) throws Exception {
-        log.debug("Retrieve classifiers relationships as PlantUML: {}", param);
-
-        StringBuilder plantumlCode = new StringBuilder();
-        plantumlCode.append("@startuml").append("\n");
-
-        // Sort the classifiers by their full namespace
-        INamedElement[] astahNamedElements = projectAccessor.findElements(IClass.class);
-        Arrays.sort(astahNamedElements, Comparator.comparing(
-            element -> element.getFullNamespace(".") != null ? element.getFullNamespace(".") : "",
-            Comparator.naturalOrder()
-        ));
-
-        for (INamedElement astahNamedElement : astahNamedElements) {
-            IClass astahClass = (IClass)astahNamedElement;
-
-            for (IAttribute astahAttribute : astahClass.getAttributes()) {
-                // Association
-                if (astahAttribute.getAssociation() != null) {
-                    // Both navigabilities are unspecified
-                    if (astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Unspecified")
-                        && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Unspecified")) {
-
-                        if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahClass) {
-                            plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --- ").append("\"" + ((IClass)(astahAttribute.getAssociation().getMemberEnds()[1].getOwner())).getName() + "\"").append("\n");
-                        }
-
-                    // One of the navigabilities is specified
-                    } else {
-
-                        if (astahAttribute.getAssociation().getMemberEnds()[0].getOwner() == astahClass
-                            && astahAttribute.getAssociation().getMemberEnds()[0].getNavigability().equals("Navigable")) {
-                            plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --> ").append("\"" + ((IClass)(astahAttribute.getAssociation().getMemberEnds()[1].getOwner())).getName() + "\"").append("\n");
-                        }
-
-                        if (astahAttribute.getAssociation().getMemberEnds()[1].getOwner() == astahClass
-                            && astahAttribute.getAssociation().getMemberEnds()[1].getNavigability().equals("Navigable")) {
-                            plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --> ").append("\"" + ((IClass)(astahAttribute.getAssociation().getMemberEnds()[0].getOwner())).getName() + "\"").append("\n");
-                        }
-                    }
-                }
-            }
-
-            // Realization
-            for (IRealization astahRealization : astahClass.getClientRealizations()) {
-                if (astahRealization.getSupplier() != null) {
-                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" ..|> ").append("\"" + astahRealization.getSupplier().getName() + "\"").append("\n");
-                }
-            }
-
-            // Generalization
-            for (IGeneralization astahGeneralization : astahClass.getGeneralizations()) {
-                if (astahGeneralization.getSuperType() != null) {
-                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" --|> ").append("\"" + astahGeneralization.getSuperType().getName() + "\"").append("\n");
-                }
-            }
-
-            // Dependency
-            for (IDependency astahDependency : astahClass.getClientDependencies()) {
-                if (astahDependency.getSupplier() != null) {
-                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" ..> ").append("\"" + astahDependency.getSupplier().getName() + "\"").append("\n");
-                }
-            }
-
-            // Usage
-            for (IUsage astahUsage : astahClass.getClientUsages()) {
-                if (astahUsage.getSupplier() != null) {
-                    plantumlCode.append("\"" + astahClass.getName() + "\"").append(" ..> ").append("\"" + astahUsage.getSupplier().getName() + "\"").append("\n");
-                }
-            }
-        }
-
-        plantumlCode.append("@enduml").append("\n");
-        log.debug("Classifiers relationships as PlantUML: {}", plantumlCode.toString());
-
-        return new PlantumlDTO(plantumlCode.toString());
-    }
-
-    private PlantumlDTO getRelationshipsAsPlantumlCode(NoInputDTO param) throws Exception {
-        log.debug("Get relationships as PlantUML code: {}", param);
+    private PlantumlDTO retrieveRelationshipsAsPlantuml(NoInputDTO param) throws Exception {
+        log.debug("Retrieve relationships as PlantUML: {}", param);
 
         StringBuilder plantumlCode = new StringBuilder("@startuml\n");
 
         List<INamedElement> namedElements = new ArrayList<>(Arrays.asList(projectAccessor.findElements(INamedElement.class)));
         namedElements.sort(Comparator.comparing(element -> element.getFullName(".")));
+
+        // An association is reachable from the attributes of the classes on both of its ends,
+        // so keep track of the associations that have already been added to avoid duplicates.
+        Set<String> addedAssociationIds = new LinkedHashSet<>();
 
         for (INamedElement namedElement : namedElements) {
             if (namedElement.getName().isEmpty()) {
@@ -883,6 +790,47 @@ public class ProjectInfoTool implements ToolProvider {
                     plantumlCode.append("\"").append(namedElement.getFullName(".")).append("\"")
                             .append(" +-- ")
                             .append("\"").append(nestedClass.getFullName(".")).append("\"\n");
+                }
+
+                // Add associations
+                for (IAttribute attribute : ((IClass) namedElement).getAttributes()) {
+                    IAssociation association = attribute.getAssociation();
+                    if (association == null) {
+                        continue;
+                    }
+
+                    if (!addedAssociationIds.add(association.getId())) {
+                        continue;
+                    }
+
+                    IAttribute associationEndA = association.getMemberEnds()[0];
+                    IAttribute associationEndB = association.getMemberEnds()[1];
+
+                    // The type of an association end is the class placed on that end
+                    IClass classOnAssociationEndA = associationEndA.getType();
+                    IClass classOnAssociationEndB = associationEndB.getType();
+                    if (classOnAssociationEndA == null || classOnAssociationEndB == null) {
+                        continue;
+                    }
+
+                    // An arrowhead is placed on the navigable end
+                    boolean isAssociationEndANavigable = "Navigable".equals(associationEndA.getNavigability());
+                    boolean isAssociationEndBNavigable = "Navigable".equals(associationEndB.getNavigability());
+
+                    String arrow;
+                    if (isAssociationEndANavigable && isAssociationEndBNavigable) {
+                        arrow = " <--> ";
+                    } else if (isAssociationEndANavigable) {
+                        arrow = " <-- ";
+                    } else if (isAssociationEndBNavigable) {
+                        arrow = " --> ";
+                    } else {
+                        arrow = " --- ";
+                    }
+
+                    plantumlCode.append("\"").append(classOnAssociationEndA.getFullName(".")).append("\"")
+                            .append(arrow)
+                            .append("\"").append(classOnAssociationEndB.getFullName(".")).append("\"\n");
                 }
 
                 // Add inheritances

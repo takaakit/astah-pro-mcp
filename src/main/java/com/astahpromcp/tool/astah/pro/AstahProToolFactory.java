@@ -7,6 +7,7 @@ import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.editor.*;
 import com.astahpromcp.tool.astah.pro.guide.*;
 import com.astahpromcp.tool.astah.pro.image.*;
+import com.astahpromcp.tool.astah.pro.preliminary.*;
 import com.astahpromcp.tool.astah.pro.review.*;
 import com.astahpromcp.tool.astah.pro.script.*;
 import com.astahpromcp.tool.astah.pro.model.*;
@@ -60,7 +61,9 @@ public class AstahProToolFactory {
             AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
             DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
             ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
-            ImageCaptureSupport imageCaptureSupport = new ImageCaptureSupport(astahProToolSupport, imageOutputDir);
+            SystemPropertySupport systemPropertySupport = new SystemPropertySupport();
+            ImageCaptureSupport imageCaptureSupport = new ImageCaptureSupport(astahProToolSupport, systemPropertySupport, imageOutputDir);
+            SvgOverlaySupport svgOverlaySupport = new SvgOverlaySupport(imageCaptureSupport, imageConvertSupport, systemPropertySupport);
             TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
 
             List<ToolProvider> providers = new ArrayList<>();
@@ -73,7 +76,7 @@ public class AstahProToolFactory {
             providers.add(new DiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageConvertSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new StructureDiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageCaptureSupport, includeEditorTools));
             providers.add(new CommentTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
-            providers.add(new DiagramTool(projectAccessor, transactionSupport, astahProToolSupport, imageOutputDir, includeEditorTools));
+            providers.add(new DiagramTool(projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport, imageOutputDir, includeEditorTools));
             providers.add(new ElementTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new ConstraintTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new LinkPresentationTool(projectAccessor, transactionSupport, astahProToolSupport, imageCaptureSupport, includeEditorTools));
@@ -86,6 +89,8 @@ public class AstahProToolFactory {
             providers.add(new DiagramLayoutLintTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new TerminologyConsistencyTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
             providers.add(new DiagramConsistencyTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
+            providers.add(new PreliminaryLayoutTool(includeEditorTools));
+            providers.add(new SvgOverlayTool(svgOverlaySupport));
             
             // The view managers are available only inside the running Astah GUI (plugin environment).
             try {
@@ -138,6 +143,7 @@ public class AstahProToolFactory {
             if (categoryFlags.sequenceDiagramEnabled()) {
                 providers.add(new SequenceDiagramGuideTool());
                 providers.add(new SequenceDiagramEditorTool(projectAccessor, transactionSupport, sequenceDiagramEditor, astahProToolSupport, imageCaptureSupport, includeEditorTools));
+                providers.add(new SequenceDiagramTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
                 providers.add(new CombinedFragmentTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
                 providers.add(new GateTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
                 providers.add(new InteractionOperandTool(projectAccessor, transactionSupport, astahProToolSupport, includeEditorTools));
