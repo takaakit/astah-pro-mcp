@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewAssociationClassPresentationDTO;
@@ -35,45 +35,24 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ClassDiagramEditor.html
 @Slf4j
-public class ClassDiagramEditorTool implements ToolProvider {
+public class ClassDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final ClassDiagramEditor classDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public ClassDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ClassDiagramEditor classDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public ClassDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ClassDiagramEditor classDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.classDiagramEditor = classDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create class diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_class_dgm",
@@ -91,7 +70,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_instance_spec",
-                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created node presentation of the instance specification along with the updated diagram image in low resolution.",
+                "Create an instance specification of the specified class (specified by ID) at the specified point (specified by x and y coordinates) on the specified class diagram (specified by ID), and return the newly created node presentation of the instance specification along with the updated diagram image in low resolution. Set the name to an empty string when the instance specification has no name.",
                 this::createInstanceSpecification,
                 NewInstanceWithPointDTO.class,
                 NodePresentationDTO.class),
@@ -149,7 +128,7 @@ public class ClassDiagramEditorTool implements ToolProvider {
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInstanceSpecification(NewInstanceWithPointDTO param) throws Exception {
         log.debug("Create instance specification: {}", param);
 
-        IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
+        IClass astahClass = astahProToolSupport.getClassOrPrimitiveType(param.targetClassId());
         IClassDiagram astahClassDiagram = astahProToolSupport.getClassDiagram(param.targetDiagramId());
 
         classDiagramEditor.setDiagram(astahClassDiagram);

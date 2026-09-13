@@ -34,8 +34,7 @@ public class PseudostateToolTest {
         tool = new PseudostateTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

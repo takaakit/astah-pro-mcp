@@ -51,8 +51,7 @@ public class NodePresentationToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

@@ -63,8 +63,7 @@ public class ERDiagramEditorToolTest {
             transactionSupport,
             erDiagramEditor,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createERDiagram() method
         createERDiagram = TestSupport.getAccessibleMethod(

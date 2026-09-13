@@ -62,8 +62,7 @@ public class DiagramViewManagerToolTest {
             projectAccessor,
             diagramViewManager,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // openDiagram() method
         openDiagram = TestSupport.getAccessibleMethod(

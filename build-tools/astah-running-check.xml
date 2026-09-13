@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Refuses to build while an Astah that is running this plugin is up. -->
+<project name="astah-running-check" default="check">
+
+    <target name="-init">
+        <condition property="astah.check.skipped">
+            <istrue value="${astah.running.check.skip}"/>
+        </condition>
+    </target>
+
+    <target name="check" depends="-init" unless="astah.check.skipped">
+
+        <fail unless="astah.output.directory">astah.output.directory was not passed to this check.</fail>
+
+        <property environment="env"/>
+
+        <!-- The launcher writes the plugin path with forward slashes, so compare in that form -->
+        <pathconvert property="astah.output.dir.slashes" targetos="unix">
+            <path location="${astah.output.directory}"/>
+        </pathconvert>
+
+        <!-- jps ships with every JDK, so it is there whenever Maven is. Ant properties are immutable, so the first of these that matches wins and the last one is the default. -->
+        <condition property="jps.executable" value="${java.home}/bin/jps.exe">
+            <available file="${java.home}/bin/jps.exe"/>
+        </condition>
+        <condition property="jps.executable" value="${java.home}/bin/jps">
+            <available file="${java.home}/bin/jps" type="file"/>
+        </condition>
+        <property name="jps.executable" value="jps"/>
+
+        <!-- PROBE 1 (authoritative): a JVM started with this project's output directory as its plugin path. Such a process holds the directory open no matter what state the plugin inside it is in, which is exactly the condition that must block the build. -->
+        <exec executable="${jps.executable}" outputproperty="astah.jvm.args"
+              failifexecutionfails="false" resultproperty="astah.jps.exit">
+            <arg value="-v"/>
+        </exec>
+        <condition property="astah.found.jvm">
+            <contains string="${astah.jvm.args}" substring="${astah.output.dir.slashes}" casesensitive="false"/>
+        </condition>
+
+        <!-- PROBE 2 (fallback): the MCP server's own ports, for the case jps is unavailable or cannot see the process. The ports McpServerConfig resolves: the environment variable when it is set, the default otherwise. -->
+        <condition property="astah.port.direct" value="${env.ASTAH_PRO_MCP_PORT_FOR_DIRECT}" else="18888">
+            <isset property="env.ASTAH_PRO_MCP_PORT_FOR_DIRECT"/>
+        </condition>
+        <condition property="astah.port.programmatic" value="${env.ASTAH_PRO_MCP_PORT_FOR_PROGRAMMATIC}" else="8888">
+            <isset property="env.ASTAH_PRO_MCP_PORT_FOR_PROGRAMMATIC"/>
+        </condition>
+        <condition property="astah.found.port">
+            <or>
+                <socket server="127.0.0.1" port="${astah.port.direct}"/>
+                <socket server="127.0.0.1" port="${astah.port.programmatic}"/>
+            </or>
+        </condition>
+
+        <condition property="astah.evidence" value="a running JVM has ${astah.output.dir.slashes} as its plugin path">
+            <isset property="astah.found.jvm"/>
+        </condition>
+        <property name="astah.evidence"
+                  value="one of the MCP server ports (${astah.port.direct}, ${astah.port.programmatic}) is accepting connections"/>
+
+        <condition property="astah.is.running">
+            <or>
+                <isset property="astah.found.jvm"/>
+                <isset property="astah.found.port"/>
+            </or>
+        </condition>
+
+        <fail if="astah.is.running">
+
+======================================================================
+ Astah is running. Refusing to build.
+
+ Evidence: ${astah.evidence}.
+
+ Astah executes this plugin straight out of target/classes, so building
+ now would either wipe that directory and leave Astah with a classpath
+ that fails on the next class it loads, or overwrite the classes Astah
+ is running and mix old code with new.
+
+ Exit Astah, then build again:   astah-build
+ Start it back up afterwards:    astah-launch
+
+ To build anyway:                -Dastah.running.check.skip=true
+======================================================================
+        </fail>
+    </target>
+</project>

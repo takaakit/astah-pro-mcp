@@ -6,7 +6,7 @@ public record NewLostMessageDTO(
     @JsonPropertyDescription("Target sequence diagram identifier")
     String targetSequenceDiagramId,
     
-    @JsonPropertyDescription("New lost message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name.")
+    @JsonPropertyDescription("New lost message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name. Set this to an empty string when the lost message has no name.")
     String newLostMessageName,
     
     @JsonPropertyDescription("Sender node presentation identifier. Must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.")

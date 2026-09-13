@@ -7,7 +7,7 @@ public record NewIncludeDTO(
 
     @JsonPropertyDescription("Included usecase identifier") String includedUsecaseId,
 
-    @JsonPropertyDescription("New include name")
+    @JsonPropertyDescription("New include name. Set this to an empty string when the include has no name.")
     String newIncludeName
 ) {
 }

@@ -42,8 +42,7 @@ public class ERIndexToolTest {
         tool = new ERIndexTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

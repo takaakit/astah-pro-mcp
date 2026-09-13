@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.project;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class ProjectInfoTool implements ToolProvider {
+public class ProjectInfoTool extends AstahToolProvider {
 
     private static final int CHUNK_SIZE = 400;
     private static final long CHUNK_CACHE_TTL_NANOS = TimeUnit.SECONDS.toNanos(180);
@@ -45,34 +45,17 @@ public class ProjectInfoTool implements ToolProvider {
     private final Object nameCacheLock = new Object();
     private final Object labelCacheLock = new Object();
     private final Object definitionCacheLock = new Object();
-    private final boolean includeEditTools;
 
-    public ProjectInfoTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ProjectInfoTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.astahProToolSupport = astahProToolSupport;
         this.nameIdTypeDTOChunksCache = new ArrayList<>();
         this.labelIdTypeDTOChunksCache = new ArrayList<>();
         this.definitionNameIdTypeDTOChunksCache = new ArrayList<>();
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create project info tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_named_elements",
@@ -172,10 +155,6 @@ public class ProjectInfoTool implements ToolProvider {
                 NoInputDTO.class,
                 PlantumlDTO.class)
         );
-    }
-
-    private List<ToolDefinition> createEditTools() {
-        return List.of();
     }
 
     private AllNameIdTypeInfoDTO getAllNamedElements(NoInputDTO param) throws Exception {

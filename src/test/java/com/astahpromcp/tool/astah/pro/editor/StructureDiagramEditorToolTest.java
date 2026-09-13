@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -49,8 +50,7 @@ public class StructureDiagramEditorToolTest {
             transactionSupport,
             astahProToolSupport,
             diagramEditorSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createNodePresentation() method
         createNodePresentation = TestSupport.getAccessibleMethod(
@@ -105,17 +105,18 @@ public class StructureDiagramEditorToolTest {
     }
 
     @Test
-    void createLinkPresentation_ok() throws Exception {
+    void createLinkPresentation_ok_1() throws Exception {
         // Get class diagram
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
 
         // Get association
-        IAssociation association = (IAssociation) TestSupport.instance().getNamedElementByClassAndName(
-            IAssociation.class,
-            "");
-        
+        IClass classBarModel = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Bar");
+        IAssociation association = classBarModel.getAttributes()[0].getAssociation();
+
         // Get class (source node presentation)
         INodePresentation classBar = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
@@ -144,5 +145,46 @@ public class StructureDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void createLinkPresentation_ok_2() throws Exception {
+        // Get composite structure diagram
+        ICompositeStructureDiagram compositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Composite Structure Diagram0");
+
+        // Get connector
+        IConnector connector = (IConnector) TestSupport.instance().getNamedElementByClassAndName(
+            IConnector.class,
+            "");
+
+        // Get parts
+        INodePresentation part0 = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Part",
+            "Part0");
+        INodePresentation part1 = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Part",
+            "Part1");
+
+        // Create input DTO
+        NewLinkPresentationDTO inputDTO = new NewLinkPresentationDTO(
+            compositeStructureDiagram.getId(),
+            connector.getId(),
+            part0.getID(),
+            part1.getID());
+
+        // ----------------------------------------
+        // Call createLinkPresentation()
+        // ----------------------------------------
+        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createLinkPresentation,
+            tool,
+            inputDTO,
+            LinkPresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(connector.getId(), outputDTO.presentation().correspondingModelElement().id());
     }
 }

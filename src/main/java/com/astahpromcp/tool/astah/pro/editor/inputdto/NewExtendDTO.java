@@ -9,7 +9,7 @@ public record NewExtendDTO(
     @JsonPropertyDescription("Extended usecase identifier")
     String extendedUsecaseId,
 
-    @JsonPropertyDescription("New extend name")
+    @JsonPropertyDescription("New extend name. Set this to an empty string when the extend has no name.")
     String newExtendName
 ) {
 }

@@ -43,8 +43,7 @@ public class StateToolTest {
         tool = new StateTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // Methods
         getInfo = TestSupport.getAccessibleMethod(

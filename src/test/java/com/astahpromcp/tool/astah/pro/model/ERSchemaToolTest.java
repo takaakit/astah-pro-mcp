@@ -34,8 +34,7 @@ public class ERSchemaToolTest {
         tool = new ERSchemaTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

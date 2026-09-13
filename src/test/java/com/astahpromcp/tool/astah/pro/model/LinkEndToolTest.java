@@ -40,8 +40,7 @@ public class LinkEndToolTest {
         tool = new LinkEndTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

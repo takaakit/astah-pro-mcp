@@ -67,8 +67,7 @@ public class MindmapEditorToolTest {
             mindmapEditor,
             astahProToolSupport,
             imageConvertSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createMindmapDiagram() method
         createMindmapDiagram = TestSupport.getAccessibleMethod(

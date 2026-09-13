@@ -63,8 +63,7 @@ public class ProjectInfoToolTest {
         // Tool
         tool = new ProjectInfoTool(
             projectAccessor,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getAllNamedElements() method
         getAllNamedElements = TestSupport.getAccessibleMethod(

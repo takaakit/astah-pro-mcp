@@ -1,0 +1,485 @@
+# category                   	name                                               	direct	programmatic
+#
+# This file is the only record of which tools each profile publishes.
+# One row per tool. 'x' publishes the tool to that profile, '-' withholds it.
+#
+#   direct       = port 18888, the direct tool calling mode
+#   programmatic = port 8888, published directly on the programmatic tool calling mode
+
+Common                       	add_file_path_hyperlink_to_named_elem              	x	-
+Common                       	add_file_path_hyperlink_to_node_prst               	x	-
+Common                       	add_named_element_hyperlink_to_named_elem          	x	-
+Common                       	add_named_element_hyperlink_to_node_prst           	x	-
+Common                       	add_stereotype                                     	x	-
+Common                       	add_url_hyperlink_to_named_elem                    	x	-
+Common                       	add_url_hyperlink_to_node_prst                     	x	-
+Common                       	architectural_design_smells                        	x	x
+Common                       	astah_api_script_guide                             	x	x
+Common                       	astah_pro_mcp_guide                                	x	x
+Common                       	bring_prsts_to_front                               	x	x
+Common                       	capture_astah_window                               	x	x
+Common                       	capture_dgm_img                                    	x	x
+Common                       	center_prst_in_dgm                                 	x	-
+Common                       	change_fill_color                                  	x	-
+Common                       	change_font_color                                  	x	-
+Common                       	change_line_color                                  	x	-
+Common                       	change_parent                                      	x	-
+Common                       	change_tagged_val                                  	x	-
+Common                       	close_dgm                                          	x	x
+Common                       	create_artifact                                    	x	-
+Common                       	create_asso                                        	x	-
+Common                       	create_asso_class                                  	x	-
+Common                       	create_attr                                        	x	-
+Common                       	create_class_in_parent_class                       	x	-
+Common                       	create_class_in_parent_pkg                         	x	-
+Common                       	create_component                                   	x	-
+Common                       	create_constraint                                  	x	-
+Common                       	create_copy_dep                                    	x	-
+Common                       	create_dep                                         	x	-
+Common                       	create_derive_req_dep                              	x	-
+Common                       	create_enum_in_parent_pkg                          	x	-
+Common                       	create_enum_literal                                	x	-
+Common                       	create_gen                                         	x	-
+Common                       	create_interface_in_parent_class                   	x	-
+Common                       	create_interface_in_parent_pkg                     	x	-
+Common                       	create_link_prst_on_dgm                            	x	-
+Common                       	create_nesting_link_prst_on_dgm                    	x	-
+Common                       	create_node_prst_on_dgm                            	x	-
+Common                       	create_note                                        	x	-
+Common                       	create_note_anchor                                 	x	-
+Common                       	create_ope                                         	x	-
+Common                       	create_param                                       	x	-
+Common                       	create_pkg_in_parent_pkg                           	x	-
+Common                       	create_port                                        	x	-
+Common                       	create_proj                                        	x	-
+Common                       	create_qualifier                                   	x	-
+Common                       	create_real                                        	x	-
+Common                       	create_refine_dep                                  	x	-
+Common                       	create_req_in_parent_pkg                           	x	-
+Common                       	create_req_in_parent_req                           	x	-
+Common                       	create_satisfy_dep                                 	x	-
+Common                       	create_tagged_val                                  	x	-
+Common                       	create_template_param                              	x	-
+Common                       	create_test_case_in_parent_pkg                     	x	-
+Common                       	create_test_case_in_parent_test_case               	x	-
+Common                       	create_trace_dep                                   	x	-
+Common                       	create_usage                                       	x	-
+Common                       	create_verify_dep                                  	x	-
+Common                       	crop_dgm_img                                       	x	x
+Common                       	delete_dgm                                         	x	-
+Common                       	delete_elem                                        	x	-
+Common                       	delete_prst                                        	x	-
+Common                       	detect_overlap                                     	x	x
+Common                       	dgm_layout_anti_patterns                           	x	x
+Common                       	dgm_layout_guide                                   	x	x
+Common                       	diagram_consistency_maintenance_steps              	x	x
+Common                       	export_dgm_png_img                                 	x	-
+Common                       	find_named_elements_by_name                        	x	-
+Common                       	generate_dgm_img_from_puml                         	x	x
+Common                       	generate_graph_img_from_dot                        	x	x
+Common                       	get_all_constraints_and_conditions                 	x	-
+Common                       	get_all_prst_types                                 	x	x
+Common                       	get_all_tools_callable_from_mcp_tool_script        	-	x
+Common                       	get_astah_pro_mcp_version                          	x	x
+Common                       	get_chunk_of_all_definitions                       	x	-
+Common                       	get_chunk_of_all_named_elements                    	x	-
+Common                       	get_chunk_of_all_prsts                             	x	-
+Common                       	get_chunk_of_astah_pro_user_guide                  	x	x
+Common                       	get_chunk_of_color_palette_guide                   	x	x
+Common                       	get_chunk_of_conceptual_model_conventions          	x	x
+Common                       	get_chunk_of_ddd_reference                         	x	x
+Common                       	get_chunk_of_object_relational_impedance_mismatch  	x	x
+Common                       	get_chunk_of_ocl_spec                              	x	x
+Common                       	get_chunk_of_puml_guide                            	x	x
+Common                       	get_chunk_of_systems_engineering                   	x	x
+Common                       	get_comment_info                                   	x	-
+Common                       	get_constraint_info                                	x	-
+Common                       	get_current_dgm                                    	x	x
+Common                       	get_dgm_info                                       	x	-
+Common                       	get_dgm_rectangle                                  	x	-
+Common                       	get_dgms_of_element                                	x	-
+Common                       	get_element_of_prst                                	x	-
+Common                       	get_highlighted_prsts_within_dgm                   	x	x
+Common                       	get_info_of_all_definitions                        	x	-
+Common                       	get_info_of_all_named_elements                     	x	-
+Common                       	get_info_of_all_prsts                              	x	-
+Common                       	get_info_of_astah_log                              	x	x
+Common                       	get_info_of_astah_pro_user_guide                   	x	x
+Common                       	get_info_of_color_palette_guide                    	x	x
+Common                       	get_info_of_conceptual_model_conventions           	x	x
+Common                       	get_info_of_ddd_reference                          	x	x
+Common                       	get_info_of_dgm_prsts                              	x	-
+Common                       	get_info_of_mcp_server_log                         	x	x
+Common                       	get_info_of_object_relational_impedance_mismatch   	x	x
+Common                       	get_info_of_ocl_spec                               	x	x
+Common                       	get_info_of_puml_guide                             	x	x
+Common                       	get_info_of_systems_engineering                    	x	x
+Common                       	get_info_of_tools_callable_from_mcp_tool_script    	-	x
+Common                       	get_link_prst_info                                 	x	-
+Common                       	get_mcp_tool_script_example                        	-	x
+Common                       	get_node_info                                      	x	-
+Common                       	get_node_prst_rectangle                            	x	-
+Common                       	get_proj                                           	x	-
+Common                       	get_proj_path                                      	x	x
+Common                       	get_prsts_on_dgm                                   	x	-
+Common                       	get_selected_elements                              	x	x
+Common                       	get_selected_prst                                  	x	x
+Common                       	get_workspace_dir_path                             	x	x
+Common                       	get_zoom_factor                                    	x	-
+Common                       	highlight_prst                                     	x	x
+Common                       	insert_jpg_img_on_dgm                              	x	-
+Common                       	insert_png_img_on_dgm                              	x	-
+Common                       	insert_rect_on_dgm                                 	x	-
+Common                       	insert_svg_img_on_dgm                              	x	x
+Common                       	insert_txt_on_dgm                                  	x	-
+Common                       	is_proj_modified                                   	x	x
+Common                       	is_proj_opened                                     	x	x
+Common                       	mcp_tool_script_guide                              	-	x
+Common                       	open_dgm                                           	x	x
+Common                       	open_proj                                          	x	-
+Common                       	overlay_svg_img_on_dgm_img                         	x	x
+Common                       	preliminary_layout_steps                           	x	x
+Common                       	read_architectural_design_smells                   	x	x
+Common                       	read_uml_modeling_architecture_insights            	x	x
+Common                       	remove_all_file_path_hyperlinks_from_named_elem    	x	-
+Common                       	remove_all_file_path_hyperlinks_from_node_prst     	x	-
+Common                       	remove_all_named_elem_hyperlinks_from_named_elem   	x	-
+Common                       	remove_all_named_elem_hyperlinks_from_node_prst    	x	-
+Common                       	remove_all_url_hyperlinks_from_named_elem          	x	-
+Common                       	remove_all_url_hyperlinks_from_node_prst           	x	-
+Common                       	remove_stereotype                                  	x	-
+Common                       	retrieve_classifiers_that_ref_or_be_refed_by       	x	-
+Common                       	retrieve_classifiers_within_pkg                    	x	-
+Common                       	retrieve_pkg_structure_as_puml                     	x	x
+Common                       	retrieve_relationships_as_puml                     	x	x
+Common                       	run_astah_api_script                               	x	x
+Common                       	run_mcp_tool_script                                	-	x
+Common                       	save_proj                                          	x	x
+Common                       	save_proj_as                                       	x	x
+Common                       	search_within_named_elements                       	x	-
+Common                       	search_within_prsts                                	x	-
+Common                       	select_all_prsts                                   	x	x
+Common                       	select_prsts                                       	x	x
+Common                       	send_prsts_to_back                                 	x	x
+Common                       	set_label                                          	x	-
+Common                       	set_line_style_of_link_prst                        	x	-
+Common                       	set_node_prst_height                               	x	-
+Common                       	set_node_prst_location                             	x	-
+Common                       	set_node_prst_width                                	x	-
+Common                       	set_points_of_link_prst                            	x	-
+Common                       	set_specification_of_constraint                    	x	-
+Common                       	set_type_modifier                                  	x	-
+Common                       	show_in_property_view                              	x	x
+Common                       	show_in_structure_tree                             	x	x
+Common                       	store_architectural_design_smells                  	x	x
+Common                       	store_uml_modeling_architecture_insights           	x	x
+Common                       	terminology_consistency_maintenance_steps          	x	x
+Common                       	uml_modeling_architecture_insights                 	x	x
+Common                       	unhighlight_prst                                   	x	x
+Common                       	unselect_all_prsts                                 	x	x
+Common                       	zoom                                               	x	x
+Common                       	zoom_fit                                           	x	x
+
+Class Diagram                	add_invariant_to_class                             	x	-
+Class Diagram                	add_ope_postcond                                   	x	-
+Class Diagram                	add_ope_precond                                    	x	-
+Class Diagram                	class_dgm_guide                                    	x	x
+Class Diagram                	create_asso_class_prst                             	x	-
+Class Diagram                	create_class_dgm                                   	x	-
+Class Diagram                	create_instance_spec                               	x	-
+Class Diagram                	create_link_between_instance_specs                 	x	-
+Class Diagram                	get_all_named_element_types                        	x	x
+Class Diagram                	get_asso_class_info                                	x	-
+Class Diagram                	get_asso_end_a_info                                	x	-
+Class Diagram                	get_asso_end_b_info                                	x	-
+Class Diagram                	get_asso_info                                      	x	-
+Class Diagram                	get_attr_info                                      	x	-
+Class Diagram                	get_class_info                                     	x	-
+Class Diagram                	get_dep_info                                       	x	-
+Class Diagram                	get_enum_info                                      	x	-
+Class Diagram                	get_generalization_info                            	x	-
+Class Diagram                	get_instance_spec_info                             	x	-
+Class Diagram                	get_named_element_info                             	x	-
+Class Diagram                	get_ope_info                                       	x	-
+Class Diagram                	get_pkg_info                                       	x	-
+Class Diagram                	get_real_info                                      	x	-
+Class Diagram                	get_slot_info                                      	x	-
+Class Diagram                	get_usage_info                                     	x	-
+Class Diagram                	remove_invariant_from_class                        	x	-
+Class Diagram                	remove_ope_bodycond                                	x	-
+Class Diagram                	remove_ope_postcond                                	x	-
+Class Diagram                	remove_ope_precond                                 	x	-
+Class Diagram                	set_abstract_of_class                              	x	-
+Class Diagram                	set_abstract_of_ope                                	x	-
+Class Diagram                	set_active_of_class                                	x	-
+Class Diagram                	set_aggregation_kind_of_asso_end_a                 	x	-
+Class Diagram                	set_aggregation_kind_of_asso_end_b                 	x	-
+Class Diagram                	set_alias1                                         	x	-
+Class Diagram                	set_alias2                                         	x	-
+Class Diagram                	set_classifier_to_instance_spec                    	x	-
+Class Diagram                	set_definition                                     	x	-
+Class Diagram                	set_init_val_of_asso_end_a                         	x	-
+Class Diagram                	set_init_val_of_asso_end_b                         	x	-
+Class Diagram                	set_init_val_of_attr                               	x	-
+Class Diagram                	set_leaf_of_class                                  	x	-
+Class Diagram                	set_leaf_of_ope                                    	x	-
+Class Diagram                	set_multiplicity_of_asso_end_a                     	x	-
+Class Diagram                	set_multiplicity_of_asso_end_b                     	x	-
+Class Diagram                	set_multiplicity_of_attr                           	x	-
+Class Diagram                	set_name                                           	x	-
+Class Diagram                	set_navigability_of_asso_end_a                     	x	-
+Class Diagram                	set_navigability_of_asso_end_b                     	x	-
+Class Diagram                	set_ope_bodycond                                   	x	-
+Class Diagram                	set_return_type_expression_of_ope                  	x	-
+Class Diagram                	set_return_type_of_ope                             	x	-
+Class Diagram                	set_static_of_asso_end_a                           	x	-
+Class Diagram                	set_static_of_asso_end_b                           	x	-
+Class Diagram                	set_static_of_attr                                 	x	-
+Class Diagram                	set_static_of_ope                                  	x	-
+Class Diagram                	set_type_expression_of_attr                        	x	-
+Class Diagram                	set_type_expression_of_param                       	x	-
+Class Diagram                	set_type_of_attr                                   	x	-
+Class Diagram                	set_type_of_param                                  	x	-
+Class Diagram                	set_val_of_enum_literal                            	x	-
+Class Diagram                	set_val_of_slot                                    	x	-
+Class Diagram                	set_visibility                                     	x	-
+
+Sequence Diagram             	add_interaction_operand                            	x	-
+Sequence Diagram             	create_combined_fragment                           	x	-
+Sequence Diagram             	create_create_msg                                  	x	-
+Sequence Diagram             	create_destroy_msg                                 	x	-
+Sequence Diagram             	create_found_msg                                   	x	-
+Sequence Diagram             	create_interaction_use                             	x	-
+Sequence Diagram             	create_lifeline                                    	x	-
+Sequence Diagram             	create_lost_msg                                    	x	-
+Sequence Diagram             	create_msg                                         	x	-
+Sequence Diagram             	create_return_msg                                  	x	-
+Sequence Diagram             	create_seq_dgm                                     	x	-
+Sequence Diagram             	create_termination                                 	x	-
+Sequence Diagram             	get_combined_fragment_info                         	x	-
+Sequence Diagram             	get_gate_info                                      	x	-
+Sequence Diagram             	get_interaction_info                               	x	-
+Sequence Diagram             	get_interaction_operand_info                       	x	-
+Sequence Diagram             	get_interaction_use_info                           	x	-
+Sequence Diagram             	get_lifeline_info                                  	x	-
+Sequence Diagram             	get_link_end_info                                  	x	-
+Sequence Diagram             	get_link_info                                      	x	-
+Sequence Diagram             	get_msg_info                                       	x	-
+Sequence Diagram             	get_seq_dgm_info                                   	x	-
+Sequence Diagram             	seq_dgm_guide                                      	x	x
+Sequence Diagram             	set_aggr_of_link_end                               	x	-
+Sequence Diagram             	set_arg_of_interaction_use                         	x	-
+Sequence Diagram             	set_arg_of_msg                                     	x	-
+Sequence Diagram             	set_async_of_msg                                   	x	-
+Sequence Diagram             	set_base_class_of_lifeline                         	x	-
+Sequence Diagram             	set_combined_fragment_kind                         	x	-
+Sequence Diagram             	set_composition_of_link_end                        	x	-
+Sequence Diagram             	set_guard_of_interaction_operand                   	x	-
+Sequence Diagram             	set_guard_of_msg                                   	x	-
+Sequence Diagram             	set_height_of_interaction_operand                  	x	-
+Sequence Diagram             	set_length_of_lifeline                             	x	-
+Sequence Diagram             	set_navigation_of_link_end                         	x	-
+Sequence Diagram             	set_ope_of_msg                                     	x	-
+Sequence Diagram             	set_return_val_of_msg                              	x	-
+Sequence Diagram             	set_return_val_variable_of_msg                     	x	-
+Sequence Diagram             	set_seq_dgm_to_interaction_use                     	x	-
+
+Activity Diagram             	activity_dgm_guide                                 	x	x
+Activity Diagram             	create_accept_event_act                            	x	-
+Activity Diagram             	create_accept_time_event_act                       	x	-
+Activity Diagram             	create_act                                         	x	-
+Activity Diagram             	create_activity_dgm                                	x	-
+Activity Diagram             	create_activity_param_node                         	x	-
+Activity Diagram             	create_call_behavior_act                           	x	-
+Activity Diagram             	create_connector                                   	x	-
+Activity Diagram             	create_decision_merge_node                         	x	-
+Activity Diagram             	create_dep_between_nodes                           	x	-
+Activity Diagram             	create_final_node                                  	x	-
+Activity Diagram             	create_flow                                        	x	-
+Activity Diagram             	create_flow_final_node                             	x	-
+Activity Diagram             	create_fork_node                                   	x	-
+Activity Diagram             	create_in_or_out_pin                               	x	-
+Activity Diagram             	create_init_node                                   	x	-
+Activity Diagram             	create_join_node                                   	x	-
+Activity Diagram             	create_obj_node                                    	x	-
+Activity Diagram             	create_partition                                   	x	-
+Activity Diagram             	create_process                                     	x	-
+Activity Diagram             	create_send_signal_act                             	x	-
+Activity Diagram             	get_action_info                                    	x	-
+Activity Diagram             	get_activity_dgm_info                              	x	-
+Activity Diagram             	get_activity_info                                  	x	-
+Activity Diagram             	get_activity_node_info                             	x	-
+Activity Diagram             	get_activity_of_activity_dgm                       	x	-
+Activity Diagram             	get_control_node_info                              	x	-
+Activity Diagram             	get_flow_info                                      	x	-
+Activity Diagram             	get_obj_node_info                                  	x	-
+Activity Diagram             	get_partition_info                                 	x	-
+Activity Diagram             	remove_represents_from_partition                   	x	-
+Activity Diagram             	set_action_of_flow                                 	x	-
+Activity Diagram             	set_base_class_of_obj_node                         	x	-
+Activity Diagram             	set_calling_activity_of_action                     	x	-
+Activity Diagram             	set_guard_of_flow                                  	x	-
+Activity Diagram             	set_represents_of_partition                        	x	-
+
+State Machine Diagram        	add_inter_trans_of_state                           	x	-
+State Machine Diagram        	add_region                                         	x	-
+State Machine Diagram        	change_parent_state                                	x	-
+State Machine Diagram        	create_choice_pseudostate                          	x	-
+State Machine Diagram        	create_deep_history_pseudostate                    	x	-
+State Machine Diagram        	create_final_state                                 	x	-
+State Machine Diagram        	create_fork_pseudostate                            	x	-
+State Machine Diagram        	create_init_pseudostate                            	x	-
+State Machine Diagram        	create_join_pseudostate                            	x	-
+State Machine Diagram        	create_junction_pseudostate                        	x	-
+State Machine Diagram        	create_shallow_history_pseudostate                 	x	-
+State Machine Diagram        	create_state                                       	x	-
+State Machine Diagram        	create_state_machine_dgm                           	x	-
+State Machine Diagram        	create_sub_machine_state                           	x	-
+State Machine Diagram        	create_transition                                  	x	-
+State Machine Diagram        	delete_all_inter_trans_of_state                    	x	-
+State Machine Diagram        	delete_region                                      	x	-
+State Machine Diagram        	get_pseudostate_info                               	x	-
+State Machine Diagram        	get_state_info                                     	x	-
+State Machine Diagram        	get_state_machine_dgm_info                         	x	-
+State Machine Diagram        	get_state_machine_info                             	x	-
+State Machine Diagram        	get_transition_info                                	x	-
+State Machine Diagram        	get_vertex_info                                    	x	-
+State Machine Diagram        	set_action_of_transition                           	x	-
+State Machine Diagram        	set_do_act_of_state                                	x	-
+State Machine Diagram        	set_entry_of_state                                 	x	-
+State Machine Diagram        	set_event_of_transition                            	x	-
+State Machine Diagram        	set_exit_of_state                                  	x	-
+State Machine Diagram        	set_guard_of_transition                            	x	-
+State Machine Diagram        	state_machine_dgm_guide                            	x	x
+
+Use Case Diagram             	create_actor                                       	x	-
+Use Case Diagram             	create_extend                                      	x	-
+Use Case Diagram             	create_extension_point                             	x	-
+Use Case Diagram             	create_include                                     	x	-
+Use Case Diagram             	create_usecase                                     	x	-
+Use Case Diagram             	create_usecase_dgm                                 	x	-
+Use Case Diagram             	get_extend_info                                    	x	-
+Use Case Diagram             	get_include_info                                   	x	-
+Use Case Diagram             	get_usecase_info                                   	x	-
+Use Case Diagram             	usecase_dgm_guide                                  	x	x
+
+Communication Diagram        	communication_dgm_guide                            	x	x
+Communication Diagram        	get_communication_dgm_info                         	x	-
+Communication Diagram        	get_interaction_of_communication_dgm               	x	-
+Communication Diagram        	get_lifeline_link_info                             	x	-
+
+Composite Structure Diagram  	composite_structure_dgm_guide                      	x	x
+Composite Structure Diagram  	create_composite_structure_dgm                     	x	-
+Composite Structure Diagram  	create_connector_between_parts_and_ports           	x	-
+Composite Structure Diagram  	create_part_prst                                   	x	-
+Composite Structure Diagram  	create_port_prst                                   	x	-
+Composite Structure Diagram  	create_provided_interface_of_port                  	x	-
+Composite Structure Diagram  	create_provided_interface_prst                     	x	-
+Composite Structure Diagram  	create_required_interface_of_port                  	x	-
+Composite Structure Diagram  	create_required_interface_prst                     	x	-
+Composite Structure Diagram  	create_structured_class_prst                       	x	-
+Composite Structure Diagram  	get_connector_info                                 	x	-
+Composite Structure Diagram  	get_port_info                                      	x	-
+Composite Structure Diagram  	set_behavior_of_port                               	x	-
+Composite Structure Diagram  	set_service_of_port                                	x	-
+Composite Structure Diagram  	show_interface_prsts_of_port                       	x	-
+
+Requirement Diagram          	create_req_dgm                                     	x	-
+Requirement Diagram          	get_req_info                                       	x	-
+Requirement Diagram          	get_test_case_info                                 	x	-
+Requirement Diagram          	req_dgm_guide                                      	x	x
+Requirement Diagram          	set_req_id                                         	x	-
+Requirement Diagram          	set_req_text                                       	x	-
+
+ER Diagram                   	er_dgm_guide                                       	x	x
+ER Diagram                   	get_er_attr_info                                   	x	-
+ER Diagram                   	get_er_datatype_info                               	x	-
+ER Diagram                   	get_er_dgm_info                                    	x	-
+ER Diagram                   	get_er_domain_info                                 	x	-
+ER Diagram                   	get_er_entity_info                                 	x	-
+ER Diagram                   	get_er_index_info                                  	x	-
+ER Diagram                   	get_er_model_info                                  	x	-
+ER Diagram                   	get_er_package_info                                	x	-
+ER Diagram                   	get_er_relationship_info                           	x	-
+ER Diagram                   	get_er_schema_info                                 	x	-
+ER Diagram                   	get_er_subtype_relationship_info                   	x	-
+
+Mind Map Diagram             	change_parent_of_topic                             	x	-
+Mind Map Diagram             	change_to_floating_topic                           	x	-
+Mind Map Diagram             	create_floating_topic                              	x	-
+Mind Map Diagram             	create_link_between_topics                         	x	-
+Mind Map Diagram             	create_mind_map_dgm                                	x	-
+Mind Map Diagram             	create_topic                                       	x	-
+Mind Map Diagram             	delete_child_topics                                	x	-
+Mind Map Diagram             	delete_img_from_topic                              	x	-
+Mind Map Diagram             	get_mind_map_dgm_info                              	x	-
+Mind Map Diagram             	insert_jpg_img_into_topic                          	x	-
+Mind Map Diagram             	insert_png_img_into_topic                          	x	-
+Mind Map Diagram             	insert_svg_img_into_topic                          	x	-
+Mind Map Diagram             	mind_map_guide                                     	x	x
+Mind Map Diagram             	move_topic_within_sibling_order                    	x	-
+Mind Map Diagram             	set_boundary_of_topic                              	x	-
+
+#@withheld
+# The tools below are deliberately published on no profile at all.
+#
+# ER: the editing tools are withheld because there are too many of them and publishing them may affect the existing tools
+
+ER Diagram                   	add_er_attr_to_er_index                            	-	-
+ER Diagram                   	create_er_attr_in_er_entity                        	-	-
+ER Diagram                   	create_er_datatype_in_er_model                     	-	-
+ER Diagram                   	create_er_dgm                                      	-	-
+ER Diagram                   	create_er_domain_in_er_domain                      	-	-
+ER Diagram                   	create_er_domain_in_er_model                       	-	-
+ER Diagram                   	create_er_entity_in_parent_er_pkg                  	-	-
+ER Diagram                   	create_er_index_of_er_attr                         	-	-
+ER Diagram                   	create_er_model_in_project                         	-	-
+ER Diagram                   	create_er_pkg_in_parent_er_pkg                     	-	-
+ER Diagram                   	create_identifying_relationship                    	-	-
+ER Diagram                   	create_link_prst_on_er_dgm                         	-	-
+ER Diagram                   	create_many_to_many_relationship                   	-	-
+ER Diagram                   	create_node_prst_on_er_dgm                         	-	-
+ER Diagram                   	create_non_identifying_relationship                	-	-
+ER Diagram                   	create_subtype_relationship                        	-	-
+ER Diagram                   	create_subtype_relationship_group_on_er_dgm        	-	-
+ER Diagram                   	delete_er_model_or_er_elem                         	-	-
+ER Diagram                   	remove_er_attr_from_er_index                       	-	-
+ER Diagram                   	set_align_er_attr_items_of_er_dgm                  	-	-
+ER Diagram                   	set_cardinality_of_er_relationship                 	-	-
+ER Diagram                   	set_child_verb_phrase_of_er_relationship           	-	-
+ER Diagram                   	set_conclusive_of_er_subtype_relationship          	-	-
+ER Diagram                   	set_default_length_precision_of_er_datatype        	-	-
+ER Diagram                   	set_default_value_of_er_attr                       	-	-
+ER Diagram                   	set_default_value_of_er_domain                     	-	-
+ER Diagram                   	set_description_of_er_datatype                     	-	-
+ER Diagram                   	set_discriminator_attr_of_er_subtype_relationship  	-	-
+ER Diagram                   	set_er_datatype_of_er_attr                         	-	-
+ER Diagram                   	set_er_datatype_of_er_domain                       	-	-
+ER Diagram                   	set_er_domain_of_er_attr                           	-	-
+ER Diagram                   	set_er_index_of_er_relationship                    	-	-
+ER Diagram                   	set_initial_display_level_of_er_dgm                	-	-
+ER Diagram                   	set_key_of_er_index                                	-	-
+ER Diagram                   	set_length_constraint_of_er_datatype               	-	-
+ER Diagram                   	set_length_precision_of_er_attr                    	-	-
+ER Diagram                   	set_length_precision_of_er_domain                  	-	-
+ER Diagram                   	set_logical_name_of_er_attr                        	-	-
+ER Diagram                   	set_logical_name_of_er_domain                      	-	-
+ER Diagram                   	set_logical_name_of_er_entity                      	-	-
+ER Diagram                   	set_logical_name_of_er_relationship                	-	-
+ER Diagram                   	set_logical_name_of_er_subtype_relationship        	-	-
+ER Diagram                   	set_model_type_of_er_dgm                           	-	-
+ER Diagram                   	set_not_null_of_er_attr                            	-	-
+ER Diagram                   	set_not_null_of_er_domain                          	-	-
+ER Diagram                   	set_notation_of_er_dgm                             	-	-
+ER Diagram                   	set_parent_er_domain_of_er_domain                  	-	-
+ER Diagram                   	set_parent_required_of_er_relationship             	-	-
+ER Diagram                   	set_parent_verb_phrase_of_er_relationship          	-	-
+ER Diagram                   	set_physical_name_of_er_attr                       	-	-
+ER Diagram                   	set_physical_name_of_er_domain                     	-	-
+ER Diagram                   	set_physical_name_of_er_entity                     	-	-
+ER Diagram                   	set_physical_name_of_er_relationship               	-	-
+ER Diagram                   	set_physical_name_of_er_subtype_relationship       	-	-
+ER Diagram                   	set_precision_constraint_of_er_datatype            	-	-
+ER Diagram                   	set_primary_key_of_er_attr                         	-	-
+ER Diagram                   	set_type_of_er_entity                              	-	-
+ER Diagram                   	set_unique_of_er_index                             	-	-

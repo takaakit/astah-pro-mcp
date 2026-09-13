@@ -252,6 +252,25 @@ class McpClientApprovalServletTest {
     }
 
     @Test
+    void buildDialogMessage_ok_namesTheClientPortAndTheServerPort() {
+        // The plugin listens on one port per profile, so the dialog must say which of them the client reached, not only where the client came from.
+        when(request.getHeader("Mcp-Session-Id")).thenReturn(null);
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(request.getRemotePort()).thenReturn(51325);
+        when(request.getRemoteHost()).thenReturn("localhost");
+        when(request.getLocalPort()).thenReturn(18888);
+        when(request.getHeader("User-Agent")).thenReturn("Test-Agent");
+
+        String message = servlet.buildDialogMessage(McpClientApprovalServlet.RequestContext.from(request));
+
+        assertTrue(message.contains("Client address: 127.0.0.1"), message);
+        assertTrue(message.contains("Client host: localhost"), message);
+        assertTrue(message.contains("Client port: 51325"), message);
+        assertTrue(message.contains("Server port: 18888"), message);
+        assertTrue(message.contains("User-Agent: Test-Agent"), message);
+    }
+
+    @Test
     void service_ok_allowsRequestForDefaultIpv6LoopbackOrigin() throws Exception {
         servlet = new McpClientApprovalServlet(delegate, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
 

@@ -40,8 +40,7 @@ public class EREntityToolTest {
         tool = new EREntityTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

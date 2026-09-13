@@ -12,7 +12,7 @@ public record NewDependencyDTO(
     @JsonPropertyDescription("Supplier node presentation identifier")
     String supplierNodePresentationId,
 
-    @JsonPropertyDescription("New dependency name")
+    @JsonPropertyDescription("New dependency name. Set this to an empty string when the dependency has no name.")
     String newDependencyName
 ) {
 }

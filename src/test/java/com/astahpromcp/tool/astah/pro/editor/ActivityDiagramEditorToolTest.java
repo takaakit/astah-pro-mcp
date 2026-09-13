@@ -76,8 +76,7 @@ public class ActivityDiagramEditorToolTest {
             transactionSupport,
             activityDiagramEditor,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createAcceptEventAction() method
         createAcceptEventAction = TestSupport.getAccessibleMethod(
@@ -685,6 +684,44 @@ public class ActivityDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void createObjectNode_ok_primitiveTypeAsBaseClass() throws Exception {
+        // Get activity diagram
+        IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IActivityDiagram.class,
+            "Activity Diagram0");
+
+        // Get primitive type
+        IClass primitiveType = null;
+        for (IClass candidate : new AstahProToolSupport(projectAccessor).getPrimitiveTypes()) {
+            if ("int".equals(candidate.getName())) {
+                primitiveType = candidate;
+            }
+        }
+        assertNotNull(primitiveType);
+
+        // Create input DTO
+        NewObjectNodeDTO inputDTO = new NewObjectNodeDTO(
+            activityDiagram.getId(),
+            primitiveType.getId(),
+            "overdueDays",
+            240,
+            440);
+
+        // ----------------------------------------
+        // Call createObjectNode()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createObjectNode,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals("overdueDays : int", outputDTO.presentation().label());
     }
 
     @Disabled

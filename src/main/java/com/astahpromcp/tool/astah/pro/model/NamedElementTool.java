@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.model;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
@@ -14,7 +14,6 @@ import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
@@ -22,37 +21,20 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
 @Slf4j
-public class NamedElementTool implements ToolProvider {
+public class NamedElementTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
-    private final boolean includeEditTools;
 
-    public NamedElementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public NamedElementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create named element tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_named_element_info",
@@ -66,12 +48,9 @@ public class NamedElementTool implements ToolProvider {
                 "Return the list of all named element type names. Note that \"Unknown\" is excluded from the type names.",
                 this::getAllTypes,
                 NoInputDTO.class,
-                NamedElementTypeListDTO.class)
-        );
-    }
+                NamedElementTypeListDTO.class),
 
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
+
             ToolSupport.toolDefinitionReturningDto(
                 "set_name",
                 "Set the name of the specified named element (specified by ID), and return the model element of the named element after it is edited. The name must be a plain, literal Unicode string; do NOT HTML/XML-escape special characters (e.g., pass \"A & B\", not \"A &amp; B\"; \"<x>\", not \"&lt;x&gt;\").",

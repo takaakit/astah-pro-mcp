@@ -39,8 +39,7 @@ public class DiagramLayoutLintToolTest {
         tool = new DiagramLayoutLintTool(
                 projectAccessor,
                 transactionSupport,
-                astahProToolSupport,
-                true);
+                astahProToolSupport);
 
         // detectOverlap() method
         detectOverlap = TestSupport.getAccessibleMethod(

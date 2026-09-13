@@ -46,7 +46,7 @@ public final class ToolSupport {
             function,
             inputDtoType);
 
-        return new ToolDefinition(schema, handler);
+        return new ToolDefinition(schema, ToolDefinition.ResultKind.DTO, handler);
     }
 
     // Create a tool schema for tools returning DTO
@@ -102,7 +102,7 @@ public final class ToolSupport {
             return ResponseSupport.success(outputDto);
             
         } catch (Throwable t) {
-            String msg = String.format("Exception @tool=%s: %s", toolName, t.getMessage());
+            String msg = String.format("Exception @tool=%s: %s", toolName, describeThrowable(t));
             log.error(msg, t);
             return ResponseSupport.error(msg);
         }
@@ -136,7 +136,7 @@ public final class ToolSupport {
             function,
             inputDtoType);
 
-        return new ToolDefinition(schema, handler);
+        return new ToolDefinition(schema, ToolDefinition.ResultKind.CONTENTS, handler);
     }
 
     // Create a tool schema for tools returning contents
@@ -188,7 +188,7 @@ public final class ToolSupport {
             return ResponseSupport.success(contents);
             
         } catch (Throwable t) {
-            String msg = String.format("Exception @tool=%s: %s", toolName, t.getMessage());
+            String msg = String.format("Exception @tool=%s: %s", toolName, describeThrowable(t));
             log.error(msg, t);
             return ResponseSupport.error(msg);
         }
@@ -235,7 +235,7 @@ public final class ToolSupport {
             function,
             inputDtoType);
 
-        return new ToolDefinition(schema, handler);
+        return new ToolDefinition(schema, ToolDefinition.ResultKind.DTO_AND_CONTENTS, handler);
     }
 
     // Create a tool schema for tools returning DTO and contents
@@ -295,9 +295,18 @@ public final class ToolSupport {
             return ResponseSupport.success(outputDto, contents);
 
         } catch (Throwable t) {
-            String msg = String.format("Exception @tool=%s: %s", toolName, t.getMessage());
+            String msg = String.format("Exception @tool=%s: %s", toolName, describeThrowable(t));
             log.error(msg, t);
             return ResponseSupport.error(msg);
         }
+    }
+
+    static String describeThrowable(Throwable t) {
+        String message = t.getMessage();
+        if (message == null || message.isBlank()) {
+            return String.valueOf(t);
+        }
+
+        return message;
     }
 }

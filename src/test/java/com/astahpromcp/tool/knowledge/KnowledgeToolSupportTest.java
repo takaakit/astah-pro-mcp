@@ -10,6 +10,8 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -150,26 +152,112 @@ public class KnowledgeToolSupportTest {
     }
 
     @Test
+    void chunkAndCache_ok_keepsEveryChunkWithinTheResponseBudget() {
+        KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
+
+        DocumentDTO result = KnowledgeToolSupport.chunkAndCache("a".repeat(300000), contentCache);
+
+        assertTrue(result.totalChunks() > 1, "the document has to be large enough to split");
+        for (int i = 0; i < result.totalChunks(); i++) {
+            int length = contentCache.chunkAt(i).length();
+            assertTrue(length <= KnowledgeToolSupport.MAX_CHUNK_CHARS,
+                    "chunk " + i + " is " + length + " characters, over the " + KnowledgeToolSupport.MAX_CHUNK_CHARS + " budget");
+        }
+    }
+
+    @Test
+    void splitTextWithOverlap_ok_capsTheOverlapPrefixToItsTail() {
+        // No line breaks, so the last 3 lines of the first chunk are the whole first chunk
+        String text = "a".repeat(4000) + "b".repeat(4000);
+
+        List<String> chunks = KnowledgeToolSupport.splitTextWithOverlap(text, 4000, 3);
+
+        assertEquals(2, chunks.size());
+        assertEquals(KnowledgeToolSupport.CHUNK_OVERLAP_MAX_CHARS + 4000, chunks.get(1).length(),
+                "The overlap prefix should be capped");
+        assertTrue(text.contains(chunks.get(1)),
+                "The capped prefix should be the tail of the previous chunk, so the chunk stays a continuous part of the document");
+    }
+
+    @Test
     void chunkAndCache_ok_splitsTextAndReplacesContentCache() {
-        List<String> contentCache = new ArrayList<>(List.of("stale chunk"));
-        String text = "a".repeat(60000); // larger than the default 50KB chunk size, so it splits into two chunks
+        KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
+        KnowledgeToolSupport.chunkAndCache("stale chunk", contentCache);
+        String text = "a".repeat(60000); // larger than the default chunk size, so it splits into two chunks
 
         DocumentDTO result = KnowledgeToolSupport.chunkAndCache(text, contentCache);
 
-        assertEquals(2, contentCache.size(), "Stale content should be replaced by the new chunks");
-        assertEquals(contentCache.size(), result.totalChunks());
-        assertEquals(contentCache.get(0), result.firstChunk());
+        DocumentDTO cached = contentCache.describe();
+        assertEquals(2, cached.totalChunks(), "Stale content should be replaced by the new chunks");
+        assertEquals(cached.totalChunks(), result.totalChunks());
+        assertEquals(cached.firstChunk(), result.firstChunk());
     }
 
     @Test
     void chunkAndCache_ok_storesASingleEmptyChunkForEmptyText() {
-        List<String> contentCache = new ArrayList<>();
+        KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
 
         DocumentDTO result = KnowledgeToolSupport.chunkAndCache("", contentCache);
 
-        assertEquals(List.of(""), contentCache);
         assertEquals(1, result.totalChunks());
         assertEquals("", result.firstChunk());
+        assertEquals("", contentCache.chunkAt(0));
+    }
+
+    @Test
+    void contentCache_ok_describesNothingBeforeAnythingIsLoaded() {
+        KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
+
+        assertFalse(contentCache.isLoaded());
+        assertNull(contentCache.describe());
+        assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(0));
+    }
+
+    @Test
+    void contentCache_ng_rejectsAChunkIndexOutsideTheDocument() {
+        KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
+        KnowledgeToolSupport.chunkAndCache("only one chunk", contentCache);
+
+        assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(-1));
+        assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(1));
+    }
+
+    // The two profiles share one provider instance and these tools take no Astah lock, so a reload has to be
+    // visible as a whole. Reading while another thread reloads must never see an empty or half-filled cache.
+    @Test
+    void contentCache_ok_staysReadableWhileAnotherThreadReloadsIt() throws Exception {
+        KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
+        KnowledgeToolSupport.chunkAndCache("a".repeat(60000), contentCache);
+
+        AtomicBoolean running = new AtomicBoolean(true);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread reader = new Thread(() -> {
+            while (running.get()) {
+                try {
+                    // Each call reads one snapshot. Two calls may land on different reloads, so what has to hold is that neither ever sees the cache empty or half-filled, which is what clearing and refilling a shared list would expose.
+                    DocumentDTO seen = contentCache.describe();
+                    assertNotNull(seen, "the cache must never be observed empty once it has been loaded");
+                    assertFalse(seen.firstChunk().isEmpty(), "a chunk must never be observed half-written");
+                    assertEquals(1, seen.firstChunk().chars().distinct().count(),
+                            "the first chunk must come from a single reload, not a mix of two");
+                    assertFalse(contentCache.chunkAt(0).isEmpty());
+                } catch (Throwable t) {
+                    failure.compareAndSet(null, t);
+                    return;
+                }
+            }
+        });
+        reader.start();
+
+        for (int i = 0; i < 200; i++) {
+            KnowledgeToolSupport.chunkAndCache("b".repeat(60000), contentCache);
+            KnowledgeToolSupport.chunkAndCache("c".repeat(120000), contentCache);
+        }
+        running.set(false);
+        reader.join(10_000);
+
+        assertNull(failure.get(), () -> "reader observed a broken cache: " + failure.get());
     }
 
     @Test

@@ -25,6 +25,9 @@ public record PartitionDTO(
     List<NameIdTypeDTO> subPartitions,
 
     @JsonPropertyDescription("Whether it is a horizontal partition or not")
-    boolean isHorizontal
+    boolean isHorizontal,
+
+    @JsonPropertyDescription("Element that this partition represents.")
+    NameIdTypeDTO represents
 ) {
 }

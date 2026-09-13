@@ -36,8 +36,7 @@ public class InteractionOperandToolTest {
         tool = new InteractionOperandTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

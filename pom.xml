@@ -14,11 +14,12 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<lombok.version>1.18.46</lombok.version>
 		<astah.argLine>-Duser.language=en</astah.argLine>  <!-- launch Astah in English -->
+		<astah.running.check.skip>false</astah.running.check.skip>  <!-- see build-tools/astah-running-check.xml -->
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.astahpromcp</groupId>
 	<artifactId>astah-pro-mcp</artifactId>
-	<version>0.2.9</version>
+	<version>0.3.0</version>
 	<packaging>bundle</packaging>
 	<name>Astah Pro MCP</name>
 	<description>MCP server for Astah professional</description>
@@ -50,6 +51,54 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<!-- Before clean deletes anything: this is the destructive case -->
+						<id>refuse-to-clean-while-astah-is-running</id>
+						<phase>pre-clean</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<ant antfile="${project.basedir}/build-tools/astah-running-check.xml" inheritAll="false">
+									<property name="astah.output.directory" value="${project.build.outputDirectory}"/>
+									<property name="astah.running.check.skip" value="${astah.running.check.skip}"/>
+								</ant>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Before a plain compile/test, which would overwrite the classes Astah is running. validate is reached after clean, so it cannot replace the check above. -->
+						<id>refuse-to-compile-while-astah-is-running</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<ant antfile="${project.basedir}/build-tools/astah-running-check.xml" inheritAll="false">
+									<property name="astah.output.directory" value="${project.build.outputDirectory}"/>
+									<property name="astah.running.check.skip" value="${astah.running.check.skip}"/>
+								</ant>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<!-- Last line of defense for whatever the probes above miss. A running Astah holds the embedded dependency jars open, and failing there would leave target/classes without com/**; carrying on lets compile put it back. The jars that survive are byte-identical to the ones that would have replaced them. -->
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
+			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.11.0</version>
 				<executions>
@@ -62,6 +111,8 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 							<excludeGroupIds>com.change_vision.astah,org.osgi</excludeGroupIds>
+							<!-- Same set the maven-bundle-plugin embeds (Embed-Dependency scope=compile|runtime), so the directory Astah runs from holds what the bundle actually uses and nothing else. Without this the provided and test scoped jars are copied in too, where they sit unreferenced by Bundle-ClassPath. -->
+							<includeScope>runtime</includeScope>
 							<overWriteIfNewer>true</overWriteIfNewer>
 						</configuration>
 					</execution>

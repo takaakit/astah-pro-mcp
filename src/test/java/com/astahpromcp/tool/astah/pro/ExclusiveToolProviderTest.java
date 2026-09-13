@@ -31,7 +31,7 @@ public class ExclusiveToolProviderTest {
 
     private static ToolDefinition definitionWith(
             BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler) {
-        return new ToolDefinition(DUMMY_SCHEMA, handler);
+        return new ToolDefinition(DUMMY_SCHEMA, ToolDefinition.ResultKind.DTO, handler);
     }
 
     private static ToolDefinition wrap(ToolDefinition definition, long lockTimeoutSeconds) {

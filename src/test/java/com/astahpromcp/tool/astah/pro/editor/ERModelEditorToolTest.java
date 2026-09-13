@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
@@ -53,7 +54,7 @@ public class ERModelEditorToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
-            true);
+            new SystemPropertySupport());
 
         // createERModel() method
         createERModel = TestSupport.getAccessibleMethod(

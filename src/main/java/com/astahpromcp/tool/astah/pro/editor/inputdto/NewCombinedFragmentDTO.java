@@ -7,7 +7,7 @@ public record NewCombinedFragmentDTO(
     @JsonPropertyDescription("Target sequence diagram identifier")
     String targetSequenceDiagramId,
     
-    @JsonPropertyDescription("New combined fragment name")
+    @JsonPropertyDescription("New combined fragment name. Set this to an empty string when the combined fragment has no name.")
     String newCombinedFragmentName,
     
     @JsonPropertyDescription("Combined fragment kind")

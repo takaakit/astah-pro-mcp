@@ -81,6 +81,21 @@ public class DiagramEditorSupport {
             throw new RuntimeException(errorMessage);
         }
 
+        return findDiagramEditor(requiredEditorClass);
+    }
+
+    public DiagramEditor getCorrespondingDiagramEditor(IDiagram diagram, IElement element) {
+
+        // Note: A composite structure diagram is the one place where the editor depends on what is being drawn.
+        if (diagram instanceof ICompositeStructureDiagram && element instanceof IConnector) {
+            log.debug("Drawing a connector on a composite structure diagram, which needs its own editor");
+            return findDiagramEditor(CompositeStructureDiagramEditor.class);
+        }
+
+        return getCorrespondingDiagramEditor(diagram);
+    }
+
+    private DiagramEditor findDiagramEditor(Class<? extends DiagramEditor> requiredEditorClass) {
         // Look for an editor instance that matches
         for (DiagramEditor editor : diagramEditors) {
             // Check whether the editor is an instance of the required editor class

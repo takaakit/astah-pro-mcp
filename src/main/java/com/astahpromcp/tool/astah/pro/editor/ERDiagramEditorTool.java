@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewERDiagramDTO;
@@ -34,45 +34,24 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERDiagramEditor.html
 @Slf4j
-public class ERDiagramEditorTool implements ToolProvider {
+public class ERDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final ERDiagramEditor erDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public ERDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ERDiagramEditor erDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public ERDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ERDiagramEditor erDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.erDiagramEditor = erDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create ER diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_er_dgm",

@@ -24,7 +24,7 @@ public class PreliminaryLayoutToolTest {
     @BeforeEach
     void setUp() throws Exception {
         // Tool
-        tool = new PreliminaryLayoutTool(true);
+        tool = new PreliminaryLayoutTool();
 
         // getSteps() method
         getSteps = TestSupport.getAccessibleMethod(
@@ -69,9 +69,9 @@ public class PreliminaryLayoutToolTest {
         // ----------------------------------------
         List<McpSchema.Content> contents = invokeGetSteps();
 
-        // The steps, then six diagram types each contributing its SVG code followed by the PNG image it renders to
+        // The steps, then seven diagram types each contributing its SVG code followed by the PNG image it renders to
         assertNotNull(contents);
-        assertEquals(13, contents.size());
+        assertEquals(15, contents.size());
         for (int i = 1; i < contents.size(); i += 2) {
             McpSchema.TextContent svgCode = assertInstanceOf(McpSchema.TextContent.class, contents.get(i));
             assertTrue(svgCode.text().contains("<svg"));
@@ -79,10 +79,10 @@ public class PreliminaryLayoutToolTest {
         }
     }
 
+    // The provider always returns its whole definition; which profiles publish it is decided by the manifest,
+    // where preliminary_layout_steps is published to the direct and programmatic profiles.
     @Test
-    void createToolDefinitions_ok_editToolsOnly() throws Exception {
-        // The steps are only useful while editing, so they are withheld from the query-only profile
-        assertEquals(0, new PreliminaryLayoutTool(false).createToolDefinitions().size());
-        assertEquals(1, new PreliminaryLayoutTool(true).createToolDefinitions().size());
+    void createToolDefinitions_ok_returnsItsOneTool() throws Exception {
+        assertEquals(1, new PreliminaryLayoutTool().createToolDefinitions().size());
     }
 }

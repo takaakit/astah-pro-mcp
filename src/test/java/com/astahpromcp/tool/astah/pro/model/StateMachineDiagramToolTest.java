@@ -34,8 +34,7 @@ public class StateMachineDiagramToolTest {
         tool = new StateMachineDiagramTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // Methods
         getInfo = TestSupport.getAccessibleMethod(

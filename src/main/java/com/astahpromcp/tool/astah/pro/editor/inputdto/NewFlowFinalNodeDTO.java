@@ -6,7 +6,7 @@ public record NewFlowFinalNodeDTO(
     @JsonPropertyDescription("Target activity diagram identifier")
     String targetActivityDiagramId,
 
-    @JsonPropertyDescription("New flow final node name. An empty string is not allowed as a node name.")
+    @JsonPropertyDescription("New flow final node name. Always set a name. An empty string is not allowed as a node name.")
     String newFlowFinalNodeName,
 
     @JsonPropertyDescription("Location X coordinate")

@@ -10,6 +10,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -42,8 +43,7 @@ public class LifelineToolTest {
         tool = new LifelineTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(
@@ -139,7 +139,7 @@ public class LifelineToolTest {
 
         // Create input DTO
         LifelineWithLengthDTO inputDTO = new LifelineWithLengthDTO(
-            lifeline.getId(),
+            lifeline.getPresentations()[0].getID(),
             100);
 
         // ----------------------------------------
@@ -158,5 +158,63 @@ public class LifelineToolTest {
         String lengthProperty = lifeline.getPresentations()[0].getProperty(Key.LIFELINE_LENGTH);
         assertNotNull(lengthProperty);
         assertEquals(100, (int) Double.parseDouble(lengthProperty));
+    }
+
+    @Test
+    void setLength_ng_modelElementIdGiven() throws Exception {
+        // Get lifeline
+        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElementByClassAndName(
+            ILifeline.class,
+            "foo");
+
+        // Create input DTO
+        LifelineWithLengthDTO inputDTO = new LifelineWithLengthDTO(
+            lifeline.getId(),
+            100);
+
+        // ----------------------------------------
+        // Call setLength()
+        // ----------------------------------------
+        assertThrows(Exception.class, () ->
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setLength,
+                tool,
+                inputDTO,
+                NodePresentationDTO.class));
+    }
+
+    @Test
+    void setLength_ng_otherNodePresentationType() throws Exception {
+        // Get lifeline
+        ILifeline lifeline = (ILifeline) TestSupport.instance().getNamedElementByClassAndName(
+            ILifeline.class,
+            "foo");
+
+        // Get a node presentation on the same diagram that does not draw a lifeline
+        INodePresentation notLifelinePresentation = null;
+        for (IPresentation presentation : lifeline.getPresentations()[0].getDiagram().getPresentations()) {
+            if (presentation instanceof INodePresentation
+                && !"Lifeline".equals(presentation.getType())) {
+                notLifelinePresentation = (INodePresentation) presentation;
+                break;
+            }
+        }
+        assertNotNull(notLifelinePresentation);
+
+        // Create input DTO
+        LifelineWithLengthDTO inputDTO = new LifelineWithLengthDTO(
+            notLifelinePresentation.getID(),
+            100);
+
+
+        // ----------------------------------------
+        // Call setLength()
+        // ----------------------------------------
+        assertThrows(Exception.class, () ->
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setLength,
+                tool,
+                inputDTO,
+                NodePresentationDTO.class));
     }
 }

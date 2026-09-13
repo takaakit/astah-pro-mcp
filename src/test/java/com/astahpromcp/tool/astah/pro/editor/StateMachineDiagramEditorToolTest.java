@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -67,8 +68,7 @@ public class StateMachineDiagramEditorToolTest {
             transactionSupport,
             stateMachineDiagramEditor,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // Methods
         addRegion = TestSupport.getAccessibleMethod(
@@ -607,6 +607,44 @@ public class StateMachineDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals("SubmachineState", outputDTO.presentation().type());
+        assertEquals(stateMachineDiagram0.getId(), outputDTO.presentation().renderedInDiagram().id());
+        // The newly created presentation must be returned, not the parent one.
+        assertNotEquals(parentNodePresentation.getID(), outputDTO.presentation().id());
+    }
+
+    @Test
+    void createSubMachineState_atTopLevel_ok() throws Exception {
+        // Get state machine diagrams
+        IStateMachineDiagram stateMachineDiagram0 = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IStateMachineDiagram.class,
+            "Statemachine Diagram0");
+
+        IStateMachineDiagram stateMachineDiagram1 = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
+                IStateMachineDiagram.class,
+                "Statemachine Diagram1");
+
+        // Create input DTO
+        NewSubMachineStateDTO inputDTO = new NewSubMachineStateDTO(
+            stateMachineDiagram0.getId(),
+            "",
+            stateMachineDiagram1.getId(),
+            1000,
+            300);
+
+        // ----------------------------------------
+        // Call createSubMachineState()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createSubMachineState,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals("SubmachineState", outputDTO.presentation().type());
+        assertEquals(stateMachineDiagram0.getId(), outputDTO.presentation().renderedInDiagram().id());
     }
 
     @Test

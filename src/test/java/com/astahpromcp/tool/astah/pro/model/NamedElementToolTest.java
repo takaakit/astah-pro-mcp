@@ -45,8 +45,7 @@ public class NamedElementToolTest {
         tool = new NamedElementTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

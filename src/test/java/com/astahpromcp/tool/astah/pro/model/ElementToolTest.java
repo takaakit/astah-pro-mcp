@@ -44,8 +44,7 @@ public class ElementToolTest {
         tool = new ElementTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // addStereotype() method
         addStereotype = TestSupport.getAccessibleMethod(
@@ -207,6 +206,74 @@ public class ElementToolTest {
         assertNotNull(outputDTO);
 
         assertEquals("John Doe", clazz.getTaggedValue("author"));
+    }
+
+    @Test
+    void changeTaggedValue_ng_missingKey() throws Exception {
+        // Get element
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+        String authorBefore = clazz.getTaggedValue("author");
+
+        // Create input DTO
+        ElementWithTaggedValueDTO inputDTO = new ElementWithTaggedValueDTO(
+            clazz.getId(),
+            "noSuchKey",
+            "John Doe");
+
+        // ----------------------------------------
+        // Call changeTaggedValue()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                changeTaggedValue,
+                tool,
+                inputDTO,
+                ElementDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("'noSuchKey'"));
+        assertTrue(exception.getCause().getMessage().contains("author"));
+        assertTrue(exception.getCause().getMessage().contains("create_tagged_val"));
+
+        // Check that nothing was changed or created
+        assertEquals(authorBefore, clazz.getTaggedValue("author"));
+        assertEquals("", clazz.getTaggedValue("noSuchKey"));
+    }
+
+    @Test
+    void changeTaggedValue_ng_caseMismatch() throws Exception {
+        // Get element
+        IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+
+        // Create input DTO
+        ElementWithTaggedValueDTO inputDTO = new ElementWithTaggedValueDTO(
+            clazz.getId(),
+            "Author",
+            "John Doe");
+
+        // ----------------------------------------
+        // Call changeTaggedValue()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                changeTaggedValue,
+                tool,
+                inputDTO,
+                ElementDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Did you mean 'author'?"));
+
+        // Check tagged value is not changed
+        assertNotEquals("John Doe", clazz.getTaggedValue("author"));
     }
 
     @Test

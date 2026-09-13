@@ -41,6 +41,7 @@ public final class ExclusiveToolProvider implements ToolProvider {
         return delegate.createToolDefinitions().stream()
                 .map(definition -> new ToolDefinition(
                         definition.toolSchema(),
+                        definition.resultKind(),
                         wrapWithLock(definition)))
                 .toList();
     }

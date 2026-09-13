@@ -28,7 +28,7 @@ public record MessageDTO(
     @JsonPropertyDescription("Is Synchronous")
     boolean isSynchronous,
 
-    @JsonPropertyDescription("Index")
+    @JsonPropertyDescription("Index. Empty if none (e.g., a return message).")
     String index,
 
     @JsonPropertyDescription("Activator")

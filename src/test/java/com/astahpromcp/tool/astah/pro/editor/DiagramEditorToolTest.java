@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
@@ -65,10 +66,10 @@ public class DiagramEditorToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
+            new SystemPropertySupport(),
             diagramEditorSupport,
             imageConvertSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // insertSvgImage() method
         insertSvgImage = TestSupport.getAccessibleMethod(

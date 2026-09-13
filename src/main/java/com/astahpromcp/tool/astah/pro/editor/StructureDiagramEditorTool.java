@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationDTO;
@@ -27,52 +27,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StructureDiagramEditor.html
 @Slf4j
-public class StructureDiagramEditorTool implements ToolProvider {
+public class StructureDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public StructureDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public StructureDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.diagramEditorSupport = diagramEditorSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create structure diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_node_prst_on_dgm",
@@ -105,7 +83,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         StructureDiagramEditor structureDiagramEditor;
         try {
-            structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram);
+            structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram, astahElement);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get structure diagram editor.");
         }
@@ -150,7 +128,7 @@ public class StructureDiagramEditorTool implements ToolProvider {
 
         StructureDiagramEditor structureDiagramEditor;
         try {
-            structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram);
+            structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram, astahElement);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get structure diagram editor.");
         }

@@ -34,8 +34,7 @@ public class ActivityToolTest {
         tool = new ActivityTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

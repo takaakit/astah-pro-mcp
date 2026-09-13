@@ -1,8 +1,8 @@
 package com.astahpromcp.tool.astah.pro.preliminary;
 
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -16,7 +16,7 @@ import java.util.Base64;
 import java.util.List;
 
 @Slf4j
-public class PreliminaryLayoutTool implements ToolProvider {
+public class PreliminaryLayoutTool extends AstahToolProvider {
 
     private static final String EXAMPLE_RESOURCE_DIR = "/preliminary-layout/";
     private static final String EXAMPLE_SVG_SUFFIX = "-preliminary-layout-example.svg";
@@ -25,6 +25,7 @@ public class PreliminaryLayoutTool implements ToolProvider {
     private static final List<DiagramTypeExample> EXAMPLES = List.of(
         new DiagramTypeExample("use-case-diagram", "Use Case Diagram"),
         new DiagramTypeExample("class-diagram", "Class Diagram"),
+        new DiagramTypeExample("composite-structure-diagram", "Composite Structure Diagram"),
         new DiagramTypeExample("sequence-diagram", "Sequence Diagram"),
         new DiagramTypeExample("activity-diagram", "Activity Diagram"),
         new DiagramTypeExample("state-machine-diagram", "State Machine Diagram"),
@@ -33,33 +34,12 @@ public class PreliminaryLayoutTool implements ToolProvider {
     private record DiagramTypeExample(String resourceBaseName, String displayName) {
     }
 
-    private final boolean includeEditTools;
 
-    public PreliminaryLayoutTool(boolean includeEditTools) {
-        this.includeEditTools = includeEditTools;
+    public PreliminaryLayoutTool() {
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create preliminary layout tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningContents(
                 "preliminary_layout_steps",
@@ -173,6 +153,21 @@ Class Diagram:
   - Generalization
   - Realization
   - Dependency
+  - Note anchor (only for notes on elements)
+
+Composite Structure Diagram:
+- Rectangles
+  - Class
+  - Structured class
+  - Part (nested within the structured class that owns it)
+  - Port (on the border of the structured class or the part that owns it)
+  - Provided interface (lollipop symbol)
+  - Required interface (socket symbol)
+  - Note
+- Lines
+  - Association (including aggregation and composition)
+  - Connector
+  - Line from a port or a part to the provided or required interface symbol it belongs to
   - Note anchor (only for notes on elements)
 
 Sequence Diagram:

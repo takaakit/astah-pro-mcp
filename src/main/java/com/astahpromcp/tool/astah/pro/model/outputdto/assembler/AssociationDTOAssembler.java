@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
 import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IAttribute;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 
@@ -16,6 +17,8 @@ public class AssociationDTOAssembler {
         return new AssociationDTO(
             NamedElementDTOAssembler.toDTO(astahAssociation),
             NameIdTypeDTOAssembler.toDTO(associationEndA),
-            NameIdTypeDTOAssembler.toDTO(associationEndB));
+            NameIdTypeDTOAssembler.toDTO(associationEndB),
+            NameIdTypeDTOAssembler.toDTO((INamedElement) associationEndA.getOwner()),
+            NameIdTypeDTOAssembler.toDTO((INamedElement) associationEndB.getOwner()));
     }
 }

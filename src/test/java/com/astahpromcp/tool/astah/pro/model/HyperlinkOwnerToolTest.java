@@ -59,8 +59,7 @@ public class HyperlinkOwnerToolTest {
         tool = new HyperlinkOwnerTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // addUrlHyperlinkToNamedElement() method
         addUrlHyperlinkToNamedElement = TestSupport.getAccessibleMethod(

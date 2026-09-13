@@ -16,37 +16,37 @@ public final class McpServerConfig {
     // Default host address
     public static final String HOST = "127.0.0.1";
 
-    // Environment variable that overrides the port for full tool access
-    public static final String ENV_PORT_FOR_FULL_TOOL = "ASTAH_PRO_MCP_PORT_FOR_FULL";
+    // Environment variable that overrides the port for the direct tool calling mode
+    public static final String ENV_PORT_FOR_DIRECT = "ASTAH_PRO_MCP_PORT_FOR_DIRECT";
 
-    // Environment variable that overrides the port for query-only tool access
-    public static final String ENV_PORT_FOR_QUERY_ONLY_TOOL = "ASTAH_PRO_MCP_PORT_FOR_QUERY";
+    // Environment variable that overrides the port for the programmatic tool calling mode
+    public static final String ENV_PORT_FOR_PROGRAMMATIC = "ASTAH_PRO_MCP_PORT_FOR_PROGRAMMATIC";
 
-    // Port for full tool access
-    public static final int DEFAULT_PORT_FOR_FULL_TOOL = 8888;
+    // Port for the direct tool calling mode
+    public static final int DEFAULT_PORT_FOR_DIRECT = 18888;
 
-    // Port for query-only tool access
-    public static final int DEFAULT_PORT_FOR_QUERY_ONLY_TOOL = 8889;
+    // Port for the programmatic tool calling mode
+    public static final int DEFAULT_PORT_FOR_PROGRAMMATIC = 8888;
 
-    private static final PortResolver.Result FULL_TOOL_PORT = PortResolver.resolve(
-            ENV_PORT_FOR_FULL_TOOL,
-            System.getenv(ENV_PORT_FOR_FULL_TOOL),
-            DEFAULT_PORT_FOR_FULL_TOOL);
+    private static final PortResolver.Result DIRECT_PORT = PortResolver.resolve(
+            ENV_PORT_FOR_DIRECT,
+            System.getenv(ENV_PORT_FOR_DIRECT),
+            DEFAULT_PORT_FOR_DIRECT);
 
-    private static final PortResolver.Result QUERY_ONLY_TOOL_PORT = PortResolver.resolve(
-            ENV_PORT_FOR_QUERY_ONLY_TOOL,
-            System.getenv(ENV_PORT_FOR_QUERY_ONLY_TOOL),
-            DEFAULT_PORT_FOR_QUERY_ONLY_TOOL);
+    private static final PortResolver.Result PROGRAMMATIC_PORT = PortResolver.resolve(
+            ENV_PORT_FOR_PROGRAMMATIC,
+            System.getenv(ENV_PORT_FOR_PROGRAMMATIC),
+            DEFAULT_PORT_FOR_PROGRAMMATIC);
 
-    // Port for full tool access, overridable via ASTAH_PRO_MCP_PORT_FOR_FULL
-    public static final int PORT_FOR_FULL_TOOL = FULL_TOOL_PORT.port();
+    // Port for the direct tool calling mode, overridable via ASTAH_PRO_MCP_PORT_FOR_DIRECT
+    public static final int PORT_FOR_DIRECT = DIRECT_PORT.port();
 
-    // Port for query-only tool access, overridable via ASTAH_PRO_MCP_PORT_FOR_QUERY
-    public static final int PORT_FOR_QUERY_ONLY_TOOL = QUERY_ONLY_TOOL_PORT.port();
+    // Port for the programmatic tool calling mode, overridable via ASTAH_PRO_MCP_PORT_FOR_PROGRAMMATIC
+    public static final int PORT_FOR_PROGRAMMATIC = PROGRAMMATIC_PORT.port();
 
     // Warnings produced while resolving the ports
     public static List<String> portResolutionWarnings() {
-        return Stream.of(FULL_TOOL_PORT.warning(), QUERY_ONLY_TOOL_PORT.warning())
+        return Stream.of(DIRECT_PORT.warning(), PROGRAMMATIC_PORT.warning())
                 .filter(Objects::nonNull)
                 .toList();
     }
@@ -67,9 +67,42 @@ public final class McpServerConfig {
     // Maximum time to wait for the EDT queue to drain after a tool execution.
     public static final long EDT_FLUSH_TIMEOUT_SECONDS = 20;
 
-    // Maximum time a script run may execute.
+    // Maximum time one run_astah_api_script (astah api script) run may execute.
     // Kept below the tool call timeout of typical MCP clients (around 30 seconds) so that the timeout response actually reaches the AI agent instead of the client giving up first.
-    public static final long SCRIPT_EXECUTION_TIMEOUT_SECONDS = 20;
+    public static final long ASTAH_API_SCRIPT_TIMEOUT_SECONDS = 20;
+
+    // Maximum time one run_mcp_tool_script (mcp tool script) run may execute
+    public static final long MCP_TOOL_SCRIPT_TIMEOUT_SECONDS = 20;
+
+    // Maximum size of the mcp tool script source
+    public static final int MCP_TOOL_SCRIPT_MAX_SOURCE_BYTES = 32_768;
+
+    // Name the engine is given for the mcp tool script itself, which is what tells its frames from those of the preludes evaluated before it
+    public static final String MCP_TOOL_SCRIPT_SOURCE_NAME = "mcp-tool-script";
+
+    // Maximum amount of print() output kept from one mcp tool script run
+    public static final int MCP_TOOL_SCRIPT_MAX_STDOUT_BYTES = 65_536;
+
+    // Maximum size of the JSON arguments of a single tool call made from an mcp tool script
+    public static final int MCP_TOOL_SCRIPT_MAX_ARG_BYTES = 262_144;
+
+    // Maximum size of the JSON result of a single tool call made from an mcp tool script
+    public static final int MCP_TOOL_SCRIPT_MAX_RESULT_BYTES = 1_048_576;
+
+    // Maximum number of tool calls one mcp tool script run may make
+    public static final int MCP_TOOL_SCRIPT_MAX_CALLS = 500;
+
+    // Maximum nesting depth of the JSON arguments of a tool call made from an mcp tool script
+    public static final int MCP_TOOL_SCRIPT_MAX_JSON_DEPTH = 64;
+
+    // Maximum size of a single get_all_tools_callable_from_mcp_tool_script response
+    public static final int CALLABLE_TOOL_LIST_MAX_RESULT_BYTES = 131_072;
+
+    // Maximum size of a single get_info_of_tools_callable_from_mcp_tool_script response
+    public static final int CALLABLE_TOOL_INFO_MAX_RESULT_BYTES = 57_344;
+
+    // Maximum number of tool functions one get_info_of_tools_callable_from_mcp_tool_script call may ask about
+    public static final int CALLABLE_TOOL_INFO_MAX_NAMES = 10;
 
     // Maximum time to establish a connection when fetching knowledge documents from the web.
     public static final long KNOWLEDGE_FETCH_CONNECT_TIMEOUT_SECONDS = 10;

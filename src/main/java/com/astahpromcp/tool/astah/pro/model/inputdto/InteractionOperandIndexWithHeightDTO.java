@@ -3,8 +3,8 @@ package com.astahpromcp.tool.astah.pro.model.inputdto;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record InteractionOperandIndexWithHeightDTO(
-    @JsonPropertyDescription("Target combined fragment identifier")
-    String targetCombinedFragmentId,
+    @JsonPropertyDescription("Target combined fragment node presentation identifier")
+    String targetCombinedFragmentNodePresentationId,
 
     @JsonPropertyDescription("1-based index of the target interaction operand within the combined fragment")
     int targetInteractionOperandIndex,

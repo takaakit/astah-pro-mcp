@@ -43,8 +43,7 @@ public class ERSubtypeRelationshipToolTest {
         tool = new ERSubtypeRelationshipTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

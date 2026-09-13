@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.review;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
@@ -32,47 +32,26 @@ import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
-public class DiagramLayoutLintTool implements ToolProvider {
+public class DiagramLayoutLintTool extends AstahToolProvider {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
-    private final boolean includeEditTools;
 
-    public DiagramLayoutLintTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public DiagramLayoutLintTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create diagram layout lint tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "detect_overlap",
-                "Detect overlap of presentations in the specified diagram (specified by ID) and return the overlap information. Use this tool when you need to adjust the layout of a diagram.",
+                "Detect overlap of presentations in the specified diagram (specified by ID) and return the overlap information. An empty string is returned when no overlap is detected. Use this tool when you need to adjust the layout of a diagram.",
                 this::detectOverlap,
                 IdDTO.class,
                 ReportDTO.class));
@@ -241,7 +220,7 @@ public class DiagramLayoutLintTool implements ToolProvider {
             IPresentation targetEnd = linkPresentation.getTargetEnd();
             for (INodePresentation nodePresentation : nodePresentations) {
                 // Skip the link's own endpoints, since the link legitimately touches them.
-                if (nodePresentation.equals(sourceEnd) || nodePresentation.equals(targetEnd)) {
+                if (isEndOrItsAncestor(nodePresentation, sourceEnd) || isEndOrItsAncestor(nodePresentation, targetEnd)) {
                     continue;
                 }
 
@@ -255,6 +234,19 @@ public class DiagramLayoutLintTool implements ToolProvider {
             }
         }
         return sb;
+    }
+
+    // Whether the given node presentation is an end of the link, or encloses that end.
+    // Comparing against the ends alone is not enough on a sequence diagram: the end of a message there is the activation the message leaves or starts, never the lifeline that activation sits on, while the nodes checked against are the lifelines.
+    private static boolean isEndOrItsAncestor(INodePresentation nodePresentation, IPresentation end) {
+        IPresentation current = end;
+        while (current != null) {
+            if (nodePresentation.equals(current)) {
+                return true;
+            }
+            current = current instanceof INodePresentation node ? node.getParent() : null;
+        }
+        return false;
     }
 
     // Detect overlaps between lines

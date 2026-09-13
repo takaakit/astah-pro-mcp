@@ -37,8 +37,7 @@ public class ConstraintToolTest {
         tool = new ConstraintTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

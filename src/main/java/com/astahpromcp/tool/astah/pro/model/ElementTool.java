@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.model;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
@@ -27,49 +27,31 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IElement.html
 @Slf4j
-public class ElementTool implements ToolProvider {
+public class ElementTool extends AstahToolProvider {
+
+    private static final String ASTAH_INTERNAL_TAGGED_VALUE_KEY_PREFIX = "jude.";
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
-    private final boolean includeEditTools;
 
-    public ElementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ElementTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create element tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_dgms_of_element",
                 "Returns all diagrams in which the presentations of the specified element (specified by ID) are displayed. Furthermore, if the base class or base classifier of an InstanceSpecification, Lifeline, or ObjectNode is the specified element, the return value includes diagrams in which the presentations of those InstanceSpecifications, Lifelines, or ObjectNodes are displayed. It also includes diagrams that are located under (i.e., owned by) the specified element.",
                 this::getDiagramsOfElement,
                 IdDTO.class,
-                NameIdTypeListDTO.class)
-        );
-    }
+                NameIdTypeListDTO.class),
 
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
+
             ToolSupport.toolDefinitionReturningDto(
                 "add_stereotype",
                 "Add a stereotype (specified by string) to the specified element (specified by ID), and return the element after it is edited.",
@@ -93,7 +75,7 @@ public class ElementTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "change_tagged_val",
-                "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element after it is changed.",
+                "Change the value of the specified key (specified by string) of the specified element (specified by ID), and return the element after it is changed. The key is case-sensitive and must be the key of a tagged value that the element already has; otherwise an error is returned.",
                 this::changeTaggedValue,
                 ElementWithTaggedValueDTO.class,
                 ElementDTO.class)
@@ -141,16 +123,71 @@ public class ElementTool implements ToolProvider {
 
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
 
+        ITaggedValue astahTaggedValue = findTaggedValue(astahElement, param.targetKey());
+        if (astahTaggedValue == null) {
+            throw new IllegalArgumentException(describeMissingTaggedValueKey(astahElement, param.targetKey()));
+        }
+
+        txnAstah.run( () -> {
+            astahTaggedValue.setValue(param.value());
+        });
+
+        return ElementDTOAssembler.toDTO(astahElement);
+    }
+
+    private ITaggedValue findTaggedValue(IElement astahElement, String key) {
+
         for (ITaggedValue taggedValue : astahElement.getTaggedValues()) {
-            if (taggedValue.getKey().equals(param.targetKey())) {
-                txnAstah.run( () -> {
-                    taggedValue.setValue(param.value());
-                });
-                break;
+            if (taggedValue.getKey().equals(key)) {
+                return taggedValue;
             }
         }
 
-        return ElementDTOAssembler.toDTO(astahElement);
+        return null;
+    }
+
+    private String describeMissingTaggedValueKey(IElement astahElement, String key) {
+
+        List<String> listedKeys = new ArrayList<>();
+        int internalKeyCount = 0;
+        String caseInsensitiveMatch = null;
+
+        for (ITaggedValue taggedValue : astahElement.getTaggedValues()) {
+            String existingKey = taggedValue.getKey();
+
+            // Keys managed by Astah are left out of the list, because an element can carry many of them and they are not meant to be changed by this tool.
+            if (existingKey.startsWith(ASTAH_INTERNAL_TAGGED_VALUE_KEY_PREFIX)) {
+                internalKeyCount++;
+                continue;
+            }
+
+            listedKeys.add(existingKey);
+            if (caseInsensitiveMatch == null && existingKey.equalsIgnoreCase(key)) {
+                caseInsensitiveMatch = existingKey;
+            }
+        }
+
+        StringBuilder message = new StringBuilder(String.format(
+            "Failed to change the tagged value because the element (ID: %s) has no tagged value with the key '%s'. Keys are case-sensitive.",
+            astahElement.getId(), key));
+
+        if (caseInsensitiveMatch != null) {
+            message.append(String.format(" Did you mean '%s'?", caseInsensitiveMatch));
+        }
+
+        message.append(listedKeys.isEmpty()
+            ? " Existing keys: (none)."
+            : " Existing keys: " + listedKeys + ".");
+
+        if (internalKeyCount > 0) {
+            message.append(String.format(
+                " (%d Astah-internal key(s) starting with '%s' are not listed.)",
+                internalKeyCount, ASTAH_INTERNAL_TAGGED_VALUE_KEY_PREFIX));
+        }
+
+        message.append(" To add a new tagged value, use create_tagged_val.");
+
+        return message.toString();
     }
 
     private NameIdTypeListDTO getDiagramsOfElement(IdDTO param) throws Exception {

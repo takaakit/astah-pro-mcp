@@ -44,6 +44,9 @@ public class MessageDTOAssembler {
             operation = NameIdTypeDTO.empty();
         }
 
+        // If the message has no index (such as a return message), use an empty string.
+        String index = astahMessage.getIndex() != null ? astahMessage.getIndex() : "";
+
         return new MessageDTO(
             NamedElementDTOAssembler.toDTO(astahMessage),
             astahMessage.getArgument(),
@@ -53,7 +56,7 @@ public class MessageDTOAssembler {
             astahMessage.isAsynchronous(),
             astahMessage.isReturnMessage(),
             astahMessage.isSynchronous(),
-            astahMessage.getIndex(),
+            index,
             activator,
             successor,
             source,

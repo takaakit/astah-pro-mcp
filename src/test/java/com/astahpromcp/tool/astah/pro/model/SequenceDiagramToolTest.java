@@ -34,8 +34,7 @@ public class SequenceDiagramToolTest {
         tool = new SequenceDiagramTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

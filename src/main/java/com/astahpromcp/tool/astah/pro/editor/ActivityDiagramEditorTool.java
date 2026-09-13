@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
@@ -24,52 +24,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
 @Slf4j
-public class ActivityDiagramEditorTool implements ToolProvider {
+public class ActivityDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final ActivityDiagramEditor activityDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public ActivityDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, ActivityDiagramEditor activityDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.activityDiagramEditor = activityDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create activity diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_accept_event_act",
@@ -101,7 +79,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_activity_param_node",
-                "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the activity parameter node along with the updated diagram image in low resolution. An empty string is not allowed as a node name.",
+                "Create a new activity parameter node of the base class (specified by ID) at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the activity parameter node along with the updated diagram image in low resolution. An empty string is not allowed as a node name. Note that an activity parameter node is always placed on the border of the diagram frame: it is snapped from the specified point onto the nearest edge of the frame. Specify a point close to the edge where the node should sit, and check the returned drawn rectangle for its actual location.",
                 this::createActivityParameterNode,
                 NewActivityParameterNodeDTO.class,
                 NodePresentationDTO.class),
@@ -129,14 +107,14 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_dep_between_nodes",
-                "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created link presentation of the dependency along with the updated diagram image in low resolution.",
+                "Create a new dependency between the specified source node presentation (specified by ID) and the specified target node presentation (specified by ID) on the specified activity diagram (specified by ID), and return the newly created link presentation of the dependency along with the updated diagram image in low resolution. Set the name to an empty string when the dependency has no name.",
                 this::createDependency,
                 NewDependencyDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_final_node",
-                "Create a new final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the final node along with the updated diagram image in low resolution. An empty string is not allowed as a node name.",
+                "Create a new final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the final node along with the updated diagram image in low resolution. Always set a name. An empty string is not allowed as a node name.",
                 this::createFinalNode,
                 NewFinalNodeDTO.class,
                 NodePresentationDTO.class),
@@ -150,7 +128,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_flow_final_node",
-                "Create a new flow final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the flow final node along with the updated diagram image in low resolution. An empty string is not allowed as a node name.",
+                "Create a new flow final node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the flow final node along with the updated diagram image in low resolution. Always set a name. An empty string is not allowed as a node name.",
                 this::createFlowFinalNode,
                 NewFlowFinalNodeDTO.class,
                 NodePresentationDTO.class),
@@ -164,7 +142,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_init_node",
-                "Create a new initial node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the initial node along with the updated diagram image in low resolution. An empty string is not allowed as a node name. An empty string is not allowed as a node name.",
+                "Create a new initial node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the initial node along with the updated diagram image in low resolution. Always set a name. An empty string is not allowed as a node name.",
                 this::createInitialNode,
                 NewInitialNodeDTO.class,
                 NodePresentationDTO.class),
@@ -297,7 +275,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         log.debug("Create activity parameter node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
-        IClass astahBaseClass = astahProToolSupport.getClass(param.baseClassId());
+        IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
@@ -544,7 +522,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         log.debug("Create object node: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
-        IClass astahBaseClass = astahProToolSupport.getClass(param.baseClassId());
+        IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
@@ -596,7 +574,7 @@ public class ActivityDiagramEditorTool implements ToolProvider {
         log.debug("Create pin: {}", param);
 
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
-        IClass astahBaseClass = astahProToolSupport.getClass(param.baseClassId());
+        IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
         INodePresentation astahParentAction = astahProToolSupport.getNodePresentation(param.parentActionId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);

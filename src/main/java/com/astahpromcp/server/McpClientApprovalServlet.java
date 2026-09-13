@@ -104,15 +104,15 @@ public class McpClientApprovalServlet extends HttpServlet {
         // If the origin is not allowed, reject the request
         if (!isOriginAllowed(actualReq)) {
             String origin = Optional.ofNullable(actualReq.getHeader("Origin")).orElse("<none>");
-            log.warn("Rejected MCP request due to disallowed Origin header: {}", origin);
+            log.warn("Rejected MCP request to port {} due to disallowed Origin header: {}", context.localPort(), origin);
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Origin not allowed");
             return;
         }
 
         // 'server/discover' is a pre-initialize probe sent by newer MCP clients. The transport rejects pre-session methods it does not know with a plain HTTP 400 instead of a JSON-RPC error envelope, so answer -32601 here; the client then falls back to the legacy initialize handshake.
         if ("server/discover".equals(call.method()) && context.sessionId().isEmpty()) {
-            log.info("Received server/discover probe from {}; replying 'Method not found' to trigger the initialize fallback",
-                    context.clientAddress());
+            log.info("Received server/discover probe from {} to port {}; replying 'Method not found' to trigger the initialize fallback",
+                    context.clientAddress(), context.localPort());
             respondMethodNotFound(resp, call.id());
             return;
         }
@@ -120,11 +120,11 @@ public class McpClientApprovalServlet extends HttpServlet {
         // If the request is an initialize attempt, request approval from the user
         if (call.isInitialize()) {
             if (!requestUserApproval(context)) {
-                log.info("Rejected MCP connection from {}", context.clientAddress());
+                log.info("Rejected MCP connection from {} to port {}", context.clientAddress(), context.localPort());
                 resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Connection not approved by user");
                 return;
             }
-            log.info("Approved MCP connection from {}", context.clientAddress());
+            log.info("Approved MCP connection from {} to port {}", context.clientAddress(), context.localPort());
         }
 
         // Create a response wrapper to track the status and the issued session ID
@@ -136,13 +136,13 @@ public class McpClientApprovalServlet extends HttpServlet {
         // Log the session issued by the transport after a successful initialization
         if (call.isInitialize() && responseWrapper.isSuccessful()) {
             responseWrapper.issuedSessionId().ifPresent(sessionId ->
-                    log.info("Registered client session: {} from {} (User-Agent: {})",
-                            sessionId, context.clientAddress(), context.userAgent()));
+                    log.info("Registered client session: {} from {} to port {} (User-Agent: {})",
+                            sessionId, context.clientAddress(), context.localPort(), context.userAgent()));
         }
 
         // Log when the MCP client closes its session
         if (context.isDeleteRequest() && responseWrapper.isSuccessful() && context.sessionId().isPresent()) {
-            log.info("Connection closed by MCP client (session '{}').", context.sessionId().get());
+            log.info("Connection closed by MCP client (session '{}') on port {}.", context.sessionId().get(), context.localPort());
         }
     }
 
@@ -166,8 +166,8 @@ public class McpClientApprovalServlet extends HttpServlet {
     private boolean requestUserApproval(RequestContext context) {
         // Auto-approve follow-up initializes from the same client right after a user approval
         if (isWithinApprovalGracePeriod(context)) {
-            log.info("Auto-approved MCP connection from {} within the approval grace period (User-Agent: {}).",
-                    context.clientAddress(), context.userAgent());
+            log.info("Auto-approved MCP connection from {} to port {} within the approval grace period (User-Agent: {}).",
+                    context.clientAddress(), context.localPort(), context.userAgent());
             return true;
         }
 
@@ -179,14 +179,14 @@ public class McpClientApprovalServlet extends HttpServlet {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Interrupted while waiting for the approval dialog of another connection; rejecting {}",
-                    context.clientAddress());
+            log.warn("Interrupted while waiting for the approval dialog of another connection on port {}; rejecting {}",
+                    context.localPort(), context.clientAddress());
             return false;
         }
 
         if (!acquired) {
-            log.warn("Gave up waiting for the approval dialog of another connection after {} seconds; rejecting {}",
-                    McpServerConfig.APPROVAL_DIALOG_WAIT_TIMEOUT_SECONDS, context.clientAddress());
+            log.warn("Gave up waiting for the approval dialog of another connection on port {} after {} seconds; rejecting {}",
+                    context.localPort(), McpServerConfig.APPROVAL_DIALOG_WAIT_TIMEOUT_SECONDS, context.clientAddress());
             return false;
         }
 
@@ -211,7 +211,7 @@ public class McpClientApprovalServlet extends HttpServlet {
     // Prompt the user with a modal dialog and return whether they approved the connection
     boolean promptUserForApproval(RequestContext context) throws InterruptedException, InvocationTargetException {
         if (GraphicsEnvironment.isHeadless()) {
-            log.warn("Headless environment detected. Rejecting connection from {}:{}.", context.remoteAddress(), context.remotePort());
+            log.warn("Headless environment detected. Rejecting connection from {} to port {}.", context.clientAddress(), context.localPort());
             return false;
         }
 
@@ -240,15 +240,14 @@ public class McpClientApprovalServlet extends HttpServlet {
     }
 
     // Build the dialog message
-    private String buildDialogMessage(RequestContext context) {
-        String sb = "Connection request received from MCP client." + "\n" +
+    String buildDialogMessage(RequestContext context) {
+        return "Connection request received from MCP client." + "\n" +
                 "\n" +
-                "Address: " + context.remoteAddress() + "\n" +
-                "Host: " + context.remoteHost() + "\n" +
-                "Port: " + context.remotePort() + "\n" +
+                "Client address: " + context.remoteAddress() + "\n" +
+                "Client host: " + context.remoteHost() + "\n" +
+                "Client port: " + context.remotePort() + "\n" +
+                "Server port: " + context.localPort() + "\n" +
                 "User-Agent: " + context.userAgent() + "\n";
-
-        return sb;
     }
 
     // Check if the origin is allowed
@@ -442,6 +441,7 @@ public class McpClientApprovalServlet extends HttpServlet {
         private final String remoteAddress;
         private final int remotePort;
         private final String remoteHost;
+        private final int localPort;
         private final String userAgent;
 
         private RequestContext(String method,
@@ -449,12 +449,14 @@ public class McpClientApprovalServlet extends HttpServlet {
                                String remoteAddress,
                                int remotePort,
                                String remoteHost,
+                               int localPort,
                                String userAgent) {
             this.method = method;
             this.sessionId = sessionId;
             this.remoteAddress = remoteAddress;
             this.remotePort = remotePort;
             this.remoteHost = remoteHost;
+            this.localPort = localPort;
             this.userAgent = userAgent;
         }
 
@@ -467,8 +469,9 @@ public class McpClientApprovalServlet extends HttpServlet {
             String remoteAddress = request.getRemoteAddr();
             int remotePort = request.getRemotePort();
             String remoteHost = request.getRemoteHost();
+            int localPort = request.getLocalPort();
             String userAgent = Optional.ofNullable(request.getHeader("User-Agent")).orElse("Unknown");
-            return new RequestContext(method, sessionIdHeader, remoteAddress, remotePort, remoteHost, userAgent);
+            return new RequestContext(method, sessionIdHeader, remoteAddress, remotePort, remoteHost, localPort, userAgent);
         }
 
         boolean isDeleteRequest() {
@@ -493,6 +496,10 @@ public class McpClientApprovalServlet extends HttpServlet {
 
         String remoteHost() {
             return remoteHost;
+        }
+
+        int localPort() {
+            return localPort;
         }
 
         String userAgent() {

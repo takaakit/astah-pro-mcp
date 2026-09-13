@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithAbstractDTO;
@@ -48,7 +49,7 @@ public class ClassToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
-            true);
+            new SystemPropertySupport());
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

@@ -9,7 +9,7 @@ public record NewInstanceWithPointDTO(
     @JsonPropertyDescription("Target class identifier")
     String targetClassId,
 
-    @JsonPropertyDescription("New instance name")
+    @JsonPropertyDescription("New instance name. Set this to an empty string when the instance specification has no name.")
     String newInstanceName,
 
     @JsonPropertyDescription("Location X coordinate")

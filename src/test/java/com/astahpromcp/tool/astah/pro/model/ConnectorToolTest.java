@@ -34,8 +34,7 @@ public class ConnectorToolTest {
         tool = new ConnectorTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

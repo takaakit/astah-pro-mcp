@@ -42,8 +42,7 @@ public class ERDatatypeToolTest {
         tool = new ERDatatypeTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

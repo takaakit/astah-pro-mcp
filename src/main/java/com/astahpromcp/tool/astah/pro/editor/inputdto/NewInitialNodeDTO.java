@@ -6,7 +6,7 @@ public record NewInitialNodeDTO(
     @JsonPropertyDescription("Target activity diagram identifier")
     String targetActivityDiagramId,
 
-    @JsonPropertyDescription("New initial node name. An empty string is not allowed as a node name. An empty string is not allowed as a node name.")
+    @JsonPropertyDescription("New initial node name. Always set a name. An empty string is not allowed as a node name.")
     String newInitialNodeName,
 
     @JsonPropertyDescription("Location X coordinate")

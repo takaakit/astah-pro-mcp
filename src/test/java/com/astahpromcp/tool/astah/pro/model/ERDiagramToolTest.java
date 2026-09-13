@@ -42,8 +42,7 @@ public class ERDiagramToolTest {
         tool = new ERDiagramTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

@@ -7,6 +7,11 @@ import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
 @Slf4j
 public class AstahProToolSupport {
     
@@ -17,10 +22,18 @@ public class AstahProToolSupport {
     }
 
     private <T> T getEntity(String id, Class<T> clazz, String typeName) {
-        
+
         IEntity astahEntity = projectAccessor.getEntity(id);
 
         if (astahEntity == null) {
+            // A primitive type is never returned by getEntity(), so an ID that reaches here may still name one. Say so, because "incorrect ID" would be misleading.
+            IClass astahPrimitiveType = findPrimitiveType(id);
+            if (astahPrimitiveType != null) {
+                throw new IllegalArgumentException(String.format(
+                    "Failed to get %s (ID: %s) because '%s' is a primitive type predefined in the project. A primitive type can only be used as a type or a base classifier (for example, the type of an attribute or the base class of an object node); it can never be renamed, edited or deleted.",
+                    typeName, id, astahPrimitiveType.getName()));
+            }
+
             throw new NullPointerException(String.format("Failed to get %s (ID: %s) due to an incorrect ID.", typeName, id));
         }
 
@@ -29,6 +42,59 @@ public class AstahProToolSupport {
         }
         
         return clazz.cast(astahEntity);
+    }
+
+    public List<IClass> getPrimitiveTypes() {
+
+        Set<INamedElement> astahPrimitiveTypes;
+        try {
+            astahPrimitiveTypes = projectAccessor.getPrimitiveTypes();
+        } catch (Exception e) {
+            // No project is open, for example.
+            log.debug("Failed to get the primitive types of the project.", e);
+            return List.of();
+        }
+
+        List<IClass> primitiveTypes = new ArrayList<>();
+        for (INamedElement astahPrimitiveType : astahPrimitiveTypes) {
+            // The set holds a null entry in place of a primitive type that has been broken by an edit, so it is not enough to take every entry.
+            if (astahPrimitiveType instanceof IClass) {
+                primitiveTypes.add((IClass) astahPrimitiveType);
+            }
+        }
+        primitiveTypes.sort(Comparator.comparing(INamedElement::getName));
+
+        return primitiveTypes;
+    }
+
+    public IClass findPrimitiveType(String id) {
+
+        for (IClass primitiveType : getPrimitiveTypes()) {
+            if (primitiveType.getId().equals(id)) {
+                return primitiveType;
+            }
+        }
+
+        return null;
+    }
+
+    public IClass getClassOrPrimitiveType(String id) {
+
+        IClass astahPrimitiveType = findPrimitiveType(id);
+        if (astahPrimitiveType != null) {
+            return astahPrimitiveType;
+        }
+
+        return getEntity(id, IClass.class, "classifier");
+    }
+
+    public void verifyDeleted(String id) {
+
+        if (projectAccessor.getEntity(id) == null) {
+            return;
+        }
+
+        throw new IllegalStateException(String.format("Failed to delete entity (ID: %s) because it still exists in the project. Astah may have raised a confirmation dialog and a user may have answered No to it, cancelling the delete.", id));
     }
 
     public IDiagram getDiagram(String id) {

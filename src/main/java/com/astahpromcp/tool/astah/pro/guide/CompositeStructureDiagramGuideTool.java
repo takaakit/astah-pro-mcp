@@ -39,9 +39,12 @@ public class CompositeStructureDiagramGuideTool implements ToolProvider {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * In the definition below, StructuredClassifier and EncapsulatedClassifier correspond to the Class element in Astah. Therefore, understand StructuredClassifier as Class.
-* Draw a composite structure diagram in this order: (1) create a structured class presentation and set its width and height, (2) create attributes of the class and render them as part presentations, (3) create ports, (4) create provided and required interfaces, (5) create connectors.
+* Draw a composite structure diagram in this order: (1) create a structured class presentation and set its width and height, (2) create an association from the structured class to the type of each part, and render the association end owned by the structured class as a part presentation, (3) create ports, (4) create provided and required interfaces, (5) create connectors.
+* A port is a model element before it is a presentation. Create the port under the class that owns it, and then render it as a port presentation.
 * A structured class presentation cannot be shrunk once it has part presentations inside. Therefore, decide its size before creating part presentations.
-* A part presentation is a rendering of an attribute of the structured class. Therefore, create the attribute first, and then render it as a part presentation.
+* A part presentation is a rendering of an attribute owned by the structured class. Create that attribute as an association end, not as a plain attribute. A plain attribute can also be rendered as a part presentation, but no connector can be attached to it later, so the part would have to be recreated.
+* Astah reverses the UML rule for the composite marker: a part box is drawn solid when the association end typed by the structured class has isComposite = true, which leaves the structured class's own ownedAttribute - the very attribute the part box draws - with isComposite = false.
+* NEVER judge whether a role is a part from its own isComposite; read the opposite association end instead. To get a solid part box, create the association with the structured class as its source, and set the composite aggregation kind on that source end.
 * The location of a part presentation is an absolute coordinate on the diagram, not a coordinate relative to its parent. Placing a part presentation outside its parent enlarges the parent so that it encloses the part.
 * Nesting a part presentation within another part presentation is not supported. The parent of a part presentation is always a structured class presentation.
 * A port of a part belongs to the class that types the part, not to the structured class enclosing the part.

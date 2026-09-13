@@ -65,8 +65,7 @@ public class ClassDiagramEditorToolTest {
             transactionSupport,
             classDiagramEditor,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createClassDiagram() method
         createClassDiagram = TestSupport.getAccessibleMethod(
@@ -216,6 +215,50 @@ public class ClassDiagramEditorToolTest {
             "TestInstance");
         assertNotNull(instanceSpecification);
         assertEquals("Bar", instanceSpecification.getClassifier().getName());
+    }
+
+    @Test
+    void createInstanceSpecification_ok_primitiveTypeAsClassifier() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+
+        // Get primitive type
+        IClass primitiveType = null;
+        for (IClass candidate : new AstahProToolSupport(projectAccessor).getPrimitiveTypes()) {
+            if ("int".equals(candidate.getName())) {
+                primitiveType = candidate;
+            }
+        }
+        assertNotNull(primitiveType);
+
+        // Create input DTO
+        NewInstanceWithPointDTO inputDTO = new NewInstanceWithPointDTO(
+            classDiagram.getId(),
+            primitiveType.getId(),
+            "TestPrimitiveInstance",
+            300,
+            200);
+
+        // ----------------------------------------
+        // Call createInstanceSpecification()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createInstanceSpecification,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Get instance specification
+        IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElementByClassAndName(
+            IInstanceSpecification.class,
+            "TestPrimitiveInstance");
+        assertNotNull(instanceSpecification);
+        assertEquals("int", instanceSpecification.getClassifier().getName());
     }
 
     @Test

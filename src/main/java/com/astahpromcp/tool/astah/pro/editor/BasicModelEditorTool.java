@@ -1,9 +1,10 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
@@ -13,50 +14,30 @@ import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicModelEditor.html
 @Slf4j
-public class BasicModelEditorTool implements ToolProvider {
+public class BasicModelEditorTool extends AstahToolProvider {
 
     private final BasicModelEditor basicModelEditor;
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
-    private final boolean includeEditTools;
+    private final SystemPropertySupport systemPropertySupport;
 
-    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport) {
         this.basicModelEditor = basicModelEditor;
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
-        this.includeEditTools = includeEditTools;
+        this.systemPropertySupport = systemPropertySupport;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create basic model editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "change_parent",
@@ -200,7 +181,7 @@ public class BasicModelEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "create_qualifier",
-                "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created model element of the qualifier. Limitation: Because an ID of the qualifier type is required, a qualifier of a primitive type cannot be created.",
+                "Create a new qualifier (type and name) to the specified association end (specified by ID), and return the newly created model element of the qualifier.",
                 this::createQualifier,
                 NewQualifierToAssociationEndDTO.class,
                 AttributeDTO.class),
@@ -588,7 +569,7 @@ public class BasicModelEditorTool implements ToolProvider {
         log.debug("Create qualifier: {}", param);
 
         IAttribute astahAssociationEnd = astahProToolSupport.getAttribute(param.targetAssociationEndId());
-        IClass astahType = astahProToolSupport.getClass(param.qualifierTypeId());
+        IClass astahType = astahProToolSupport.getClassOrPrimitiveType(param.qualifierTypeId());
 
         // Create an attribute on the owner class to serve as the qualifier
         IAttribute createdAstahQualifier = txnAstah.call( () -> {
@@ -620,7 +601,7 @@ public class BasicModelEditorTool implements ToolProvider {
         log.debug("Create template parameter: {}", param);
 
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
-        IClass astahType = astahProToolSupport.getClass(param.templateParameterTypeId());
+        IClass astahType = astahProToolSupport.getClassOrPrimitiveType(param.templateParameterTypeId());
 
         txnAstah.run( () -> {
             basicModelEditor.createTemplateParameter(
@@ -640,9 +621,13 @@ public class BasicModelEditorTool implements ToolProvider {
 
         ElementDTO deletedElementDTO = ElementDTOAssembler.toDTO(astahElement);
 
-        txnAstah.run( () -> {
-            basicModelEditor.delete(astahElement);
+        systemPropertySupport.deleteWithoutConfirmationDialog( () -> {
+            txnAstah.run( () -> {
+                basicModelEditor.delete(astahElement);
+            });
         });
+
+        astahProToolSupport.verifyDeleted(param.id());
 
         return deletedElementDTO;
     }

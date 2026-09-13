@@ -12,10 +12,10 @@ public record NewActivityParameterNodeDTO(
     @JsonPropertyDescription("New activity parameter node name. An empty string is not allowed as a node name.")
     String newActivityParameterNodeName,
 
-    @JsonPropertyDescription("Location X coordinate")
+    @JsonPropertyDescription("Location X coordinate. The node is snapped from this point onto the nearest edge of the diagram frame.")
     int locationX,
 
-    @JsonPropertyDescription("Location Y coordinate")
+    @JsonPropertyDescription("Location Y coordinate. The node is snapped from this point onto the nearest edge of the diagram frame.")
     int locationY
 ) {
 }

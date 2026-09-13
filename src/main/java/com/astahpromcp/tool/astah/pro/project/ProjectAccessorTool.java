@@ -1,8 +1,8 @@
 package com.astahpromcp.tool.astah.pro.project;
 
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.FilePathDTO;
@@ -16,6 +16,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOA
 import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
+import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -30,37 +31,20 @@ import java.nio.file.Path;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
 @Slf4j
-public class ProjectAccessorTool implements ToolProvider {
+public class ProjectAccessorTool extends AstahToolProvider {
 
     private static final String UNSAVED_PROJECT_PATH = "no_title";
 
     private final ProjectAccessor projectAccessor;
     private final AstahProToolSupport astahProToolSupport;
-    private final boolean includeEditTools;
 
-    public ProjectAccessorTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public ProjectAccessorTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.astahProToolSupport = astahProToolSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create project accessor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_proj",
@@ -85,7 +69,7 @@ public class ProjectAccessorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "find_named_elements_by_name",
-                "Search named elements in the project by partially matching the element name. Search names are case-insensitive. Note that presentations won't be searched.",
+                "Search named elements in the project by partial (substring) match on the element name, case-insensitively: searching \"Book\" also returns \"BookCopy\". Note that presentations won't be searched. The primitive types predefined in the project (e.g., int) are searched as well, and are returned with the element type \"PrimitiveType\".",
                 this::findNamedElementsByName,
                 NameDTO.class,
                 NameIdTypeListDTO.class),
@@ -95,12 +79,9 @@ public class ProjectAccessorTool implements ToolProvider {
                 "Return the full path of the Astah project file (e.g., /path/to/project.asta). If the project has not been saved, return an empty string. For example, use this tool when you want to derive a relative path from an absolute path based on the Astah project file location.",
                 this::getProjectPath,
                 NoInputDTO.class,
-                ProjectPathDTO.class)
-        );
-    }
+                ProjectPathDTO.class),
 
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
+
             ToolSupport.toolDefinitionReturningDto(
                 "create_proj",
                 "Create an Astah project (root package), and return the model element of the named element for the project. The project element is the root package.",
@@ -117,14 +98,14 @@ public class ProjectAccessorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "save_proj",
-                "Save the current project, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
+                "Save the current project, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Harness.",
                 this::saveProject,
                 NoInputDTO.class,
                 ProjectPathDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "save_proj_as",
-                "Save the current project with a new name, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.",
+                "Save the current project with a new name, and return the full path of the Astah project file (e.g., /path/to/project.asta). Note: Save the project using this tool only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Harness.",
                 this::saveProjectAs,
                 FilePathDTO.class,
                 ProjectPathDTO.class)
@@ -257,6 +238,13 @@ public class ProjectAccessorTool implements ToolProvider {
             }
         }
 
+        // A primitive type is not a part of the model tree, so findElements() never returns one. Search the primitive types here as well, because a type is what is most often looked up by name.
+        for (IClass astahPrimitiveType : astahProToolSupport.getPrimitiveTypes()) {
+            if (astahPrimitiveType.getName().toLowerCase().contains(param.name().toLowerCase())) {
+                namedIdTypeDTOs.add(NameIdTypeDTOAssembler.toPrimitiveTypeDTO(astahPrimitiveType));
+            }
+        }
+
         return new NameIdTypeListDTO(namedIdTypeDTOs);
     }
 
@@ -304,7 +292,7 @@ public class ProjectAccessorTool implements ToolProvider {
 
         // Check that the target file does not already exist
         if (new File(param.filePath()).exists()) {
-            throw new RuntimeException("The specified file path already exists: " + param.filePath());
+            throw new RuntimeException("The specified file path already exists: " + param.filePath() + ". If you want to save the current project, use other tool function to overwrite it.");
         }
 
         try {

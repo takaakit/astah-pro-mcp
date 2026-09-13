@@ -4,6 +4,7 @@ import tools.jackson.core.JacksonException;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -20,7 +21,7 @@ public final class ResponseSupport {
     // Success method is used to return a success response with contents
     public static McpSchema.CallToolResult success(List<McpSchema.Content> contents) {
         return McpSchema.CallToolResult.builder()
-                .content(contents)
+                .content(withoutEmptyImages(contents))
                 .isError(false)
                 .build();
     }
@@ -37,13 +38,33 @@ public final class ResponseSupport {
             String jsonContent = JsonSupport.OBJ_MAPPER.writeValueAsString(dto);
 
             return McpSchema.CallToolResult.builder()
-                    .content(contents)
+                    .content(withoutEmptyImages(contents))
                     .isError(false)
                     .structuredContent(JsonSupport.MCP_JSON_MAPPER, jsonContent)
                     .build();
 
         } catch (JacksonException | IllegalArgumentException e) {
             return error(serializationErrorMessage(dto, e));
+        }
+    }
+
+    // Drop any image content that carries no data
+    private static List<McpSchema.Content> withoutEmptyImages(List<McpSchema.Content> contents) {
+        if (contents == null || contents.isEmpty()) {
+            return List.of();
+        
+        } else {
+            List<McpSchema.Content> kept = new ArrayList<>(contents.size());
+            for (McpSchema.Content content : contents) {
+                if (content instanceof McpSchema.ImageContent image
+                        && (image.data() == null || image.data().isEmpty())) {
+                    log.debug("Dropped an image content of type {} carrying no data", image.mimeType());
+                    continue;
+                }
+                kept.add(content);
+            }
+    
+            return List.copyOf(kept);
         }
     }
 

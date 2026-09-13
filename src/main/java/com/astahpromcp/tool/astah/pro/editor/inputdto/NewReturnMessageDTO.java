@@ -9,7 +9,7 @@ public record NewReturnMessageDTO(
     @JsonPropertyDescription("Target message link presentation identifier corresponding to the return message")
     String targetMessageLinkPresentationId,
     
-    @JsonPropertyDescription("New return message name")
+    @JsonPropertyDescription("New return message name. Set this to an empty string when the return message has no name.")
     String newReturnMessageName
 ) {
 }

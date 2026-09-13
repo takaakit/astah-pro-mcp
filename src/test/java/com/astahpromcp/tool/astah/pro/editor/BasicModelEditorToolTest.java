@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
@@ -70,7 +71,7 @@ public class BasicModelEditorToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
-            true);
+            new SystemPropertySupport());
 
         // changeParent() method
         changeParent = TestSupport.getAccessibleMethod(
@@ -590,6 +591,38 @@ public class BasicModelEditorToolTest {
         assertEquals(com.astahpromcp.tool.astah.pro.common.NavigabilityKind.NAVIGABLE.astahValue, createdAssociationEndB.getNavigability());
         assertEquals(false, createdAssociationEndB.isAggregate());
         assertEquals(false, createdAssociationEndB.isComposite());
+        assertEquals(targetClass.getId(), outputDTO.associationEndAOwner().id());
+        assertEquals(sourceClass.getId(), outputDTO.associationEndBOwner().id());
+    }
+
+    @Test
+    void createAssociation_selfAssociation_ok() throws Exception {
+        // Get class
+        IClass fooClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+
+        // Create input DTO
+        NewAssociationDTO inputDTO = new NewAssociationDTO(
+            fooClass.getId(),
+            fooClass.getId(),
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.UNSPECIFIED,
+            com.astahpromcp.tool.astah.pro.common.NavigabilityKind.UNSPECIFIED,
+            com.astahpromcp.tool.astah.pro.common.AggregationKind.NONE,
+            com.astahpromcp.tool.astah.pro.common.AggregationKind.NONE);
+
+        // ----------------------------------------
+        // Call createAssociation()
+        // ----------------------------------------
+        AssociationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            createAssociation,
+            tool,
+            inputDTO,
+            AssociationDTO.class);
+
+        // Check with the created association
+        assertEquals(fooClass.getId(), outputDTO.associationEndAOwner().id());
+        assertEquals(fooClass.getId(), outputDTO.associationEndBOwner().id());
     }
 
     @Test
@@ -616,9 +649,11 @@ public class BasicModelEditorToolTest {
             tool,
             inputDTO,
             AssociationClassDTO.class);
-        
+
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(targetClass.getId(), outputDTO.association().associationEndAOwner().id());
+        assertEquals(sourceClass.getId(), outputDTO.association().associationEndBOwner().id());
     }
 
     @Test

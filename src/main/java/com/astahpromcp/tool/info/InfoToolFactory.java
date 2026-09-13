@@ -1,6 +1,5 @@
 package com.astahpromcp.tool.info;
 
-import com.astahpromcp.tool.ToolCategoryFlags;
 import com.astahpromcp.tool.ToolProvider;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +12,7 @@ public class InfoToolFactory {
     public InfoToolFactory() {
     }
 
-    public List<ToolProvider> createToolProviders(ToolCategoryFlags categoryFlags) {
+    public List<ToolProvider> createToolProviders() {
         try {
             return List.of(
                     new InfoTool()

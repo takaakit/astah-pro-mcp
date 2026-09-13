@@ -43,8 +43,7 @@ public class AttributeToolTest {
         tool = new AttributeTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

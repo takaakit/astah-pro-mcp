@@ -6,7 +6,7 @@ public record NewDestroyMessageDTO(
     @JsonPropertyDescription("Target sequence diagram identifier")
     String targetSequenceDiagramId,
     
-    @JsonPropertyDescription("New destroy message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name.")
+    @JsonPropertyDescription("New destroy message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name. Set this to an empty string when the destroy message has no name.")
     String newDestroyMessageName,
     
     @JsonPropertyDescription("Sender node presentation identifier. Must be one of the following node presentation types: Activation (ExecutionSpecification), Lifeline, InteractionUse, or Frame.")

@@ -45,8 +45,7 @@ public class ProjectAccessorToolTest {
         // Tool
         tool = new ProjectAccessorTool(
             projectAccessor,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // createProject() method
         createProject = TestSupport.getAccessibleMethod(
@@ -291,6 +290,26 @@ public class ProjectAccessorToolTest {
         assertNotNull(outputDTO);
         assertEquals(outputDTO.value().size(), 1);
         assertEquals(outputDTO.value().get(0).name(), "Foo");
+    }
+
+    @Test
+    void findNamedElementsByName_ok_primitiveType() throws Exception {
+        // Create input DTO
+        NameDTO inputDTO = new NameDTO("int");
+
+        // ----------------------------------------
+        // Call findNamedElementsByName()
+        // ----------------------------------------
+        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            findNamedElementsByName,
+            tool,
+            inputDTO,
+            NameIdTypeListDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.value().stream().anyMatch(nameIdType ->
+            "int".equals(nameIdType.name()) && "PrimitiveType".equals(nameIdType.type())));
     }
 
     @Test

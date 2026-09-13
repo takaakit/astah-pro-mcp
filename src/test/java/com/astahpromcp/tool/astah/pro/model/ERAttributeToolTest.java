@@ -52,8 +52,7 @@ public class ERAttributeToolTest {
         tool = new ERAttributeTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

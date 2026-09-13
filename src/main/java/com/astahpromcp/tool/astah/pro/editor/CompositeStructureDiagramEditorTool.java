@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
@@ -47,45 +47,24 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/CompositeStructureDiagramEditor.html
 @Slf4j
-public class CompositeStructureDiagramEditorTool implements ToolProvider {
+public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final CompositeStructureDiagramEditor compositeStructureDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public CompositeStructureDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, CompositeStructureDiagramEditor compositeStructureDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public CompositeStructureDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, CompositeStructureDiagramEditor compositeStructureDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.compositeStructureDiagramEditor = compositeStructureDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create composite structure diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_composite_structure_dgm",
@@ -124,7 +103,7 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_part_prst",
-                "Create a new part presentation of the specified attribute (specified by ID) inside the specified parent structured class presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the part along with the updated diagram image in low resolution. Since the specified point is an absolute coordinate on the diagram, specify a point inside the parent structured class presentation; otherwise the parent is automatically enlarged to enclose the part.",
+                "Create a new part presentation of the specified attribute (specified by ID) inside the specified parent structured class presentation (specified by ID) at the specified point (specified by x and y coordinates) on the specified composite structure diagram (specified by ID), and return the newly created node presentation of the part along with the updated diagram image in low resolution. Since the specified point is an absolute coordinate on the diagram, specify a point inside the parent structured class presentation; otherwise the parent is automatically enlarged to enclose the part. Only one part presentation of the same attribute can be drawn inside the same parent structured class presentation.",
                 this::createPartPresentation,
                 NewPartPresentationDTO.class,
                 NodePresentationDTO.class),
@@ -270,6 +249,15 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
             throw new IllegalArgumentException("Target attribute for part presentation must be owned by the class that the parent node presentation represents.");
         }
 
+        // Astah silently discards a second part presentation of the same attribute inside the same parent when the transaction is committed, and still returns it as if it had been created.
+        for (IPresentation astahExistingPresentation : astahAttribute.getPresentations()) {
+            if (astahExistingPresentation instanceof INodePresentation astahExistingNodePresentation
+                    && Type.PART.matches(astahExistingNodePresentation.getType())
+                    && astahParentNodePresentation.equals(astahExistingNodePresentation.getParent())) {
+                throw new IllegalArgumentException("A part presentation (ID: " + astahExistingNodePresentation.getID() + ") of the target attribute already exists inside the parent structured class presentation. Only one part presentation of the same attribute can be drawn inside the same parent, so use the existing one.");
+            }
+        }
+
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
         INodePresentation astahNodePresentation = txnAstah.call( () -> {
@@ -280,6 +268,11 @@ public class CompositeStructureDiagramEditorTool implements ToolProvider {
                     param.locationX(),
                     param.locationY()));
         });
+
+        // Safety net for any other case in which Astah discards the part presentation on commit: it then belongs to no diagram and its ID cannot be resolved.
+        if (astahNodePresentation.getDiagram() == null) {
+            throw new IllegalStateException("Astah discarded the part presentation when the edit was committed, so nothing was added to the diagram. Check the part presentations of the target attribute that already exist on the diagram.");
+        }
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 

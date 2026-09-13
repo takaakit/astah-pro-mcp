@@ -12,14 +12,15 @@ import java.io.IOException;
 import java.net.*;
 import java.time.Duration;
 import java.util.Enumeration;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class McpServerAppTest {
 
     private static final int[] SERVER_PORTS = {
-            McpServerConfig.PORT_FOR_FULL_TOOL,
-            McpServerConfig.PORT_FOR_QUERY_ONLY_TOOL
+            McpServerConfig.PORT_FOR_DIRECT,
+            McpServerConfig.PORT_FOR_PROGRAMMATIC
     };
 
     private McpServerApp app;
@@ -66,24 +67,27 @@ public class McpServerAppTest {
     }
 
     @Test
-    void start_ok_jettyConnectorBindsOnlyToLoopbackHost() throws Exception {
+    void start_ok_everyJettyConnectorBindsOnlyToLoopbackHost() throws Exception {
         startServer();
 
-        Server jettyServer = app.getJettyServer();
-        assertNotNull(jettyServer, "Jetty server should be initialized after start");
+        List<Server> jettyServers = app.getJettyServers();
+        assertEquals(SERVER_PORTS.length, jettyServers.size(), "Every profile should have its own Jetty server");
 
-        Connector[] connectors = jettyServer.getConnectors();
-        assertTrue(connectors.length > 0, "Expected at least one connector to be configured");
+        for (Server jettyServer : jettyServers) {
+            Connector[] connectors = jettyServer.getConnectors();
+            assertTrue(connectors.length > 0, "Expected at least one connector to be configured");
 
-        Connector connector = connectors[0];
-        assertTrue(connector instanceof ServerConnector, "First connector should be a ServerConnector");
+            for (Connector connector : connectors) {
+                assertTrue(connector instanceof ServerConnector, "Connector should be a ServerConnector");
 
-        ServerConnector serverConnector = (ServerConnector) connector;
-        String boundHost = serverConnector.getHost();
+                ServerConnector serverConnector = (ServerConnector) connector;
+                String boundHost = serverConnector.getHost();
 
-        assertNotNull(boundHost, "ServerConnector host should be explicitly set");
-        assertEquals("127.0.0.1", boundHost, "ServerConnector must bind to 127.0.0.1");
-        assertNotEquals("0.0.0.0", boundHost, "ServerConnector must not bind to 0.0.0.0");
+                assertNotNull(boundHost, "ServerConnector host should be explicitly set");
+                assertEquals("127.0.0.1", boundHost, "ServerConnector must bind to 127.0.0.1");
+                assertNotEquals("0.0.0.0", boundHost, "ServerConnector must not bind to 0.0.0.0");
+            }
+        }
     }
 
     private void waitForServerReady() throws InterruptedException, UnknownHostException {

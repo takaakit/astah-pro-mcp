@@ -56,4 +56,27 @@ public class ResponseSupportTest {
         assertTrue(result.content().isEmpty());
         assertEquals(Map.of("value", "abc"), result.structuredContent());
     }
+
+    @Test
+    void success_ok_dropsAnImageContentCarryingNoData() {
+        McpSchema.ImageContent noImage = McpSchema.ImageContent.builder("", "image/png").build();
+
+        McpSchema.CallToolResult result = ResponseSupport.success(new TestDto("abc"), List.of(noImage));
+
+        assertFalse(result.isError());
+        assertTrue(result.content().isEmpty());
+        assertEquals(Map.of("value", "abc"), result.structuredContent());
+    }
+
+    @Test
+    void success_ok_keepsEveryContentBesideTheEmptyImage() {
+        McpSchema.ImageContent noImage = McpSchema.ImageContent.builder("", "image/png").build();
+        McpSchema.ImageContent image = McpSchema.ImageContent.builder("base64", "image/png").build();
+        McpSchema.TextContent text = McpSchema.TextContent.builder("plain text").build();
+
+        McpSchema.CallToolResult result = ResponseSupport.success(List.of(noImage, image, text));
+
+        assertFalse(result.isError());
+        assertEquals(List.of(image, text), result.content());
+    }
 }

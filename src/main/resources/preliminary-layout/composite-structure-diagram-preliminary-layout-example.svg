@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="813" height="484" viewBox="28 39 813 484">
+
+  <!-- rectangles -->
+  <g fill="#fff" stroke="#000" stroke-width="1">
+    <rect data-type="Note" data-name="" x="48" y="59" width="388" height="97"/>
+    <rect data-type="StructuredClass" data-name="Class0" x="48" y="212" width="662" height="291"/>
+    <rect data-type="Part" data-name="Part0" x="82" y="292" width="200" height="168"/>
+    <rect data-type="Part" data-name="Part1" x="450" y="292" width="177" height="60"/>
+    <rect data-type="Part" data-name="Part2" x="450" y="400" width="177" height="60"/>
+    <rect data-type="Port" data-name="" x="620" y="315" width="14" height="14"/>
+    <rect data-type="Port" data-name="" x="703" y="315" width="14" height="14"/>
+    <rect data-type="Port" data-name="" x="620" y="423" width="14" height="14"/>
+    <rect data-type="Port" data-name="" x="703" y="423" width="14" height="14"/>
+    <rect data-type="Class" data-name="Interface0" x="780" y="312" width="20" height="20"/>
+    <rect data-type="Class" data-name="Interface1" x="780" y="420" width="20" height="20"/>
+  </g>
+
+  <!-- lines -->
+  <g fill="none" stroke="#000" stroke-width="1">
+    <path data-type="Connector" data-name="crtl" data-source="Part0" data-target="Part1"
+          d="M282,322 L450,322"/>
+    <path data-type="Connector" data-name="out" data-source="Part0" data-target="Part2"
+          d="M282,430 L450,430"/>
+    <path data-type="Connector" data-name="" data-source="Part1" data-target="Class0"
+          d="M634,322 L703,322"/>
+    <path data-type="Connector" data-name="" data-source="Part2" data-target="Class0"
+          d="M634,430 L703,430"/>
+    <path data-type="Usage" data-name="" data-source="Interface0" data-target="Class0"
+          d="M717,322 L780,322"/>
+    <path data-type="Realization" data-name="" data-source="Interface1" data-target="Class0"
+          d="M717,430 L780,430"/>
+  </g>
+
+  <!-- texts -->
+  <g fill="#000" stroke="none" font-family="sans-serif" font-size="12">
+    <text x="379" y="228" text-anchor="middle">Class0</text>
+    <text x="182" y="380" text-anchor="middle">- Part0 : Class2[1]</text>
+    <text x="538" y="326" text-anchor="middle">- Part1 : Class1[3]</text>
+    <text x="538" y="434" text-anchor="middle">- Part2 : Class3[1]</text>
+    <text x="366" y="340" text-anchor="middle">crtl:Control</text>
+    <text x="366" y="448" text-anchor="middle">out:Output</text>
+    <text x="790" y="344" text-anchor="middle">Interface0</text>
+    <text x="790" y="452" text-anchor="middle">Interface1</text>
+  </g>
+</svg>

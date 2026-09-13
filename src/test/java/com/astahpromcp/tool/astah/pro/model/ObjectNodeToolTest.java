@@ -37,8 +37,7 @@ public class ObjectNodeToolTest {
         tool = new ObjectNodeTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

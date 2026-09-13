@@ -34,8 +34,7 @@ public class ERPackageToolTest {
         tool = new ERPackageTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

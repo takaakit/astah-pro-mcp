@@ -55,8 +55,7 @@ public class PresentationToolTest {
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // getElement() method
         getElement = TestSupport.getAccessibleMethod(

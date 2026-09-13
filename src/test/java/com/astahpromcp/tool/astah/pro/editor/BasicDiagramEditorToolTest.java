@@ -50,8 +50,7 @@ public class BasicDiagramEditorToolTest {
             transactionSupport,
             astahProToolSupport,
             diagramEditorSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createNote() method
         createNote = TestSupport.getAccessibleMethod(
@@ -131,7 +130,7 @@ public class BasicDiagramEditorToolTest {
             outputDTO.presentation().id());
         
         // Check with the created note
-        assertEquals(400.0, createdNote.getWidth(), 0.1);
+        assertEquals(800.0, createdNote.getWidth(), 0.1);
         assertEquals(100.0, createdNote.getLocation().getX(), 0.1);
         assertEquals(200.0, createdNote.getLocation().getY(), 0.1);
     }

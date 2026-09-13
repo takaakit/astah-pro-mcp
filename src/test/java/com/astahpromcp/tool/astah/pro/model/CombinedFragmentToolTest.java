@@ -12,6 +12,8 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,8 +45,7 @@ public class CombinedFragmentToolTest {
         tool = new CombinedFragmentTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(
@@ -175,7 +176,7 @@ public class CombinedFragmentToolTest {
 
         // Create input DTO
         InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
-            combinedFragment.getId(),
+            combinedFragment.getPresentations()[0].getID(),
             1,
             120);
 
@@ -201,7 +202,7 @@ public class CombinedFragmentToolTest {
 
         // Create input DTO
         InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
-            combinedFragment.getId(),
+            combinedFragment.getPresentations()[0].getID(),
             3,
             120);
 
@@ -227,7 +228,7 @@ public class CombinedFragmentToolTest {
 
         // Create input DTO
         InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
-            combinedFragment.getId(),
+            combinedFragment.getPresentations()[0].getID(),
             0,
             120);
 
@@ -250,8 +251,65 @@ public class CombinedFragmentToolTest {
 
         // Create input DTO
         InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
-            combinedFragment.getId(),
+            combinedFragment.getPresentations()[0].getID(),
             4,
+            120);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_modelElementIdGiven() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getId(),
+            1,
+            120);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_otherNodePresentationType() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Get a node presentation on the same diagram that does not draw a combined fragment
+        INodePresentation notCombinedFragmentPresentation = null;
+        for (IPresentation presentation : combinedFragment.getPresentations()[0].getDiagram().getPresentations()) {
+            if (presentation instanceof INodePresentation
+                && !"CombinedFragment".equals(presentation.getType())) {
+                notCombinedFragmentPresentation = (INodePresentation) presentation;
+                break;
+            }
+        }
+        assertNotNull(notCombinedFragmentPresentation);
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            notCombinedFragmentPresentation.getID(),
+            1,
             120);
 
         // ----------------------------------------

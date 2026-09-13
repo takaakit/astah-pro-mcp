@@ -6,7 +6,7 @@ public record NewSubMachineStateDTO(
     @JsonPropertyDescription("Target diagram identifier")
     String targetDiagramId,
 
-    @JsonPropertyDescription("Parent node presentation identifier")
+    @JsonPropertyDescription("Parent node presentation identifier. If there is no parent node presentation (i.e., when rendering at the top level), set an empty string.")
     String parentNodePresentationId,
 
     @JsonPropertyDescription("Sub machine diagram identifier")

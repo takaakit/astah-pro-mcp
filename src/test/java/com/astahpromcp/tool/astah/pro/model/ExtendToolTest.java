@@ -34,8 +34,7 @@ public class ExtendToolTest {
         tool = new ExtendTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

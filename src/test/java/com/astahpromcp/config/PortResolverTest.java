@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PortResolverTest {
 
-    private static final String ENV_NAME = "ASTAH_PRO_MCP_PORT_FOR_FULL";
-    private static final int DEFAULT_PORT = 8888;
+    private static final String ENV_NAME = "ASTAH_PRO_MCP_PORT_FOR_DIRECT";
+    private static final int DEFAULT_PORT = 18888;
 
     @Test
     void resolve_ok_usesDefaultWhenValueIsNotConfigured() {

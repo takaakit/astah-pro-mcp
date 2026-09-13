@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.presentation;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
@@ -22,7 +22,6 @@ import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
@@ -30,39 +29,22 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/IPresentation.html
 @Slf4j
-public class PresentationTool implements ToolProvider {
+public class PresentationTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public PresentationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public PresentationTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create presentation tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_element_of_prst",
@@ -73,15 +55,12 @@ public class PresentationTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_all_prst_types",
-                "Return the list of all presentation type names. Note that \"Unknown\" is excluded from the type names.",
+                "Return the list of all presentation type names. A presentation type name is the notation the presentation is drawn with, which may differ from the type of the model element. For example, an enumeration, a component, an artifact and a use case on a class diagram are all drawn with the class rectangle, so their type is \"Class\". Note that \"Unknown\" is excluded from the type names.",
                 this::getAllTypes,
                 NoInputDTO.class,
-                PresentationTypeListDTO.class)
-        );
-    }
+                PresentationTypeListDTO.class),
 
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
+
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_label",
                 "Set the label of the specified presentation (specified by ID), and return the presentation after it is set along with the updated diagram image in low resolution. Note that escape sequences such as \\n cannot be used in labels, but actual newline characters (Unicode U+000A, embedded directly in the string) are supported.",

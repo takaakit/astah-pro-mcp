@@ -36,8 +36,7 @@ public class CommunicationDiagramToolTest {
         tool = new CommunicationDiagramTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

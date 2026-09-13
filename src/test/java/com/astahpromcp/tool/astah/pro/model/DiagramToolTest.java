@@ -56,8 +56,7 @@ public class DiagramToolTest {
             transactionSupport,
             astahProToolSupport,
             new SystemPropertySupport(),
-            imageOutputDir,
-            true);
+            imageOutputDir);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

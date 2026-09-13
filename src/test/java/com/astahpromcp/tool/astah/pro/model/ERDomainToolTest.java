@@ -49,8 +49,7 @@ public class ERDomainToolTest {
         tool = new ERDomainTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

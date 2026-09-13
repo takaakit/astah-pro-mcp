@@ -36,7 +36,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class KnowledgeToolSupport {
 
-    private static final int CHUNK_SIZE = 51200; // characters 50KB (50 * 1024)
+    static final int MAX_CHUNK_CHARS = 49152; // characters 48KB (48 * 1024)
+
+    static final int CHUNK_OVERLAP_MAX_CHARS = 2048; // characters 2KB (2 * 1024)
+
+    private static final int CHUNK_SIZE = MAX_CHUNK_CHARS - CHUNK_OVERLAP_MAX_CHARS; // characters, before the overlap prefix is added
     private static final int CHUNK_OVERLAP_LINES = 3; // lines of the previous chunk repeated at the start of the next chunk
 
     // Reusable, thread-safe HTML-to-Markdown converter
@@ -117,10 +121,20 @@ public class KnowledgeToolSupport {
         List<String> overlappedChunks = new ArrayList<>(chunks.size());
         overlappedChunks.add(chunks.get(0));
         for (int i = 1; i < chunks.size(); i++) {
-            overlappedChunks.add(lastLines(chunks.get(i - 1), overlapLines) + chunks.get(i));
+            overlappedChunks.add(overlapPrefix(chunks.get(i - 1), overlapLines) + chunks.get(i));
         }
 
         return overlappedChunks;
+    }
+
+    // Returns the overlap to put in front of the next chunk: the last `overlapLines` lines of the previous chunk,
+    private static String overlapPrefix(String previousChunk, int overlapLines) {
+        String overlap = lastLines(previousChunk, overlapLines);
+        if (overlap.length() <= CHUNK_OVERLAP_MAX_CHARS) {
+            return overlap;
+        }
+
+        return overlap.substring(overlap.length() - CHUNK_OVERLAP_MAX_CHARS);
     }
 
     // Returns the last `lineCount` lines of the text
@@ -136,15 +150,48 @@ public class KnowledgeToolSupport {
         return text.substring(index + 1);
     }
 
+    // A loaded document, held as one immutable list that is replaced as a whole.
+    public static final class ContentCache {
+
+        private volatile List<String> chunks = List.of();
+
+        // Whether the document has been loaded yet
+        public boolean isLoaded() {
+            return !chunks.isEmpty();
+        }
+
+        // The shape of the loaded document, or null when nothing is loaded.
+        // Read from a single snapshot, so the count and the first chunk always describe the same document.
+        public DocumentDTO describe() {
+            List<String> snapshot = chunks;
+            if (snapshot.isEmpty()) {
+                return null;
+            }
+            return new DocumentDTO(snapshot.size(), snapshot.get(0));
+        }
+
+        // One chunk of the loaded document, read from a single snapshot
+        public String chunkAt(int index) {
+            List<String> snapshot = chunks;
+            if (index < 0 || index >= snapshot.size()) {
+                throw new IllegalArgumentException("Invalid chunk index: " + index);
+            }
+            return snapshot.get(index);
+        }
+
+        private void replace(List<String> newChunks) {
+            chunks = List.copyOf(newChunks);
+        }
+    }
+
     // Splits text into overlapping chunks and replaces the contents of contentCache with them.
-    public static DocumentDTO chunkAndCache(String text, List<String> contentCache) {
+    public static DocumentDTO chunkAndCache(String text, ContentCache contentCache) {
         List<String> chunks = splitTextWithOverlap(text, CHUNK_SIZE, CHUNK_OVERLAP_LINES);
         if (chunks.isEmpty()) {
             chunks.add(""); // Ensure there is at least one empty chunk
         }
 
-        contentCache.clear();
-        contentCache.addAll(chunks);
+        contentCache.replace(chunks);
 
         return new DocumentDTO(chunks.size(), chunks.get(0));
     }

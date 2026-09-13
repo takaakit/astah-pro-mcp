@@ -49,8 +49,7 @@ public class ERRelationshipToolTest {
         tool = new ERRelationshipTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

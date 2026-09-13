@@ -44,6 +44,13 @@ public class PartitionDTOAssembler {
             subPartitions.add(NameIdTypeDTOAssembler.toDTO(astahSubPartition));
         }
 
+        NameIdTypeDTO represents;
+        if (astahPartition.getRepresents() != null) {
+            represents = NameIdTypeDTOAssembler.toDTO(astahPartition.getRepresents());
+        } else {
+            represents = NameIdTypeDTO.empty();
+        }
+
         return new PartitionDTO(
             NamedElementDTOAssembler.toDTO(astahPartition),
             activityNodes,
@@ -51,6 +58,7 @@ public class PartitionDTOAssembler {
             nextPartition,
             superPartition,
             subPartitions,
-            astahPartition.isHorizontal());
+            astahPartition.isHorizontal(),
+            represents);
     }
 }

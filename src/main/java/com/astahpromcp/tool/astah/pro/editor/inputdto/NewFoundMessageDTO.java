@@ -6,7 +6,7 @@ public record NewFoundMessageDTO(
     @JsonPropertyDescription("Target sequence diagram identifier")
     String targetSequenceDiagramId,
     
-    @JsonPropertyDescription("New found message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name.")
+    @JsonPropertyDescription("New found message name. '()' is appended to the message name when it is displayed. Therefore, it is not necessary to add '()' at the end of the message name. Set this to an empty string when the found message has no name.")
     String newFoundMessageName,
     
     @JsonPropertyDescription("Start point X coordinate")

@@ -1,6 +1,5 @@
 package com.astahpromcp.tool.visualization;
 
-import com.astahpromcp.tool.ToolCategoryFlags;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.common.ImageConvertSupport;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ public class VisualizationToolFactory {
         // No dependencies
     }
 
-    public List<ToolProvider> createToolProviders(ToolCategoryFlags categoryFlags) {
+    public List<ToolProvider> createToolProviders() {
         try {
             ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
 

@@ -34,8 +34,7 @@ public class TestCaseToolTest {
         tool = new TestCaseTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

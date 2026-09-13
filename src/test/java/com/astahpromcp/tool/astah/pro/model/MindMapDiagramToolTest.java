@@ -36,8 +36,7 @@ public class MindMapDiagramToolTest {
         tool = new MindMapDiagramTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(

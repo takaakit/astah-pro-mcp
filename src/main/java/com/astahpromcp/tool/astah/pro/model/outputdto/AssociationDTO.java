@@ -11,6 +11,12 @@ public record AssociationDTO(
     NameIdTypeDTO associationEndA,
 
     @JsonPropertyDescription("Association end B")
-    NameIdTypeDTO associationEndB
+    NameIdTypeDTO associationEndB,
+
+    @JsonPropertyDescription("Owner of association end A")
+    NameIdTypeDTO associationEndAOwner,
+
+    @JsonPropertyDescription("Owner of association end B")
+    NameIdTypeDTO associationEndBOwner
 ) {
 }

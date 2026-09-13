@@ -16,14 +16,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 // Tool that fetches the astah pro user guide web pages and returns them in chunks
 @Slf4j
-public class AstahProUserGuideTool implements ToolProvider {
+public class AstahProUserGuideTool implements ToolProvider, RemoteDocumentTool {
 
-    private final List<String> contentCache;
+    private final KnowledgeToolSupport.ContentCache contentCache;
     private final Path outputDirectory;
     private final HttpClient httpClient;
 
@@ -34,7 +33,7 @@ public class AstahProUserGuideTool implements ToolProvider {
     public AstahProUserGuideTool(Path outputDirectory, HttpClient httpClient) {
         this.outputDirectory = outputDirectory;
         this.httpClient = httpClient;
-        this.contentCache = new CopyOnWriteArrayList<>();
+        this.contentCache = new KnowledgeToolSupport.ContentCache();
     }
 
     @Override
@@ -64,9 +63,10 @@ public class AstahProUserGuideTool implements ToolProvider {
     private DocumentDTO getAstahProUserGuide(NoInputDTO param) throws IOException {
         log.debug("Get astah pro user guide: {}", param);
 
-        if (!contentCache.isEmpty()) {
+        DocumentDTO cached = contentCache.describe();
+        if (cached != null) {
             log.info("astah pro user guide already loaded, returning from cache.");
-            return new DocumentDTO(contentCache.size(), contentCache.get(0));
+            return cached;
         }
 
         log.info("Loading astah pro user guide from web pages.");
@@ -104,11 +104,6 @@ public class AstahProUserGuideTool implements ToolProvider {
     private DocumentChunkDTO getAstahProUserGuideChunk(ChunkDTO param) {
         log.debug("Get astah pro user guide chunk: {}", param);
 
-        int chunkIndex = param.chunkIndex();
-        if (chunkIndex < 0 || chunkIndex >= contentCache.size()) {
-            throw new IllegalArgumentException("Invalid chunk index: " + chunkIndex);
-        }
-
-        return new DocumentChunkDTO(contentCache.get(chunkIndex));
+        return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

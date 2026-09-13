@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
@@ -22,52 +22,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StateMachineDiagramEditor.html
 @Slf4j
-public class StateMachineDiagramEditorTool implements ToolProvider {
+public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final StateMachineDiagramEditor stateMachineDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public StateMachineDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, StateMachineDiagramEditor stateMachineDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public StateMachineDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, StateMachineDiagramEditor stateMachineDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.stateMachineDiagramEditor = stateMachineDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create state machine diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "add_region",
@@ -162,7 +140,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_sub_machine_state",
-                "Create a new sub machine state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the sub machine state along with the updated diagram image in low resolution.",
+                "Create a new sub machine state at the specified point (specified by x and y coordinates) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the newly created node presentation of the sub machine state along with the updated diagram image in low resolution. If there is no parent node presentation (i.e., when rendering at the top level), set the parent node presentation ID to an empty string.",
                 this::createSubMachineState,
                 NewSubMachineStateDTO.class,
                 NodePresentationDTO.class),
@@ -530,13 +508,19 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
         log.debug("Create sub machine state: {}", param);
 
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
-        INodePresentation astahParentNodePresentation = astahProToolSupport.getNodePresentation(param.parentNodePresentationId());
         IStateMachineDiagram astahSubMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.subMachineDiagramId());
+
+        INodePresentation astahParentNodePresentation;
+        if (param.parentNodePresentationId().isEmpty()) {
+            astahParentNodePresentation = null;
+        } else {
+            astahParentNodePresentation = astahProToolSupport.getNodePresentation(param.parentNodePresentationId());
+        }
 
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
 
-        txnAstah.run( () -> {
-            stateMachineDiagramEditor.createSubmachineState(
+        INodePresentation astahSubMachineState = txnAstah.call( () -> {
+            return stateMachineDiagramEditor.createSubmachineState(
                 astahParentNodePresentation,
                 astahSubMachineDiagram,
                 new Point2D.Double(
@@ -544,7 +528,7 @@ public class StateMachineDiagramEditorTool implements ToolProvider {
                     param.locationY()));
         });
 
-        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
+        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahSubMachineState);
 
         McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 

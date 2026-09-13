@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.view;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
@@ -33,7 +33,7 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IDiagramViewManager.html
 @Slf4j
-public class DiagramViewManagerTool implements ToolProvider {
+public class DiagramViewManagerTool extends AstahToolProvider {
 
     private static final String FIT_WINDOW_TOOLBAR_BUTTON_NAME = "managementview.tool_button.drop_down_fit_window";
     private static final String FIT_WINDOW_ACTION_COMMAND = "FitWindow%both";
@@ -45,33 +45,16 @@ public class DiagramViewManagerTool implements ToolProvider {
     private final IDiagramViewManager diagramViewManager;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
-    private final boolean includeEditTools;
 
-    public DiagramViewManagerTool(ProjectAccessor projectAccessor, IDiagramViewManager diagramViewManager, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, boolean includeEditTools) {
+    public DiagramViewManagerTool(ProjectAccessor projectAccessor, IDiagramViewManager diagramViewManager, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.diagramViewManager = diagramViewManager;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create diagram view manager tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "open_dgm",
@@ -155,12 +138,9 @@ public class DiagramViewManagerTool implements ToolProvider {
                 "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information.",
                 this::getHighlightedPresentationsWithinDiagram,
                 IdDTO.class,
-                PresentationListDTO.class)
-        );
-    }
+                PresentationListDTO.class),
 
-    private List<ToolDefinition> createEditTools() {
-        return List.of(
+
             /* To leverage the AI's layout capabilities, do not register the automatic layout tool.
             ToolSupport.definition(
                 "auto_layout",

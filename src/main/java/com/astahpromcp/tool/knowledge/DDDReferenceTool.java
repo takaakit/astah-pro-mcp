@@ -13,12 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
-public class DDDReferenceTool implements ToolProvider {
+public class DDDReferenceTool implements ToolProvider, RemoteDocumentTool {
 
-    private final List<String> contentCache;
+    private final KnowledgeToolSupport.ContentCache contentCache;
     
     private final Path outputDirectory;
 
@@ -26,7 +25,7 @@ public class DDDReferenceTool implements ToolProvider {
 
     public DDDReferenceTool(Path outputDirectory) {
         this.outputDirectory = outputDirectory;
-        this.contentCache = new CopyOnWriteArrayList<>();
+        this.contentCache = new KnowledgeToolSupport.ContentCache();
     }
 
     @Override
@@ -56,9 +55,10 @@ public class DDDReferenceTool implements ToolProvider {
     private DocumentDTO getDDDReference(NoInputDTO param) throws IOException {
         log.debug("Get DDD reference: {}", param);
 
-        if (!contentCache.isEmpty()) {
+        DocumentDTO cached = contentCache.describe();
+        if (cached != null) {
             log.info("Domain-Driven Design Reference already loaded, returning from cache.");
-            return new DocumentDTO(contentCache.size(), contentCache.get(0));
+            return cached;
         }
 
         log.info("Loading Domain-Driven Design Reference from PDF URL.");
@@ -81,11 +81,6 @@ public class DDDReferenceTool implements ToolProvider {
     private DocumentChunkDTO getDDDReferenceChunk(ChunkDTO param) {
         log.debug("Get DDD reference chunk: {}", param);
 
-        int chunkIndex = param.chunkIndex();
-        if (chunkIndex < 0 || chunkIndex >= contentCache.size()) {
-            throw new IllegalArgumentException("Invalid chunk index: " + chunkIndex);
-        }
-
-        return new DocumentChunkDTO(contentCache.get(chunkIndex));
+        return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

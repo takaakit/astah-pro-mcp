@@ -9,6 +9,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -50,9 +51,18 @@ public class AstahProMcpGuideTool implements ToolProvider {
             }
         }
 
-        String primitiveTypes = "";
+        // getPrimitiveTypes() yields a null where a primitive type has been renamed, and reading a name from that null would fail this guide, so the nulls are skipped.
+        List<String> primitiveTypeNames = new ArrayList<>();
         for (INamedElement primitiveType : projectAccessor.getPrimitiveTypes()) {
-            primitiveTypes += primitiveType.getName() + System.lineSeparator();
+            if (primitiveType != null) {
+                primitiveTypeNames.add(primitiveType.getName());
+            }
+        }
+        primitiveTypeNames.sort(null);
+
+        String primitiveTypes = "";
+        for (String primitiveTypeName : primitiveTypeNames) {
+            primitiveTypes += primitiveTypeName + System.lineSeparator();
         }
         
         String contents = """
@@ -73,7 +83,7 @@ IMPORTANT POINTS to Keep in Mind:
 * Association ends are attribute elements (member ends) of the association. Therefore, the information of association ends can be obtained through the information of the association.  
 * The Astah that this MCP server references and edits is also edited by users. Therefore, assume that the project itself—and the model elements and presentations it contains—may be updated, and retrieve the latest information from Astah as needed. For example, a user may switch to a different Astah project, or make changes to model elements or presentations.  
 * Object diagrams and package diagrams are substituted with class diagrams. This means that, for example, instance specifications and instance specification links are drawn on class diagrams.  
-* Save the Astah project using tools only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Skills.
+* Save the Astah project using tools only when the user explicitly instructs you to do so, or when explicitly instructed in Agent Harness.
   DO NOT save the Astah project on your own initiative.
 * When new node/link presentations are placed on diagrams, adjust the layout of those presentations in accordance with the diagram layout guide and to avoid diagram layout anti-patterns.
 * After you have finished editing the model elements and diagrams, and immediately before performing the final diagram layout check and adjustment, you MUST maintain terminology consistency across the names, labels, and definitions of model elements and diagrams.

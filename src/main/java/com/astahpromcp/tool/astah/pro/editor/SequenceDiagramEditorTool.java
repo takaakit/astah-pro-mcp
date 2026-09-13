@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
@@ -24,52 +24,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/SequenceDiagramEditor.html
 @Slf4j
-public class SequenceDiagramEditorTool implements ToolProvider {
+public class SequenceDiagramEditorTool extends AstahToolProvider {
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final SequenceDiagramEditor sequenceDiagramEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public SequenceDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, SequenceDiagramEditor sequenceDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public SequenceDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, SequenceDiagramEditor sequenceDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.sequenceDiagramEditor = sequenceDiagramEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create sequence diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "create_seq_dgm",
@@ -80,49 +58,49 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_combined_fragment",
-                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created node presentation of the combined fragment along with the updated diagram image in low resolution.",
+                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created node presentation of the combined fragment along with the updated diagram image in low resolution. Set the name to an empty string when the combined fragment has no name.",
                 this::createCombinedFragment,
                 NewCombinedFragmentDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_msg",
-                "Create a new message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. Set the name to an empty string when the message has no name.",
                 this::createMessage,
                 NewMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_create_msg",
-                "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the create message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new create message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the create message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. The create message must be placed at or above the first message attached to the receiver lifeline. Set the name to an empty string when the create message has no name.",
                 this::createCreateMessage,
                 NewCreateMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_destroy_msg",
-                "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the destroy message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new destroy message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the destroy message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. Set the name to an empty string when the destroy message has no name.",
                 this::createDestroyMessage,
                 NewDestroyMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_return_msg",
-                "Create a new return message to the specified message (specified by presentation ID) on the specified sequence diagram (specified by ID), and return the newly created link presentation of the return message along with the updated diagram image in low resolution. Note that the Y coordinate of the return message cannot be specified; it is automatically determined to be the end of the activation (ExecutionSpecification) of the target message.",
+                "Create a new return message to the specified message (specified by presentation ID) on the specified sequence diagram (specified by ID), and return the newly created link presentation of the return message along with the updated diagram image in low resolution. Note that the Y coordinate of the return message cannot be specified; it is automatically determined to be the end of the activation (ExecutionSpecification) of the target message. Set the name to an empty string when the return message has no name.",
                 this::createReturnMessage,
                 NewReturnMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_lost_msg",
-                "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the lost message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender.",
+                "Create a new lost message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the lost message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. If the message should be sent from an existing activation (ExecutionSpecification), be sure to specify the activation (ExecutionSpecification) as the message sender. Set the name to an empty string when the lost message has no name.",
                 this::createLostMessage,
                 NewLostMessageDTO.class,
                 LinkPresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_found_msg",
-                "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the found message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.",
+                "Create a new found message on the specified sequence diagram (specified by ID), and return the newly created link presentation of the found message along with the updated diagram image in low resolution. It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message. Set the name to an empty string when the found message has no name.",
                 this::createFoundMessage,
                 NewFoundMessageDTO.class,
                 LinkPresentationDTO.class),
@@ -136,7 +114,7 @@ public class SequenceDiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_lifeline",
-                "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created node presentation of the lifeline along with the updated diagram image in low resolution.",
+                "Create a new lifeline on the specified sequence diagram (specified by ID), and return the newly created node presentation of the lifeline along with the updated diagram image in low resolution. Set the name to an empty string when the lifeline has no name.",
                 this::createLifeline,
                 NewLifelineDTO.class,
                 NodePresentationDTO.class),
@@ -258,11 +236,23 @@ public class SequenceDiagramEditorTool implements ToolProvider {
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
         ILinkPresentation createMessage = txnAstah.call( () -> {
-            return sequenceDiagramEditor.createCreateMessage(
+            ILinkPresentation astahCreateMessage = sequenceDiagramEditor.createCreateMessage(
                 param.newCreateMessageName(),
                 senderNode,
                 receiverNode,
                 param.locationY());
+
+            // Note: createCreateMessage() does not throw when the location cannot be used (e.g., the receiver lifeline already has a message above the location). It returns a presentation that has neither a model nor points instead.
+            if (astahCreateMessage == null
+                || astahCreateMessage.getModel() == null
+                || astahCreateMessage.getPoints() == null) {
+                throw new IllegalArgumentException(String.format(
+                    "Failed to create the create message to the lifeline '%s' at y=%s. A create message must be placed at or above the first message attached to the receiver lifeline (messages it sends, receives or returns all count). Specify a smaller locationY, move the existing messages of the receiver lifeline down, or choose another receiver.",
+                    receiverNode.getLabel(),
+                    param.locationY()));
+            }
+
+            return astahCreateMessage;
         });
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(createMessage);

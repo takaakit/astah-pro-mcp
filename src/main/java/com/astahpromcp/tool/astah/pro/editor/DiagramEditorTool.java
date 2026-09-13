@@ -1,11 +1,12 @@
 package com.astahpromcp.tool.astah.pro.editor;
 
+import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport.RasterizedSvgImage;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
@@ -35,7 +36,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,49 +44,30 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/DiagramEditor.html
 @Slf4j
-public class DiagramEditorTool implements ToolProvider {
+public class DiagramEditorTool extends AstahToolProvider {
 
     private static final double SVG_IMAGE_RASTERIZATION_SCALE = 4.0;
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
+    private final SystemPropertySupport systemPropertySupport;
     private final DiagramEditorSupport diagramEditorSupport;
     private final ImageConvertSupport imageConvertSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private final boolean includeEditTools;
 
-    public DiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageConvertSupport imageConvertSupport, ImageCaptureSupport imageCaptureSupport, boolean includeEditTools) {
+    public DiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport, DiagramEditorSupport diagramEditorSupport, ImageConvertSupport imageConvertSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
+        this.systemPropertySupport = systemPropertySupport;
         this.diagramEditorSupport = diagramEditorSupport;
         this.imageConvertSupport = imageConvertSupport;
         this.imageCaptureSupport = imageCaptureSupport;
-        this.includeEditTools = includeEditTools;
     }
 
     @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            List<ToolDefinition> tools = new ArrayList<>(createQueryTools());
-            if (includeEditTools) {
-                tools.addAll(createEditTools());
-            }
-
-            return List.copyOf(tools);
-
-        } catch (Exception e) {
-            log.error("Failed to create diagram editor tools", e);
-            return List.of();
-        }
-    }
-
-    private List<ToolDefinition> createQueryTools() {
-        return List.of();
-    }
-
-    private List<ToolDefinition> createEditTools() {
+    protected List<ToolDefinition> createTools() {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "insert_svg_img_on_dgm",
@@ -132,7 +113,7 @@ public class DiagramEditorTool implements ToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_prst",
-                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation along with the updated diagram image in low resolution. Note that deleting a presentation does not delete the corresponding element.",
+                "Delete the specified presentation (specified by ID) on the specified diagram (specified by ID), and return the deleted presentation along with the updated diagram image in low resolution. Note that deleting a presentation does not delete the corresponding model element. However, some presentations have a model element that is hidden from the model browser, and such a model element is deleted when that presentation is deleted.",
                 this::deletePresentation,
                 DeletePresentationDTO.class,
                 PresentationDTO.class)
@@ -385,9 +366,13 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        txnAstah.run( () -> {
-            diagramEditor.deleteDiagram();
+        systemPropertySupport.deleteWithoutConfirmationDialog( () -> {
+            txnAstah.run( () -> {
+                diagramEditor.deleteDiagram();
+            });
         });
+
+        astahProToolSupport.verifyDeleted(param.targetDiagramId());
 
         return diagramDTO;
     }
@@ -411,9 +396,13 @@ public class DiagramEditorTool implements ToolProvider {
 
         diagramEditor.setDiagram(astahDiagram);
 
-        txnAstah.run( () -> {
-            diagramEditor.deletePresentation(astahPresentation);
+        systemPropertySupport.deleteWithoutConfirmationDialog( () -> {
+            txnAstah.run( () -> {
+                diagramEditor.deletePresentation(astahPresentation);
+            });
         });
+
+        astahProToolSupport.verifyDeleted(param.targetPresentationId());
 
         McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
 

@@ -48,8 +48,7 @@ public class AssociationToolTest {
         tool = new AssociationTool(
             projectAccessor,
             transactionSupport,
-            astahProToolSupport,
-            true);
+            astahProToolSupport);
 
         // getAssociationInfo() method
         getAssociationInfo = TestSupport.getAccessibleMethod(
@@ -158,6 +157,8 @@ public class AssociationToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(association.getMemberEnds()[1].getType().getId(), outputDTO.associationEndAOwner().id());
+        assertEquals(association.getMemberEnds()[0].getType().getId(), outputDTO.associationEndBOwner().id());
     }
 
     @Test

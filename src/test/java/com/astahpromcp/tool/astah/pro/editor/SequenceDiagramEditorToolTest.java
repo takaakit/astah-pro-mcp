@@ -22,7 +22,11 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -62,8 +66,7 @@ public class SequenceDiagramEditorToolTest {
             transactionSupport,
             sequenceDiagramEditor,
             astahProToolSupport,
-            imageCaptureSupport,
-            true);
+            imageCaptureSupport);
 
         // createSequenceDiagram() method
         createSequenceDiagram = TestSupport.getAccessibleMethod(
@@ -268,6 +271,48 @@ public class SequenceDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void createCreateMessage_ng_receiverIsSender() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get lifeline
+        INodePresentation lifelineNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // Create input DTO
+        NewCreateMessageDTO inputDTO = new NewCreateMessageDTO(
+            sequenceDiagram.getId(),
+            "Test Create Message",
+            lifelineNode.getID(),
+            lifelineNode.getID(),
+            120
+        );
+
+        // ----------------------------------------
+        // Call createCreateMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createCreateMessage,
+                tool,
+                inputDTO,
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Failed to create the create message"));
+
+        // Check that nothing was left on the diagram
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
     }
 
     @Test
