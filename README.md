@@ -57,7 +57,7 @@ Model: Astra / Effort: Medium / Total time: approx. 19 min
 
 ### Grok Build
 
-Model: Grok 4.6 / Effort: Medium / Total time: approx. 41 min
+Model: Grok 4.7 / Effort: Medium / Total time: approx. 41 min
 
 <table width="100%">
   <tr>
@@ -67,10 +67,10 @@ Model: Grok 4.6 / Effort: Medium / Total time: approx. 41 min
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/grok-build/Library%20Management%20Structure.png"><img src="demo/grok-build/Library%20Management%20Structure.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Borrow%20Book.png"><img src="demo/grok-build/Borrow%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Return%20Book.png"><img src="demo/grok-build/Return%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Book%20Copy.png"><img src="demo/grok-build/Book%20Copy.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/Library%20structure.png"><img src="demo/grok-build/Library%20structure.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/Borrow%20a%20copy.png"><img src="demo/grok-build/Borrow%20a%20copy.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/Return%20a%20copy.png"><img src="demo/grok-build/Return%20a%20copy.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/Book%20copy.png"><img src="demo/grok-build/Book%20copy.png" width="100%"></a></td>
   </tr>
 </table>
 
