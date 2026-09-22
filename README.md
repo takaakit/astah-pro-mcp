@@ -19,7 +19,7 @@ Prompts:
 
 ### Claude Code
 
-Model: Opus 5 / Effort: Medium / Total time: approx. 13 min
+Model: Opus 5.5 / Effort: Medium / Total time: approx. 15 min
 
 <table width="100%">
   <tr>
@@ -29,10 +29,10 @@ Model: Opus 5 / Effort: Medium / Total time: approx. 13 min
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/claude-code/Library%20Management.png"><img src="demo/claude-code/Library%20Management.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/Library%20Management%20System.png"><img src="demo/claude-code/Library%20Management%20System.png" width="100%"></a></td>
     <td width="25%"><a href="demo/claude-code/Borrow%20a%20Book.png"><img src="demo/claude-code/Borrow%20a%20Book.png" width="100%"></a></td>
     <td width="25%"><a href="demo/claude-code/Return%20a%20Book.png"><img src="demo/claude-code/Return%20a%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/Book%20Copy%20Lifecycle.png"><img src="demo/claude-code/Book%20Copy%20Lifecycle.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/BookCopy%20States.png"><img src="demo/claude-code/BookCopy%20States.png" width="100%"></a></td>
   </tr>
 </table>
 
