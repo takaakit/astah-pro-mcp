@@ -6,6 +6,7 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.AstahApiLock;
+import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.JsonSupport;
@@ -20,8 +21,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -581,6 +585,110 @@ public class McpToolScriptExecutorTest {
         assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS));
     }
 
+    // The wait can be cut short by the caller as well as by the timeout: a cancelled or disconnected request interrupts
+    // the thread waiting for the run. That interrupt does not stop the runner, so the same protection has to be in place,
+    // and it has to be in place before this call returns, while it still holds the Astah API lock.
+    @Test
+    void execute_ng_suspendsAccessWhenTheWaitIsInterrupted() throws Exception {
+        CountDownLatch toolRunning = new CountDownLatch(1);
+        CountDownLatch releaseTool = new CountDownLatch(1);
+        McpToolScriptExecutor executor =
+                new McpToolScriptExecutor(uninterruptibleRegistry(toolRunning, releaseTool), 30, new FakeTransactionBoundary());
+
+        AtomicReference<McpToolScriptExecutor.Result> result = new AtomicReference<>();
+        AtomicBoolean interruptFlagKept = new AtomicBoolean();
+        Thread caller = new Thread(() -> {
+            result.set(executor.execute("tools.hold_on({});"));
+            interruptFlagKept.set(Thread.currentThread().isInterrupted());
+        }, "interrupted-caller");
+        caller.setDaemon(true);
+        caller.start();
+
+        assertTrue(toolRunning.await(10, TimeUnit.SECONDS), "The script should have reached the tool call");
+        caller.interrupt();
+        caller.join(10_000);
+
+        assertFalse(caller.isAlive(), "The interrupted caller should have stopped waiting");
+        assertFalse(result.get().ok(), "An interrupted wait must be reported as a failure");
+        assertNotNull(AstahApiLock.suspensionReason(),
+                "The abandoned runner may still be calling the Astah API, so access must be suspended");
+        assertTrue(interruptFlagKept.get(), "The caller's interrupt flag must be restored");
+
+        releaseTool.countDown();
+        assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS),
+                "Astah API access should be restored once the abandoned runner terminates");
+    }
+
+    // The tool call that the interrupted run left behind holds the lock's protection, so nothing else may reach the model.
+    @Test
+    void execute_ng_startsNoFurtherToolCallsAfterAnInterruptedWait() throws Exception {
+        CountDownLatch toolRunning = new CountDownLatch(1);
+        CountDownLatch releaseTool = new CountDownLatch(1);
+        AtomicInteger callsAfterInterrupt = new AtomicInteger();
+        McpToolScriptExecutor executor = new McpToolScriptExecutor(
+                uninterruptibleRegistry(toolRunning, releaseTool, callsAfterInterrupt), 30, new FakeTransactionBoundary());
+
+        Thread caller = new Thread(
+                () -> executor.execute("tools.hold_on({}); for (var i = 0; i < 50; i++) { try { tools.count_me({}); } catch (e) {} }"),
+                "interrupted-caller");
+        caller.setDaemon(true);
+        caller.start();
+
+        assertTrue(toolRunning.await(10, TimeUnit.SECONDS), "The script should have reached the tool call");
+        caller.interrupt();
+        caller.join(10_000);
+
+        releaseTool.countDown();
+        Thread.sleep(1_000);
+        assertEquals(0, callsAfterInterrupt.get(), "No tool call may start after the run was abandoned");
+
+        assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS));
+    }
+
+    // The protection has to be registered before the interrupted call returns, while it still holds the Astah API lock:
+    // a request already queued for that lock acquires it the instant this one lets go, and it checks the suspension only
+    // once, right after acquiring. Registering the suspension after the release would leave exactly the window this guards.
+    @Test
+    void execute_ng_refusesTheToolQueuedForTheLockWhenTheWaitIsInterrupted() throws Exception {
+        CountDownLatch toolRunning = new CountDownLatch(1);
+        CountDownLatch releaseTool = new CountDownLatch(1);
+        McpToolScriptExecutor executor =
+                new McpToolScriptExecutor(uninterruptibleRegistry(toolRunning, releaseTool), 30, new FakeTransactionBoundary());
+
+        // The script tool and a following editing tool, each holding the Astah API lock exactly as a profile registers them.
+        ToolDefinition scriptTool = lockedTool("run_script",
+                (exchange, request) -> ResponseSupport.success(Map.of("ok", executor.execute("tools.hold_on({});").ok())));
+        AtomicInteger followingToolRuns = new AtomicInteger();
+        ToolDefinition followingTool = lockedTool("edit_class_info", (exchange, request) -> {
+            followingToolRuns.incrementAndGet();
+            return ResponseSupport.success(Map.of("edited", true));
+        });
+
+        Thread caller = new Thread(() -> call(scriptTool), "interrupted-caller");
+        caller.setDaemon(true);
+        caller.start();
+        assertTrue(toolRunning.await(10, TimeUnit.SECONDS), "The script should have reached the tool call");
+
+        // Queued for the lock before the interrupt, so it acquires the lock the moment the interrupted call releases it.
+        AtomicReference<McpSchema.CallToolResult> followingResult = new AtomicReference<>();
+        Thread queued = new Thread(() -> followingResult.set(call(followingTool)), "queued-for-lock");
+        queued.setDaemon(true);
+        queued.start();
+        assertTrue(awaitQueuedForLock(queued, 10, TimeUnit.SECONDS), "The following tool should be waiting for the lock");
+
+        caller.interrupt();
+        queued.join(30_000);
+
+        assertFalse(queued.isAlive(), "The queued tool should have been answered");
+        assertEquals(0, followingToolRuns.get(),
+                "The tool that took the lock next must not run while the abandoned runner may still use the Astah API");
+        assertTrue(Boolean.TRUE.equals(followingResult.get().isError()),
+                "The tool that took the lock next must be refused: " + followingResult.get().content());
+
+        releaseTool.countDown();
+        assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS));
+    }
+
     @Test
     void execute_ok_leavesAccessUsable() {
         McpToolScriptExecutor.Result result = executor().execute("1 + 1;");
@@ -725,6 +833,58 @@ public class McpToolScriptExecutorTest {
             }
             return ResponseSupport.success(Map.of("ok", true));
         }));
+
+        return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of());
+    }
+
+    private static ToolDefinition lockedTool(
+            String name,
+            java.util.function.BiFunction<io.modelcontextprotocol.server.McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler) {
+        ToolProvider provider = () -> List.of(new ToolDefinition(schema(name), ToolDefinition.ResultKind.DTO, handler));
+        return new ExclusiveToolProvider(provider, 30).createToolDefinitions().get(0);
+    }
+
+    private static McpSchema.CallToolResult call(ToolDefinition definition) {
+        String name = definition.toolSchema().name();
+        return definition.toolHandler().apply(null, new McpSchema.CallToolRequest(name, Map.of(), null));
+    }
+
+    private static boolean awaitQueuedForLock(Thread thread, long timeout, TimeUnit unit) throws InterruptedException {
+        long deadline = System.nanoTime() + unit.toNanos(timeout);
+        while (System.nanoTime() < deadline) {
+            if (AstahApiLock.LOCK.hasQueuedThread(thread)) {
+                return true;
+            }
+            Thread.sleep(10);
+        }
+
+        return AstahApiLock.LOCK.hasQueuedThread(thread);
+    }
+
+    private static AstahToolRegistry uninterruptibleRegistry(CountDownLatch running, CountDownLatch release) {
+        return uninterruptibleRegistry(running, release, new AtomicInteger());
+    }
+
+    // A tool that keeps running through its interrupt, so that the runner is still alive while the assertions run:
+    // a thread that stops at the first interruptible point would lift the suspension before the test could observe it.
+    private static AstahToolRegistry uninterruptibleRegistry(CountDownLatch running, CountDownLatch release, AtomicInteger callsAfterInterrupt) {
+        ToolProvider provider = () -> List.of(
+                new ToolDefinition(schema("hold_on"), ToolDefinition.ResultKind.DTO, (exchange, request) -> {
+                    running.countDown();
+                    boolean released = false;
+                    while (!released) {
+                        try {
+                            released = release.await(50, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            // Swallowed on purpose: this stands in for a script that does not stop when it is interrupted.
+                        }
+                    }
+                    return ResponseSupport.success(Map.of("ok", true));
+                }),
+                new ToolDefinition(schema("count_me"), ToolDefinition.ResultKind.DTO, (exchange, request) -> {
+                    callsAfterInterrupt.incrementAndGet();
+                    return ResponseSupport.success(Map.of("ok", true));
+                }));
 
         return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of());
     }

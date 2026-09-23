@@ -369,4 +369,4 @@ tools.set_line_style_of_link_prst({
 });
 
 
-print('Created the activity diagram Order Fulfilment.');
+print('Created the activity diagram Order Fulfilment (' + diagramId + ').');

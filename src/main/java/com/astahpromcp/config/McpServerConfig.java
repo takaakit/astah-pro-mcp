@@ -95,8 +95,8 @@ public final class McpServerConfig {
     // Maximum nesting depth of the JSON arguments of a tool call made from an mcp tool script
     public static final int MCP_TOOL_SCRIPT_MAX_JSON_DEPTH = 64;
 
-    // Maximum size of a single get_all_tools_callable_from_mcp_tool_script response
-    public static final int CALLABLE_TOOL_LIST_MAX_RESULT_BYTES = 131_072;
+    // Maximum size of the tool function entries in one callable-tool chunk
+    public static final int CALLABLE_TOOL_CHUNK_MAX_BYTES = 24_576;
 
     // Maximum size of a single get_info_of_tools_callable_from_mcp_tool_script response
     public static final int CALLABLE_TOOL_INFO_MAX_RESULT_BYTES = 57_344;
@@ -113,11 +113,16 @@ public final class McpServerConfig {
     // Root directory where generated output is stored.
     public static final Path ROOT_OUTPUT_DIR = Paths.get(System.getProperty("user.home"), ".astah-pro-mcp");
 
+    public static final String WORKSPACE_DIR_NAME_PREFIX = "workspace-";
+
     // Temporary workspace directory
-    public static final Path WORKSPACE_DIR = ROOT_OUTPUT_DIR.resolve("workspace");
+    public static final Path WORKSPACE_DIR = ROOT_OUTPUT_DIR.resolve(WORKSPACE_DIR_NAME_PREFIX + ProcessHandle.current().pid());
 
     // Jetty server idle timeout
     public static final int JETTY_IDLE_TIMEOUT_MS = 300000; // 5min
+
+    // Maximum size of a single inbound MCP request body, in bytes.
+    public static final int MCP_MAX_REQUEST_SIZE_BYTES = 16 * 1024 * 1024;
 
     // Interval at which the MCP transport pings each session over its listening SSE stream.
     // Kept well below JETTY_IDLE_TIMEOUT_MS.

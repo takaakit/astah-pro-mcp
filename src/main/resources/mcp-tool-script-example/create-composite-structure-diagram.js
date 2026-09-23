@@ -320,4 +320,4 @@ tools.set_points_of_link_prst({
 // each line afterwards with set_points_of_link_prst as above.
 
 
-print('Created the composite structure diagram ATM Internal Structure.');
+print('Created the composite structure diagram ATM Internal Structure (' + diagramId + ').');

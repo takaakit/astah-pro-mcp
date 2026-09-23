@@ -22,7 +22,7 @@ public class ConfigTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
             "get_workspace_dir_path",
-            "Return the path to the workspace directory.",
+            "Return the path to the workspace directory. The directory is a temporary one that belongs to the running Astah process alone.",
             this::getWorkspaceDirectoryPath,
             NoInputDTO.class,
             WorkspaceDirectoryPathDTO.class)

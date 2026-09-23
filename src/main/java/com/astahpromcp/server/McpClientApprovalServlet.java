@@ -58,6 +58,9 @@ public class McpClientApprovalServlet extends HttpServlet {
     private String lastApprovedUserAgent;
     private final Set<String> originHostAllowlist;
 
+    // Largest POST body this servlet caches and hands to the transport
+    private final int maxRequestSizeBytes;
+
     // For production
     public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate) {
         this(delegate, McpServerConfig.ORIGIN_HOST_ALLOWLIST);
@@ -66,7 +69,19 @@ public class McpClientApprovalServlet extends HttpServlet {
     // For testing
     public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate,
                                     Set<String> originHostAllowlist) {
+        this(delegate, originHostAllowlist, McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES);
+    }
+
+    // For testing, so that the size boundary can be exercised.
+    public McpClientApprovalServlet(HttpServletStreamableServerTransportProvider delegate,
+                                    Set<String> originHostAllowlist,
+                                    int maxRequestSizeBytes) {
         this.delegate = Objects.requireNonNull(delegate, "delegate");
+
+        if (maxRequestSizeBytes <= 0) {
+            throw new IllegalArgumentException("maxRequestSizeBytes must be positive");
+        }
+        this.maxRequestSizeBytes = maxRequestSizeBytes;
 
         if (originHostAllowlist != null) {
             this.originHostAllowlist = originHostAllowlist.stream()
@@ -91,22 +106,45 @@ public class McpClientApprovalServlet extends HttpServlet {
             actualReq = new SessionHeaderInjectingRequestWrapper(req, sessionIdParam.trim());
         }
 
-        // The JSON-RPC method decides probe handling and approval below, and the servlet input stream is single-read, so cache the POST body and parse it once here
-        JsonRpcCall call = JsonRpcCall.NONE;
-        if ("POST".equalsIgnoreCase(actualReq.getMethod())) {
-            CachedBodyRequestWrapper cachedReq = new CachedBodyRequestWrapper(actualReq);
-            call = JsonRpcCall.parse(cachedReq.getBody());
-            actualReq = cachedReq;
-        }
-
         RequestContext context = RequestContext.from(actualReq);
 
-        // If the origin is not allowed, reject the request
+        // If the origin is not allowed, reject the request.
+        // Checked before the body is cached, so that a request this servlet will never serve cannot make it buffer anything.
         if (!isOriginAllowed(actualReq)) {
             String origin = Optional.ofNullable(actualReq.getHeader("Origin")).orElse("<none>");
             log.warn("Rejected MCP request to port {} due to disallowed Origin header: {}", context.localPort(), origin);
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Origin not allowed");
             return;
+        }
+
+        // The JSON-RPC method decides probe handling and approval below, and the servlet input stream is single-read, so cache the POST body and parse it once here.
+        // The body is read under the same limit the transport applies, because everything below runs on a body this servlet has already buffered whole.
+        JsonRpcCall call = JsonRpcCall.NONE;
+        if ("POST".equalsIgnoreCase(actualReq.getMethod())) {
+            // An announced length above the limit is refused without reading the body at all
+            long announcedLength = actualReq.getContentLengthLong();
+            if (announcedLength > maxRequestSizeBytes) {
+                log.warn("Rejected MCP request to port {}: Content-Length {} exceeds the limit of {} bytes",
+                        context.localPort(), announcedLength, maxRequestSizeBytes);
+                resp.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                return;
+            }
+
+            CachedBodyRequestWrapper cachedReq;
+            try {
+                // A length that is absent, chunked or understated is caught here instead, by the number of bytes actually read
+                cachedReq = CachedBodyRequestWrapper.readBounded(actualReq, maxRequestSizeBytes);
+
+            } catch (RequestBodyTooLargeException e) {
+                // Only a size overrun becomes 413; an ordinary I/O failure keeps propagating as one
+                log.warn("Rejected MCP request to port {}: request body exceeds the limit of {} bytes",
+                        context.localPort(), maxRequestSizeBytes);
+                resp.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                return;
+            }
+
+            call = JsonRpcCall.parse(cachedReq.getBody());
+            actualReq = cachedReq;
         }
 
         // 'server/discover' is a pre-initialize probe sent by newer MCP clients. The transport rejects pre-session methods it does not know with a plain HTTP 400 instead of a JSON-RPC error envelope, so answer -32601 here; the client then falls back to the legacy initialize handshake.
@@ -344,6 +382,16 @@ public class McpClientApprovalServlet extends HttpServlet {
         }
     }
 
+    // Raised only when the request body passes the size limit, so that an ordinary I/O failure is never reported as 413.
+    private static final class RequestBodyTooLargeException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
+        RequestBodyTooLargeException(int maxBodyBytes) {
+            super("Request body exceeds the maximum allowed size of " + maxBodyBytes + " bytes");
+        }
+    }
+
     // Minimal view of the JSON-RPC call carried in a POST body
     record JsonRpcCall(String method, JsonNode id) {
 
@@ -547,13 +595,48 @@ public class McpClientApprovalServlet extends HttpServlet {
     // Buffers the request body so it can be inspected here and still be read by the transport
     private static final class CachedBodyRequestWrapper extends HttpServletRequestWrapper {
 
+        // Size of one read from the client, not a limit of its own
+        private static final int READ_CHUNK_BYTES = 8192;
+
         private final byte[] cachedBody;
 
-        CachedBodyRequestWrapper(HttpServletRequest request) throws IOException {
+        private CachedBodyRequestWrapper(HttpServletRequest request, byte[] cachedBody) {
             super(request);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            request.getInputStream().transferTo(baos);
-            this.cachedBody = baos.toByteArray();
+            this.cachedBody = cachedBody;
+        }
+
+        // Cache the body while reading at most maxBodyBytes + 1 bytes, so that a body far above the limit costs
+        // no more than a body just above it. The one extra byte is what proves the limit was passed.
+        static CachedBodyRequestWrapper readBounded(HttpServletRequest request, int maxBodyBytes)
+                throws IOException, RequestBodyTooLargeException {
+
+            ServletInputStream input = request.getInputStream();
+            ByteArrayOutputStream body = new ByteArrayOutputStream();
+            byte[] chunk = new byte[READ_CHUNK_BYTES];
+            int total = 0;
+
+            while (true) {
+                int wanted = Math.min(chunk.length, maxBodyBytes - total + 1);
+                int read = input.read(chunk, 0, wanted);
+                if (read == -1) {
+                    break;
+                }
+
+                total += read;
+                if (total > maxBodyBytes) {
+                    throw new RequestBodyTooLargeException(maxBodyBytes);
+                }
+                body.write(chunk, 0, read);
+            }
+
+            return new CachedBodyRequestWrapper(request, body.toByteArray());
+        }
+
+        // MCP bodies are UTF-8. Reported here rather than delegated, so that this servlet's own parse and the transport's
+        // parse of the same cached bytes cannot decode them differently.
+        @Override
+        public String getCharacterEncoding() {
+            return StandardCharsets.UTF_8.name();
         }
 
         @Override
@@ -564,6 +647,12 @@ public class McpClientApprovalServlet extends HttpServlet {
                 @Override
                 public int read() throws IOException {
                     return bais.read();
+                }
+
+                // The transport reads the body in buffers; without this the default implementation would fall back to one call per byte
+                @Override
+                public int read(byte[] b, int off, int len) throws IOException {
+                    return bais.read(b, off, len);
                 }
 
                 @Override

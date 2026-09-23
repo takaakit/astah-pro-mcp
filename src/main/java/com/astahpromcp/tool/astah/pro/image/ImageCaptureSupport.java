@@ -18,7 +18,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Locale;
 
 @Slf4j
 public class ImageCaptureSupport {
@@ -124,7 +126,7 @@ public class ImageCaptureSupport {
             log.info("PNG conversion succeeded ({} bytes, scale={}, region={}, cropSize={}x{})",
                     pngBytes.length, encoded.scale(), region, crop.width, crop.height);
 
-            saveScaledImage(relativeImagePath, encoded.scale(), pngBytes);
+            saveScaledImage(imageOutputDir, relativeImagePath, encoded.scale(), pngBytes);
 
             String base64 = Base64.getEncoder().encodeToString(pngBytes);
             return McpSchema.ImageContent.builder(base64, "image/png").build();
@@ -144,19 +146,33 @@ public class ImageCaptureSupport {
         return createImageContent(diagramId, ImageRegion.FULL, PngSizeTarget.SMALL);
     }
 
+    // Places the scaled PNG next to the image it was encoded from.
+    static Path scaledImagePathOf(Path imageOutputDir, String relativeImagePath, double scale) {
+        String baseName = relativeImagePath.endsWith(".png")
+                ? relativeImagePath.substring(0, relativeImagePath.length() - ".png".length())
+                : relativeImagePath;
+
+        Path exportedRelative = Paths.get(baseName);
+        Path parent = exportedRelative.getParent();
+        // Locale.ROOT keeps the decimal point a dot: a comma-decimal locale would write "_scale1,00.png".
+        String scaledFileName = "scaled_" + exportedRelative.getFileName()
+                + "_scale" + String.format(Locale.ROOT, "%.2f", scale) + ".png";
+
+        return (parent == null ? imageOutputDir : imageOutputDir.resolve(parent)).resolve(scaledFileName);
+    }
+
     // Saves the encoded PNG next to the exported image for troubleshooting; failures are non-fatal.
-    private void saveScaledImage(String relativeImagePath, double scale, byte[] pngBytes) {
+    static void saveScaledImage(Path imageOutputDir, String relativeImagePath, double scale, byte[] pngBytes) {
         try {
-            String baseName = relativeImagePath.endsWith(".png")
-                    ? relativeImagePath.substring(0, relativeImagePath.length() - ".png".length())
-                    : relativeImagePath;
-            String scaledFileName = "scaled_" + baseName + "_scale" + String.format("%.2f", scale) + ".png";
-            Path scaledImagePath = imageOutputDir.resolve(scaledFileName);
+            Path scaledImagePath = scaledImagePathOf(imageOutputDir, relativeImagePath, scale);
+            Files.createDirectories(scaledImagePath.getParent());
             Files.write(scaledImagePath, pngBytes);
             log.info("Scaled image saved to: {}", scaledImagePath);
-            
+
         } catch (Exception e) {
-            log.warn("Failed to save scaled image file: {}", e.getMessage());
+            // toString rather than getMessage: NoSuchFileException.getMessage() is the bare path, which reads
+            // as if the file were missing rather than as the directory not existing.
+            log.warn("Failed to save scaled image file: {}", e.toString());
             // Continue even if writing the file fails
         }
     }
@@ -271,17 +287,7 @@ public class ImageCaptureSupport {
 
             log.info("PNG conversion succeeded ({} bytes, scale={}, size={}x{})", pngBytes.length, encoded.scale(), width, height);
 
-            // Write the scaled image to disk
-            try {
-                Files.createDirectories(imageOutputDir);
-                String scaledFileName = "scaled_astah_window_scale" + String.format("%.2f", encoded.scale()) + ".png";
-                Path scaledImagePath = imageOutputDir.resolve(scaledFileName);
-                Files.write(scaledImagePath, pngBytes);
-                log.info("Scaled image saved to: {}", scaledImagePath);
-            } catch (Exception e) {
-                log.warn("Failed to save scaled image file: {}", e.getMessage());
-                // Continue even if writing the file fails
-            }
+            saveScaledImage(imageOutputDir, "astah_window.png", encoded.scale(), pngBytes);
 
             String base64 = Base64.getEncoder().encodeToString(pngBytes);
             return McpSchema.ImageContent.builder(base64, "image/png").build();

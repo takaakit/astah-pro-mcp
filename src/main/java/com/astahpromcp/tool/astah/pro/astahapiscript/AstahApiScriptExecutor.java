@@ -99,11 +99,20 @@ public class AstahApiScriptExecutor {
                 "");
 
         } catch (InterruptedException e) {
+            // The wait was cut short, not the script: this thread stopped waiting while the runner may still be calling the Astah API.
             Thread.currentThread().interrupt();
             runner.interrupt();
-            
+
+            String message = "Interrupted while waiting for astah api script execution. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops.";
+            // Logged because the caller that was waiting for this result is usually gone: what an agent sees is the next tool call being refused.
+            log.warn(message);
+
+            // The abandoned thread may still be calling the Astah API, so no tool may run until it terminates.
+            // Registered before returning, while this call still holds the Astah API lock, so that whoever acquires the lock next sees it.
+            AstahApiLock.suspend(runner, "an astah api script whose caller stopped waiting is still running");
+
             return Result.failure(
-                "Interrupted while waiting for astah api script execution",
+                message,
                 -1,
                 -1,
                 "",

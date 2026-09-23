@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
@@ -362,6 +364,261 @@ class McpClientApprovalServletTest {
         thread.setDaemon(true);
         thread.start();
         return thread;
+    }
+
+    private static final String SMALL_POST = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}";
+
+    private static final String JAPANESE_POST = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\","
+            + "\"params\":{\"name\":\"set_name\",\"arguments\":{\"name\":\"クラス図\"}}}";
+
+    // A servlet whose limit is the given number of bytes, so the boundary can be exercised without a 16 MiB body
+    private McpClientApprovalServlet servletLimitedTo(int maxRequestSizeBytes) {
+        return new McpClientApprovalServlet(delegate, McpServerConfig.ORIGIN_HOST_ALLOWLIST, maxRequestSizeBytes);
+    }
+
+    // Stub what every POST below shares: an established session, no Origin header, no declared Content-Length
+    private void stubSessionPost() {
+        when(request.getHeader("Mcp-Session-Id")).thenReturn("session-123");
+        when(request.getMethod()).thenReturn("POST");
+    }
+
+    // Body stub that reports how many bytes the servlet actually pulled from the client
+    private AtomicInteger stubCountingBody(String body) throws Exception {
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        AtomicInteger delivered = new AtomicInteger();
+        when(request.getInputStream()).thenReturn(new ServletInputStream() {
+            private final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+
+            @Override
+            public int read() {
+                int value = bais.read();
+                if (value != -1) {
+                    delivered.incrementAndGet();
+                }
+                return value;
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) {
+                int count = bais.read(b, off, len);
+                if (count > 0) {
+                    delivered.addAndGet(count);
+                }
+                return count;
+            }
+
+            @Override
+            public boolean isFinished() {
+                return bais.available() == 0;
+            }
+
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+            }
+        });
+        return delivered;
+    }
+
+    // The request the servlet handed to the transport
+    private HttpServletRequest captureDelegatedRequest() throws Exception {
+        ArgumentCaptor<HttpServletRequest> captor = ArgumentCaptor.forClass(HttpServletRequest.class);
+        verify(delegate).service(captor.capture(), ArgumentMatchers.any(HttpServletResponse.class));
+        return captor.getValue();
+    }
+
+    private static String readBodyOf(HttpServletRequest delegated) throws Exception {
+        return new String(delegated.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+    @Test
+    void service_ok_acceptsBodyExactlyAtTheLimit() throws Exception {
+        int exactly = SMALL_POST.getBytes(StandardCharsets.UTF_8).length;
+        stubSessionPost();
+        stubBody(SMALL_POST);
+
+        servletLimitedTo(exactly).service(request, response);
+
+        verify(response, never()).sendError(anyInt());
+        assertEquals(SMALL_POST, readBodyOf(captureDelegatedRequest()),
+                "A body at the limit must reach the transport unchanged");
+    }
+
+    @Test
+    void service_ok_acceptsBodyBelowTheLimit() throws Exception {
+        stubSessionPost();
+        stubBody(SMALL_POST);
+
+        servletLimitedTo(SMALL_POST.getBytes(StandardCharsets.UTF_8).length + 1024).service(request, response);
+
+        verify(response, never()).sendError(anyInt());
+        assertEquals(SMALL_POST, readBodyOf(captureDelegatedRequest()));
+    }
+
+    @Test
+    void service_ng_rejectsBodyOneByteOverTheLimit() throws Exception {
+        int oneByteShortOfTheBody = SMALL_POST.getBytes(StandardCharsets.UTF_8).length - 1;
+        stubSessionPost();
+        stubBody(SMALL_POST);
+
+        servletLimitedTo(oneByteShortOfTheBody).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_ng_rejectsOnContentLengthWithoutReadingTheBody() throws Exception {
+        // An announced length above the limit must be refused before a single byte is pulled from the client
+        stubSessionPost();
+        when(request.getContentLengthLong()).thenReturn(64L * 1024 * 1024);
+
+        servletLimitedTo(1024).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(request, never()).getInputStream();
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_ng_rejectsOversizedBodyWhenLengthIsUnknown() throws Exception {
+        // A chunked request reports -1; only the bytes actually read can catch it
+        stubSessionPost();
+        when(request.getContentLengthLong()).thenReturn(-1L);
+        AtomicInteger delivered = stubCountingBody("x".repeat(40_000));
+
+        servletLimitedTo(1024).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(delegate, never()).service(any(), any());
+        assertTrue(delivered.get() <= 1025,
+                "The servlet must stop at the limit plus the byte that proves it was passed, but read " + delivered.get());
+    }
+
+    @Test
+    void service_ng_rejectsOversizedBodyWhenContentLengthUnderstatesIt() throws Exception {
+        // A length small enough to clear the early check must not exempt the body from the real count
+        stubSessionPost();
+        when(request.getContentLengthLong()).thenReturn(10L);
+        AtomicInteger delivered = stubCountingBody("x".repeat(40_000));
+
+        servletLimitedTo(1024).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(delegate, never()).service(any(), any());
+        assertTrue(delivered.get() <= 1025, "Read " + delivered.get() + " bytes despite the limit of 1024");
+    }
+
+    @Test
+    void service_ng_rejectsOversizedInitializeBeforeAskingTheUser() throws Exception {
+        // Size is settled before the approval dialog, so an oversized body cannot make the dialog appear
+        McpClientApprovalServlet spyServlet = spy(servletLimitedTo(16));
+        stubSessionPost();
+        stubBody("{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{}}");
+
+        spyServlet.service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(spyServlet, never()).promptUserForApproval(any());
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_ng_rejectsOversizedServerDiscoverBeforeAnsweringIt() throws Exception {
+        // The probe reply is this servlet's own, so it too must come after the size check
+        when(request.getHeader("Mcp-Session-Id")).thenReturn(null);
+        when(request.getMethod()).thenReturn("POST");
+        stubBody("{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"server/discover\",\"params\":{}}");
+
+        servletLimitedTo(16).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(response, never()).getWriter();
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_ng_rejectsDisallowedOriginWithoutCachingTheBody() throws Exception {
+        // Origin is settled first, so a request this servlet will never serve cannot make it buffer anything
+        when(request.getHeader("Origin")).thenReturn("http://evil.example.com");
+        when(request.getHeader("Mcp-Session-Id")).thenReturn(null);
+        when(request.getHeader("User-Agent")).thenReturn("Test-Agent");
+        when(request.getMethod()).thenReturn("POST");
+
+        servletLimitedTo(1024).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Origin not allowed");
+        verify(request, never()).getInputStream();
+        verify(request, never()).getContentLengthLong();
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_ng_limitsJapaneseBodyByUtf8BytesNotCharacters() throws Exception {
+        int utf8Bytes = JAPANESE_POST.getBytes(StandardCharsets.UTF_8).length;
+        assertTrue(utf8Bytes > JAPANESE_POST.length(),
+                "The fixture must be one whose byte count and character count differ");
+
+        stubSessionPost();
+        stubBody(JAPANESE_POST);
+
+        // One byte short of the UTF-8 length, but still well above the character count
+        servletLimitedTo(utf8Bytes - 1).service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(delegate, never()).service(any(), any());
+    }
+
+    @Test
+    void service_ok_passesJapaneseBodyToTheTransportUnchanged() throws Exception {
+        stubSessionPost();
+        stubBody(JAPANESE_POST);
+
+        servletLimitedTo(McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES).service(request, response);
+
+        assertEquals(JAPANESE_POST, readBodyOf(captureDelegatedRequest()));
+    }
+
+    @Test
+    void service_ok_keepsLineBreaksInsideTheBody() throws Exception {
+        // SDK 2.0.0 read the body with readLine() and dropped the line breaks; 2.0.1 keeps the bytes. A script
+        // argument carrying escaped line breaks must survive this servlet's cache and reach the transport intact.
+        String body = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"run_mcp_tool_script\","
+                + "\"arguments\":{\"source\":\"// first\\nconst a = 1;\\n\"}}}\n";
+        stubSessionPost();
+        stubBody(body);
+
+        servletLimitedTo(McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES).service(request, response);
+
+        assertEquals(body, readBodyOf(captureDelegatedRequest()),
+                "The body handed to the transport must be byte-identical, line breaks included");
+    }
+
+    @Test
+    void service_ok_reportsUtf8ToTheTransportWhateverTheClientDeclared() throws Exception {
+        // This servlet parses the cached bytes as UTF-8, and the transport decodes the same bytes with whatever
+        // getCharacterEncoding() reports. Reporting UTF-8 is what keeps the two parses identical.
+        stubSessionPost();
+        stubBody(SMALL_POST);
+
+        servletLimitedTo(McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES).service(request, response);
+
+        assertEquals("UTF-8", captureDelegatedRequest().getCharacterEncoding());
+    }
+
+    @Test
+    void servlet_ng_rejectsANonPositiveLimit() {
+        assertThrows(IllegalArgumentException.class, () -> servletLimitedTo(0));
+    }
+
+    @Test
+    void config_ok_sharesTheSdkDefaultLimitWithTheTransport() {
+        // McpServerApp states this same value on the transport builder, so both layers bound the body identically
+        assertEquals(16 * 1024 * 1024, McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES);
     }
 
     // Wait until the thread has queued up behind the approval dialog

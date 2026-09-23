@@ -305,4 +305,4 @@ tools.create_link_prst_on_dgm({
 });
 
 
-print('Created the class diagram Ordering.');
+print('Created the class diagram Ordering (' + diagramId + ').');

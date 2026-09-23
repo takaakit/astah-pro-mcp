@@ -1,11 +1,48 @@
 /*
- * Creates two classes with definitions, attributes, operations and parameters, then places them on a class diagram.
+ * Creates two classes and an enumeration with definitions, attributes, operations, parameters and enumeration literals, then places them on a class diagram.
  */
 
 var rootPackageId = tools.get_proj({}).element.id;
-// find_named_elements_by_name matches partially and value[0] need not be the exact match.
-var diagramId = tools.find_named_elements_by_name({ name: 'Class Diagram0' }).value
-  .filter(function (e) { return e.name === 'Class Diagram0' && e.type === 'ClassDiagram'; })[0].id;
+// find_named_elements_by_name matches partially, and an exact name is not necessarily unique either,
+// so the hits are filtered and then counted rather than taking value[0].
+var diagrams = tools.find_named_elements_by_name({ name: 'Class Diagram0' }).value
+  .filter(function (e) { return e.name === 'Class Diagram0' && e.type === 'ClassDiagram'; });
+if (diagrams.length !== 1) {
+  throw new Error('Expected 1 ClassDiagram named "Class Diagram0", found ' + diagrams.length + '.');
+}
+var diagramId = diagrams[0].id;
+
+
+// ============================================================
+// Currency
+// ============================================================
+
+// create_enum_in_parent_pkg wraps the model element in classDTO, unlike the other create tools,
+// so the ID is at .classDTO.namedElement.element.id rather than .namedElement.element.id.
+var currency = tools.create_enum_in_parent_pkg({
+  newEnumerationName: 'Currency',
+  parentPackageId: rootPackageId
+});
+var currencyId = currency.classDTO.namedElement.element.id;
+
+tools.set_definition({
+  targetNamedElementId: currencyId,
+  definition: 'The currency an amount of money is counted in.'
+});
+
+// Create the enumeration literals.
+tools.create_enum_literal({
+  newEnumerationLiteralName: 'JPY',
+  parentEnumerationId: currencyId
+});
+tools.create_enum_literal({
+  newEnumerationLiteralName: 'USD',
+  parentEnumerationId: currencyId
+});
+tools.create_enum_literal({
+  newEnumerationLiteralName: 'EUR',
+  parentEnumerationId: currencyId
+});
 
 
 // ============================================================
@@ -29,6 +66,17 @@ tools.set_definition({
 tools.create_attr({
   newAttributeName: 'amount',
   parentClassId: moneyId
+});
+
+var currencyOfMoney = tools.create_attr({
+  newAttributeName: 'currency',
+  parentClassId: moneyId
+});
+
+// An enumeration is a model element too, so the attribute is typed by its ID.
+tools.set_type_of_attr({
+  targetAttributeId: currencyOfMoney.namedElement.element.id,
+  attributeTypeId: currencyId
 });
 
 // Create an operation. Its return type defaults to void.
@@ -128,7 +176,7 @@ tools.set_type_of_param({
 
 
 // ============================================================
-// Place the classes on the class diagram.
+// Place the classes and the enumeration on the class diagram.
 // ============================================================
 
 tools.create_node_prst_on_dgm({
@@ -145,5 +193,12 @@ tools.create_node_prst_on_dgm({
   locationY: 40
 });
 
+tools.create_node_prst_on_dgm({
+  targetDiagramId: diagramId,
+  targetElementId: currencyId,
+  locationX: 705,
+  locationY: 40
+});
 
-print('Created Money and OrderLine, and placed them on the class diagram.');
+
+print('Created Currency, Money and OrderLine, and placed them on the class diagram (' + diagramId + ').');

@@ -70,9 +70,23 @@ tools.set_multiplicity_of_asso_end_b({
 // Draw the association on the class diagram
 // ============================================================
 
-// A link presentation connects the node presentations of the two classes, so look them up first.
-var sourceNodeId = tools.get_class_info({ id: sourceClassId }).namedElement.element.correspondingPresentationIds[0];
-var targetNodeId = tools.get_class_info({ id: targetClassId }).namedElement.element.correspondingPresentationIds[0];
+// A link presentation connects node presentations, so take the two ends from the diagram itself.
+// correspondingPresentationIds lists every drawing of the class in the project, oldest first, so its
+// [0] need not be on diagramId -- and a foreign end is not always reported as an error.
+var presentations = tools.get_prsts_on_dgm({ id: diagramId }).value;
+
+function findNodeIdOnDiagram(modelId, name) {
+  var hits = presentations.filter(function (p) {
+    return p.correspondingModelElement.id === modelId;
+  });
+  if (hits.length !== 1) {
+    throw new Error('Expected 1 presentation of "' + name + '" on the diagram, found ' + hits.length + '.');
+  }
+  return hits[0].id;
+}
+
+var sourceNodeId = findNodeIdOnDiagram(sourceClassId, 'Class0');
+var targetNodeId = findNodeIdOnDiagram(targetClassId, 'Class1');
 
 tools.create_link_prst_on_dgm({
   targetDiagramId: diagramId,
@@ -82,4 +96,4 @@ tools.create_link_prst_on_dgm({
 });
 
 
-print('Created the association and drew it on the class diagram.');
+print('Created the association and drew it on the class diagram (' + diagramId + ').');

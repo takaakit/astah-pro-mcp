@@ -91,7 +91,7 @@ public class ProfileCatalogWiringTest {
         ToolCatalog catalog = McpServerApp.publishingCatalog(catalogs);
 
         Set<String> expected = new TreeSet<>(Set.of(
-                "get_all_tools_callable_from_mcp_tool_script",
+                "get_chunk_of_tools_callable_from_mcp_tool_script",
                 "get_info_of_tools_callable_from_mcp_tool_script",
                 "run_mcp_tool_script",
                 "mcp_tool_script_guide",

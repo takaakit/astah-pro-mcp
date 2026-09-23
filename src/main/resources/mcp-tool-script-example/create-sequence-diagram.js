@@ -200,4 +200,4 @@ tools.set_ope_of_msg({
 });
 
 
-print('Created the sequence diagram Checkout.');
+print('Created the sequence diagram Checkout (' + diagramId + ').');

@@ -26,9 +26,9 @@ public class ToolManifestTest {
     void load_ok_readsTheShippedManifest() {
         ToolManifest manifest = ToolManifest.load();
 
-        assertEquals(461, manifest.size(), "every tool definition the six factories produce needs a row");
-        assertEquals(398, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
-        assertEquals(83, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
+        assertEquals(462, manifest.size(), "every tool definition the six factories produce needs a row");
+        assertEquals(399, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
+        assertEquals(84, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
         assertEquals(58, manifest.withheldNames().size());
     }
 

@@ -36,7 +36,7 @@ public class McpToolScriptExampleTool implements ToolProvider {
         new Example("export-all-diagrams-as-png.js",
             "Exports every diagram in the project as a PNG image file."),
         new Example("create-two-classes.js",
-            "Creates two classes with definitions, attributes, operations and parameters, then places them on a class diagram."),
+            "Creates two classes and an enumeration with definitions, attributes, operations, parameters and enumeration literals, then places them on a class diagram."),
         new Example("create-association.js",
             "Creates an association between two existing classes, sets the association name, the role names and the multiplicities, then draws it on a class diagram."));
 

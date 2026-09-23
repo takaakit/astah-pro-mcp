@@ -15,8 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 // Tool that fetches the astah pro user guide web pages and returns them in chunks
 @Slf4j
@@ -75,23 +73,7 @@ public class AstahProUserGuideTool implements ToolProvider, RemoteDocumentTool {
             throw new IOException("astah pro user guide URL resource not found or is empty.");
         }
 
-        List<CompletableFuture<String>> futures = urls.stream()
-                .filter(url -> !url.trim().isEmpty())
-                .map(url -> KnowledgeToolSupport.fetchAndParse(httpClient, url))
-                .collect(Collectors.toList());
-
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-
-        List<String> pageContents = allFutures.thenApply(v ->
-                futures.stream().map(CompletableFuture::join).collect(Collectors.toList())
-        ).join();
-
-        StringBuilder allTextContent = new StringBuilder();
-        for (String content : pageContents) {
-            allTextContent.append(content).append(System.lineSeparator()).append(System.lineSeparator());
-        }
-
-        String allTextContentString = allTextContent.toString();
+        String allTextContentString = KnowledgeToolSupport.fetchAllOrFail(httpClient, urls, "astah pro user guide");
 
         String outputFileName = "astah_pro_and_uml_user_guide.md";
         Path outputPath = outputDirectory.resolve(outputFileName);

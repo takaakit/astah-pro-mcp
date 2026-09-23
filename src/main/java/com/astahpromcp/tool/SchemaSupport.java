@@ -1,9 +1,12 @@
 package com.astahpromcp.tool;
 
 import tools.jackson.databind.JsonNode;
+import com.fasterxml.classmate.ResolvedType;
 import com.github.victools.jsonschema.generator.*;
 import com.github.victools.jsonschema.module.jackson.JacksonSchemaModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
+
+import java.util.Map;
 
 // JSON schema utility
 public final class SchemaSupport {
@@ -27,6 +30,20 @@ public final class SchemaSupport {
 
         // Every property is required
         configBuilder.forFields().withRequiredCheck(field -> true);
+
+        // A Map is written where it is used, never as a named definition in $defs.
+        // Without this, a DTO using the same Map type twice would get a definition named like "Map(String,Object)".
+        configBuilder.forTypesInGeneral().withCustomDefinitionProvider(new CustomDefinitionProviderV2() {
+            @Override
+            public CustomDefinition provideCustomSchemaDefinition(ResolvedType javaType, SchemaGenerationContext context) {
+                if (!Map.class.isAssignableFrom(javaType.getErasedType())) {
+                    return null;
+                }
+                // Passing this provider makes the standard definition skip it, rather than come back here
+                return new CustomDefinition(context.createStandardDefinition(javaType, this),
+                    CustomDefinition.DefinitionType.INLINE, CustomDefinition.AttributeInclusion.YES);
+            }
+        });
 
         return new SchemaGenerator(configBuilder.build());
     }

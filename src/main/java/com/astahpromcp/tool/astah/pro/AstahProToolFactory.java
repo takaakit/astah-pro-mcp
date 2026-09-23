@@ -221,7 +221,7 @@ public class AstahProToolFactory {
             providers.add(new MindMapDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Astah API script tools
-            providers.add(new AstahApiScriptGuideTool());
+            providers.add(new AstahApiScriptExampleTool());
             providers.add(new AstahApiScriptTool(projectAccessor));
 
             return List.copyOf(providers);

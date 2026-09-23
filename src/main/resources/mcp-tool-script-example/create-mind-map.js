@@ -63,8 +63,8 @@ tools.create_topic({
 });
 
 // A label holds a description under its title as well as the title. Write the line break as '\n':
-// a Unicode escape for a line feed is turned into a real line break before the script is parsed,
-// which would end the string literal there and stop the run with "Missing close quote".
+// let the JSON serializer escape that backslash when this script goes into the script field, since
+// an unescaped one is decoded to a real line break, which stops the run with "Missing close quote".
 var providerOutage = tools.create_topic({
   targetDiagramId: diagramId,
   parentTopicId: risks,
@@ -158,4 +158,4 @@ tools.create_link_between_topics({
 // about the map as a whole belongs in the label of the root topic or of a floating topic.
 
 
-print('Created the mind map Checkout Redesign.');
+print('Created the mind map Checkout Redesign (' + diagramId + ').');

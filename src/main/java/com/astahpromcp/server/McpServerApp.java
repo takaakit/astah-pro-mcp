@@ -49,7 +49,7 @@ public final class McpServerApp {
 
     private static final String DIRECT_PROFILE_INSTRUCTIONS ="This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.";
 
-    private static final String PROGRAMMATIC_PROFILE_INSTRUCTIONS ="This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah; it is intended for trusted local automation and has full access to that project. This port exposes only a small part of its tool functions directly. Use 'get_all_tools_callable_from_mcp_tool_script' to see the others and 'get_info_of_tools_callable_from_mcp_tool_script' to learn the arguments of the ones you choose, then call them from 'run_mcp_tool_script' as tools.<name>({ ... }), which lets one script perform many operations in a single round trip. There are two kinds of script here. An mcp tool script, run by 'run_mcp_tool_script', calls this server's tool functions; an astah api script, run by 'run_astah_api_script', uses the raw Astah API. Prefer the mcp tool script, and use an astah api script only for operations that require the raw Astah API. One run of 'run_mcp_tool_script' is one Astah transaction: if any tool function call fails, every change the script made is rolled back. Tool functions that return an image, that fetch over the network or convert a PDF, that save the project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project or the logs, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. The MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project, MUST call the 'mcp_tool_script_guide' tool function before using 'run_mcp_tool_script', MUST call the 'astah_api_script_guide' tool function before using 'run_astah_api_script', and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.";
+    private static final String PROGRAMMATIC_PROFILE_INSTRUCTIONS ="This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah; it is intended for trusted local automation and has full access to that project. This port exposes only a small part of its tool functions directly. Read every chunk of 'get_chunk_of_tools_callable_from_mcp_tool_script' to see the others (call it with 'chunkIndex' 0 first, then request every remaining index its 'totalChunks' names, all in parallel) and use 'get_info_of_tools_callable_from_mcp_tool_script' to learn the arguments of the ones you choose, then call them from 'run_mcp_tool_script' as tools.<name>({ ... }), which lets one script perform many operations in a single round trip. There are two kinds of script here. An mcp tool script, run by 'run_mcp_tool_script', calls this server's tool functions; an astah api script, run by 'run_astah_api_script', uses the raw Astah API. Prefer the mcp tool script, and use an astah api script only for operations that require the raw Astah API. One run of 'run_mcp_tool_script' is one Astah transaction: if any tool function call fails, every change the script made is rolled back. Tool functions that return an image, that fetch over the network or convert a PDF, that save the project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project or the logs, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. The MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project, MUST call the 'mcp_tool_script_guide' tool function before using 'run_mcp_tool_script', MUST call the 'astah_api_script_guide' tool function before using 'run_astah_api_script', and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.";
 
     private static final class ServerInstance {
         private final ServerProfileConfig profile;
@@ -101,7 +101,7 @@ public final class McpServerApp {
 
     private void createWorkspaceDirectory() throws IOException {
         workspaceDir = McpServerConfig.WORKSPACE_DIR.toFile();
-        FileUtils.forceMkdir(workspaceDir);
+        WorkspaceDirectories.prepare(McpServerConfig.WORKSPACE_DIR, WorkspaceDirectories::isProcessAlive);
     }
 
     // Load the manifest and build the catalogs, then check the two against each other.
@@ -147,38 +147,117 @@ public final class McpServerApp {
         }
     }
 
-    // Start a server instance for a given profile
+    // Start a server instance for a given profile.
+    // A profile is registered only once it is whole, so anything created before a failure is unreachable to stopProfiles()
+    // and is released here instead: the transport starts a keep-alive scheduler the moment it is built, and that task
+    // holds on to the transport, so losing the local variable does not stop it.
     private ServerInstance startServerInstance(ServerProfileConfig profile) throws Exception {
 
         log.info("Initialize MCP profile '{}' on port {} (manifest column={}, script thumbnails={})",
                 profile.name(), profile.port(), profile.manifestColumn(), profile.scriptThumbnails());
 
-        // Create the transport provider
-        HttpServletStreamableServerTransportProvider transport = HttpServletStreamableServerTransportProvider.builder()
+        HttpServletStreamableServerTransportProvider transport = null;
+        McpSyncServer mcpSyncServer = null;
+        Server jettyServer = null;
+
+        try {
+            // Create the transport provider
+            transport = transportFactory.get();
+            log.info("Created transport with keep-alive interval: {} s", McpServerConfig.TRANSPORT_KEEP_ALIVE_INTERVAL_SECONDS);
+
+            // Register the tool providers
+            List<ToolProvider> providers = registerToolProviders(profile);
+
+            // Build the MCP server
+            mcpSyncServer = buildMcpServer(transport, providers, profile.instructions());
+
+            // Create the servlet
+            McpClientApprovalServlet approvalServlet = new McpClientApprovalServlet(transport);
+
+            // Create the Jetty server
+            jettyServer = createJettyServer(McpServerConfig.HOST, profile.port(), approvalServlet);
+            jettyServer.start();
+
+            log.info("Started MCP profile '{}' on port {}", profile.name(), profile.port());
+            return new ServerInstance(profile,
+                    transport,
+                    mcpSyncServer,
+                    jettyServer);
+
+        } catch (Exception e) {
+            // Kept as suppressed rather than thrown: a failure to clean up must not replace the reason the profile did not start.
+            for (Exception cleanupFailure : releaseProfileResources(profile.name(), mcpSyncServer, transport, jettyServer)) {
+                e.addSuppressed(cleanupFailure);
+            }
+
+            throw e;
+        }
+    }
+
+    // Package-private so that a test can hold on to the transport a failed start creates: the failure path drops it,
+    // and what has to be proven is that it was closed before that.
+    java.util.function.Supplier<HttpServletStreamableServerTransportProvider> transportFactory = McpServerApp::newTransport;
+
+    private static HttpServletStreamableServerTransportProvider newTransport() {
+        return HttpServletStreamableServerTransportProvider.builder()
                 .mcpEndpoint("/mcp")
                 .jsonMapper(JsonSupport.MCP_JSON_MAPPER)
                 .keepAliveInterval(Duration.ofSeconds(McpServerConfig.TRANSPORT_KEEP_ALIVE_INTERVAL_SECONDS))
+                .maxRequestSize(McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES)
                 .build();
-        log.info("Created transport with keep-alive interval: {} s", McpServerConfig.TRANSPORT_KEEP_ALIVE_INTERVAL_SECONDS);
-        
-        // Register the tool providers
-        List<ToolProvider> providers = registerToolProviders(profile);
+    }
 
-        // Build the MCP server
-        McpSyncServer mcpSyncServer = buildMcpServer(transport, providers, profile.instructions());
+    // Release what one profile owns, whether it finished starting or not.
+    // Every step is attempted even when an earlier one fails, and the failures are returned rather than thrown, so that
+    // the caller decides what they mean.
+    static List<Exception> releaseProfileResources(String profileName,
+                                                   McpSyncServer mcpServer,
+                                                   HttpServletStreamableServerTransportProvider transport,
+                                                   Server jettyServer) {
+        List<Exception> failures = new ArrayList<>();
 
-        // Create the servlet
-        McpClientApprovalServlet approvalServlet = new McpClientApprovalServlet(transport);
+        if (mcpServer != null) {
+            try {
+                log.debug("Close MCP server for profile '{}'", profileName);
+                mcpServer.closeGracefully();
 
-        // Create the Jetty server
-        Server jettyServer = createJettyServer(McpServerConfig.HOST, profile.port(), approvalServlet);
-        jettyServer.start();
+            } catch (Exception e) {
+                log.warn("Failed to close MCP server for profile '{}': {}", profileName, e.getMessage());
+                failures.add(e);
+            }
 
-        log.info("Started MCP profile '{}' on port {}", profile.name(), profile.port());
-        return new ServerInstance(profile,
-                transport,
-                mcpSyncServer,
-                jettyServer);
+        } else if (transport != null) {
+            try {
+                log.debug("Closing transport for profile '{}'", profileName);
+                transport.closeGracefully().block();
+
+            } catch (Exception e) {
+                log.warn("Failed to close transport for profile '{}': {}", profileName, e.getMessage());
+                failures.add(e);
+            }
+        }
+
+        if (jettyServer != null) {
+            try {
+                log.debug("Stopping Jetty server for profile '{}'", profileName);
+                jettyServer.stop();
+
+            } catch (Exception e) {
+                log.warn("Failed to stop Jetty server for profile '{}': {}", profileName, e.getMessage());
+                failures.add(e);
+
+            } finally {
+                try {
+                    jettyServer.destroy();
+
+                } catch (Exception destroyError) {
+                    log.warn("Failed to destroy Jetty server for profile '{}': {}", profileName, destroyError.getMessage());
+                    failures.add(destroyError);
+                }
+            }
+        }
+
+        return failures;
     }
 
     // Register the tool providers this profile publishes.
@@ -198,7 +277,7 @@ public final class McpServerApp {
         for (ToolProvider toolProvider : toolProviders) {
             toolProvider.createToolDefinitions().forEach(d -> registered.add(d.toolSchema().name()));
         }
-        Set<String> extras = profile.mcpToolScriptSurface() ? Set.of("get_all_tools_callable_from_mcp_tool_script", "get_info_of_tools_callable_from_mcp_tool_script", "run_mcp_tool_script", "mcp_tool_script_guide", "get_mcp_tool_script_example") : Set.of();
+        Set<String> extras = profile.mcpToolScriptSurface() ? Set.of("get_chunk_of_tools_callable_from_mcp_tool_script", "get_info_of_tools_callable_from_mcp_tool_script", "run_mcp_tool_script", "mcp_tool_script_guide", "get_mcp_tool_script_example") : Set.of();
         ToolManifestValidator.verifyRegistered(profile.name(), registered, manifest, profile.manifestColumn(), publishingCatalog(catalogs), extras);
         log.info("Profile '{}' publishes {} tools", profile.name(), registered.size());
 
@@ -412,47 +491,11 @@ public final class McpServerApp {
 
     private void stopProfiles() {
         for (ServerInstance instance : serverInstances) {
-            if (instance.mcpServer != null) {
-                try {
-                    log.debug("Close MCP server for profile '{}'", instance.profile.name());
-                    instance.mcpServer.closeGracefully();
-                    
-                } catch (Exception e) {
-                    log.warn("Failed to close MCP server for profile '{}': {}", instance.profile.name(), e.getMessage());
-                }
-            }
-            
-            if (instance.transport != null) {
-                try {
-                    log.debug("Closing transport for profile '{}'", instance.profile.name());
-                    instance.transport.closeGracefully().block();
-                    
-                } catch (Exception e) {
-                    log.warn("Failed to close transport for profile '{}': {}", instance.profile.name(), e.getMessage());
-                }
-            }
-            
-            if (instance.jettyServer != null) {
-                try {
-                    log.debug("Stopping Jetty server for profile '{}'", instance.profile.name());
-                    instance.jettyServer.stop();
-                    
-                } catch (Exception e) {
-                    log.warn("Failed to stop Jetty server for profile '{}': {}", instance.profile.name(), e.getMessage());
-                    
-                } finally {
-                    try {
-                        instance.jettyServer.destroy();
-                        
-                    } catch (Exception destroyError) {
-                        log.warn("Failed to destroy Jetty server for profile '{}': {}", instance.profile.name(), destroyError.getMessage());
-                    }
-                }
-            }
+            releaseProfileResources(instance.profile.name(), instance.mcpServer, instance.transport, instance.jettyServer);
         }
         serverInstances.clear();
     }
-    
+
     // Exposed for tests to inspect Jetty configuration.
     List<Server> getJettyServers() {
         return serverInstances.stream()

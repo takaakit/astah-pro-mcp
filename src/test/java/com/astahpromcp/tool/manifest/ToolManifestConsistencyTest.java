@@ -64,13 +64,13 @@ public class ToolManifestConsistencyTest {
         ToolManifest manifest = ToolManifest.load();
         ToolCatalog catalog = catalog();
 
-        // 398 = rows with direct = x, 19 = the view manager tools the catalog lacks outside the GUI.
-        assertEquals(398 - 19,
+        // 399 = rows with direct = x, 19 = the view manager tools the catalog lacks outside the GUI.
+        assertEquals(399 - 19,
                 catalog.select(manifest.namesFor(ToolManifest.Profile.DIRECT)).unlocked().stream()
                         .mapToLong(p -> p.createToolDefinitions().size()).sum());
-        // 83 = rows with programmatic = x, 17 = the view manager tools the catalog lacks outside the GUI,
-        // 5 = get_all_tools_callable_from_mcp_tool_script, get_info_of_tools_callable_from_mcp_tool_script, run_mcp_tool_script, mcp_tool_script_guide and get_mcp_tool_script_example, which McpToolScriptProviderFactory builds rather than the catalog.
-        assertEquals(83 - 17 - 5,
+        // 84 = rows with programmatic = x, 17 = the view manager tools the catalog lacks outside the GUI,
+        // 5 = get_chunk_of_tools_callable_from_mcp_tool_script, get_info_of_tools_callable_from_mcp_tool_script, run_mcp_tool_script, mcp_tool_script_guide and get_mcp_tool_script_example, which McpToolScriptProviderFactory builds rather than the catalog.
+        assertEquals(84 - 17 - 5,
                 catalog.select(manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC)).unlocked().stream()
                         .mapToLong(p -> p.createToolDefinitions().size()).sum());
     }

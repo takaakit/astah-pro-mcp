@@ -211,4 +211,4 @@ tools.create_link_prst_on_dgm({
 });
 
 
-print('Created the use case diagram Online Shop.');
+print('Created the use case diagram Online Shop (' + diagramId + ').');

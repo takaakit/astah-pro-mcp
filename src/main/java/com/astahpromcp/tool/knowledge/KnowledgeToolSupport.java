@@ -239,7 +239,24 @@ public class KnowledgeToolSupport {
         }
     }
 
-    public static CompletableFuture<String> fetchAndParse(HttpClient httpClient, String urlString) {
+    // The outcome of fetching one page: either its text or the reason it could not be fetched.
+    // Kept apart so that a failure can never travel on as page content and be cached as a loaded document.
+    public record FetchResult(String url, String text, String error) {
+
+        static FetchResult ok(String url, String text) {
+            return new FetchResult(url, text, null);
+        }
+
+        static FetchResult error(String url, String reason) {
+            return new FetchResult(url, null, reason);
+        }
+
+        public boolean isError() {
+            return error != null;
+        }
+    }
+
+    public static CompletableFuture<FetchResult> fetchAndParse(HttpClient httpClient, String urlString) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
@@ -248,39 +265,77 @@ public class KnowledgeToolSupport {
                         .header("User-Agent", "Java HttpClient Bot")
                         .build();
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                
+
                 // Check HTTP status code
                 int statusCode = response.statusCode();
                 if (statusCode == 403) {
                     log.warn("HTTP 403 Forbidden error when fetching {}: Access denied", urlString);
-                    return "[Error fetching content from " + urlString + ": HTTP 403 Forbidden]";
+                    return FetchResult.error(urlString, "HTTP 403 Forbidden");
                 } else if (statusCode == 429) {
                     log.warn("HTTP 429 Too Many Requests error when fetching {}: Rate limit exceeded", urlString);
-                    return "[Error fetching content from " + urlString + ": HTTP 429 Too Many Requests]";
+                    return FetchResult.error(urlString, "HTTP 429 Too Many Requests");
                 } else if (statusCode >= 400) {
                     log.warn("HTTP error when fetching {}: Status code {}", urlString, statusCode);
-                    return "[Error fetching content from " + urlString + ": HTTP " + statusCode + "]";
+                    return FetchResult.error(urlString, "HTTP " + statusCode);
                 }
-                
-                return convertHtmlToMarkdown(response.body());
+
+                return FetchResult.ok(urlString, convertHtmlToMarkdown(response.body()));
 
             } catch (ConnectException e) {
                 log.warn("Connection error when fetching {}: {}", urlString, e.getMessage());
-                return "[Error fetching content from " + urlString + ": Connection failed]";
+                return FetchResult.error(urlString, "Connection failed");
             } catch (SocketTimeoutException e) {
                 log.warn("Socket timeout error when fetching {}: {}", urlString, e.getMessage());
-                return "[Error fetching content from " + urlString + ": Socket timeout]";
+                return FetchResult.error(urlString, "Socket timeout");
             } catch (HttpTimeoutException e) {
                 log.warn("HTTP timeout error when fetching {}: {}", urlString, e.getMessage());
-                return "[Error fetching content from " + urlString + ": HTTP timeout]";
+                return FetchResult.error(urlString, "HTTP timeout");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.warn("Request interrupted when fetching {}: {}", urlString, e.getMessage());
-                return "[Error fetching content from " + urlString + ": Request interrupted]";
+                return FetchResult.error(urlString, "Request interrupted");
             } catch (Exception e) {
                 log.warn("Failed to fetch or parse {}: {}", urlString, e.getMessage());
-                return "[Error fetching content from " + urlString + "]";
+                return FetchResult.error(urlString, String.valueOf(e));
             }
         });
+    }
+
+    // Fetches every page in parallel and joins them into one document.
+    // All or nothing: a single failed page fails the whole load, so a transient network failure is never kept as a loaded
+    // document and the next call to the tool fetches again. Returning here means every page was fetched.
+    public static String fetchAllOrFail(HttpClient httpClient, List<String> urls, String documentName) throws IOException {
+        List<CompletableFuture<FetchResult>> futures = urls.stream()
+                .filter(url -> !url.trim().isEmpty())
+                .map(url -> fetchAndParse(httpClient, url))
+                .toList();
+
+        List<FetchResult> results = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream().map(CompletableFuture::join).toList())
+                .join();
+
+        if (results.isEmpty()) {
+            throw new IOException(String.format("No page to fetch for %s: the URL list is empty.", documentName));
+        }
+
+        List<String> failures = results.stream()
+                .filter(FetchResult::isError)
+                .map(result -> result.url() + " (" + result.error() + ")")
+                .toList();
+
+        if (!failures.isEmpty()) {
+            String message = String.format(
+                    "Failed to fetch %d of %d pages of %s, so none of it was loaded. Call this tool again once the connection is back. Failed pages: %s",
+                    failures.size(), results.size(), documentName, String.join(", ", failures));
+            log.warn(message);
+            throw new IOException(message);
+        }
+
+        StringBuilder allTextContent = new StringBuilder();
+        for (FetchResult result : results) {
+            allTextContent.append(result.text()).append(System.lineSeparator()).append(System.lineSeparator());
+        }
+
+        return allTextContent.toString();
     }
 }

@@ -1,7 +1,12 @@
 package com.astahpromcp.tool.astah.pro.image;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.astahpromcp.tool.astah.pro.common.ImageRegion;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -9,6 +14,11 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,6 +101,111 @@ public class ImageCaptureSupportTest {
         BufferedImage decoded = decode(encoded.bytes());
         assertEquals(300, decoded.getWidth());
         assertEquals(200, decoded.getHeight());
+    }
+
+    @Test
+    void scaledImagePathOf_ok_prefixesTheFileNameAndKeepsTheNamespaceDirectories(@TempDir Path outputDir) {
+        // exportImage returns the diagram's namespace as directories, so the prefix must not touch them:
+        // "scaled_" + the whole path would name a directory ("scaled_State") that was never created.
+        Path scaledImagePath = ImageCaptureSupport.scaledImagePathOf(
+                outputDir, relativePath("State", "Statemachine", "Statemachine Diagram.png"), 1.0);
+
+        assertEquals(outputDir.resolve("State").resolve("Statemachine").resolve("scaled_Statemachine Diagram_scale1.00.png"),
+                scaledImagePath);
+    }
+
+    @Test
+    void scaledImagePathOf_ok_keepsARootLevelDiagramDirectlyInTheOutputDir() {
+        // A diagram owned by the root package has no directory component at all.
+        Path outputDir = Path.of("out");
+
+        Path scaledImagePath = ImageCaptureSupport.scaledImagePathOf(outputDir, "Class Diagram.png", 0.76);
+
+        assertEquals(outputDir.resolve("scaled_Class Diagram_scale0.76.png"), scaledImagePath);
+    }
+
+    @Test
+    void scaledImagePathOf_ok_writesADecimalPointEvenInACommaDecimalLocale() {
+        // German and friends format 1.0 as "1,00", which would make the file name vary by machine.
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.GERMANY);
+
+            Path scaledImagePath = ImageCaptureSupport.scaledImagePathOf(Path.of("out"), "Class Diagram.png", 1.0);
+
+            assertEquals("scaled_Class Diagram_scale1.00.png", scaledImagePath.getFileName().toString());
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
+
+    @Test
+    void saveScaledImage_ok_createsTheMissingNamespaceDirectories(@TempDir Path outputDir) throws Exception {
+        byte[] pngBytes = {1, 2, 3};
+
+        ImageCaptureSupport.saveScaledImage(
+                outputDir, relativePath("State", "Statemachine", "Statemachine Diagram.png"), 1.0, pngBytes);
+
+        Path expected = outputDir.resolve("State").resolve("Statemachine").resolve("scaled_Statemachine Diagram_scale1.00.png");
+        assertTrue(Files.exists(expected), "The scaled image must be written next to the exported one");
+        assertArrayEquals(pngBytes, Files.readAllBytes(expected));
+    }
+
+    @Test
+    void saveScaledImage_ok_overwritesWhenTheParentDirectoryAlreadyExists(@TempDir Path outputDir) throws Exception {
+        Files.createDirectories(outputDir.resolve("Deployment"));
+        String relativeImagePath = relativePath("Deployment", "Deployment Diagram.png");
+        ImageCaptureSupport.saveScaledImage(outputDir, relativeImagePath, 1.0, new byte[]{1, 2, 3});
+
+        ImageCaptureSupport.saveScaledImage(outputDir, relativeImagePath, 1.0, new byte[]{4, 5});
+
+        Path expected = outputDir.resolve("Deployment").resolve("scaled_Deployment Diagram_scale1.00.png");
+        assertArrayEquals(new byte[]{4, 5}, Files.readAllBytes(expected), "The second write must replace the first");
+    }
+
+    @Test
+    void saveScaledImage_ng_swallowsTheFailureAndNamesTheExceptionClass(@TempDir Path outputDir) throws Exception {
+        // A plain file where the namespace directory must go: createDirectories then fails deterministically
+        // on every platform, unlike a read-only directory.
+        Files.createFile(outputDir.resolve("State"));
+
+        ListAppender<ILoggingEvent> captured = attachAppenderTo(ImageCaptureSupport.class);
+        try {
+            assertDoesNotThrow(() -> ImageCaptureSupport.saveScaledImage(
+                    outputDir, relativePath("State", "Statemachine Diagram.png"), 1.0, new byte[]{1, 2, 3}),
+                    "Saving the troubleshooting copy must never break the tool call");
+
+            List<ILoggingEvent> warnings = captured.list.stream()
+                    .filter(event -> event.getLevel() == Level.WARN)
+                    .toList();
+            assertEquals(1, warnings.size(), "The failure must be reported exactly once");
+            assertTrue(warnings.getFirst().getFormattedMessage().contains("FileAlreadyExistsException"),
+                    "The warning must name the exception class, not just the path: "
+                            + warnings.getFirst().getFormattedMessage());
+        } finally {
+            detachAppenderFrom(ImageCaptureSupport.class, captured);
+        }
+    }
+
+    // exportImage hands back a path in the platform's own separators, and Paths.get only splits on those.
+    private static String relativePath(String... names) {
+        return String.join(File.separator, names);
+    }
+
+    private static ListAppender<ILoggingEvent> attachAppenderTo(Class<?> type) {
+        ch.qos.logback.classic.Logger logger =
+                (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(type);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        return appender;
+    }
+
+    private static void detachAppenderFrom(Class<?> type, ListAppender<ILoggingEvent> appender) {
+        ch.qos.logback.classic.Logger logger =
+                (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(type);
+        logger.detachAppender(appender);
+        appender.stop();
     }
 
     private static BufferedImage uniformImage(int width, int height, Color color) {

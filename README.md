@@ -38,7 +38,7 @@ Model: Opus 5.5 / Effort: Medium / Total time: approx. 15 min
 
 ### Codex CLI
 
-Model: Astra / Effort: Medium / Total time: approx. 19 min
+Model: GPT-6 Astra / Effort: Medium / Total time: approx. 19 min
 
 <table width="100%">
   <tr>
@@ -85,7 +85,6 @@ Model: Grok 4.7 / Effort: Medium / Total time: approx. 41 min
   - Grok Build
   - Antigravity CLI
   - Cursor IDE
-  - Antigravity IDE
   - Kiro IDE
 
 - **Astah Pro v12.0 or later**
@@ -125,8 +124,8 @@ This plugin experimentally implements a programmatic tool calling mode (port `88
 
 | Mode | Port | Exposed tools |
 | --- | --- | --- |
-| Programmatic tool calling | `8888` | 83 |
-| Direct tool calling | `18888` | 398 |
+| Programmatic tool calling | `8888` | 84 |
+| Direct tool calling | `18888` | 399 |
 
 <details>
 <summary><b>Claude Code</b></summary>
@@ -194,30 +193,6 @@ Create `.agents/mcp_config.json` under your project directory (workspace scope) 
 
 <details>
 <summary><b>Cursor IDE</b></summary>
-
-```json
-{
-  "mcpServers": {
-    "astah-pro-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "http://127.0.0.1:8888/mcp",
-        "--allow-http"
-      ]
-    }
-  }
-}
-```
-
-> Use [mcp-remote](https://github.com/geelen/mcp-remote) to bridge the HTTP connection. [Node.js](https://nodejs.org/) must be installed.
-
-</details>
-
-
-<details>
-<summary><b>Antigravity IDE</b></summary>
 
 ```json
 {

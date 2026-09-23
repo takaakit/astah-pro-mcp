@@ -2,21 +2,23 @@
  * Lists the presentations on a class diagram together with the model elements behind them, by crossing between the presentation IDs and the model element IDs.
  */
 
-// find_named_elements_by_name matches partially and value[0] need not be the exact match.
-var diagramId = tools.find_named_elements_by_name({ name: 'Class Diagram0' }).value
-  .filter(function (e) { return e.name === 'Class Diagram0' && e.type === 'ClassDiagram'; })[0].id;
+// find_named_elements_by_name matches partially, and an exact name is not necessarily unique either,
+// so the hits are filtered and then counted rather than taking value[0].
+var diagrams = tools.find_named_elements_by_name({ name: 'Class Diagram0' }).value
+  .filter(function (e) { return e.name === 'Class Diagram0' && e.type === 'ClassDiagram'; });
+if (diagrams.length !== 1) {
+  throw new Error('Expected 1 ClassDiagram named "Class Diagram0", found ' + diagrams.length + '.');
+}
+var diagramId = diagrams[0].id;
 
 
 // ============================================================
 // Both IDs of every presentation on the diagram
 // ============================================================
 
-// A presentation and the model element it draws have separate IDs, and a tool function takes one of
-// the two only. Whatever draws, moves, sizes or colours something takes a presentation ID, as
-// create_link_prst_on_dgm, set_node_prst_location, set_length_of_lifeline and change_fill_color do.
-// Whatever reads or edits the model takes a model element ID, as every get_*_info tool, set_name and
-// delete_elem do.
-// Passing the wrong one fails with "due to an incorrect type".
+// A presentation and the model element it draws have separate IDs, and each ID argument wants one
+// kind or the other. Read it with get_info_of_tools_callable_from_mcp_tool_script. Passing the wrong kind fails with
+// "due to an incorrect type", and the message names the kind that was wanted.
 
 // get_prsts_on_dgm carries both IDs, so it crosses a whole diagram in one call.
 var presentations = tools.get_prsts_on_dgm({ id: diagramId }).value;
@@ -40,13 +42,19 @@ print(lines.join('\n'));
 // Crossing when only the presentation ID is at hand
 // ============================================================
 
-// A create_* tool that draws something hands back a presentation on its own, so the model element
-// has to be asked for. get_node_info crosses over for a node, and get_link_prst_info for a link.
+// A create_* tool that draws a model element already hands the model ID back in
+// presentation.correspondingModelElement, so nothing needs asking for right after creating. This
+// crossing is for a presentation ID that came from somewhere else: get_prsts_on_dgm, a selection, the
+// end of a link.
 var nodeId = '';
 for (var n = 0; n < presentations.length && nodeId === ''; n++) {
   if (presentations[n].type === 'Class') {
     nodeId = presentations[n].id;
   }
+}
+
+if (nodeId === '') {
+  throw new Error('No class is drawn on the diagram, so there is no node presentation to cross over from.');
 }
 
 var classId = tools.get_node_info({ id: nodeId }).presentation.correspondingModelElement.id;

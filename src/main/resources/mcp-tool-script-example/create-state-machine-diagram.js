@@ -274,4 +274,4 @@ tools.set_points_of_link_prst({
 });
 
 
-print('Created the state machine diagram Media Player.');
+print('Created the state machine diagram Media Player (' + diagramId + ').');

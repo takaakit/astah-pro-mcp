@@ -20,11 +20,11 @@ public class ToolCatalogDerivationTest {
 
 
     @Test
-    void notMcpToolScriptCallableNames_ok_isTwentySixToolsFromThreeStructuralFacts() {
+    void notMcpToolScriptCallableNames_ok_isTwentyEightToolsFromThreeStructuralFacts() {
         ToolCatalog catalog = catalog();
 
-        assertEquals(26, catalog.notMcpToolScriptCallableNames().size());
-        assertEquals(9, countWithReason(catalog, NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT));
+        assertEquals(28, catalog.notMcpToolScriptCallableNames().size());
+        assertEquals(11, countWithReason(catalog, NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT));
         assertEquals(16, countWithReason(catalog, NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
         assertEquals(1, countWithReason(catalog, NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT));
     }

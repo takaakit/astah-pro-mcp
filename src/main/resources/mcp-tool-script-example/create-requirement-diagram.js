@@ -224,4 +224,4 @@ tools.create_link_prst_on_dgm({
 });
 
 
-print('Created the requirement diagram Checkout Requirements.');
+print('Created the requirement diagram Checkout Requirements (' + diagramId + ').');

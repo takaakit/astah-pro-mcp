@@ -4,6 +4,7 @@ import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -41,7 +43,7 @@ public class KnowledgeToolSupportTest {
         doReturn("<html><body>guide text</body></html>").when(response).body();
         doReturn(response).when(httpClient).send(any(), any());
 
-        String content = KnowledgeToolSupport.fetchAndParse(httpClient, "http://example.com/guide").join();
+        KnowledgeToolSupport.FetchResult result = KnowledgeToolSupport.fetchAndParse(httpClient, "http://example.com/guide").join();
 
         ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
         verify(httpClient).send(requestCaptor.capture(), any());
@@ -49,17 +51,20 @@ public class KnowledgeToolSupportTest {
         assertTrue(requestCaptor.getValue().timeout().get().compareTo(Duration.ZERO) > 0,
                 "Request timeout should be a positive duration");
 
-        assertEquals("guide text", content.trim(), "The page body should be converted to Markdown");
+        assertFalse(result.isError(), "A page that was fetched is not a failure");
+        assertEquals("guide text", result.text().trim(), "The page body should be converted to Markdown");
     }
 
     @Test
-    void fetchAndParse_ng_returnsErrorPlaceholderOnTimeout() throws Exception {
+    void fetchAndParse_ng_reportsFailureWithoutTextOnTimeout() throws Exception {
         HttpClient httpClient = mock(HttpClient.class);
         doThrow(new HttpTimeoutException("request timed out")).when(httpClient).send(any(), any());
 
-        String content = KnowledgeToolSupport.fetchAndParse(httpClient, "http://example.com/guide").join();
+        KnowledgeToolSupport.FetchResult result = KnowledgeToolSupport.fetchAndParse(httpClient, "http://example.com/guide").join();
 
-        assertTrue(content.contains("HTTP timeout"), "The placeholder should tell the reason");
+        assertTrue(result.isError(), "A timed out page is a failure, not content");
+        assertNull(result.text(), "A failed page carries no text that could be cached as the document");
+        assertTrue(result.error().contains("HTTP timeout"), "The failure should tell the reason");
     }
 
     @Test
@@ -261,15 +266,63 @@ public class KnowledgeToolSupportTest {
     }
 
     @Test
-    void fetchAndParse_ng_returnsErrorPlaceholderOnHttpErrorStatus() throws Exception {
+    void fetchAndParse_ng_reportsFailureWithoutTextOnHttpErrorStatus() throws Exception {
         HttpClient httpClient = mock(HttpClient.class);
         @SuppressWarnings("unchecked")
         HttpResponse<String> response = (HttpResponse<String>) mock(HttpResponse.class);
         doReturn(403).when(response).statusCode();
         doReturn(response).when(httpClient).send(any(), any());
 
-        String content = KnowledgeToolSupport.fetchAndParse(httpClient, "http://example.com/guide").join();
+        KnowledgeToolSupport.FetchResult result = KnowledgeToolSupport.fetchAndParse(httpClient, "http://example.com/guide").join();
 
-        assertTrue(content.contains("403"), "The placeholder should tell the status code");
+        assertTrue(result.isError(), "A rejected page is a failure, not content");
+        assertNull(result.text(), "A failed page carries no text that could be cached as the document");
+        assertTrue(result.error().contains("403"), "The failure should tell the status code");
+    }
+
+    @Test
+    void fetchAllOrFail_ok_joinsEveryPage() throws Exception {
+        HttpClient httpClient = mock(HttpClient.class);
+        @SuppressWarnings("unchecked")
+        HttpResponse<String> response = (HttpResponse<String>) mock(HttpResponse.class);
+        doReturn(200).when(response).statusCode();
+        doReturn("<html><body>page text</body></html>").when(response).body();
+        doReturn(response).when(httpClient).send(any(), any());
+
+        String document = KnowledgeToolSupport.fetchAllOrFail(httpClient,
+                List.of("http://example.com/a", "http://example.com/b"), "test guide");
+
+        assertEquals(2, document.split("page text", -1).length - 1, "Every page should be part of the document");
+    }
+
+    @Test
+    void fetchAllOrFail_ng_failsWithoutTextWhenOnePageFails() throws Exception {
+        HttpClient httpClient = mock(HttpClient.class);
+        @SuppressWarnings("unchecked")
+        HttpResponse<String> ok = (HttpResponse<String>) mock(HttpResponse.class);
+        doReturn(200).when(ok).statusCode();
+        doReturn("<html><body>page text</body></html>").when(ok).body();
+        @SuppressWarnings("unchecked")
+        HttpResponse<String> unavailable = (HttpResponse<String>) mock(HttpResponse.class);
+        doReturn(503).when(unavailable).statusCode();
+        // Answered by URL: the pages are fetched in parallel, so the order the stub is called in is not fixed.
+        doAnswer(invocation -> {
+            HttpRequest request = invocation.getArgument(0);
+            return request.uri().toString().endsWith("/b") ? unavailable : ok;
+        }).when(httpClient).send(any(), any());
+
+        IOException failure = assertThrows(IOException.class, () -> KnowledgeToolSupport.fetchAllOrFail(httpClient,
+                List.of("http://example.com/a", "http://example.com/b"), "test guide"));
+
+        assertTrue(failure.getMessage().contains("503"), "The failure should tell why the page could not be fetched");
+        assertTrue(failure.getMessage().contains("http://example.com/b"), "The failure should name the failed page");
+    }
+
+    @Test
+    void fetchAllOrFail_ng_failsWhenThereIsNoUrl() {
+        HttpClient httpClient = mock(HttpClient.class);
+
+        assertThrows(IOException.class, () -> KnowledgeToolSupport.fetchAllOrFail(httpClient, List.of(" "), "test guide"),
+                "An empty URL list must not be loaded as an empty document");
     }
 }

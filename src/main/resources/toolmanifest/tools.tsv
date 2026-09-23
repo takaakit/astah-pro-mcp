@@ -79,7 +79,7 @@ Common                       	generate_dgm_img_from_puml                        
 Common                       	generate_graph_img_from_dot                        	x	x
 Common                       	get_all_constraints_and_conditions                 	x	-
 Common                       	get_all_prst_types                                 	x	x
-Common                       	get_all_tools_callable_from_mcp_tool_script        	-	x
+Common                       	get_astah_api_script_example                       	x	x
 Common                       	get_astah_pro_mcp_version                          	x	x
 Common                       	get_chunk_of_all_definitions                       	x	-
 Common                       	get_chunk_of_all_named_elements                    	x	-
@@ -92,6 +92,7 @@ Common                       	get_chunk_of_object_relational_impedance_mismatch 
 Common                       	get_chunk_of_ocl_spec                              	x	x
 Common                       	get_chunk_of_puml_guide                            	x	x
 Common                       	get_chunk_of_systems_engineering                   	x	x
+Common                       	get_chunk_of_tools_callable_from_mcp_tool_script   	-	x
 Common                       	get_comment_info                                   	x	-
 Common                       	get_constraint_info                                	x	-
 Common                       	get_current_dgm                                    	x	x

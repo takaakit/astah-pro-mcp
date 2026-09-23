@@ -164,7 +164,7 @@ public class ProgrammaticProfileParityTest {
 
         // Looking names up in the registry touches nothing that needs serializing, and taking the lock would make
         // a plain lookup queue behind another agent's edit.
-        assertTrue(unlocked.contains("get_all_tools_callable_from_mcp_tool_script"));
+        assertTrue(unlocked.contains("get_chunk_of_tools_callable_from_mcp_tool_script"));
         assertTrue(unlocked.contains("get_info_of_tools_callable_from_mcp_tool_script"));
     }
 
