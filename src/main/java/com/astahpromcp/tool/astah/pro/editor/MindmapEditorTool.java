@@ -12,9 +12,8 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewFloatingTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.ChangeParentOfTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.MoveTopicWithinSiblingOrderDTO;
-import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageIntoTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkBetweenTopicsDTO;
-import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageIntoTopicDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngOrJpgImageIntoTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageIntoTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.TopicWithBoundaryVisibilityDTO;
@@ -121,17 +120,10 @@ public class MindmapEditorTool extends AstahToolProvider {
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
-                "insert_png_img_into_topic",
-                "Insert a PNG image (specified by image URL) into the specified topic (specified by presentation ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image in low resolution.",
-                this::insertPngImageIntoTopic,
-                NewPngImageIntoTopicDTO.class,
-                NodePresentationDTO.class),
-
-            ToolSupport.toolDefinitionReturningDtoAndContents(
-                "insert_jpg_img_into_topic",
-                "Insert a JPG image (specified by image URL) into the specified topic (specified by presentation ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image in low resolution.",
-                this::insertJpgImageIntoTopic,
-                NewJpgImageIntoTopicDTO.class,
+                "insert_png_or_jpg_img_into_topic",
+                "Insert a PNG or JPG image (specified by image URL) into the specified topic (specified by presentation ID) on the specified mind map diagram (specified by ID), and return the node presentation of the image-inserted topic along with the updated diagram image in low resolution.",
+                this::insertPngOrJpgImageIntoTopic,
+                NewPngOrJpgImageIntoTopicDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
@@ -183,9 +175,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFloatingTopic(NewFloatingTopicDTO param) throws Exception {
@@ -205,9 +197,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFloatingTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createTopic(NewTopicDTO param) throws Exception {
@@ -224,9 +216,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTopicLink(NewLinkBetweenTopicsDTO param) throws Exception {
@@ -244,9 +236,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLink);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfTopic(ChangeParentOfTopicDTO param) throws Exception {
@@ -264,9 +256,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> moveTopicWithinSiblingOrder(MoveTopicWithinSiblingOrderDTO param) throws Exception {
@@ -287,9 +279,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertSvgImageIntoTopic(NewSvgImageIntoTopicDTO param) throws Exception {
@@ -308,13 +300,13 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(diagramImage));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertPngImageIntoTopic(NewPngImageIntoTopicDTO param) throws Exception {
-        log.debug("Insert PNG image into topic: {}", param);
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertPngOrJpgImageIntoTopic(NewPngOrJpgImageIntoTopicDTO param) throws Exception {
+        log.debug("Insert PNG or JPG image into topic: {}", param);
 
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
@@ -329,30 +321,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(diagramImage));
-    }
-
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> insertJpgImageIntoTopic(NewJpgImageIntoTopicDTO param) throws Exception {
-        log.debug("Insert JPG image into topic: {}", param);
-
-        IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
-        INodePresentation astahTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
-
-        mindmapEditor.setDiagram(astahMindMapDiagram);
-
-        Image image = imageConvertSupport.urlToImage(param.imageUrl());
-
-        txnAstah.run( () -> {
-            mindmapEditor.setImage(astahTopic, image);
-        });
-
-        NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTopic);
-
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
-
-        return Pair.of(dto, List.of(diagramImage));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteChildTopics(DeleteChildTopicsDTO param) throws Exception {
@@ -369,9 +340,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetParentTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteImageFromTopic(DeleteImageFromTopicDTO param) throws Exception {
@@ -388,9 +359,9 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> setBoundaryOfTopic(TopicWithBoundaryVisibilityDTO param) throws Exception {
@@ -407,8 +378,8 @@ public class MindmapEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetTopic);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

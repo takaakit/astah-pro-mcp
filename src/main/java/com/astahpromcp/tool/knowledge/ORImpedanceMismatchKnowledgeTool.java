@@ -47,7 +47,7 @@ public class ORImpedanceMismatchKnowledgeTool implements ToolProvider, RemoteDoc
 
                 ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_object_relational_impedance_mismatch",
-                    "Return the chunk data of Object-Relational Impedance Mismatch knowledge. If no chunk data exists, an empty string is set.",
+                    "Return the chunk data of Object-Relational Impedance Mismatch knowledge. The chunk index must be in the range 0 to totalChunks - 1 (totalChunks is returned by the corresponding get_info_of_... tool function, which must be called first); otherwise an error is returned.",
                     this::getORImpedanceMismatchKnowledgeChunk,
                     ChunkDTO.class,
                     DocumentChunkDTO.class)

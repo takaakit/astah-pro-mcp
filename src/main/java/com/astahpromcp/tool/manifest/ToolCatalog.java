@@ -5,6 +5,8 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
+import com.astahpromcp.tool.astah.pro.view.DiagramViewManagerTool;
+import com.astahpromcp.tool.astah.pro.view.ProjectViewManagerTool;
 import com.astahpromcp.tool.config.ConfigToolFactory;
 import com.astahpromcp.tool.info.InfoToolFactory;
 import com.astahpromcp.tool.knowledge.KnowledgeToolFactory;
@@ -60,6 +62,8 @@ public final class ToolCatalog {
         for (ToolProvider provider : providers) {
             // A provider that fetches over HTTP or converts a PDF holds the Astah API lock for the whole run if an mcp tool script calls it, so none of its tools may be called from one.
             boolean remote = provider instanceof RemoteDocumentTool;
+            // A provider that drives the Astah view acts outside the Astah transaction, so a rollback could not undo what its tools did.
+            boolean view = provider instanceof DiagramViewManagerTool || provider instanceof ProjectViewManagerTool;
 
             for (ToolDefinition definition : provider.createToolDefinitions()) {
                 String name = definition.toolSchema().name();
@@ -72,7 +76,7 @@ public final class ToolCatalog {
                     lockedNames.add(name);
                 }
 
-                NotMcpToolScriptCallableReason reason = notMcpToolScriptCallableReasonOf(name, definition, remote);
+                NotMcpToolScriptCallableReason reason = notMcpToolScriptCallableReasonOf(name, definition, remote, view);
                 if (reason != null) {
                     reasons.put(name, reason);
                 }
@@ -80,8 +84,8 @@ public final class ToolCatalog {
         }
     }
 
-    // Derived, never declared: a tool that answers without structured content has nothing an mcp tool script could receive, a nested astah api script run is refused outright, and a remote fetch would block the other profiles.
-    private static NotMcpToolScriptCallableReason notMcpToolScriptCallableReasonOf(String name, ToolDefinition definition, boolean remote) {
+    // Derived, never declared: a tool that answers without structured content has nothing an mcp tool script could receive, a nested astah api script run is refused outright, a remote fetch would block the other profiles, and a change to the view would survive the rollback of the run.
+    private static NotMcpToolScriptCallableReason notMcpToolScriptCallableReasonOf(String name, ToolDefinition definition, boolean remote, boolean view) {
         if (!definition.resultKind().carriesStructuredContent()) {
             return NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT;
         }
@@ -91,7 +95,15 @@ public final class ToolCatalog {
         if (remote) {
             return NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO;
         }
+        if (view) {
+            return NotMcpToolScriptCallableReason.DRIVES_THE_VIEW;
+        }
         return null;
+    }
+
+    // Build a catalog from the given providers, for tests.
+    static ToolCatalog of(List<ToolProvider> astahProviders, List<ToolProvider> otherProviders) {
+        return new ToolCatalog(astahProviders, otherProviders);
     }
 
     // Build one catalog

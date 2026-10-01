@@ -100,7 +100,7 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_decision_merge_node",
-                "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified package (specified by ID) of the specified activity diagram (specified by ID), and return the newly created node presentation of the decision merge node along with the updated diagram image in low resolution.",
+                "Create a new decision merge node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the decision merge node along with the updated diagram image in low resolution. The node belongs to the partition that contains the specified point, if any.",
                 this::createDecisionMergeNode,
                 NewDecisionMergeNodeDTO.class,
                 NodePresentationDTO.class),
@@ -135,7 +135,7 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_fork_node",
-                "Create a new fork node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created node presentation of the fork node along with the updated diagram image in low resolution.",
+                "Create a new fork node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the fork node along with the updated diagram image in low resolution. The node belongs to the partition that contains the specified point, if any.",
                 this::createForkNode,
                 NewForkNodeDTO.class,
                 NodePresentationDTO.class),
@@ -149,7 +149,7 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_join_node",
-                "Create a new join node at the specified point (specified by x and y coordinates) on the specified node presentation (specified by ID) of the specified activity diagram (specified by ID), and return the newly created node presentation of the join node along with the updated diagram image in low resolution.",
+                "Create a new join node at the specified point (specified by x and y coordinates) on the specified activity diagram (specified by ID), and return the newly created node presentation of the join node along with the updated diagram image in low resolution. The node belongs to the partition that contains the specified point, if any.",
                 this::createJoinNode,
                 NewJoinNodeDTO.class,
                 NodePresentationDTO.class),
@@ -208,9 +208,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptTimeEventAction(NewAcceptTimeEventActionDTO param) throws Exception {
@@ -230,9 +230,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAction(NewActionDTO param) throws Exception {
@@ -252,9 +252,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private ActivityDiagramDTO createActivityDiagram(NewActivityDiagramDTO param) throws Exception {
@@ -290,9 +290,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createCallBehaviorAction(NewCallBehaviorActionDTO param) throws Exception {
@@ -314,9 +314,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createConnector(NewConnectorDTO param) throws Exception {
@@ -336,9 +336,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createDecisionMergeNode(NewDecisionMergeNodeDTO param) throws Exception {
@@ -358,9 +358,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDependency(NewDependencyDTO param) throws Exception {
@@ -381,9 +381,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalNode(NewFinalNodeDTO param) throws Exception {
@@ -403,9 +403,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFlow(NewFlowDTO param) throws Exception {
@@ -425,9 +425,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFlowFinalNode(NewFlowFinalNodeDTO param) throws Exception {
@@ -447,9 +447,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkNode(NewForkNodeDTO param) throws Exception {
@@ -469,9 +469,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialNode(NewInitialNodeDTO param) throws Exception {
@@ -491,9 +491,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinNode(NewJoinNodeDTO param) throws Exception {
@@ -513,9 +513,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createObjectNode(NewObjectNodeDTO param) throws Exception {
@@ -537,9 +537,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartition(NewPartitionDTO param) throws Exception {
@@ -565,9 +565,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(NewPinWithBaseClassAndParentActionDTO param) throws Exception {
@@ -592,9 +592,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createProcess(NewProcessDTO param) throws Exception {
@@ -614,9 +614,9 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createSendSignalAction(NewSendSignalActionDTO param) throws Exception {
@@ -636,8 +636,8 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetActivityDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetActivityDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

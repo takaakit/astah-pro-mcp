@@ -1,41 +1,11 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class SequenceDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class SequenceDiagramGuideTool implements ToolProvider {
-
-    public SequenceDiagramGuideTool() {
+    private SequenceDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "seq_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a sequence diagram to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create sequence diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get sequence diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * An ExecutionSpecification in the UML specification refers to the same thing as an Activation in Astah.
@@ -45,6 +15,7 @@ IMPORTANT POINTS to Keep in Mind:
 * It is not necessary to add '()' at the end of the message name. '()' is automatically displayed at the end of the message.
 * When the height of an interaction operand in a combined fragment is changed, the drawing positions of the presentations contained within the combined fragment are also automatically changed as a result. Therefore, when newly placing node/link presentations within a combined fragment, be sure to finish adjusting the height of the interaction operand beforehand.
 * To change the drawing position (Y-coordinate) of a message or a group of messages, delete the target message or group of messages, and then create the message or group of messages at the changed Y-coordinate. Note that this cannot be achieved by changing the coordinates of the message link presentation.
+* The Interaction owned by a sequence diagram has its own name (empty by default), which does not follow the diagram name. If it has a name, rename it as well when you rename the diagram.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
@@ -85,6 +56,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * ExecutionSpecifications are represented as thin rectangles (gray or white) on the lifeline.
         """;
         
-        return new GuideDTO(contents);
+        return contents;
     }
 }

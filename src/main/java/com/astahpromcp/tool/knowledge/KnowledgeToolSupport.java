@@ -81,9 +81,20 @@ public class KnowledgeToolSupport {
         if (!generatedPath.equals(outputPath)) {
             Files.move(generatedPath, outputPath, StandardCopyOption.REPLACE_EXISTING);
         }
+
+        // Written back so that the saved file holds the same text this method returns
+        String markdown = unescapeHtmlSpecialChars(Files.readString(outputPath, StandardCharsets.UTF_8));
+        Files.writeString(outputPath, markdown, StandardCharsets.UTF_8);
         log.info("Markdown saved to file: {}", outputPath.toAbsolutePath());
 
-        return Files.readString(outputPath, StandardCharsets.UTF_8);
+        return markdown;
+    }
+
+    // Reverts the escaping OpenDataLoader PDF applies to '<', '>' and '&' for HTML renderers.
+    // The Markdown reaches the MCP client as plain text, where the entities would corrupt expressions such as OCL's '->'.
+    // '&amp;' goes last, so that an escaped entity such as "&amp;lt;" comes back as the literal "&lt;" rather than '<'.
+    static String unescapeHtmlSpecialChars(String markdown) {
+        return markdown.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&");
     }
 
     // Converts PDF bytes to Markdown via a temporary <outputBaseName>.pdf file in the output directory
@@ -173,8 +184,11 @@ public class KnowledgeToolSupport {
         // One chunk of the loaded document, read from a single snapshot
         public String chunkAt(int index) {
             List<String> snapshot = chunks;
+            if (snapshot.isEmpty()) {
+                throw new IllegalStateException("The document has not been loaded yet. Call the corresponding get_info_of_... tool function first.");
+            }
             if (index < 0 || index >= snapshot.size()) {
-                throw new IllegalArgumentException("Invalid chunk index: " + index);
+                throw new IllegalArgumentException("Invalid chunk index: " + index + ". The valid range is 0 to " + (snapshot.size() - 1) + " (totalChunks=" + snapshot.size() + ").");
             }
             return snapshot.get(index);
         }

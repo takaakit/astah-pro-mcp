@@ -85,6 +85,7 @@ public class AstahProToolFactory {
             // Common tools
             providers.add(new AstahProMcpGuideTool(projectAccessor));
             providers.add(new DiagramLayoutGuideTool());
+            providers.add(new DiagramGuideTool());
             providers.add(new BasicDiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageCaptureSupport));
             providers.add(new BasicModelEditorTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport));
             providers.add(new DiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport, diagramEditorSupport, imageConvertSupport, imageCaptureSupport));
@@ -118,7 +119,6 @@ public class AstahProToolFactory {
             }
 
             // Activity diagram tools
-            providers.add(new ActivityDiagramGuideTool());
             providers.add(new ActivityDiagramEditorTool(projectAccessor, transactionSupport, activityDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new ActionTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new ActivityDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -130,7 +130,6 @@ public class AstahProToolFactory {
             providers.add(new PartitionTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Class diagram tools
-            providers.add(new ClassDiagramGuideTool());
             providers.add(new ClassDiagramEditorTool(projectAccessor, transactionSupport, classDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new AssociationClassTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new AssociationTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -150,12 +149,11 @@ public class AstahProToolFactory {
             providers.add(new UsageTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Sequence diagram tools
-            providers.add(new SequenceDiagramGuideTool());
             providers.add(new SequenceDiagramEditorTool(projectAccessor, transactionSupport, sequenceDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new SequenceDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
-            providers.add(new CombinedFragmentTool(projectAccessor, transactionSupport, astahProToolSupport));
+            providers.add(new CombinedFragmentTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new GateTool(projectAccessor, transactionSupport, astahProToolSupport));
-            providers.add(new InteractionOperandTool(projectAccessor, transactionSupport, astahProToolSupport));
+            providers.add(new InteractionOperandTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new InteractionTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new InteractionUseTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new LifelineTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -164,7 +162,6 @@ public class AstahProToolFactory {
             providers.add(new MessageTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // State machine diagram tools
-            providers.add(new StateMachineDiagramGuideTool());
             providers.add(new StateMachineDiagramEditorTool(projectAccessor, transactionSupport, stateMachineDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new StateMachineDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new StateMachineTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -174,7 +171,6 @@ public class AstahProToolFactory {
             providers.add(new PseudostateTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Use case diagram tools
-            providers.add(new UseCaseDiagramGuideTool());
             providers.add(new UseCaseDiagramEditorTool(projectAccessor, transactionSupport, useCaseDiagramEditor, astahProToolSupport));
             providers.add(new UseCaseModelEditorTool(projectAccessor, transactionSupport, useCaseModelEditor, astahProToolSupport));
             providers.add(new UseCaseTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -182,25 +178,21 @@ public class AstahProToolFactory {
             providers.add(new ExtendTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Requirement diagram tools
-            providers.add(new RequirementDiagramGuideTool());
             providers.add(new RequirementDiagramEditorTool(projectAccessor, transactionSupport, requirementDiagramEditor, astahProToolSupport));
             providers.add(new RequirementTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new TestCaseTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Communication diagram tools
-            providers.add(new CommunicationDiagramGuideTool());
             providers.add(new CommunicationDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new LifelineLinkTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Composite structure diagram tools
-            providers.add(new CompositeStructureDiagramGuideTool());
             providers.add(new CompositeStructureDiagramEditorTool(projectAccessor, transactionSupport, compositeStructureDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new CompositeStructureModelEditorTool(compositeStructureModelEditor, projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new ConnectorTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new PortTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // ER diagram tools
-            providers.add(new ERDiagramGuideTool());
             providers.add(new ERModelEditorTool(erModelEditor, projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport));
             providers.add(new ERDiagramEditorTool(projectAccessor, transactionSupport, erDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new ERDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -216,7 +208,6 @@ public class AstahProToolFactory {
             providers.add(new ERSubtypeRelationshipTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // Mind map diagram tools
-            providers.add(new MindMapGuideTool());
             providers.add(new MindmapEditorTool(projectAccessor, transactionSupport, mindmapEditor, astahProToolSupport, imageConvertSupport, imageCaptureSupport));
             providers.add(new MindMapDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
 

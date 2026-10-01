@@ -44,21 +44,21 @@ public class UseCaseModelEditorTool extends AstahToolProvider {
 
                 ToolSupport.toolDefinitionReturningDto(
                         "create_include",
-                        "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created model element of the include. Set the name to an empty string when the include has no name.",
+                        "Create a new include between a usecase (specified by ID) and an included usecase (specified by ID), and return the newly created model element of the include. Only the model element is created; nothing is drawn on any diagram, so draw it with other tool function that creates a link presentation. Set the name to an empty string when the include has no name.",
                         this::createInclude,
                         NewIncludeDTO.class,
                         IncludeDTO.class),
 
                 ToolSupport.toolDefinitionReturningDto(
                         "create_extend",
-                        "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created model element of the extend. Set the name to an empty string when the extend has no name.",
+                        "Create a new extend between a usecase (specified by ID) and an extended usecase (specified by ID), and return the newly created model element of the extend. Only the model element is created; nothing is drawn on any diagram, so draw it with other tool function that creates a link presentation. Set the name to an empty string when the extend has no name.",
                         this::createExtend,
                         NewExtendDTO.class,
                         ExtendDTO.class),
 
                 ToolSupport.toolDefinitionReturningDto(
                         "create_extension_point",
-                        "Create a new extension point in the specified usecase (specified by ID) on the specified usecase diagram (specified by ID), and return the newly created model element of the extension point.",
+                        "Create a new extension point in the specified usecase (specified by ID), and return the newly created model element of the extension point. The extension point is shown in every usecase presentation of the usecase.",
                         this::createExtensionPoint,
                         NewExtensionPointDTO.class,
                         NamedElementDTO.class),

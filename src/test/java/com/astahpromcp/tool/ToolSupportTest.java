@@ -26,7 +26,7 @@ public class ToolSupportTest {
 
         McpSchema.CallToolResult result = definition.toolHandler().apply(
                 null,
-                new McpSchema.CallToolRequest("test_dto", Map.of()));
+                new McpSchema.CallToolRequest("test_dto", Map.of(), null));
 
         assertFalse(result.isError());
         assertEquals(Map.of("value", "dto"), result.structuredContent());
@@ -43,7 +43,7 @@ public class ToolSupportTest {
 
         McpSchema.CallToolResult result = definition.toolHandler().apply(
                 null,
-                new McpSchema.CallToolRequest("test_contents", Map.of()));
+                new McpSchema.CallToolRequest("test_contents", Map.of(), null));
 
         assertFalse(result.isError());
         assertEquals(List.of(text), result.content());
@@ -61,7 +61,7 @@ public class ToolSupportTest {
 
         McpSchema.CallToolResult result = definition.toolHandler().apply(
                 null,
-                new McpSchema.CallToolRequest("test_dto_and_contents", Map.of()));
+                new McpSchema.CallToolRequest("test_dto_and_contents", Map.of(), null));
 
         assertFalse(result.isError());
         assertEquals(Map.of("value", "dto"), result.structuredContent());

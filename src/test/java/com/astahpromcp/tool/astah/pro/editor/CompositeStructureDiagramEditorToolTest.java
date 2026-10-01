@@ -48,7 +48,7 @@ public class CompositeStructureDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/CompositeStructureDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

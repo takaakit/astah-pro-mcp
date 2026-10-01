@@ -84,6 +84,20 @@ public class KnowledgeToolSupportTest {
     }
 
     @Test
+    void unescapeHtmlSpecialChars_ok_restoresOclOperators() {
+        String markdown = KnowledgeToolSupport.unescapeHtmlSpecialChars("self.employer-&gt;size() &lt;&gt; 0 &amp;&amp; a &lt;= b");
+
+        assertEquals("self.employer->size() <> 0 && a <= b", markdown);
+    }
+
+    @Test
+    void unescapeHtmlSpecialChars_ok_keepsAnEscapedEntityLiteral() {
+        String markdown = KnowledgeToolSupport.unescapeHtmlSpecialChars("write &amp;lt; for &lt;");
+
+        assertEquals("write &lt; for <", markdown);
+    }
+
+    @Test
     void splitTextWithOverlap_ok_returnsSingleChunkUnchangedWhenTextFitsInOneChunk() {
         String text = "line1\nline2\nline3";
 
@@ -215,7 +229,7 @@ public class KnowledgeToolSupportTest {
 
         assertFalse(contentCache.isLoaded());
         assertNull(contentCache.describe());
-        assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(0));
+        assertThrows(IllegalStateException.class, () -> contentCache.chunkAt(0));
     }
 
     @Test
@@ -224,7 +238,11 @@ public class KnowledgeToolSupportTest {
         KnowledgeToolSupport.chunkAndCache("only one chunk", contentCache);
 
         assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(-1));
-        assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(1));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(1));
+
+        // The message tells the valid range, so that the caller can correct the index
+        assertTrue(exception.getMessage().contains("0 to 0"), exception.getMessage());
+        assertTrue(exception.getMessage().contains("totalChunks=1"), exception.getMessage());
     }
 
     // The two profiles share one provider instance and these tools take no Astah lock, so a reload has to be

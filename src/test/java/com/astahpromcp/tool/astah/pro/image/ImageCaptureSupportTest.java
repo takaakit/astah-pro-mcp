@@ -3,7 +3,11 @@ package com.astahpromcp.tool.astah.pro.image;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.common.ImageRegion;
+import com.change_vision.jude.api.inf.model.IDiagram;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.LoggerFactory;
@@ -17,13 +21,20 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ImageCaptureSupportTest {
+
+    private static final String DIAGRAM_ID = "diagram-id";
 
     @Test
     void cropRectangleOf_ok_fullCoversWholeImage() {
@@ -185,6 +196,122 @@ public class ImageCaptureSupportTest {
         } finally {
             detachAppenderFrom(ImageCaptureSupport.class, captured);
         }
+    }
+
+    @Test
+    void createThumbnailContent_ng_answersWithANoticeWhenTheOutputDirectoryCannotBeCreated(@TempDir Path workspace) throws Exception {
+        // The edit is committed before its thumbnail is taken, so a throw here would report a done edit as failed,
+        // and the client would repeat it. A plain file where the output directory must go fails on every platform.
+        Path imageOutputDir = Files.createFile(workspace.resolve("images"));
+        ImageCaptureSupport support = supportFor(mock(IDiagram.class), imageOutputDir);
+
+        ListAppender<ILoggingEvent> captured = attachAppenderTo(ImageCaptureSupport.class);
+        try {
+            McpSchema.Content content = support.createThumbnailContent(DIAGRAM_ID);
+
+            String notice = assertInstanceOf(McpSchema.TextContent.class, content).text();
+            assertTrue(notice.contains("do not repeat it"), "The notice must keep the client from repeating the edit: " + notice);
+            assertTrue(notice.contains("Failed to create output directory"), "The notice must say what went wrong: " + notice);
+
+            long errors = captured.list.stream().filter(event -> event.getLevel() == Level.ERROR).count();
+            assertEquals(1, errors, "The failure must be reported exactly once, as an error");
+        } finally {
+            detachAppenderFrom(ImageCaptureSupport.class, captured);
+        }
+    }
+
+    @Test
+    void createThumbnailContent_ng_answersWithANoticeWhenTheExportRunsOutOfMemory(@TempDir Path outputDir) throws Exception {
+        // exportImage is wrapped for Exception only, so an OutOfMemoryError there reaches the thumbnail as it is. Its
+        // message, "Java heap space", does not say that memory ran out, so the notice must name the error as well.
+        IDiagram diagram = mock(IDiagram.class);
+        when(diagram.exportImage(anyString(), anyString(), anyDouble())).thenThrow(new OutOfMemoryError("Java heap space"));
+
+        McpSchema.Content content;
+        try {
+            content = supportFor(diagram, outputDir).createThumbnailContent(DIAGRAM_ID);
+        } catch (OutOfMemoryError e) {
+            // Left to escape, the error would abort the whole test run instead of failing this test.
+            throw new AssertionError("The OutOfMemoryError must be answered with a notice, not thrown", e);
+        }
+
+        String notice = assertInstanceOf(McpSchema.TextContent.class, content).text();
+        assertTrue(notice.contains("OutOfMemoryError"), "The notice must name the error: " + notice);
+        assertTrue(notice.contains("Java heap space"), "The notice must keep the error's message: " + notice);
+    }
+
+    // Only the thumbnail an edit returns is spared. An image the caller asked for, as capture_dgm_img does, has nothing
+    // committed behind it, so its failure is still the call's failure.
+    @Test
+    void createLargeImageContent_ng_stillThrowsWhenTheOutputDirectoryCannotBeCreated(@TempDir Path workspace) throws Exception {
+        Path imageOutputDir = Files.createFile(workspace.resolve("images"));
+        ImageCaptureSupport support = supportFor(mock(IDiagram.class), imageOutputDir);
+
+        Exception thrown = assertThrows(Exception.class, () -> support.createLargeImageContent(DIAGRAM_ID, ImageRegion.FULL));
+        assertTrue(thrown.getMessage().contains("Failed to create output directory"),
+                "The capture must fail for the output directory, not for anything else: " + thrown);
+    }
+
+    @Test
+    void createThumbnailContent_ok_answersWithASmallPictureOfTheWholeDiagram(@TempDir Path outputDir) throws Exception {
+        // Noise does not compress, so the size a picture comes out at is decided by the size target it was encoded for,
+        // and the thumbnail's must leave it well below what capture_dgm_img returns for the same diagram. A marker in
+        // two opposite corners shows that the thumbnail covers the whole diagram rather than one quarter of it.
+        ImageCaptureSupport support = supportFor(diagramExporting(noiseImageWithCornerMarkers(400, 200, 80)), outputDir);
+
+        McpSchema.Content content = support.createThumbnailContent(DIAGRAM_ID);
+        McpSchema.ImageContent capture = support.createLargeImageContent(DIAGRAM_ID, ImageRegion.FULL);
+
+        byte[] thumbnailBytes = Base64.getDecoder().decode(assertInstanceOf(McpSchema.ImageContent.class, content).data());
+        byte[] captureBytes = Base64.getDecoder().decode(capture.data());
+        assertTrue(thumbnailBytes.length * 3 < captureBytes.length,
+                "The thumbnail must be encoded for its own size target: " + thumbnailBytes.length + " bytes against "
+                        + captureBytes.length + " bytes for capture_dgm_img");
+
+        BufferedImage thumbnail = decode(thumbnailBytes);
+        assertColorNear(Color.RED, thumbnail.getRGB(0, 0), "top-left corner");
+        assertColorNear(Color.BLUE, thumbnail.getRGB(thumbnail.getWidth() - 1, thumbnail.getHeight() - 1), "bottom-right corner");
+    }
+
+    private static ImageCaptureSupport supportFor(IDiagram diagram, Path imageOutputDir) {
+        AstahProToolSupport astahProToolSupport = mock(AstahProToolSupport.class);
+        when(astahProToolSupport.getDiagram(DIAGRAM_ID)).thenReturn(diagram);
+        return new ImageCaptureSupport(astahProToolSupport, new SystemPropertySupport(), imageOutputDir);
+    }
+
+    // A diagram whose export writes the given picture into the output directory and answers its path, as Astah does.
+    private static IDiagram diagramExporting(BufferedImage picture) throws Exception {
+        IDiagram diagram = mock(IDiagram.class);
+        when(diagram.exportImage(anyString(), anyString(), anyDouble())).thenAnswer(invocation -> {
+            String outputDir = invocation.getArgument(0);
+            ImageIO.write(picture, "png", Path.of(outputDir).resolve("Class Diagram.png").toFile());
+            return "Class Diagram.png";
+        });
+        return diagram;
+    }
+
+    // Noise with a solid red block in the top-left corner and a solid blue one in the bottom-right corner.
+    private static BufferedImage noiseImageWithCornerMarkers(int width, int height, int markerSize) {
+        BufferedImage image = noiseImage(width, height);
+        Graphics2D graphics = image.createGraphics();
+        try {
+            graphics.setColor(Color.RED);
+            graphics.fillRect(0, 0, markerSize, markerSize);
+            graphics.setColor(Color.BLUE);
+            graphics.fillRect(width - markerSize, height - markerSize, markerSize, markerSize);
+        } finally {
+            graphics.dispose();
+        }
+        return image;
+    }
+
+    // Downscaling blends neighboring pixels, so a marker is recognized by being close to its color, not equal to it.
+    private static void assertColorNear(Color expected, int actualRgb, String where) {
+        Color actual = new Color(actualRgb);
+        int distance = Math.abs(expected.getRed() - actual.getRed())
+                + Math.abs(expected.getGreen() - actual.getGreen())
+                + Math.abs(expected.getBlue() - actual.getBlue());
+        assertTrue(distance < 90, "The " + where + " must show its marker " + expected + ", but shows " + actual);
     }
 
     // exportImage hands back a path in the platform's own separators, and Paths.get only splits on those.

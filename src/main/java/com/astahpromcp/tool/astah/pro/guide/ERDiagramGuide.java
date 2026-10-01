@@ -1,41 +1,11 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class ERDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class ERDiagramGuideTool implements ToolProvider {
-    
-    public ERDiagramGuideTool() {
-    }
-    
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-            return List.of(
-                ToolSupport.toolDefinitionReturningDto(
-                "er_dgm_guide",
-                "MCP client (you) MUST call this tool function before referencing or editing a ER diagram to understand its usage and terminology definitions.",
-                this::getGuide,
-                NoInputDTO.class,
-                GuideDTO.class)
-            );
-
-        } catch (Exception e) {
-            log.error("Failed to create ER diagram guide tools", e);
-            return List.of();
-        }
+    private ERDiagramGuide() {
     }
 
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get ER diagram guide: {}", param);
-
+    static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * Before you refer to or edit an ER diagram, use the available tools to develop a thorough understanding of Object-Relational Impedance Mismatch.
@@ -128,6 +98,6 @@ ERSubtypeRelationship ---> "foreign keys" ERAttribute
 ```
         """;
 
-        return new GuideDTO(contents);
+        return contents;
     }
 }

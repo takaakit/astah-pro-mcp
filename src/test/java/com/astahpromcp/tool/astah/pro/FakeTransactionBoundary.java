@@ -8,6 +8,8 @@ public class FakeTransactionBoundary implements TransactionBoundary {
     private int abortCount;
     private boolean failOnCommit;
     private boolean failOnBegin;
+    private boolean failOnAbort;
+    private boolean failOnFirstAbortOnly;
 
     @Override
     public void begin() {
@@ -31,6 +33,12 @@ public class FakeTransactionBoundary implements TransactionBoundary {
     @Override
     public void abort() {
         abortCount++;
+        if (failOnAbort) {
+            if (failOnFirstAbortOnly) {
+                failOnAbort = false;
+            }
+            throw new IllegalStateException("abort refused");
+        }
         inTransaction = false;
     }
 
@@ -57,5 +65,15 @@ public class FakeTransactionBoundary implements TransactionBoundary {
 
     public void failOnBegin() {
         failOnBegin = true;
+    }
+
+    public void failOnAbort() {
+        failOnAbort = true;
+    }
+
+    // Refuses the next abort only, as a transaction does that is still busy the first time it is asked.
+    public void failOnFirstAbort() {
+        failOnAbort = true;
+        failOnFirstAbortOnly = true;
     }
 }

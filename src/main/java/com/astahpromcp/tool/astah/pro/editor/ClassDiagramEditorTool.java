@@ -120,9 +120,9 @@ public class ClassDiagramEditorTool extends AstahToolProvider {
 
         PresentationListDTO dto = new PresentationListDTO(presentationDTOs);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInstanceSpecification(NewInstanceWithPointDTO param) throws Exception {
@@ -147,9 +147,9 @@ public class ClassDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createInstanceSpecificationLink(NewLinkSourceAndTargetDTO param) throws Exception {
@@ -169,8 +169,8 @@ public class ClassDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

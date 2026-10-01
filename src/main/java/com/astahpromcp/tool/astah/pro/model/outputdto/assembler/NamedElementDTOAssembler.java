@@ -14,6 +14,8 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.RealizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.UsageDTO;
 
+import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,9 +93,15 @@ public class NamedElementDTOAssembler {
                         hyperlink.getComment()));
             
             } else if (hyperlink.isFile()) {
+                String filePath;
+                try {
+                    filePath = Path.of(hyperlink.getPath(), hyperlink.getName()).toString();
+                } catch (InvalidPathException e) {
+                    filePath = hyperlink.getPath() + File.separator + hyperlink.getName();
+                }
                 filePathHyperlinks.add(
                     new FilePathHyperlinkDTO(
-                        Path.of(hyperlink.getPath(), hyperlink.getName()).toString(),
+                        filePath,
                         hyperlink.getComment()));
             
             } else if (hyperlink.isModel()) {

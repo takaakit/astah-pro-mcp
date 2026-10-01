@@ -41,7 +41,7 @@ public class SystemsEngineeringKnowledgeTool implements ToolProvider, RemoteDocu
 
                 ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_systems_engineering",
-                    "Return the chunk data of NASA Systems Engineering Handbook. If no chunk data exists, an empty string is set.",
+                    "Return the chunk data of NASA Systems Engineering Handbook. The chunk index must be in the range 0 to totalChunks - 1 (totalChunks is returned by the corresponding get_info_of_... tool function, which must be called first); otherwise an error is returned.",
                     this::getSystemsEngineeringKnowledgeChunk,
                     ChunkDTO.class,
                     DocumentChunkDTO.class)

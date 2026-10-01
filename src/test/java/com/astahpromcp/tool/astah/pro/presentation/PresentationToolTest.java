@@ -11,6 +11,11 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationTypeListDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
+import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
+import com.change_vision.jude.api.inf.model.IClassDiagram;
+import com.change_vision.jude.api.inf.model.IComment;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -19,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.geom.Point2D;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -31,6 +37,7 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 public class PresentationToolTest {
 
     private ProjectAccessor projectAccessor;
+    private TransactionSupport transactionSupport;
     private PresentationTool tool;
     private Method getElement;
     private Method getAllTypes;
@@ -43,11 +50,11 @@ public class PresentationToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+        transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/presentation/PresentationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -174,6 +181,75 @@ public class PresentationToolTest {
 
         // Check presentation after setting
         assertEquals("UpdatedFoo", presentation.getLabel());
+    }
+
+    @Test
+    void setLabel_ok_noteOnSequenceDiagram() throws Exception {
+        // Create note on a new sequence diagram
+        SequenceDiagramEditor editor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+        INodePresentation note = transactionSupport.call( () -> {
+            editor.setDiagram(editor.createSequenceDiagram(projectAccessor.getProject(), "Sequence Diagram0"));
+            return editor.createNote("Note", new Point2D.Double(100, 100));
+        });
+
+        // Create input DTO
+        PresentationWithLabelDTO inputDTO = new PresentationWithLabelDTO(
+            note.getID(),
+            "UpdatedNote\nSecond line");
+
+        // ----------------------------------------
+        // Call setLabel()
+        // ----------------------------------------
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            setLabel,
+            tool,
+            inputDTO,
+            PresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(note.getID(), outputDTO.id());
+        assertEquals("UpdatedNote\nSecond line", outputDTO.label());
+
+        // Check note after setting
+        assertEquals("UpdatedNote\nSecond line", ((IComment) note.getModel()).getBody());
+    }
+
+    @Test
+    void setLabel_ok_noteOnClassDiagram() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+
+        // Create note on the class diagram
+        ClassDiagramEditor editor = projectAccessor.getDiagramEditorFactory().getClassDiagramEditor();
+        editor.setDiagram(classDiagram);
+        INodePresentation note = transactionSupport.call( () -> {
+            return editor.createNote("Note", new Point2D.Double(100, 300));
+        });
+
+        // Create input DTO
+        PresentationWithLabelDTO inputDTO = new PresentationWithLabelDTO(
+            note.getID(),
+            "UpdatedNote\nSecond line");
+
+        // ----------------------------------------
+        // Call setLabel()
+        // ----------------------------------------
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            setLabel,
+            tool,
+            inputDTO,
+            PresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(note.getID(), outputDTO.id());
+        assertEquals("UpdatedNote\nSecond line", outputDTO.label());
+
+        // Check note after setting
+        assertEquals("UpdatedNote\nSecond line", ((IComment) note.getModel()).getBody());
     }
 
     @Test

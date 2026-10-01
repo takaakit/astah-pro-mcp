@@ -54,7 +54,7 @@ public class ERDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/ERDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

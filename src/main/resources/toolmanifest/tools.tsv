@@ -19,7 +19,7 @@ Common                       	astah_pro_mcp_guide                               
 Common                       	bring_prsts_to_front                               	x	x
 Common                       	capture_astah_window                               	x	x
 Common                       	capture_dgm_img                                    	x	x
-Common                       	center_prst_in_dgm                                 	x	-
+Common                       	center_prst_in_dgm                                 	x	x
 Common                       	change_fill_color                                  	x	-
 Common                       	change_font_color                                  	x	-
 Common                       	change_line_color                                  	x	-
@@ -51,7 +51,7 @@ Common                       	create_ope                                        
 Common                       	create_param                                       	x	-
 Common                       	create_pkg_in_parent_pkg                           	x	-
 Common                       	create_port                                        	x	-
-Common                       	create_proj                                        	x	-
+Common                       	create_proj                                        	x	x
 Common                       	create_qualifier                                   	x	-
 Common                       	create_real                                        	x	-
 Common                       	create_refine_dep                                  	x	-
@@ -70,6 +70,7 @@ Common                       	delete_dgm                                        
 Common                       	delete_elem                                        	x	-
 Common                       	delete_prst                                        	x	-
 Common                       	detect_overlap                                     	x	x
+Common                       	dgm_guide                                          	x	x
 Common                       	dgm_layout_anti_patterns                           	x	x
 Common                       	dgm_layout_guide                                   	x	x
 Common                       	diagram_consistency_maintenance_steps              	x	x
@@ -122,14 +123,14 @@ Common                       	get_node_info                                     
 Common                       	get_node_prst_rectangle                            	x	-
 Common                       	get_proj                                           	x	-
 Common                       	get_proj_path                                      	x	x
+Common                       	get_prst_geometries_on_dgm                         	x	-
 Common                       	get_prsts_on_dgm                                   	x	-
 Common                       	get_selected_elements                              	x	x
 Common                       	get_selected_prst                                  	x	x
 Common                       	get_workspace_dir_path                             	x	x
-Common                       	get_zoom_factor                                    	x	-
+Common                       	get_zoom_factor                                    	x	x
 Common                       	highlight_prst                                     	x	x
-Common                       	insert_jpg_img_on_dgm                              	x	-
-Common                       	insert_png_img_on_dgm                              	x	-
+Common                       	insert_png_or_jpg_img_on_dgm                       	x	x
 Common                       	insert_rect_on_dgm                                 	x	-
 Common                       	insert_svg_img_on_dgm                              	x	x
 Common                       	insert_txt_on_dgm                                  	x	-
@@ -137,7 +138,7 @@ Common                       	is_proj_modified                                  
 Common                       	is_proj_opened                                     	x	x
 Common                       	mcp_tool_script_guide                              	-	x
 Common                       	open_dgm                                           	x	x
-Common                       	open_proj                                          	x	-
+Common                       	open_proj                                          	x	x
 Common                       	overlay_svg_img_on_dgm_img                         	x	x
 Common                       	preliminary_layout_steps                           	x	x
 Common                       	read_architectural_design_smells                   	x	x
@@ -184,7 +185,6 @@ Common                       	zoom_fit                                          
 Class Diagram                	add_invariant_to_class                             	x	-
 Class Diagram                	add_ope_postcond                                   	x	-
 Class Diagram                	add_ope_precond                                    	x	-
-Class Diagram                	class_dgm_guide                                    	x	x
 Class Diagram                	create_asso_class_prst                             	x	-
 Class Diagram                	create_class_dgm                                   	x	-
 Class Diagram                	create_instance_spec                               	x	-
@@ -267,7 +267,6 @@ Sequence Diagram             	get_link_end_info                                 
 Sequence Diagram             	get_link_info                                      	x	-
 Sequence Diagram             	get_msg_info                                       	x	-
 Sequence Diagram             	get_seq_dgm_info                                   	x	-
-Sequence Diagram             	seq_dgm_guide                                      	x	x
 Sequence Diagram             	set_aggr_of_link_end                               	x	-
 Sequence Diagram             	set_arg_of_interaction_use                         	x	-
 Sequence Diagram             	set_arg_of_msg                                     	x	-
@@ -285,7 +284,6 @@ Sequence Diagram             	set_return_val_of_msg                             
 Sequence Diagram             	set_return_val_variable_of_msg                     	x	-
 Sequence Diagram             	set_seq_dgm_to_interaction_use                     	x	-
 
-Activity Diagram             	activity_dgm_guide                                 	x	x
 Activity Diagram             	create_accept_event_act                            	x	-
 Activity Diagram             	create_accept_time_event_act                       	x	-
 Activity Diagram             	create_act                                         	x	-
@@ -351,7 +349,6 @@ State Machine Diagram        	set_entry_of_state                                
 State Machine Diagram        	set_event_of_transition                            	x	-
 State Machine Diagram        	set_exit_of_state                                  	x	-
 State Machine Diagram        	set_guard_of_transition                            	x	-
-State Machine Diagram        	state_machine_dgm_guide                            	x	x
 
 Use Case Diagram             	create_actor                                       	x	-
 Use Case Diagram             	create_extend                                      	x	-
@@ -362,14 +359,11 @@ Use Case Diagram             	create_usecase_dgm                                
 Use Case Diagram             	get_extend_info                                    	x	-
 Use Case Diagram             	get_include_info                                   	x	-
 Use Case Diagram             	get_usecase_info                                   	x	-
-Use Case Diagram             	usecase_dgm_guide                                  	x	x
 
-Communication Diagram        	communication_dgm_guide                            	x	x
 Communication Diagram        	get_communication_dgm_info                         	x	-
 Communication Diagram        	get_interaction_of_communication_dgm               	x	-
 Communication Diagram        	get_lifeline_link_info                             	x	-
 
-Composite Structure Diagram  	composite_structure_dgm_guide                      	x	x
 Composite Structure Diagram  	create_composite_structure_dgm                     	x	-
 Composite Structure Diagram  	create_connector_between_parts_and_ports           	x	-
 Composite Structure Diagram  	create_part_prst                                   	x	-
@@ -388,11 +382,9 @@ Composite Structure Diagram  	show_interface_prsts_of_port                      
 Requirement Diagram          	create_req_dgm                                     	x	-
 Requirement Diagram          	get_req_info                                       	x	-
 Requirement Diagram          	get_test_case_info                                 	x	-
-Requirement Diagram          	req_dgm_guide                                      	x	x
 Requirement Diagram          	set_req_id                                         	x	-
 Requirement Diagram          	set_req_text                                       	x	-
 
-ER Diagram                   	er_dgm_guide                                       	x	x
 ER Diagram                   	get_er_attr_info                                   	x	-
 ER Diagram                   	get_er_datatype_info                               	x	-
 ER Diagram                   	get_er_dgm_info                                    	x	-
@@ -414,10 +406,8 @@ Mind Map Diagram             	create_topic                                      
 Mind Map Diagram             	delete_child_topics                                	x	-
 Mind Map Diagram             	delete_img_from_topic                              	x	-
 Mind Map Diagram             	get_mind_map_dgm_info                              	x	-
-Mind Map Diagram             	insert_jpg_img_into_topic                          	x	-
-Mind Map Diagram             	insert_png_img_into_topic                          	x	-
+Mind Map Diagram             	insert_png_or_jpg_img_into_topic                   	x	x
 Mind Map Diagram             	insert_svg_img_into_topic                          	x	-
-Mind Map Diagram             	mind_map_guide                                     	x	x
 Mind Map Diagram             	move_topic_within_sibling_order                    	x	-
 Mind Map Diagram             	set_boundary_of_topic                              	x	-
 

@@ -41,8 +41,7 @@ public class MindmapEditorToolTest {
     private Method changeParentOfTopic;
     private Method moveTopicWithinSiblingOrder;
     private Method insertSvgImageIntoTopic;
-    private Method insertPngImageIntoTopic;
-    private Method insertJpgImageIntoTopic;
+    private Method insertPngOrJpgImageIntoTopic;
     private Method deleteChildTopics;
     private Method deleteImageFromTopic;
     private Method setBoundaryOfTopic;
@@ -57,7 +56,7 @@ public class MindmapEditorToolTest {
         MindmapEditor mindmapEditor = projectAccessor.getDiagramEditorFactory().getMindmapEditor();
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -117,17 +116,11 @@ public class MindmapEditorToolTest {
             "insertSvgImageIntoTopic",
             NewSvgImageIntoTopicDTO.class);
 
-        // insertPngImageIntoTopic() method
-        insertPngImageIntoTopic = TestSupport.getAccessibleMethod(
+        // insertPngOrJpgImageIntoTopic() method
+        insertPngOrJpgImageIntoTopic = TestSupport.getAccessibleMethod(
             MindmapEditorTool.class,
-            "insertPngImageIntoTopic",
-            NewPngImageIntoTopicDTO.class);
-
-        // insertJpgImageIntoTopic() method
-        insertJpgImageIntoTopic = TestSupport.getAccessibleMethod(
-            MindmapEditorTool.class,
-            "insertJpgImageIntoTopic",
-            NewJpgImageIntoTopicDTO.class);
+            "insertPngOrJpgImageIntoTopic",
+            NewPngOrJpgImageIntoTopicDTO.class);
 
         // deleteChildTopics() method
         deleteChildTopics = TestSupport.getAccessibleMethod(
@@ -388,7 +381,7 @@ public class MindmapEditorToolTest {
     }
 
     @Test
-    void insertPngImageIntoTopic_ok() throws Exception {
+    void insertPngOrJpgImageIntoTopic_ok_insertsAPngImage() throws Exception {
         // Get mind map diagram and a topic
         IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
@@ -400,16 +393,16 @@ public class MindmapEditorToolTest {
         String imageUrl = pngResource.toExternalForm();
 
         // Create input DTO
-        NewPngImageIntoTopicDTO inputDTO = new NewPngImageIntoTopicDTO(
+        NewPngOrJpgImageIntoTopicDTO inputDTO = new NewPngOrJpgImageIntoTopicDTO(
             mindMapDiagram.getId(),
             rootTopic.getID(),
             imageUrl);
 
         // ----------------------------------------
-        // Call insertPngImageIntoTopic()
+        // Call insertPngOrJpgImageIntoTopic()
         // ----------------------------------------
         NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
-            insertPngImageIntoTopic,
+            insertPngOrJpgImageIntoTopic,
             tool,
             inputDTO,
             NodePresentationDTO.class);
@@ -419,7 +412,7 @@ public class MindmapEditorToolTest {
     }
 
     @Test
-    void insertJpgImageIntoTopic_ok() throws Exception {
+    void insertPngOrJpgImageIntoTopic_ok_insertsAJpgImage() throws Exception {
         // Get mind map diagram and a topic
         IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
@@ -431,16 +424,16 @@ public class MindmapEditorToolTest {
         String imageUrl = jpgResource.toExternalForm();
 
         // Create input DTO
-        NewJpgImageIntoTopicDTO inputDTO = new NewJpgImageIntoTopicDTO(
+        NewPngOrJpgImageIntoTopicDTO inputDTO = new NewPngOrJpgImageIntoTopicDTO(
             mindMapDiagram.getId(),
             rootTopic.getID(),
             imageUrl);
 
         // ----------------------------------------
-        // Call insertJpgImageIntoTopic()
+        // Call insertPngOrJpgImageIntoTopic()
         // ----------------------------------------
         NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
-            insertJpgImageIntoTopic,
+            insertPngOrJpgImageIntoTopic,
             tool,
             inputDTO,
             NodePresentationDTO.class);

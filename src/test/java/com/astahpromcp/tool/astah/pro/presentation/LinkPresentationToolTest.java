@@ -57,7 +57,7 @@ public class LinkPresentationToolTest {
         projectAccessor.open("src/test/resources/modelfile/presentation/LinkPresentationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

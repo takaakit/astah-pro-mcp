@@ -119,9 +119,9 @@ public class NodePresentationTool extends AstahToolProvider {
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahNodePresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahNodePresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationWidth(NodePresentationWithWidthDTO param) throws Exception {
@@ -143,9 +143,9 @@ public class NodePresentationTool extends AstahToolProvider {
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahNodePresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahNodePresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationHeight(NodePresentationWithHeightDTO param) throws Exception {
@@ -167,8 +167,8 @@ public class NodePresentationTool extends AstahToolProvider {
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahNodePresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahNodePresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

@@ -14,6 +14,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationTypeListDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.change_vision.jude.api.inf.model.IComment;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -122,14 +123,19 @@ public class PresentationTool extends AstahToolProvider {
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
         txnAstah.run( () -> {
-            astahPresentation.setLabel(param.label());
+            // IPresentation.setLabel() rejects a note on sequence, component, deployment and composite structure diagrams with "Parameter should be set correctly.", while setting the name of its comment sets the note content on every diagram.
+            if (astahPresentation.getModel() instanceof IComment astahComment) {
+                astahComment.setName(param.label());
+            } else {
+                astahPresentation.setLabel(param.label());
+            }
         });
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahPresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeFillColor(PresentationWithColorDTO param) throws Exception {
@@ -143,9 +149,9 @@ public class PresentationTool extends AstahToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahPresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeLineColor(PresentationWithColorDTO param) throws Exception {
@@ -159,9 +165,9 @@ public class PresentationTool extends AstahToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahPresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeFontColor(PresentationWithColorDTO param) throws Exception {
@@ -175,8 +181,8 @@ public class PresentationTool extends AstahToolProvider {
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(astahPresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahPresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

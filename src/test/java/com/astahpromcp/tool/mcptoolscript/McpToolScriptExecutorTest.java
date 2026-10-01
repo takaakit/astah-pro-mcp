@@ -10,6 +10,7 @@ import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.JsonSupport;
+import com.astahpromcp.tool.mcptoolscript.outputdto.ModelChangesKind;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
@@ -64,7 +65,7 @@ public class McpToolScriptExecutorTest {
                             return ResponseSupport.success(Map.of("edited", true));
                         }),
                 new ToolDefinition(schema("capture_dgm_img"), ToolDefinition.ResultKind.CONTENTS,
-                        (exchange, request) -> ResponseSupport.success(List.of(new McpSchema.TextContent("image")))),
+                        (exchange, request) -> ResponseSupport.success(List.of(McpSchema.TextContent.builder("image").build()))),
                 new ToolDefinition(schema("run_astah_api_script"), ToolDefinition.ResultKind.DTO,
                         (exchange, request) -> ResponseSupport.success(Map.of("ok", true))),
                 new ToolDefinition(schema("get_info_of_ocl_spec"), ToolDefinition.ResultKind.DTO,
@@ -131,7 +132,34 @@ public class McpToolScriptExecutorTest {
         assertTrue(result.errorMessage().contains("capture_dgm_img"),
                 "The run has to say which call failed, because the script swallowed the exception: "
                         + result.errorMessage());
-        assertTrue(result.errorMessage().contains("rolled back"), result.errorMessage());
+    }
+
+    @Test
+    void execute_ng_saysNothingWasLostWhenARunThatOnlyReadsCaughtAToolFailure() {
+        McpToolScriptExecutor.Result result = executor().execute(
+                "try { tools.capture_dgm_img({}); } catch (e) { print('caught'); }\n"
+                        + "print(tools.get_class_info({ id: 'x' }).name);");
+
+        assertFalse(result.ok(), "A caught failure is still a failure of the run");
+        assertTrue(result.output().contains("Sample"), result.output());
+        assertEquals(ModelChangesKind.NONE, result.modelChanges(), result.errorMessage());
+        assertFalse(result.errorMessage().contains("rolled back"),
+                "A run that changed nothing must not claim a rollback: " + result.errorMessage());
+        assertTrue(result.errorMessage().contains("nothing was lost"), result.errorMessage());
+    }
+
+    @Test
+    void execute_ng_saysNothingWasLostWhenARunThatOnlyReadsFailsOnItsOwn() {
+        McpToolScriptExecutor.Result result = executor().execute(
+                "tools.get_class_info({ id: 'x' });\nthrow new Error('boom');");
+
+        assertFalse(result.ok());
+        assertEquals(ModelChangesKind.NONE, result.modelChanges(), result.errorMessage());
+        assertFalse(result.errorMessage().contains("rolled back"), result.errorMessage());
+        assertEquals(2, result.errorLine(), result.errorMessage());
+        // Nashorn ends the message without a full stop, and the note must not run on from it
+        assertTrue(result.errorMessage().matches("(?s).*column number \\d+\\. The run had not changed the model.*"),
+                result.errorMessage());
     }
 
     @Test
@@ -562,6 +590,8 @@ public class McpToolScriptExecutorTest {
 
         assertFalse(result.ok());
         assertTrue(result.errorMessage().contains("timed out"), result.errorMessage());
+        assertEquals(ModelChangesKind.UNKNOWN, result.modelChanges(),
+                "The run is still going when the caller is answered, so what it will have changed is not known yet");
 
         assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS),
                 "Astah API access should be restored once the interrupted script thread terminates");
@@ -664,7 +694,11 @@ public class McpToolScriptExecutorTest {
             return ResponseSupport.success(Map.of("edited", true));
         });
 
-        Thread caller = new Thread(() -> call(scriptTool), "interrupted-caller");
+        AtomicBoolean interruptFlagKept = new AtomicBoolean();
+        Thread caller = new Thread(() -> {
+            call(scriptTool);
+            interruptFlagKept.set(Thread.currentThread().isInterrupted());
+        }, "interrupted-caller");
         caller.setDaemon(true);
         caller.start();
         assertTrue(toolRunning.await(10, TimeUnit.SECONDS), "The script should have reached the tool call");
@@ -684,6 +718,11 @@ public class McpToolScriptExecutorTest {
                 "The tool that took the lock next must not run while the abandoned runner may still use the Astah API");
         assertTrue(Boolean.TRUE.equals(followingResult.get().isError()),
                 "The tool that took the lock next must be refused: " + followingResult.get().content());
+
+        // The lock wrapper drains the EDT on the way out, and that must not swallow the interrupt it is returning with.
+        caller.join(10_000);
+        assertFalse(caller.isAlive(), "The interrupted caller should have been answered");
+        assertTrue(interruptFlagKept.get(), "The caller's interrupt flag must survive the lock wrapper");
 
         releaseTool.countDown();
         assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS));
@@ -705,6 +744,7 @@ public class McpToolScriptExecutorTest {
                 new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.get_class_info({ id: '1' }).name;");
 
         assertTrue(result.ok(), result.errorMessage());
+        assertEquals(ModelChangesKind.NONE, result.modelChanges());
         assertEquals(0, transaction.beginCount(), "A script that only reads must never open a transaction");
         assertEquals(0, transaction.commitCount());
         assertEquals(0, transaction.abortCount());
@@ -731,6 +771,7 @@ public class McpToolScriptExecutorTest {
                 new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
 
         assertTrue(result.ok(), result.errorMessage());
+        assertEquals(ModelChangesKind.COMMITTED, result.modelChanges());
         assertEquals(1, transaction.beginCount(), "The first edit opens the shared transaction");
         assertEquals(1, transaction.commitCount(), "A run in which nothing failed keeps what it did");
         assertEquals(0, transaction.abortCount());
@@ -748,6 +789,12 @@ public class McpToolScriptExecutorTest {
         assertEquals(0, transaction.commitCount(), "A script that threw must not have its edits kept");
         assertEquals(1, transaction.abortCount());
         assertFalse(transaction.isInTransaction());
+        assertEquals(ModelChangesKind.ROLLED_BACK, result.modelChanges());
+        assertTrue(result.errorMessage().contains("boom"), result.errorMessage());
+        assertTrue(result.errorMessage().contains("rolled back"),
+                "A script error after an edit discards that edit, and the message has to say so: " + result.errorMessage());
+        assertTrue(result.errorMessage().matches("(?s).*column number \\d+\\. Every change the run made was rolled back\\."),
+                result.errorMessage());
     }
 
     // The case a bare "did the script finish?" would get wrong, and the reason the dispatcher keeps the failure.
@@ -761,6 +808,9 @@ public class McpToolScriptExecutorTest {
         assertFalse(result.ok(), "The script finished, but the run did not");
         assertEquals(0, transaction.commitCount());
         assertEquals(1, transaction.abortCount());
+        assertEquals(ModelChangesKind.ROLLED_BACK, result.modelChanges());
+        assertTrue(result.errorMessage().startsWith("'capture_dgm_img'"), result.errorMessage());
+        assertTrue(result.errorMessage().contains("rolled back"), result.errorMessage());
     }
 
     // A run the request thread gave up on has already been answered with a timeout failure, so whatever it does afterwards must not reach the project. Only a script that ignores its interrupt gets this far.
@@ -799,6 +849,42 @@ public class McpToolScriptExecutorTest {
         assertEquals(1, transaction.abortCount(), "The refused commit has to be rolled back");
         assertFalse(transaction.isInTransaction());
         assertTrue(result.errorOutput().contains("Failed to close the transaction"), result.errorOutput());
+        assertEquals(ModelChangesKind.ROLLED_BACK, result.modelChanges());
+        assertTrue(result.errorMessage().contains("rolled back"), result.errorMessage());
+    }
+
+    // Only an abort seen to succeed may be reported as a rollback.
+    @Test
+    void execute_ng_reportsTheChangesAsUnknownWhenNeitherTheCommitNorTheAbortWent() {
+        FakeTransactionBoundary transaction = new FakeTransactionBoundary();
+        transaction.failOnCommit();
+        transaction.failOnAbort();
+
+        McpToolScriptExecutor.Result result =
+                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
+
+        assertFalse(result.ok());
+        assertEquals(ModelChangesKind.UNKNOWN, result.modelChanges());
+        assertFalse(result.errorMessage().contains("was rolled back"),
+                "An abort that failed must not be reported as a rollback: " + result.errorMessage());
+        assertTrue(result.errorMessage().contains("could not be confirmed"), result.errorMessage());
+    }
+
+    // The net under closeTransaction settles what closeTransaction could not: once it has aborted, the changes are gone.
+    @Test
+    void execute_ng_reportsARollbackWhenTheNetAbortsWhatTheCloseCouldNot() {
+        FakeTransactionBoundary transaction = new FakeTransactionBoundary();
+        transaction.failOnCommit();
+        transaction.failOnFirstAbort();
+
+        McpToolScriptExecutor.Result result =
+                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
+
+        assertFalse(result.ok());
+        assertFalse(transaction.isInTransaction());
+        assertEquals(2, transaction.abortCount());
+        assertEquals(ModelChangesKind.ROLLED_BACK, result.modelChanges());
+        assertTrue(result.errorMessage().contains("rolled back"), result.errorMessage());
     }
 
     // Someone else holds the transaction: an Astah GUI command mid-flight, or a run that timed out and never let go.
@@ -815,6 +901,7 @@ public class McpToolScriptExecutorTest {
         assertFalse(result.output().contains("ran anyway"), "Nothing after the failed edit may run");
         assertEquals(0, transaction.commitCount());
         assertEquals(0, transaction.abortCount());
+        assertEquals(ModelChangesKind.NONE, result.modelChanges(), "The edit never got a transaction to change anything in");
     }
 
     @Test
@@ -822,6 +909,7 @@ public class McpToolScriptExecutorTest {
         assertFalse(executor().execute("").ok());
         assertFalse(executor().execute("   ").ok());
         assertFalse(executor().execute(null).ok());
+        assertEquals(ModelChangesKind.NONE, executor().execute("").modelChanges());
     }
 
     private static AstahToolRegistry interruptibleRegistry() {

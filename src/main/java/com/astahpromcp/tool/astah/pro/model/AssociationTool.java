@@ -102,14 +102,14 @@ public class AssociationTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_aggregation_kind_of_asso_end_a",
-                "Set the aggregation kind of the specified association end A (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end A. When 'composite' is specified, a filled (black) diamond is placed on association end A.",
+                "Set the aggregation kind of the specified association end A (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed at the type of association end A. When 'composite' is specified, a filled (black) diamond is placed at the type of association end A. The diamond is not shown while association end A is navigable.",
                 this::setAggregationKindOfAssociationEndA,
                 AssociationEndWithAggregationKindDTO.class,
                 AttributeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_aggregation_kind_of_asso_end_b",
-                "Set the aggregation kind of the specified association end B (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed on association end B. When 'composite' is specified, a filled (black) diamond is placed on association end B.",
+                "Set the aggregation kind of the specified association end B (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed at the type of association end B. When 'composite' is specified, a filled (black) diamond is placed at the type of association end B. The diamond is not shown while association end B is navigable.",
                 this::setAggregationKindOfAssociationEndB,
                 AssociationEndWithAggregationKindDTO.class,
                 AttributeDTO.class),

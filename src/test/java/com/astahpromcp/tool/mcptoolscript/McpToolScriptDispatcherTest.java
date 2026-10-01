@@ -8,6 +8,7 @@ import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.ToolProvider;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.type.TypeReference;
 
 import javax.swing.SwingUtilities;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class McpToolScriptDispatcherTest {
     }
 
     private static Map<String, Object> parse(String json) {
-        return JsonSupport.OBJ_MAPPER.readValue(json, Map.class);
+        return JsonSupport.OBJ_MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
     }
 
     @Test
@@ -123,7 +124,7 @@ public class McpToolScriptDispatcherTest {
     @Test
     void invoke_ng_refusesAHandlerThatReturnsNoStructuredContent() {
         ToolDefinition definition = definition("some_new_image_tool",
-                (exchange, request) -> ResponseSupport.success(List.of(new McpSchema.TextContent("image"))));
+                (exchange, request) -> ResponseSupport.success(List.of(McpSchema.TextContent.builder("image").build())));
         McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
 
         IllegalStateException e = assertThrows(IllegalStateException.class,
@@ -285,6 +286,27 @@ public class McpToolScriptDispatcherTest {
             assertTrue(queuedWorkDone.get().get(),
                     "Work queued on the EDT by call " + (i + 1) + " must have run before the call returns");
         }
+    }
+
+    // A run that timed out interrupts the runner thread, and the drain after its tool call must not swallow that interrupt.
+    @Test
+    void invoke_ok_keepsTheInterruptOfAnInterruptedCaller() throws Exception {
+        ToolDefinition definition = definition("set_name_of_named_element", (exchange, request) -> {
+            Thread.currentThread().interrupt();
+            return ResponseSupport.success(Map.of("ok", true));
+        });
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+
+        AtomicBoolean interruptKept = new AtomicBoolean();
+        Thread caller = new Thread(() -> {
+            dispatcher.invoke("set_name_of_named_element", "{}");
+            interruptKept.set(Thread.currentThread().isInterrupted());
+        }, "interrupted-caller");
+        caller.start();
+        caller.join(10_000);
+
+        assertFalse(caller.isAlive(), "The call should have returned");
+        assertTrue(interruptKept.get(), "The caller's interrupt flag must survive the EDT drain");
     }
 
     @Test

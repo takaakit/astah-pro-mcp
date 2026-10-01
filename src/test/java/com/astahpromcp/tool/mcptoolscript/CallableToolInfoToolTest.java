@@ -62,6 +62,15 @@ public class CallableToolInfoToolTest {
                 (exchange, request) -> ResponseSupport.success(Map.of("ok", true), List.of()));
     }
 
+    // A tool function that takes the arguments the given schema declares
+    private static ToolDefinition definitionTaking(String name, String inputSchema) {
+        McpSchema.Tool schema = McpSchema.Tool.builder(name, JsonSupport.MCP_JSON_MAPPER, inputSchema)
+                .description("Tool " + name)
+                .build();
+
+        return new ToolDefinition(schema, ToolDefinition.ResultKind.DTO, (exchange, request) -> ResponseSupport.success(Map.of("ok", true)));
+    }
+
     private static ToolDefinition definitionOf(String name, String description, int descriptionChars) {
         return definition(name, description.repeat(descriptionChars));
     }
@@ -230,6 +239,56 @@ public class CallableToolInfoToolTest {
 
         assertEquals("get_class_info", entry.name());
         assertEquals("Return the information of the specified class.", entry.description());
+    }
+
+    @Test
+    void getChunkOfToolsCallable_ok_carriesTheArgumentNamesOfEveryToolFunction() {
+        AstahToolRegistry registry = registryOf(
+                definitionTaking("set_location", "{\"type\":\"object\",\"properties\":{\"nodePresentationId\":{\"type\":\"string\"},\"locationX\":{\"type\":\"integer\"},\"locationY\":{\"type\":\"integer\"}}}"),
+                definitionTaking("get_project_info", "{\"type\":\"object\"}"));
+
+        List<CallableToolSummaryDTO> entries = chunk(new CallableToolInfoTool(registry), 0).tools();
+
+        assertEquals(List.of("nodePresentationId", "locationX", "locationY"), entries.get(0).arguments(),
+                "The argument names come as the schema spells and orders them");
+        assertEquals(List.of(), entries.get(1).arguments(), "A tool function that takes no arguments has none to list");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getChunkOfToolsCallable_ok_listsTheDeclaredArgumentNamesOverTheRealCatalog() {
+        AstahToolRegistry registry = realRegistry();
+
+        for (CallableToolChunkDTO chunk : allChunks(new CallableToolInfoTool(registry))) {
+            for (CallableToolSummaryDTO entry : chunk.tools()) {
+                Map<String, Object> properties = (Map<String, Object>) registry.find(entry.name()).toolSchema().inputSchema().get("properties");
+                List<String> declared = properties == null ? List.of() : List.copyOf(properties.keySet());
+
+                assertEquals(declared, entry.arguments(), "The argument names of " + entry.name() + " must be those its arguments' schema declares");
+            }
+        }
+    }
+
+    // The MCP SDK checks every answer against the schema this tool function publishes, and an answer that fails the check reaches the caller as an error.
+    @Test
+    void getChunkOfToolsCallable_ok_answersWithinItsPublishedSchemaOverTheRealCatalog() {
+        CallableToolInfoTool tool = new CallableToolInfoTool(realRegistry());
+        Map<String, Object> schema = tool.createToolDefinitions().stream()
+                .filter(candidate -> candidate.toolSchema().name().equals(CHUNK_TOOL))
+                .findFirst()
+                .orElseThrow()
+                .toolSchema()
+                .outputSchema();
+        JsonSchemaValidator validator = new DefaultJsonSchemaValidator(JsonSupport.OBJ_MAPPER);
+
+        int totalChunks = chunk(tool, 0).totalChunks();
+        for (int index = 0; index < totalChunks; index++) {
+            McpSchema.CallToolResult result = chunkResult(tool, index);
+            assertFalse(Boolean.TRUE.equals(result.isError()), String.valueOf(result.content()));
+
+            JsonSchemaValidator.ValidationResponse validation = validator.validate(schema, result.structuredContent());
+            assertTrue(validation.valid(), "Chunk " + index + " does not fit the published schema: " + validation.errorMessage());
+        }
     }
 
     @Test

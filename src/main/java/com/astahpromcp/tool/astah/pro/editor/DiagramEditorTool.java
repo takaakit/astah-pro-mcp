@@ -11,8 +11,7 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
-import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageWithPointDTO;
-import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageWithPointDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngOrJpgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewRectDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTextWithPointDTO;
@@ -77,17 +76,10 @@ public class DiagramEditorTool extends AstahToolProvider {
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
-                "insert_png_img_on_dgm",
-                "Insert a PNG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image in low resolution. When specifying a local image file, use the 'file:///' protocol.",
-                this::insertPngImage,
-                NewPngImageWithPointDTO.class,
-                RectangleDTO.class),
-
-            ToolSupport.toolDefinitionReturningDtoAndContents(
-                "insert_jpg_img_on_dgm",
-                "Insert a JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image in low resolution. When specifying a local image file, use the 'file:///' protocol.",
-                this::insertJpgImage,
-                NewJpgImageWithPointDTO.class,
+                "insert_png_or_jpg_img_on_dgm",
+                "Insert a PNG or JPG image (specified by image URL) at the specified point (specified by x and y coordinates) on the specified diagram (specified by ID), and return the rectangle (x, y, width, height) representing the boundary of the newly created image rectangle along with the updated diagram image in low resolution. When specifying a local image file, use the 'file:///' protocol.",
+                this::insertPngOrJpgImage,
+                NewPngOrJpgImageWithPointDTO.class,
                 RectangleDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
@@ -143,9 +135,9 @@ public class DiagramEditorTool extends AstahToolProvider {
 
         RectangleDTO dto = RectangleDTOAssembler.toDTO(astahImagePresentation.getRectangle());
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(diagramImage));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private INodePresentation createSvgImagePresentation(IDiagram astahDiagram, DiagramEditor diagramEditor, String imageSvgCode, double locationX, double locationY) throws Exception {
@@ -218,8 +210,8 @@ public class DiagramEditorTool extends AstahToolProvider {
         return null;
     }
 
-    private Pair<RectangleDTO, List<McpSchema.Content>> insertPngImage(NewPngImageWithPointDTO param) throws Exception {
-        log.debug("Insert PNG image: {}", param);
+    private Pair<RectangleDTO, List<McpSchema.Content>> insertPngOrJpgImage(NewPngOrJpgImageWithPointDTO param) throws Exception {
+        log.debug("Insert PNG or JPG image: {}", param);
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
@@ -249,45 +241,9 @@ public class DiagramEditorTool extends AstahToolProvider {
             image.getWidth(null),
             image.getHeight(null));
 
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(diagramImage));
-    }
-
-    private Pair<RectangleDTO, List<McpSchema.Content>> insertJpgImage(NewJpgImageWithPointDTO param) throws Exception {
-        log.debug("Insert JPG image: {}", param);
-
-        IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
-
-        DiagramEditor diagramEditor;
-        try {
-            diagramEditor = diagramEditorSupport.getCorrespondingDiagramEditor(astahDiagram);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get diagram editor.", e);
-        }
-
-        diagramEditor.setDiagram(astahDiagram);
-
-        Image image = imageConvertSupport.urlToImage(param.imageUrl());
-
-        txnAstah.run( () -> {
-            // Note: The return value of createImage() is null (likely due to an API bug), so the return value cannot be used.
-            diagramEditor.createImage(
-                image,
-                new Point2D.Double(
-                        param.locationX(),
-                        param.locationY()));
-        });
-
-        RectangleDTO dto = new RectangleDTO(
-            param.locationX(),
-            param.locationY(),
-            image.getWidth(null),
-            image.getHeight(null));
-
-        McpSchema.ImageContent diagramImage = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
-
-        return Pair.of(dto, List.of(diagramImage));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertRect(NewRectDTO param) throws Exception {
@@ -315,9 +271,9 @@ public class DiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertText(NewTextWithPointDTO param) throws Exception {
@@ -344,9 +300,9 @@ public class DiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private DiagramDTO deleteDiagram(DeleteDiagramDTO param) throws Exception {
@@ -404,9 +360,9 @@ public class DiagramEditorTool extends AstahToolProvider {
 
         astahProToolSupport.verifyDeleted(param.targetPresentationId());
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(presentationDTO, List.of(image));
+        return Pair.of(presentationDTO, List.of(thumbnailContent));
     }
 
 }

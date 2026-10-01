@@ -41,7 +41,7 @@ public class StructureDiagramEditorToolTest {
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool

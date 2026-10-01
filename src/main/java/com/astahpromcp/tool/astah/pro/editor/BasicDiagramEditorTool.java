@@ -100,9 +100,9 @@ public class BasicDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNoteAnchor(NewNoteAnchorDTO param) throws Exception {
@@ -129,8 +129,8 @@ public class BasicDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

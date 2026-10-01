@@ -1,44 +1,15 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class StateMachineDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class StateMachineDiagramGuideTool implements ToolProvider {
-
-    public StateMachineDiagramGuideTool() {
+    private StateMachineDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "state_machine_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a state machine diagram to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create state machine diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get state machine diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * To move a state to a different region within the same parent state, enlarge the destination region enough to accommodate the state being moved, and then change the coordinates of the state so that it is positioned within the destination region.
+* The StateMachine owned by a state machine diagram has its own name (initially a default such as StateMachine0), which does not follow the diagram name and is shown on submachine states that refer to it. Set it as well when you create or rename the diagram.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
@@ -85,6 +56,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * This represents the special action of sending a signal and maps directly to a SendSignalAction that is part of the Activity that describes the effect Behavior of the corresponding Transition.
         """;
         
-        return new GuideDTO(contents);
+        return contents;
     }
 }

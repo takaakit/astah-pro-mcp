@@ -47,7 +47,7 @@ public class AstahProUserGuideTool implements ToolProvider, RemoteDocumentTool {
 
                 ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_astah_pro_user_guide",
-                    "Return the chunk data of astah pro user guide. If no chunk data exists, an empty string is set.",
+                    "Return the chunk data of astah pro user guide. The chunk index must be in the range 0 to totalChunks - 1 (totalChunks is returned by the corresponding get_info_of_... tool function, which must be called first); otherwise an error is returned.",
                     this::getAstahProUserGuideChunk,
                     ChunkDTO.class,
                     DocumentChunkDTO.class)

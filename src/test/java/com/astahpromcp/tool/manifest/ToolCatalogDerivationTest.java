@@ -1,13 +1,19 @@
 package com.astahpromcp.tool.manifest;
 
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
+import com.astahpromcp.tool.astah.pro.view.DiagramViewManagerTool;
+import com.astahpromcp.tool.astah.pro.view.ProjectViewManagerTool;
+import com.change_vision.jude.api.inf.view.IDiagramViewManager;
+import com.change_vision.jude.api.inf.view.IProjectViewManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class ToolCatalogDerivationTest {
 
@@ -17,7 +23,6 @@ public class ToolCatalogDerivationTest {
     private ToolCatalog catalog() {
         return ToolCatalog.build(DiagramThumbnails.INCLUDE, workspaceDir.resolve("images"), workspaceDir);
     }
-
 
     @Test
     void notMcpToolScriptCallableNames_ok_isTwentyEightToolsFromThreeStructuralFacts() {
@@ -29,12 +34,22 @@ public class ToolCatalogDerivationTest {
         assertEquals(1, countWithReason(catalog, NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT));
     }
 
-
     @Test
     void notMcpToolScriptCallableReason_ok_isNullForAToolAScriptMayCall() {
         assertNull(catalog().notMcpToolScriptCallableReason("get_class_info"));
     }
 
+    @Test
+    void notMcpToolScriptCallableReason_ok_isDrivesTheViewForEveryViewManagerTool() {
+        ToolCatalog catalog = ToolCatalog.of(List.of(
+                new DiagramViewManagerTool(null, mock(IDiagramViewManager.class), null, null),
+                new ProjectViewManagerTool(null, mock(IProjectViewManager.class), null, null)), List.of());
+
+        assertEquals(19, catalog.notMcpToolScriptCallableNames().size());
+        for (String name : catalog.names()) {
+            assertEquals(NotMcpToolScriptCallableReason.DRIVES_THE_VIEW, catalog.notMcpToolScriptCallableReason(name), name);
+        }
+    }
 
     @Test
     void astahLockedNames_ok_coversEveryToolThatReachesTheAstahApi() {

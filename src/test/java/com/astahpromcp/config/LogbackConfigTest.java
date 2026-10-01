@@ -3,7 +3,9 @@ package com.astahpromcp.config;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.joran.spi.JoranException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -15,16 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LogbackConfigTest {
 
-    // Close and detach the file appender so Windows releases the log file before @TempDir cleanup.
+    // Stop every appender so Windows releases the log file before @TempDir cleanup, then go back to logback-test.xml:
+    // configure() replaces the whole logging setup of this JVM, and the tests that run after this one log through it.
     @AfterEach
-    void releaseLogFile() {
+    void releaseLogFile() throws JoranException {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ch.qos.logback.classic.Logger root = context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-        Appender<ILoggingEvent> file = root.getAppender("FILE");
-        if (file != null) {
-            file.stop();
-            root.detachAppender(file);
-        }
+        context.reset();
+        new ContextInitializer(context).autoConfig();
     }
 
     @Test

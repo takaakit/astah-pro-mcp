@@ -7,11 +7,13 @@ import com.change_vision.jude.api.inf.model.IMultiplicityRange;
 import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 
+import java.util.Objects;
+
 public class AttributeDTOAssembler {
     public static AttributeDTO toDTO(@NonNull IAttribute astahAttribute) throws Exception {
 
         // Note: For the Port element, an exception occurs when retrieving the following values, so the access must be wrapped in a try-catch block.
-        
+
         boolean isAggregate;
         try {
             isAggregate = astahAttribute.isAggregate();
@@ -56,28 +58,28 @@ public class AttributeDTOAssembler {
 
         String initialValue;
         try {
-            initialValue = astahAttribute.getInitialValue();
+            initialValue = Objects.requireNonNullElse(astahAttribute.getInitialValue(), "");
         } catch (Exception e) {
             initialValue = "";
         }
 
         String multiplicity;
         try {
-            multiplicity = astahAttribute.getMultiplicityRangeString();
+            multiplicity = Objects.requireNonNullElse(astahAttribute.getMultiplicityRangeString(), "");
         } catch (Exception e) {
             multiplicity = "";
         }
 
         String navigability;
         try {
-            navigability = astahAttribute.getNavigability();
+            navigability = Objects.requireNonNullElse(astahAttribute.getNavigability(), "");
         } catch (Exception e) {
             navigability = "";
         }
 
         String typeExpression;
         try {
-            typeExpression = astahAttribute.getTypeExpression();
+            typeExpression = Objects.requireNonNullElse(astahAttribute.getTypeExpression(), "");
         } catch (Exception e) {
             typeExpression = "";
         }

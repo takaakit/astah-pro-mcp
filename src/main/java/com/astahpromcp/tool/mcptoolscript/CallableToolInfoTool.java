@@ -41,7 +41,7 @@ public class CallableToolInfoTool implements ToolProvider {
         List<CallableToolSummaryDTO> summaries = new ArrayList<>();
         for (ToolDefinition definition : registry.mcpToolScriptCallableDefinitions()) {
             McpSchema.Tool schema = definition.toolSchema();
-            summaries.add(new CallableToolSummaryDTO(schema.name(), nullToEmpty(schema.description())));
+            summaries.add(new CallableToolSummaryDTO(schema.name(), nullToEmpty(schema.description()), argumentNames(schema)));
         }
 
         this.chunks = splitIntoChunks(summaries, chunkMaxBytes);
@@ -53,7 +53,7 @@ public class CallableToolInfoTool implements ToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_tools_callable_from_mcp_tool_script",
-                "Return one chunk of the list of tool functions an mcp tool script can call: the name and the description of each, so that you can find the ones to call from 'run_mcp_tool_script' as tools.<name>({ ... }). This server exposes only a small number of tool functions directly; this list is how you find the rest. One chunk is NOT the whole list: call this tool with 'chunkIndex' 0 first, read 'totalChunks' in the answer, then call it once for every remaining index, all in parallel in a single message, and choose tool functions only after you have read every chunk. It returns what each tool function is for, not what arguments it takes: call 'get_info_of_tools_callable_from_mcp_tool_script' for the argument and result schemas of the tool functions you decide to call. NOTE: this lists the tool functions of THIS server, NOT the Astah Java API; to work with the raw Astah API, call 'astah_api_script_guide' and use 'run_astah_api_script'.",
+                "Return one chunk of the list of tool functions an mcp tool script can call: the name, the description and the argument names of each, so that you can find the ones to call from 'run_mcp_tool_script' as tools.<name>({ ... }). This server exposes only a small number of tool functions directly; this list is how you find the rest. One chunk is NOT the whole list: call this tool with 'chunkIndex' 0 first, read 'totalChunks' in the answer, then call it once for every remaining index, all in parallel in a single message, and choose tool functions only after you have read every chunk. It returns what each tool function is for and the names of its arguments: call 'get_info_of_tools_callable_from_mcp_tool_script' for the argument and result schemas of the tool functions you decide to call. NOTE: this lists the tool functions of THIS server, NOT the Astah Java API; to work with the raw Astah API, call 'astah_api_script_guide' and use 'run_astah_api_script'.",
                 this::getChunkOfCallableTools,
                 ChunkDTO.class,
                 CallableToolChunkDTO.class),
@@ -184,6 +184,14 @@ public class CallableToolInfoTool implements ToolProvider {
                 nullToEmpty(schema.description()),
                 emptyIfNull(schema.inputSchema()),
                 emptyIfNull(schema.outputSchema()));
+    }
+
+    // A tool function that takes no arguments declares no properties at all, and gets an empty list
+    private static List<String> argumentNames(McpSchema.Tool schema) {
+        Map<String, Object> input = schema.inputSchema();
+        Object properties = input == null ? null : input.get("properties");
+
+        return properties instanceof Map<?, ?> map ? map.keySet().stream().map(String::valueOf).toList() : List.of();
     }
 
     private static Map<String, Object> emptyIfNull(Map<String, Object> schema) {

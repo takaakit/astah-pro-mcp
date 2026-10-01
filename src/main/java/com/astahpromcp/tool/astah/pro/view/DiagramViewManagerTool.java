@@ -107,7 +107,7 @@ public class DiagramViewManagerTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "center_prst_in_dgm",
-                "Center the specified presentations (specified by ID) in current diagram, and return the centered presentation.",
+                "Show the specified presentation (specified by ID) in the center of Diagram Editor and select it, and return the presentation. The diagram that contains the presentation is opened and becomes the current diagram.",
                 this::centerPresentationInDiagram,
                 IdDTO.class,
                 PresentationDTO.class),

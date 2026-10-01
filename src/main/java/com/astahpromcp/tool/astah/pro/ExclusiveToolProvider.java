@@ -107,6 +107,13 @@ public final class ExclusiveToolProvider implements ToolProvider {
             return;
         }
 
+        // A thread told to stop does not wait, and keeps its interrupt. Posting to the EDT from it could also lose that
+        // interrupt: when AWT has to restart a stopped EDT, AWTAutoShutdown.activateBlockerThread() swallows it.
+        if (Thread.currentThread().isInterrupted()) {
+            log.warn("Interrupted while flushing EDT after tool execution @tool={}", toolName);
+            return;
+        }
+
         // Wait with a bounded timeout instead of invokeAndWait: if the EDT is blocked
         CountDownLatch latch = new CountDownLatch(1);
         SwingUtilities.invokeLater(latch::countDown);  // no-op: drain the EDT queue before releasing the Astah API lock

@@ -13,7 +13,9 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.CombinedFragment
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyUtil;
@@ -28,11 +30,13 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 @Slf4j
 public class CombinedFragmentTool extends AstahToolProvider {
 
+    private final BasicModelEditor basicModelEditor;
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
 
-    public CombinedFragmentTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport) {
+    public CombinedFragmentTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport) {
+        this.basicModelEditor = basicModelEditor;
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
@@ -86,13 +90,29 @@ public class CombinedFragmentTool extends AstahToolProvider {
 
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
 
+        // A null or blank guard means no guard, and surrounding whitespace is removed.
+        String guard = param.guard() == null ? "" : param.guard().strip();
+
         txnAstah.run( () -> {
+            IInteractionOperand addedInteractionOperand;
             try {
-                astahCombinedFragment.addInteractionOperand(param.newInteractionOperandName(), param.guard());
+                addedInteractionOperand = astahCombinedFragment.addInteractionOperand(param.newInteractionOperandName(), guard);
             } catch (Exception e) {
                 throw new RuntimeException(String.format(
                     "Failed to add an interaction operand (%s). Some interaction operators allow only one interaction operand. If multiple interaction operands are needed, change the interaction operator of the combined fragment to one that allows them.",
                     e.getMessage()), e);
+            }
+
+            // Workaround: ICombinedFragment.addInteractionOperand() leaves a default "Guard" constraint beside the given guard, and deleting either one clears the guard. So delete them all and set the guard once. The operand has just been added, so nothing of the user's is lost.
+            IConstraint[] constraints = addedInteractionOperand.getConstraints();
+            if (constraints.length > 1) {
+                for (IConstraint constraint : constraints) {
+                    basicModelEditor.delete(constraint);
+                }
+                
+                if (!guard.isEmpty()) {
+                    addedInteractionOperand.setGuard(guard);
+                }
             }
         });
 

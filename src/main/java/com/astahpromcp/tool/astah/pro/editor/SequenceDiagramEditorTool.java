@@ -162,9 +162,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(combinedFragment);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createMessage(NewMessageDTO param) throws Exception {
@@ -201,17 +201,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(message);
 
-        List<McpSchema.Content> contents;
-        try {
-            contents = List.of(imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId()));
-        } catch (Exception e) {
-            log.warn("Edit succeeded, but failed to capture diagram image for {}: {}", param.targetSequenceDiagramId(), e.getMessage(), e);
-            contents = List.of(McpSchema.TextContent.builder(String.format(
-                "The edit succeeded, but generating the diagram preview image failed: %s. Retrieve the diagram image separately using another tool if needed.",
-                e.getMessage())).build());
-        }
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, contents);
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createCreateMessage(NewCreateMessageDTO param) throws Exception {
@@ -257,9 +249,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(createMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDestroyMessage(NewDestroyMessageDTO param) throws Exception {
@@ -293,9 +285,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(destroyMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createReturnMessage(NewReturnMessageDTO param) throws Exception {
@@ -318,17 +310,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(returnMessage);
 
-        List<McpSchema.Content> contents;
-        try {
-            contents = List.of(imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId()));
-        } catch (Exception e) {
-            log.warn("Edit succeeded, but failed to capture diagram image for {}: {}", param.targetSequenceDiagramId(), e.getMessage(), e);
-            contents = List.of(McpSchema.TextContent.builder(String.format(
-                "The edit succeeded, but generating the diagram preview image failed: %s. Retrieve the diagram image separately using another tool if needed.",
-                e.getMessage())).build());
-        }
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, contents);
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(NewLostMessageDTO param) throws Exception {
@@ -356,9 +340,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(lostMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFoundMessage(NewFoundMessageDTO param) throws Exception {
@@ -385,9 +369,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(foundMessage);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInteractionUse(NewInteractionUseDTO param) throws Exception {
@@ -411,9 +395,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(interactionUse);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createLifeline(NewLifelineDTO param) throws Exception {
@@ -431,9 +415,9 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(lifeline);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createTermination(NewTerminationDTO param) throws Exception {
@@ -451,8 +435,8 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(termination);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetSequenceDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetSequenceDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

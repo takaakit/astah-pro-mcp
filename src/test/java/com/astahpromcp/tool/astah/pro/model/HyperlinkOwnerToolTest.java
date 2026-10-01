@@ -202,6 +202,45 @@ public class HyperlinkOwnerToolTest {
     }
 
     @Test
+    void addUrlHyperlinkToNamedElement_ok_withFileHyperlinkInvalidAsPath() throws Exception {
+        // Get named element
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+
+        // A file hyperlink whose name Windows forbids in a path, as one made on another OS can carry
+        projectAccessor.getTransactionManager().beginTransaction();
+        namedElement.createFileHyperlink("report:v2.txt", "C:\\shared", "Made on another OS");
+        projectAccessor.getTransactionManager().endTransaction();
+
+        long urlHyperlinkCountBefore = Arrays.stream(namedElement.getHyperlinks()).filter(IHyperlink::isURL).count();
+
+        // Create input DTO
+        NamedElementWithUrlHyperlinkDTO inputDTO = new NamedElementWithUrlHyperlinkDTO(
+            namedElement.getId(),
+            "https://example.com/test",
+            "Test comment");
+
+        // ----------------------------------------
+        // Call addUrlHyperlink()
+        // ----------------------------------------
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            addUrlHyperlinkToNamedElement,
+            tool,
+            inputDTO,
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.filePathHyperlinks().stream()
+            .anyMatch(h -> h.filePath().startsWith("C:\\shared") && h.filePath().endsWith("report:v2.txt")));
+
+        // Check URL hyperlinks after adding
+        assertEquals(urlHyperlinkCountBefore + 1,
+            Arrays.stream(namedElement.getHyperlinks()).filter(IHyperlink::isURL).count());
+    }
+
+    @Test
     void addFilePathHyperlinkToNamedElement_ok() throws Exception {
         // Get named element
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(

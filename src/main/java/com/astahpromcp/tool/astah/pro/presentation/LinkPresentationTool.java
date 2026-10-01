@@ -114,9 +114,9 @@ public class LinkPresentationTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(linkPresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(linkPresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private static String endLabelOf(IPresentation astahEnd) {
@@ -134,8 +134,8 @@ public class LinkPresentationTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(linkPresentation.getDiagram().getId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(linkPresentation.getDiagram().getId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

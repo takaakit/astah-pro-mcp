@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.common;
 
+import com.astahpromcp.config.McpServerConfig;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderException;
@@ -12,10 +13,20 @@ import org.w3c.dom.Document;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 public class ImageConvertSupport {
 
@@ -191,16 +202,77 @@ public class ImageConvertSupport {
 
         try {
             URI uri = URI.create(imageUrl);
-            try (InputStream inputStream = uri.toURL().openStream()) {
-                BufferedImage image = ImageIO.read(inputStream);
-                if (image == null) {
-                    throw new IllegalArgumentException("Failed to read image from URL: " + imageUrl);
-                }
-                return image;
-            }
+            String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
+            return switch (scheme) {
+                case "http", "https" -> readHttpImage(uri);
+                case "file" -> readFileImage(uri);
+                default -> throw new IllegalArgumentException("Only http, https and file URLs are supported");
+            };
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to load image from URL: " + imageUrl, e);
+            // Only the top-level message reaches the client, so the reason goes into it.
+            throw new IllegalArgumentException("Failed to load image from URL: " + imageUrl + " (" + e.getMessage() + ")", e);
+        }
+    }
+
+    // The whole fetch, not each read, is bounded: a server that trickles bytes defeats a read timeout alone.
+    private BufferedImage readHttpImage(URI uri) throws IOException {
+        int timeoutMillis = (int) TimeUnit.SECONDS.toMillis(McpServerConfig.IMAGE_URL_FETCH_TIMEOUT_SECONDS);
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        connection.setConnectTimeout(timeoutMillis);
+        connection.setReadTimeout(timeoutMillis);
+
+        // A blocked socket read ignores interrupts, so closing the connection is the only way to end it on time.
+        AtomicBoolean timedOut = new AtomicBoolean();
+        CompletableFuture<Void> watchdog = CompletableFuture.runAsync(() -> {
+            timedOut.set(true);
+            connection.disconnect();
+        }, CompletableFuture.delayedExecutor(McpServerConfig.IMAGE_URL_FETCH_TIMEOUT_SECONDS, TimeUnit.SECONDS));
+
+        try (InputStream inputStream = connection.getInputStream()) {
+            return readImage(inputStream);
+        } catch (IOException e) {
+            if (timedOut.get()) {
+                throw new IOException("Timed out after " + McpServerConfig.IMAGE_URL_FETCH_TIMEOUT_SECONDS + " seconds", e);
+            }
+            throw e;
+        } finally {
+            watchdog.cancel(false);
+        }
+    }
+
+    // A UNC path would wait on the network share with no timeout at all.
+    private BufferedImage readFileImage(URI uri) throws IOException {
+        Path path = Path.of(uri);
+        if (path.toString().startsWith("\\\\")) {
+            throw new IllegalArgumentException("File URLs on a network share are not supported");
+        }
+
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            return readImage(inputStream);
+        }
+    }
+
+    // Checks the size in the header before decoding: a few megabytes of PNG can decode into gigabytes of pixels.
+    private BufferedImage readImage(InputStream inputStream) throws IOException {
+        try (ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream)) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
+            if (!readers.hasNext()) {
+                throw new IOException("Not a supported image format");
+            }
+
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(imageInputStream, true, true);
+                long pixels = (long) reader.getWidth(0) * reader.getHeight(0);
+                if (pixels > McpServerConfig.IMAGE_URL_MAX_PIXELS) {
+                    throw new IOException(String.format("Image is %dx%d pixels, above the limit of %d pixels",
+                            reader.getWidth(0), reader.getHeight(0), McpServerConfig.IMAGE_URL_MAX_PIXELS));
+                }
+                return reader.read(0);
+            } finally {
+                reader.dispose();
+            }
         }
     }
 }

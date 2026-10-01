@@ -7,8 +7,8 @@ import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee11.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.jupiter.api.AfterEach;
@@ -67,7 +67,7 @@ class McpStreamableHttpCompatibilityTest {
                                 .description("Echo the given text back")
                                 .build(),
                         (exchange, request) -> McpSchema.CallToolResult.builder()
-                                .content(List.of(new McpSchema.TextContent(String.valueOf(request.arguments().get("text")))))
+                                .content(List.of(McpSchema.TextContent.builder(String.valueOf(request.arguments().get("text"))).build()))
                                 .isError(false)
                                 .build())
                 .build();

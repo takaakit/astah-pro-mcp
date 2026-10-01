@@ -85,6 +85,7 @@ Model: Grok 4.7 / Effort: Medium / Total time: approx. 41 min
   - Grok Build
   - Antigravity CLI
   - Cursor IDE
+  - Antigravity IDE
   - Kiro IDE
 
 - **Astah Pro v12.0 or later**
@@ -124,8 +125,8 @@ This plugin experimentally implements a programmatic tool calling mode (port `88
 
 | Mode | Port | Exposed tools |
 | --- | --- | --- |
-| Programmatic tool calling | `8888` | 84 |
-| Direct tool calling | `18888` | 399 |
+| Programmatic tool calling | `8888` | 81 |
+| Direct tool calling | `18888` | 389 |
 
 <details>
 <summary><b>Claude Code</b></summary>
@@ -211,6 +212,32 @@ Create `.agents/mcp_config.json` under your project directory (workspace scope) 
 ```
 
 > Use [mcp-remote](https://github.com/geelen/mcp-remote) to bridge the HTTP connection. [Node.js](https://nodejs.org/) must be installed.
+
+</details>
+
+
+<details>
+<summary><b>Antigravity IDE</b></summary>
+
+```json
+{
+  "mcpServers": {
+    "apm": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://127.0.0.1:8888/mcp",
+        "--allow-http"
+      ]
+    }
+  }
+}
+```
+
+> Use [mcp-remote](https://github.com/geelen/mcp-remote) to bridge the HTTP connection. [Node.js](https://nodejs.org/) must be installed.
+
+> The server key is shortened to `apm` to keep tool names within Antigravity IDE's 64-character limit.
 
 </details>
 

@@ -1,41 +1,11 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class RequirementDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class RequirementDiagramGuideTool implements ToolProvider {
-
-    public RequirementDiagramGuideTool() {
+    private RequirementDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "req_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a requirement diagram to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create requirement diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get requirement diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 Terminology Definitions (quoted from OMG SysML Specification v.1.7):
 * A requirement specifies a capability or condition that must (or should) be satisfied. A requirement may specify a function that a system must perform or a performance condition a system must achieve.
@@ -58,6 +28,6 @@ Terminology Definitions (quoted from OMG SysML Specification v.1.7):
 * A Verify relationship is a dependency between a requirement and a test case or other model element that can determine whether a system fulfills the requirement.
         """;
         
-        return new GuideDTO(contents);
+        return contents;
     }
 }

@@ -289,7 +289,7 @@ public class BasicModelEditorTool extends AstahToolProvider {
     private NamedElementDTO changeParent(NamedElementWithParentDTO param) throws Exception {
         log.debug("Change parent: {}", param);
 
-        INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementid());
+        INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
         INamedElement newParentAstahNamedElement = astahProToolSupport.getNamedElement(param.newParentNamedElementId());
 
         txnAstah.run( () -> {

@@ -6,6 +6,7 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
@@ -14,7 +15,14 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssemb
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationGeometryDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationGeometryDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationGeometriesDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationGeometryDTOAssembler;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationGeometryDTOAssembler;
 import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +82,13 @@ public class DiagramTool extends AstahToolProvider {
                 PresentationListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
+                "get_prst_geometries_on_dgm",
+                "Return the geometry of every presentation on the specified diagram (specified by ID), with node presentations and link presentations in separate lists: the drawn rectangle of each node presentation and the drawn points of each link presentation, in diagram coordinates.",
+                this::getPresentationGeometriesOnDiagram,
+                IdDTO.class,
+                PresentationGeometriesDTO.class),
+
+            ToolSupport.toolDefinitionReturningDto(
                 "export_dgm_png_img",
                 "Export a PNG image of the specified diagram (specified by ID), and return the exported image file information. For example, if you need a diagram image file while creating a document, use this tool.",
                 this::exportPngImage,
@@ -110,6 +125,28 @@ public class DiagramTool extends AstahToolProvider {
         }
         
         return new PresentationListDTO(presentationDTOs);
+    }
+
+    private PresentationGeometriesDTO getPresentationGeometriesOnDiagram(IdDTO param) throws Exception {
+        log.debug("Get presentation geometries on diagram: {}", param);
+
+        IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
+
+        List<NodePresentationGeometryDTO> nodePrstGeoDTOs = new ArrayList<>();
+        List<LinkPresentationGeometryDTO> linkPrstGeoDTOs = new ArrayList<>();
+        for (IPresentation presentation : astahDiagram.getPresentations()) {
+            if (presentation instanceof INodePresentation nodePresentation) {
+                nodePrstGeoDTOs.add(NodePresentationGeometryDTOAssembler.toDTO(nodePresentation));
+            } else if (presentation instanceof ILinkPresentation linkPresentation) {
+                linkPrstGeoDTOs.add(LinkPresentationGeometryDTOAssembler.toDTO(linkPresentation));
+            }
+        }
+
+        return new PresentationGeometriesDTO(
+            NameIdTypeDTOAssembler.toDTO(astahDiagram),
+            RectangleDTOAssembler.toDTO(astahDiagram.getBoundRect()),
+            nodePrstGeoDTOs,
+            linkPrstGeoDTOs);
     }
 
     private ImageFileDTO exportPngImage(IdDTO param) throws Exception {

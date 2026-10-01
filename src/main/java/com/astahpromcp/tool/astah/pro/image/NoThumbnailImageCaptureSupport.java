@@ -20,7 +20,7 @@ public class NoThumbnailImageCaptureSupport extends ImageCaptureSupport {
     }
 
     @Override
-    public McpSchema.ImageContent createSmallImageContent(String diagramId) {
+    public McpSchema.Content createThumbnailContent(String diagramId) {
         return NO_IMAGE;
     }
 }

@@ -6,6 +6,8 @@ import com.change_vision.jude.api.inf.model.IParameter;
 import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ParameterDTO;
 
+import java.util.Objects;
+
 public class ParameterDTOAssembler {
     public static ParameterDTO toDTO(@NonNull IParameter astahParameter) throws Exception {
 
@@ -19,6 +21,6 @@ public class ParameterDTOAssembler {
         return new ParameterDTO(
             NamedElementDTOAssembler.toDTO(astahParameter),
             type,
-            astahParameter.getTypeExpression());
+            Objects.requireNonNullElse(astahParameter.getTypeExpression(), ""));
     }
 }

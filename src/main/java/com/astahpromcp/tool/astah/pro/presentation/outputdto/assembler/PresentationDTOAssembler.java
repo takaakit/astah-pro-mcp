@@ -20,12 +20,7 @@ public class PresentationDTOAssembler {
             renderedInDiagram = NameIdTypeDTO.empty();
         }
 
-        NameIdTypeDTO correspondingModelElement;
-        if (astahPresentation.getModel() != null && astahPresentation.getModel() instanceof INamedElement) {
-            correspondingModelElement = NameIdTypeDTOAssembler.toDTO((INamedElement)astahPresentation.getModel());
-        } else {
-            correspondingModelElement = NameIdTypeDTO.empty();
-        }
+        NameIdTypeDTO correspondingModelElement = correspondingModelElementOf(astahPresentation);
 
         String fillColor;
         if (astahPresentation.getProperty(Key.FILL_COLOR) != null) {
@@ -60,5 +55,13 @@ public class PresentationDTOAssembler {
             fillColor,
             lineColor,
             fontColor);
+    }
+
+    public static NameIdTypeDTO correspondingModelElementOf(@NonNull IPresentation astahPresentation) throws Exception {
+        if (astahPresentation.getModel() != null && astahPresentation.getModel() instanceof INamedElement) {
+            return NameIdTypeDTOAssembler.toDTO((INamedElement)astahPresentation.getModel());
+        } else {
+            return NameIdTypeDTO.empty();
+        }
     }
 }

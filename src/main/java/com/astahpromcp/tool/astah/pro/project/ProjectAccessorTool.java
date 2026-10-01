@@ -1,6 +1,5 @@
 package com.astahpromcp.tool.astah.pro.project;
 
-import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
@@ -25,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
@@ -126,25 +123,7 @@ public class ProjectAccessorTool extends AstahToolProvider {
     private NamedElementDTO createProject(NoInputDTO param) throws Exception {
         log.debug("Create project (root package): {}", param);
 
-        // Check if the current project is modified
-        if (projectAccessor.hasProject() && projectAccessor.isProjectModified()) {
-            if (!"no_title".equals(projectAccessor.getProjectPath())) {
-                // For a modified project
-                throw new RuntimeException("The existing project needs to be saved before creating a new project.");
-
-            } else {
-                // For a new unsaved project, create and delete a dummy project before continuing to avoid showing the save confirmation dialog.
-                try {
-                    Path tempProjectPath = McpServerConfig.WORKSPACE_DIR.resolve("dummy.asta");
-                    Files.createDirectories(tempProjectPath.getParent());
-                    Files.deleteIfExists(tempProjectPath);
-                    projectAccessor.saveAs(tempProjectPath.toString());
-                    Files.deleteIfExists(tempProjectPath);
-                } catch (Exception e) {
-                    // do nothing
-                }
-            }
-        }
+        ensureNoUnsavedChanges();
 
         try {
             projectAccessor.create();
@@ -165,28 +144,18 @@ public class ProjectAccessorTool extends AstahToolProvider {
     private NamedElementDTO openProject(FilePathDTO param) throws Exception {
         log.debug("Open project: {}", param);
 
-        // Check if the current project is modified
-        if (projectAccessor.hasProject() && projectAccessor.isProjectModified()) {
-            if (!"no_title".equals(projectAccessor.getProjectPath())) {
-                // For a modified project
-                throw new RuntimeException("The existing project needs to be saved before opening a new project.");
+        ensureNoUnsavedChanges();
 
-            } else {
-                // For a new unsaved project, create and delete a dummy project before continuing to avoid showing the save confirmation dialog.
-                try {
-                    Path tempProjectPath = McpServerConfig.WORKSPACE_DIR.resolve("dummy.asta");
-                    Files.createDirectories(tempProjectPath.getParent());
-                    Files.deleteIfExists(tempProjectPath);
-                    projectAccessor.saveAs(tempProjectPath.toString());
-                    Files.deleteIfExists(tempProjectPath);
-                } catch (Exception e) {
-                    // do nothing
-                }
-            }
+        if (!new File(param.filePath()).isFile()) {
+            throw new RuntimeException("The specified project file does not exist: " + param.filePath());
         }
 
         try {
-            projectAccessor.open(param.filePath());
+            projectAccessor.open(
+                param.filePath(),
+                false,  // isIgnoreModelVersion
+                false,  // lockMode
+                true);  // allowReadOnly
         } catch (Exception e) {
             throw new RuntimeException("Failed to open project: " + param.filePath());
         }
@@ -199,6 +168,16 @@ public class ProjectAccessorTool extends AstahToolProvider {
         }
 
         return NamedElementDTOAssembler.toDTO(astahProject);
+    }
+
+    private void ensureNoUnsavedChanges() throws Exception {
+        if (!projectAccessor.hasProject() || !projectAccessor.isProjectModified()) {
+            return;
+        } else if (UNSAVED_PROJECT_PATH.equals(projectAccessor.getProjectPath())) {
+            throw new RuntimeException("The current project is untitled and has unsaved changes.");
+        } else {
+            throw new RuntimeException("The current project has unsaved changes.");
+        }
     }
 
     private NamedElementDTO getProject(NoInputDTO param) throws Exception {

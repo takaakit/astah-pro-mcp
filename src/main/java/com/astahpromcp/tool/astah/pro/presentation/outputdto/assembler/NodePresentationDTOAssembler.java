@@ -12,6 +12,8 @@ import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 
+import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +37,15 @@ public class NodePresentationDTOAssembler {
                         hyperlink.getComment()));
             
             } else if (hyperlink.isFile()) {
+                String filePath;
+                try {
+                    filePath = Path.of(hyperlink.getPath(), hyperlink.getName()).toString();
+                } catch (InvalidPathException e) {
+                    filePath = hyperlink.getPath() + File.separator + hyperlink.getName();
+                }
                 filePathHyperlinks.add(
                     new FilePathHyperlinkDTO(
-                        Path.of(hyperlink.getPath(), hyperlink.getName()).toString(),
+                        filePath,
                         hyperlink.getComment()));
             
             } else if (hyperlink.isModel()) {

@@ -20,11 +20,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import com.change_vision.jude.api.inf.model.IState;
+
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,7 +66,7 @@ public class StateMachineDiagramEditorToolTest {
         projectAccessor.open("src/test/resources/modelfile/editor/StateMachineDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -186,6 +193,52 @@ public class StateMachineDiagramEditorToolTest {
     }
 
     @Test
+    void addRegion_ng_noRegionAdded() throws Exception {
+        // Get state machine diagram
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IStateMachineDiagram.class,
+            "Statemachine Diagram0");
+
+        // Get parent node presentation
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "State",
+            "State0");
+        IState parentState = (IState) parentNodePresentation.getModel();
+
+        NewRegionDTO inputDTO = new NewRegionDTO(
+            stateMachineDiagram.getId(),
+            parentNodePresentation.getID(),
+            true);
+
+        // Add regions until Astah stops adding one. Astah adds no region to a state that already has two regions.
+        int regionCount = parentState.getRegionSize();
+        Exception exception = null;
+        for (int i = 0; i < 5 && exception == null; i++) {
+            try {
+                // ----------------------------------------
+                // Call addRegion()
+                // ----------------------------------------
+                TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                    addRegion,
+                    tool,
+                    inputDTO,
+                    NodePresentationDTO.class);
+                
+                assertTrue(parentState.getRegionSize() > regionCount, "a call that succeeds has to add a region");
+                regionCount = parentState.getRegionSize();
+            
+            } catch (Exception e) {
+                exception = e;
+            }
+        }
+
+        // Check that the call that added nothing reported it instead of succeeding
+        assertNotNull(exception, "a call that adds no region has to fail");
+        assertTrue(exception.getCause().getMessage().contains("No region was added"), exception.getCause().getMessage());
+        assertEquals(regionCount, parentState.getRegionSize());
+    }
+
+    @Test
     void deleteRegion_ok() throws Exception {
         // Get state machine diagram
         IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
@@ -250,6 +303,55 @@ public class StateMachineDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void changeParentOfState_ok_reshapesParentToContainStateDrawnOutside() throws Exception {
+        // Get state machine diagram
+        IStateMachineDiagram stateMachineDiagram = (IStateMachineDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IStateMachineDiagram.class,
+            "Statemachine Diagram0");
+
+        // Get target and parent node presentations
+        INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "State",
+            "State1");
+        INodePresentation parentNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "State",
+            "State2");
+
+        // Draw the target clearly outside the parent
+        Rectangle2D parentRectBefore = parentNodePresentation.getRectangle();
+        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        transactionManager.beginTransaction();
+        targetNodePresentation.setLocation(new Point2D.Double(
+            parentRectBefore.getMaxX() + 300,
+            parentRectBefore.getMaxY() + 300));
+        transactionManager.endTransaction();
+        Rectangle2D targetRectBefore = targetNodePresentation.getRectangle();
+        assertFalse(parentRectBefore.contains(targetRectBefore));
+
+        // ----------------------------------------
+        // Call changeParentOfState()
+        // ----------------------------------------
+        TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            changeParentOfState,
+            tool,
+            new ChangeParentStateDTO(
+                stateMachineDiagram.getId(),
+                targetNodePresentation.getID(),
+                parentNodePresentation.getID()),
+            NodePresentationDTO.class);
+
+        // Astah leaves the target where it is and reshapes the parent around it instead.
+        assertEquals(targetRectBefore, targetNodePresentation.getRectangle());
+        Rectangle2D parentRectAfter = parentNodePresentation.getRectangle();
+        assertTrue(parentRectAfter.contains(targetNodePresentation.getRectangle()),
+            "target " + targetNodePresentation.getRectangle() + " is not inside parent " + parentRectAfter);
+
+        // Check that the model follows the presentation
+        IState targetState = (IState) targetNodePresentation.getModel();
+        assertEquals(parentNodePresentation.getModel(), targetState.getContainer());
     }
 
     @Test

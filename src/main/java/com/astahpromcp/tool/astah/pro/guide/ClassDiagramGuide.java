@@ -1,41 +1,11 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class ClassDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class ClassDiagramGuideTool implements ToolProvider {
-
-    public ClassDiagramGuideTool() {
+    private ClassDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "class_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a class diagram (also serving as an object diagram and package diagram) to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create class diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get class diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * An arrowhead is attached to the end of an association or link on the side that is set to be navigable. The end without an arrowhead shall have its navigability set to unspecified. Non-navigable shall be set only when explicitly specified by the user.
@@ -90,6 +60,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * A Package is a namespace for its members, which comprise those elements associated via packagedElement (which are said to be owned or contained), and those imported.
         """;
 
-        return new GuideDTO(contents);
+        return contents;
     }
 }

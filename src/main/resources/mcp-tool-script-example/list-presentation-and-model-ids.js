@@ -28,8 +28,8 @@ for (var i = 0; i < presentations.length; i++) {
   var presentation = presentations[i];
   var model = presentation.correspondingModelElement;
 
-  // The frame, a note and a text draw nothing from the model. correspondingModelElement is still
-  // there for them, filled with empty strings, so it is the id that tells them apart.
+  // The frame and an image draw nothing from the model. correspondingModelElement is still there
+  // for them, filled with empty strings, so it is the id that tells them apart.
   lines.push(presentation.type + ' ' + presentation.id + ' -> '
     + (model.id === '' ? '(no model element)' : model.type + ' ' + model.id));
 }

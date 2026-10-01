@@ -10,6 +10,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.NewInteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -37,12 +38,14 @@ public class CombinedFragmentToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
         TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/CombinedFragmentToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new CombinedFragmentTool(
+            basicModelEditor,
             projectAccessor,
             transactionSupport,
             astahProToolSupport);
@@ -134,6 +137,83 @@ public class CombinedFragmentToolTest {
         
         // Check that the operand was added
         assertEquals(initialOperandCount + 1, combinedFragment.getInteractionOperands().length);
+
+        // Check that the added operand holds the given guard alone, without the default "Guard" constraint beside it
+        IInteractionOperand addedOperand = combinedFragment.getInteractionOperands()[initialOperandCount];
+        assertEquals("x > 0", addedOperand.getGuard());
+        assertEquals(1, addedOperand.getConstraints().length);
+    }
+
+    @Test
+    void addInteractionOperand_ok_emptyGuard() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+        int initialOperandCount = combinedFragment.getInteractionOperands().length;
+
+        // ----------------------------------------
+        // Call addInteractionOperand() with an empty guard
+        // ----------------------------------------
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addInteractionOperand,
+            tool,
+            new NewInteractionOperandDTO(combinedFragment.getId(), "TestOperand", ""),
+            CombinedFragmentDTO.class);
+
+        // Check that the added operand has no guard, not even the default "Guard"
+        IInteractionOperand addedOperand = combinedFragment.getInteractionOperands()[initialOperandCount];
+        assertEquals("", addedOperand.getGuard());
+        assertEquals(0, addedOperand.getConstraints().length);
+    }
+
+    @Test
+    void addInteractionOperand_ok_blankOrNullGuard() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        for (String noGuard : new String[] {"   ", null}) {
+            int initialOperandCount = combinedFragment.getInteractionOperands().length;
+
+            // ----------------------------------------
+            // Call addInteractionOperand()
+            // ----------------------------------------
+            TestSupport.instance().invokeToolMethodReturningDto(
+                addInteractionOperand,
+                tool,
+                new NewInteractionOperandDTO(combinedFragment.getId(), "TestOperand", noGuard),
+                CombinedFragmentDTO.class);
+
+            // Check that the added operand has no guard, just as with an empty guard
+            IInteractionOperand addedOperand = combinedFragment.getInteractionOperands()[initialOperandCount];
+            assertEquals("", addedOperand.getGuard());
+            assertEquals(0, addedOperand.getConstraints().length);
+        }
+    }
+
+    @Test
+    void addInteractionOperand_ok_surroundingWhitespaceRemoved() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+        int initialOperandCount = combinedFragment.getInteractionOperands().length;
+
+        // ----------------------------------------
+        // Call addInteractionOperand()
+        // ----------------------------------------
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addInteractionOperand,
+            tool,
+            new NewInteractionOperandDTO(combinedFragment.getId(), "TestOperand", " x > 0 "),
+            CombinedFragmentDTO.class);
+
+        // Check that the whitespace is removed
+        IInteractionOperand addedOperand = combinedFragment.getInteractionOperands()[initialOperandCount];
+        assertEquals("x > 0", addedOperand.getGuard());
+        assertEquals(1, addedOperand.getConstraints().length);
     }
 
     @Test

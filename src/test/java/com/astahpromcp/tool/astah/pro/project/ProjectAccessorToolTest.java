@@ -184,6 +184,118 @@ public class ProjectAccessorToolTest {
     }
 
     @Test
+    void openProject_ng_fileNotFound() throws Exception {
+        String projectPath = projectAccessor.getProjectPath();
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            openProject,
+            tool,
+            new FilePathDTO("src/test/resources/modelfile/project/NotExisting.asta"),
+            NamedElementDTO.class));
+
+        // Check that the current project is kept open
+        assertTrue(exception.getCause().getMessage().contains("does not exist"));
+        assertEquals(projectPath, projectAccessor.getProjectPath());
+    }
+
+    @Test
+    void createProject_ng_modifiedUntitledProject() throws Exception {
+        // Make an untitled project with unsaved changes
+        makeModifiedUntitledProject();
+
+        // ----------------------------------------
+        // Call createProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            createProject,
+            tool,
+            new NoInputDTO(),
+            NamedElementDTO.class));
+
+        // Check that the unsaved changes were kept
+        assertTrue(exception.getCause().getMessage().contains("untitled"));
+        assertUnsavedChangesKept("no_title");
+    }
+
+    @Test
+    void createProject_ng_modifiedSavedProject() throws Exception {
+        // Make the saved project modified
+        String projectPath = projectAccessor.getProjectPath();
+        projectAccessor.getProject().setName(UNSAVED_WORK_NAME);
+
+        // ----------------------------------------
+        // Call createProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            createProject,
+            tool,
+            new NoInputDTO(),
+            NamedElementDTO.class));
+
+        // Check that the unsaved changes were kept
+        assertTrue(exception.getCause().getMessage().contains("unsaved changes"));
+        assertUnsavedChangesKept(projectPath);
+    }
+
+    @Test
+    void openProject_ng_modifiedUntitledProject() throws Exception {
+        // Make an untitled project with unsaved changes
+        makeModifiedUntitledProject();
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            openProject,
+            tool,
+            new FilePathDTO("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta"),
+            NamedElementDTO.class));
+
+        // Check that the unsaved changes were kept
+        assertTrue(exception.getCause().getMessage().contains("untitled"));
+        assertUnsavedChangesKept("no_title");
+    }
+
+    @Test
+    void openProject_ng_modifiedSavedProject() throws Exception {
+        // Make the saved project modified
+        String projectPath = projectAccessor.getProjectPath();
+        projectAccessor.getProject().setName(UNSAVED_WORK_NAME);
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            openProject,
+            tool,
+            new FilePathDTO("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta"),
+            NamedElementDTO.class));
+
+        // Check that the unsaved changes were kept
+        assertTrue(exception.getCause().getMessage().contains("unsaved changes"));
+        assertUnsavedChangesKept(projectPath);
+    }
+
+    private static final String UNSAVED_WORK_NAME = "Unsaved Work";
+
+    private void makeModifiedUntitledProject() throws Exception {
+        projectAccessor.close();
+        projectAccessor.create();
+        projectAccessor.getProject().setName(UNSAVED_WORK_NAME);
+        assertEquals("no_title", projectAccessor.getProjectPath());
+        assertTrue(projectAccessor.isProjectModified());
+    }
+
+    private void assertUnsavedChangesKept(String expectedProjectPath) throws Exception {
+        assertEquals(expectedProjectPath, projectAccessor.getProjectPath());
+        assertTrue(projectAccessor.isProjectModified());
+        assertEquals(UNSAVED_WORK_NAME, projectAccessor.getProject().getName());
+    }
+
+    @Test
     void getProject_ok() throws Exception {
         // Create input DTO
         NoInputDTO inputDTO = new NoInputDTO();

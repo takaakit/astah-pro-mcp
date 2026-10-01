@@ -1,45 +1,17 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class ActivityDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class ActivityDiagramGuideTool implements ToolProvider {
-
-    public ActivityDiagramGuideTool() {
+    private ActivityDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "activity_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a activity diagram to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create activity diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get activity diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * When the size of a partition is changed, the drawing positions of the presentations contained within that partition are also automatically changed as a result. Therefore, when newly placing node/link presentations within the partition, be sure to finish adjusting the partition size beforehand.
 * To move an action to a different lane, enlarge the destination lane enough to accommodate the action being moved, and then change the coordinates of the action so that it is positioned within the destination lane.
+* A partition with a represents shows the name of the represented element in its header instead of its own label.
+* The Activity owned by an activity diagram has its own name (initially a default such as Activity0), which does not follow the diagram name. Set it as well when you create or rename the diagram.
 
 
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
@@ -68,6 +40,6 @@ ActivityParameterNode (as discussed further below), the tokens held by an Object
 * A SendSignalAction is notated as a convex pentagon with the name of the Signal placed inside it.
         """;
         
-        return new GuideDTO(contents);
+        return contents;
     }
 }

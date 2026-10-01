@@ -109,7 +109,7 @@ public class ImageCaptureSupport {
         return new ExportedImage(image, relativeImagePath, boundRect);
     }
 
-    public McpSchema.ImageContent createImageContent(String diagramId, ImageRegion region, PngSizeTarget sizeTarget) throws Exception {
+    private McpSchema.ImageContent createImageContent(String diagramId, ImageRegion region, PngSizeTarget sizeTarget) throws Exception {
         log.debug("Capture diagram image as PNG: {}", diagramId);
 
         ExportedImage exported = exportDiagramImage(diagramId);
@@ -142,8 +142,19 @@ public class ImageCaptureSupport {
         return createImageContent(diagramId, region, PngSizeTarget.LARGE);
     }
 
-    public McpSchema.ImageContent createSmallImageContent(String diagramId) throws Exception {
-        return createImageContent(diagramId, ImageRegion.FULL, PngSizeTarget.SMALL);
+    // The picture an editing tool returns of the diagram it has just changed. The edit is already committed when this runs, so a failure here must not become a tool error.
+    public McpSchema.Content createThumbnailContent(String diagramId) {
+        try {
+            return createImageContent(diagramId, ImageRegion.FULL, PngSizeTarget.SMALL);
+
+        } catch (Throwable t) {
+            log.error("The edit was committed, but its thumbnail of diagram {} could not be generated", diagramId, t);
+            // toString rather than getMessage: an Error caught here, such as an OutOfMemoryError, is recognizable only by its type.
+            return McpSchema.TextContent.builder(String.format(
+                    "The edit was applied and committed, so do not repeat it. Only the preview image of the diagram could not be generated: %s. "
+                    + "Once the cause is resolved, 'capture_dgm_img' returns the image.",
+                    t)).build();
+        }
     }
 
     // Places the scaled PNG next to the image it was encoded from.
@@ -209,7 +220,7 @@ public class ImageCaptureSupport {
         double boundWidth = boundRect.getWidth();
         double boundHeight = boundRect.getHeight();
 
-        // The crop area is given in the diagram coordinate system, i.e. the same coordinates returned by get_dgm_rectangle and get_prsts_on_dgm.
+        // The crop area is given in the diagram coordinate system.
         // Reject any crop area that extends outside the diagram, even partially.
         // The check is performed in diagram coordinates (not pixel coordinates) so that rounding during the pixel conversion below cannot cause a false rejection at the edges.
         if (x < boundX || y < boundY

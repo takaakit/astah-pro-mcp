@@ -41,7 +41,7 @@ public class OCLSpecificationTool implements ToolProvider, RemoteDocumentTool {
 
                 ToolSupport.toolDefinitionReturningDto(
                     "get_chunk_of_ocl_spec",
-                    "Return the chunk data of OCL (Object Constraint Language) Specification. If no chunk data exists, an empty string is set.",
+                    "Return the chunk data of OCL (Object Constraint Language) Specification. The chunk index must be in the range 0 to totalChunks - 1 (totalChunks is returned by the corresponding get_info_of_... tool function, which must be called first); otherwise an error is returned.",
                     this::getOCLSpecificationChunk,
                     ChunkDTO.class,
                     DocumentChunkDTO.class)

@@ -1,41 +1,11 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class CompositeStructureDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class CompositeStructureDiagramGuideTool implements ToolProvider {
-
-    public CompositeStructureDiagramGuideTool() {
+    private CompositeStructureDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "composite_structure_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a composite structure diagram to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create composite structure diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get composite structure diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
 * In the definition below, StructuredClassifier and EncapsulatedClassifier correspond to the Class element in Astah. Therefore, understand StructuredClassifier as Class.
@@ -79,6 +49,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * A Component may be realized (or implemented) by a number of Classifiers. In that case, a Component owns a set of ComponentRealizations to these Classifiers.
         """;
 
-        return new GuideDTO(contents);
+        return contents;
     }
 }

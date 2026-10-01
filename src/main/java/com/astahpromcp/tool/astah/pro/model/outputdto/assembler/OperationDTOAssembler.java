@@ -10,19 +10,14 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ParameterDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class OperationDTOAssembler {
     public static OperationDTO toDTO(@NonNull IOperation astahOperation) throws Exception {
         
         List<ParameterDTO> parameterDTOs = new ArrayList<>();
         for (IParameter parameter : astahOperation.getParameters()) {
-
-            ParameterDTO parameterDTO = new ParameterDTO(
-                NamedElementDTOAssembler.toDTO(parameter),
-                NameIdTypeDTOAssembler.toDTO(parameter.getType()),
-                parameter.getTypeExpression());
-
-            parameterDTOs.add(parameterDTO);
+            parameterDTOs.add(ParameterDTOAssembler.toDTO(parameter));
         }
 
         NameIdTypeDTO returnType;
@@ -49,9 +44,9 @@ public class OperationDTOAssembler {
             astahOperation.isStatic(),
             parameterDTOs,
             returnType,
-            astahOperation.getReturnTypeExpression(),
+            Objects.requireNonNullElse(astahOperation.getReturnTypeExpression(), ""),
             preconditions,
             postconditions,
-            astahOperation.getBodyCondition());
+            Objects.requireNonNullElse(astahOperation.getBodyCondition(), ""));
     }
 }

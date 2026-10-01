@@ -1,41 +1,11 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.ToolSupport;
-import com.astahpromcp.tool.astah.pro.common.outputdto.GuideDTO;
-import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import lombok.extern.slf4j.Slf4j;
+final class UseCaseDiagramGuide {
 
-import java.util.List;
-
-@Slf4j
-public class UseCaseDiagramGuideTool implements ToolProvider {
-
-    public UseCaseDiagramGuideTool() {
+    private UseCaseDiagramGuide() {
     }
 
-    @Override
-    public List<ToolDefinition> createToolDefinitions() {
-        try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "usecase_dgm_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing a usecase diagram to understand its usage and terminology definitions.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
-
-        } catch (Exception e) {
-            log.error("Failed to create usecase diagram guide tools", e);
-            return List.of();
-        }
-    }
-
-    private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get usecase diagram guide: {}", param);
-        
+    static String contents() {
         String contents = """
 Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * UseCases are a means to capture the requirements of systems, i.e., what systems are supposed to do. The key concepts specified in this clause are Actors, UseCases, and subjects. Each UseCase’s subject represents a system under consideration to which the UseCase applies. Users and any other systems that may interact with a subject are represented as Actors.
@@ -49,6 +19,6 @@ Terminology Definitions (quoted from OMG UML Specification v.2.5.1):
 * An Include relationship between UseCases is shown by a dashed arrow with an open arrowhead pointing from the base UseCase to the included UseCase. The arrow is labeled with the keyword «include».
         """;
         
-        return new GuideDTO(contents);
+        return contents;
     }
 }

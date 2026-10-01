@@ -44,7 +44,7 @@ public class PartitionTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_represents_of_partition",
-                "Set the element (specified by ID) that the specified partition (specified by ID) represents, and return the model element of the partition after it is set.",
+                "Set the element (specified by ID) that the specified partition (specified by ID) represents, and return the model element of the partition after it is set. The partition header then shows the name of the represented element instead of the partition's label.",
                 this::setRepresents,
                 PartitionWithRepresentsDTO.class,
                 PartitionDTO.class),

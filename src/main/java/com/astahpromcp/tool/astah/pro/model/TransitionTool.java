@@ -91,9 +91,14 @@ public class TransitionTool extends AstahToolProvider {
 
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
-        txnAstah.run( () -> {
-            astahTransition.setEvent(param.event());
-        });
+        try {
+            txnAstah.run( () -> {
+                astahTransition.setEvent(param.event());
+            });
+
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException(e.getMessage() + " A transition from an initial pseudostate cannot have an event, and the event cannot be an empty string.", e);
+        }
 
         return TransitionDTOAssembler.toDTO(astahTransition);
     }

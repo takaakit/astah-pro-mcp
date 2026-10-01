@@ -49,21 +49,21 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "add_region",
-                "Add a new region in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image in low resolution.",
+                "Add a new region in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image in low resolution. Note that adding a region to a simple state (a state without regions) turns it into a composite state with two regions. If Astah adds no region, an error is returned.",
                 this::addRegion,
                 NewRegionDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "delete_region",
-                "Delete the specified region (specified by index) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image in low resolution.",
+                "Delete the specified region (specified by 0-based index) in the parent node presentation (specified by ID) on the specified state machine diagram (specified by ID), and return the parent node presentation along with the updated diagram image in low resolution.",
                 this::deleteRegion,
                 DeleteRegionDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_parent_state",
-                "Change the parent state (specified by presentation ID) of the specified state (specified by presentation ID) on the specified state machine diagram (specified by ID), and return the node presentation of the parent-changed state along with the updated diagram image in low resolution. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string.",
+                "Change the parent state (specified by presentation ID) of the specified state (specified by presentation ID) on the specified state machine diagram (specified by ID), and return the node presentation of the parent-changed state along with the updated diagram image in low resolution. If there is no parent state (i.e., when rendering at the top level), set the parent state ID to an empty string. Note that Astah does not move the state: if the state is drawn outside the parent state or too close to its edges, Astah enlarges the parent state in every direction until the state fits. To keep the layout, move the state well inside the parent state, or resize the parent state, before calling this tool.",
                 this::changeParentOfState,
                 ChangeParentStateDTO.class,
                 NodePresentationDTO.class),
@@ -160,7 +160,14 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
         IStateMachineDiagram astahStateMachineDiagram = astahProToolSupport.getStateMachineDiagram(param.targetDiagramId());
         INodePresentation astahParentNodePresentation = astahProToolSupport.getNodePresentation(param.parentNodePresentationId());
 
+        if (!(astahParentNodePresentation.getModel() instanceof IState astahParentState)) {
+            throw new RuntimeException("The parent node presentation is not a state: " + param.parentNodePresentationId());
+        }
+
         stateMachineDiagramEditor.setDiagram(astahStateMachineDiagram);
+
+        // Astah returns without adding anything in some situations (e.g., a state that already has two regions), so check the region count afterwards instead of reporting success blindly.
+        int regionCountBefore = astahParentState.getRegionSize();
 
         txnAstah.run( () -> {
             stateMachineDiagramEditor.addRegion(
@@ -168,11 +175,16 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
                 param.isHorizontal());
         });
 
+        int regionCountAfter = astahParentState.getRegionSize();
+        if (regionCountAfter <= regionCountBefore) {
+            throw new RuntimeException("No region was added to the state (the region count stays " + regionCountBefore + "). Astah cannot add a region to this state in its current configuration.");
+        }
+
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteRegion(DeleteRegionDTO param) throws Exception {
@@ -191,9 +203,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahParentNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfState(ChangeParentStateDTO param) throws Exception {
@@ -219,9 +231,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahTargetNodePresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createChoicePseudostate(NewChoicePseudostateDTO param) throws Exception {
@@ -248,9 +260,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahChoicePseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createDeepHistoryPseudostate(NewDeepHistoryPseudostateDTO param) throws Exception {
@@ -277,9 +289,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahDeepHistoryPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createShallowHistoryPseudostate(NewShallowHistoryPseudostateDTO param) throws Exception {
@@ -306,9 +318,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahShallowHistoryPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalState(NewFinalStateDTO param) throws Exception {
@@ -335,9 +347,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahFinalState);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkPseudostate(NewForkPseudostateDTO param) throws Exception {
@@ -366,9 +378,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahForkPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialPseudostate(NewInitialPseudostateDTO param) throws Exception {
@@ -395,9 +407,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahInitialPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinPseudostate(NewJoinPseudostateDTO param) throws Exception {
@@ -426,9 +438,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJoinPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJunctionPseudostate(NewJunctionPseudostateDTO param) throws Exception {
@@ -455,9 +467,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahJunctionPseudostate);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createState(NewStateDTO param) throws Exception {
@@ -485,9 +497,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahState);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private DiagramDTO createStateMachineDiagram(NewStateMachineDiagramDTO param) throws Exception {
@@ -530,9 +542,9 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(astahSubMachineState);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTransition(NewTransitionDTO param) throws Exception {
@@ -552,8 +564,8 @@ public class StateMachineDiagramEditorTool extends AstahToolProvider {
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(astahLinkPresentation);
 
-        McpSchema.ImageContent image = imageCaptureSupport.createSmallImageContent(param.targetDiagramId());
+        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(param.targetDiagramId());
 
-        return Pair.of(dto, List.of(image));
+        return Pair.of(dto, List.of(thumbnailContent));
     }
 }

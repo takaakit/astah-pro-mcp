@@ -7,8 +7,7 @@ import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
-import com.astahpromcp.tool.astah.pro.editor.inputdto.NewJpgImageWithPointDTO;
-import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngImageWithPointDTO;
+import com.astahpromcp.tool.astah.pro.editor.inputdto.NewPngOrJpgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewRectDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewSvgImageWithPointDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewTextWithPointDTO;
@@ -41,8 +40,7 @@ public class DiagramEditorToolTest {
     private ProjectAccessor projectAccessor;
     private DiagramEditorTool tool;
     private Method insertSvgImage;
-    private Method insertPngImage;
-    private Method insertJpgImage;
+    private Method insertPngOrJpgImage;
     private Method insertRect;
     private Method insertText;
     private Method deleteDiagram;
@@ -58,7 +56,7 @@ public class DiagramEditorToolTest {
         DiagramEditorSupport diagramEditorSupport = new DiagramEditorSupport(projectAccessor);
         ImageConvertSupport imageConvertSupport = new ImageConvertSupport();
         ImageCaptureSupport imageCaptureSupport = mock(ImageCaptureSupport.class);
-        when(imageCaptureSupport.createSmallImageContent(anyString()))
+        when(imageCaptureSupport.createThumbnailContent(anyString()))
             .thenReturn(McpSchema.ImageContent.builder("", "image/png").build());
 
         // Tool
@@ -77,17 +75,11 @@ public class DiagramEditorToolTest {
             "insertSvgImage",
             NewSvgImageWithPointDTO.class);
 
-        // insertPngImage() method
-        insertPngImage = TestSupport.getAccessibleMethod(
+        // insertPngOrJpgImage() method
+        insertPngOrJpgImage = TestSupport.getAccessibleMethod(
             DiagramEditorTool.class,
-            "insertPngImage",
-            NewPngImageWithPointDTO.class);
-
-        // insertJpgImage() method
-        insertJpgImage = TestSupport.getAccessibleMethod(
-            DiagramEditorTool.class,
-            "insertJpgImage",
-            NewJpgImageWithPointDTO.class);
+            "insertPngOrJpgImage",
+            NewPngOrJpgImageWithPointDTO.class);
 
         // insertRect() method
         insertRect = TestSupport.getAccessibleMethod(
@@ -154,9 +146,9 @@ public class DiagramEditorToolTest {
         assertNotNull(outputDTO);
     }
 
-    @Disabled("Astah internal view system components not initialized in test environment, causing NullPointerException in insertPngImage()")
+    @Disabled("Astah internal view system components not initialized in test environment, causing NullPointerException in insertPngOrJpgImage()")
     @Test
-    void insertPngImage_ok() throws Exception {
+    void insertPngOrJpgImage_ok_insertsAPngImage() throws Exception {
         // Get class diagram
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
@@ -167,17 +159,17 @@ public class DiagramEditorToolTest {
         String imageUrl = imagePath.toUri().toASCIIString();
         
         // Create input DTO
-        NewPngImageWithPointDTO inputDTO = new NewPngImageWithPointDTO(
+        NewPngOrJpgImageWithPointDTO inputDTO = new NewPngOrJpgImageWithPointDTO(
             classDiagram.getId(),
             imageUrl,
             100,
             120);
 
         // ----------------------------------------
-        // Call insertPngImage()
+        // Call insertPngOrJpgImage()
         // ----------------------------------------
         RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
-            insertPngImage,
+            insertPngOrJpgImage,
             tool,
             inputDTO,
             RectangleDTO.class);
@@ -186,9 +178,9 @@ public class DiagramEditorToolTest {
         assertNotNull(outputDTO);
     }
 
-    @Disabled("Astah internal view system components not initialized in test environment, causing NullPointerException in insertJpgImage()")
+    @Disabled("Astah internal view system components not initialized in test environment, causing NullPointerException in insertPngOrJpgImage()")
     @Test
-    void insertJpgImage_ok() throws Exception {
+    void insertPngOrJpgImage_ok_insertsAJpgImage() throws Exception {
         // Get class diagram
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
@@ -199,17 +191,17 @@ public class DiagramEditorToolTest {
         String imageUrl = imagePath.toUri().toASCIIString();
         
         // Create input DTO
-        NewJpgImageWithPointDTO inputDTO = new NewJpgImageWithPointDTO(
+        NewPngOrJpgImageWithPointDTO inputDTO = new NewPngOrJpgImageWithPointDTO(
             classDiagram.getId(),
             imageUrl,
             150,
             170);
 
         // ----------------------------------------
-        // Call insertJpgImage()
+        // Call insertPngOrJpgImage()
         // ----------------------------------------
         RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
-            insertJpgImage,
+            insertPngOrJpgImage,
             tool,
             inputDTO,
             RectangleDTO.class);

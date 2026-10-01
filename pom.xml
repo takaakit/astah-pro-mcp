@@ -12,14 +12,14 @@
 		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<lombok.version>1.18.46</lombok.version>
+		<lombok.version>1.18.48</lombok.version>
 		<astah.argLine>-Duser.language=en</astah.argLine>  <!-- launch Astah in English -->
 		<astah.running.check.skip>false</astah.running.check.skip>  <!-- see build-tools/astah-running-check.xml -->
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.astahpromcp</groupId>
 	<artifactId>astah-pro-mcp</artifactId>
-	<version>0.3.1</version>
+	<version>0.3.2</version>
 	<packaging>bundle</packaging>
 	<name>Astah Pro MCP</name>
 	<description>MCP server for Astah professional</description>
@@ -53,7 +53,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<!-- Before clean deletes anything: this is the destructive case -->
@@ -92,7 +92,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.5.0</version>
 				<configuration>
 					<!-- Last line of defense for whatever the probes above miss. A running Astah holds the embedded dependency jars open, and failing there would leave target/classes without com/**; carrying on lets compile put it back. The jars that survive are byte-identical to the ones that would have replaced them. -->
 					<failOnError>false</failOnError>
@@ -116,12 +116,19 @@
 							<overWriteIfNewer>true</overWriteIfNewer>
 						</configuration>
 					</execution>
+					<execution>
+						<!-- Sets ${org.mockito:mockito-core:jar}, which the Surefire argLine loads as a Java agent -->
+						<id>dependency-properties</id>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.15.0</version>
+				<version>3.16.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<source>25</source>
@@ -153,7 +160,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>6.0.2</version>
+				<version>6.2.0</version>
 				<extensions>true</extensions>
 				<executions>
 					<execution>
@@ -176,15 +183,17 @@
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<Embed-Dependency>*;scope=compile|runtime;type=!pom</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<_noee>true</_noee>  <!-- Java 25 class files are unknown to the bundled bnd; do not generate an osgi.ee requirement -->
+						<_noee>true</_noee>  <!-- Preserve compatibility with the Astah OSGi host; Java 25 is enforced by the compiler release -->
 					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.5.4</version>
+				<version>3.6.0</version>
 				<configuration>
+					<!-- Mockito's inline mock maker as an agent at JVM startup, instead of self-attaching at runtime, which the JDK warns about and will disallow by default -->
+					<argLine>-javaagent:${org.mockito:mockito-core:jar}</argLine>
 					<additionalClasspathElements>
 						<additionalClasspathElement>${astahPath}/astah-pro.jar</additionalClasspathElement>
 					</additionalClasspathElements>
@@ -192,6 +201,18 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencyManagement>
+		<dependencies>
+			<!-- Align Jackson 3 modules, including the validator's transitive YAML module. -->
+			<dependency>
+				<groupId>tools.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
+				<version>3.2.3</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>com.change_vision.astah</groupId>
@@ -225,24 +246,24 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>6.1.2</version>
+			<version>6.1.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>6.1.2</version>
+			<version>6.1.3</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>12.1.11</version>
+            <version>12.1.13</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-servlet</artifactId>
-            <version>12.1.11</version>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-servlet</artifactId>
+            <version>12.1.13</version>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -252,17 +273,18 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.18</version>
+            <version>2.0.20</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
@@ -272,12 +294,10 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.victools</groupId>
@@ -297,17 +317,17 @@
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>json-schema-validator</artifactId>
-            <version>3.0.6</version>
+            <version>3.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.opendataloader</groupId>
             <artifactId>opendataloader-pdf-core</artifactId>
-            <version>2.5.0</version>
+            <version>2.5.11</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.23.1</version>
+            <version>1.23.2</version>
         </dependency>
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>
@@ -317,7 +337,7 @@
         <dependency>
             <groupId>net.sourceforge.plantuml</groupId>
             <artifactId>plantuml-mit</artifactId>
-            <version>1.2026.6</version>
+            <version>1.2026.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -332,13 +352,13 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-            <version>5.23.0</version>
+            <version>5.24.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.23.0</version>
+            <version>5.24.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
