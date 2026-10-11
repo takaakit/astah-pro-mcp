@@ -38,6 +38,16 @@ public class AstahProToolFactory {
         this.imageOutputDir = imageOutputDir;
     }
 
+    // Whether this runs inside the Astah GUI (the plugin environment)
+    public static boolean isRunningInsideAstahGui() {
+        try {
+            AstahAPI.getAstahAPI().getProjectAccessor().getViewManager();
+            return true;
+        } catch (InvalidUsingException | ClassNotFoundException e) {
+            return false;
+        }
+    }
+
     // Create the tool providers, each wrapped so that its handlers hold the process-wide Astah API lock.
     public List<ToolProvider> createToolProviders() {
         return createRawToolProviders().stream()
@@ -87,11 +97,11 @@ public class AstahProToolFactory {
             providers.add(new DiagramLayoutGuideTool());
             providers.add(new DiagramGuideTool());
             providers.add(new BasicDiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageCaptureSupport));
-            providers.add(new BasicModelEditorTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport));
+            providers.add(new BasicModelEditorTool(basicModelEditor, erModelEditor, projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport));
             providers.add(new DiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport, diagramEditorSupport, imageConvertSupport, imageCaptureSupport));
             providers.add(new StructureDiagramEditorTool(projectAccessor, transactionSupport, astahProToolSupport, diagramEditorSupport, imageCaptureSupport));
             providers.add(new CommentTool(projectAccessor, transactionSupport, astahProToolSupport));
-            providers.add(new DiagramTool(projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport, imageOutputDir));
+            providers.add(new DiagramTool(projectAccessor, transactionSupport, astahProToolSupport, imageCaptureSupport));
             providers.add(new ElementTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new ConstraintTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new LinkPresentationTool(projectAccessor, transactionSupport, astahProToolSupport, imageCaptureSupport));

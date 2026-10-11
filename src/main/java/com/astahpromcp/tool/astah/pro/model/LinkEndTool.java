@@ -7,15 +7,15 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithAggregationDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithCompositionDTO;
-import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithNavigationDTO;
+import com.astahpromcp.tool.astah.pro.model.inputdto.LinkEndWithNavigabilityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LinkEndDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LinkEndDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.ILinkEnd;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILinkEnd.html
@@ -59,24 +59,20 @@ public class LinkEndTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_navigation_of_link_end",
-                "Set a navigation of the specified link end (specified by ID), and return the model element of the link end after it is set.",
-                this::setNavigation,
-                LinkEndWithNavigationDTO.class,
+                "Set the navigability of the specified link end (specified by ID), and return the model element of the link end after it is set. A newly created link end is 'unspecified'. To clear a navigability that was set, specify 'unspecified', not 'non_navigable': 'non_navigable' explicitly marks the link end as not navigable.",
+                this::setNavigability,
+                LinkEndWithNavigabilityDTO.class,
                 LinkEndDTO.class)
         );
     }
 
     private LinkEndDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get link end information: {}", param);
-
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.id());
 
         return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
     private LinkEndDTO setAggregation(LinkEndWithAggregationDTO param) throws Exception {
-        log.debug("Set aggregation of link end: {}", param);
-
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
         txnAstah.run( () -> {
@@ -87,8 +83,6 @@ public class LinkEndTool extends AstahToolProvider {
     }
 
     private LinkEndDTO setComposition(LinkEndWithCompositionDTO param) throws Exception {
-        log.debug("Set composition of link end: {}", param);
-
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
         txnAstah.run( () -> {
@@ -98,13 +92,16 @@ public class LinkEndTool extends AstahToolProvider {
         return LinkEndDTOAssembler.toDTO(astahLinkEnd);
     }
 
-    private LinkEndDTO setNavigation(LinkEndWithNavigationDTO param) throws Exception {
-        log.debug("Set navigation of link end: {}", param);
+    private LinkEndDTO setNavigability(LinkEndWithNavigabilityDTO param) throws Exception {
+        // A missing navigabilityKind is rejected when the arguments are bound, but an explicit null is not.
+        if (param.navigabilityKind() == null) {
+            throw new IllegalArgumentException("navigabilityKind must be one of 'navigable', 'non_navigable' or 'unspecified'.");
+        }
 
         ILinkEnd astahLinkEnd = astahProToolSupport.getLinkEnd(param.targetLinkEndId());
 
         txnAstah.run( () -> {
-            astahLinkEnd.setNavigability(param.isNavigation() ? "Navigable" : "Non_Navigable");
+            astahLinkEnd.setNavigability(param.navigabilityKind().astahValue);
         });
 
         return LinkEndDTOAssembler.toDTO(astahLinkEnd);

@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class MessageToolTest {
 
@@ -100,7 +100,7 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(message.getId());
 
@@ -123,7 +123,7 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Create input DTO
         MessageWithArgumentDTO inputDTO = new MessageWithArgumentDTO(
             message.getId(),
@@ -154,7 +154,7 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Create input DTO
         MessageWithGuardDTO inputDTO = new MessageWithGuardDTO(
             message.getId(),
@@ -185,7 +185,7 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Create input DTO
         MessageWithReturnValueDTO inputDTO = new MessageWithReturnValueDTO(
             message.getId(),
@@ -216,7 +216,7 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Create input DTO
         MessageWithReturnValueVariableDTO inputDTO = new MessageWithReturnValueVariableDTO(
             message.getId(),
@@ -247,7 +247,7 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Create input DTO
         MessageWithAsynchronousDTO inputDTO = new MessageWithAsynchronousDTO(
             message.getId(),
@@ -269,7 +269,7 @@ public class MessageToolTest {
         assertNotNull(outputDTO);
 
         // Check asynchronous after setting
-        assertEquals(true, message.isAsynchronous());
+        assertTrue(message.isAsynchronous());
     }
 
     @Test
@@ -278,12 +278,12 @@ public class MessageToolTest {
         IMessage message = (IMessage) TestSupport.instance().getNamedElementByClassAndName(
             IMessage.class,
             "");
-        
+
         // Get operation
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Create input DTO
         MessageWithOperationDTO inputDTO = new MessageWithOperationDTO(
             message.getId(),

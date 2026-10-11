@@ -18,10 +18,10 @@ public record ClassDTO(
     @JsonPropertyDescription("Associations")
     List<AssociationDTO> associations,
 
-    @JsonPropertyDescription("Generalizations")
+    @JsonPropertyDescription("Generalizations: Generalizations in which this class is the sub type.")
     List<GeneralizationDTO> generalizations,
 
-    @JsonPropertyDescription("Specializations")
+    @JsonPropertyDescription("Specializations: Generalizations in which this class is the super type.")
     List<GeneralizationDTO> specializations,
 
     @JsonPropertyDescription("Ports")
@@ -32,9 +32,6 @@ public record ClassDTO(
 
     @JsonPropertyDescription("Template parameters")
     List<NameIdTypeDTO> templateParameters,
-
-    @JsonPropertyDescription("Owned diagrams")
-    List<NameIdTypeDTO> ownedDiagrams,
 
     @JsonPropertyDescription("Is Abstract")
     boolean isAbstract,

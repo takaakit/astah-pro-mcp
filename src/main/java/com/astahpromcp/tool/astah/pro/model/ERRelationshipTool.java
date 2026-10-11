@@ -14,13 +14,13 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERRelationshipWithParentVer
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERRelationshipWithPhysicalNameDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERRelationshipDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERRelationshipDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERRelationship.html
@@ -100,16 +100,12 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER relationship information: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.id());
 
         return ERRelationshipDTOAssembler.toDTO(astahERRelationship);
     }
 
     private ERRelationshipDTO setCardinality(ERRelationshipWithCardinalityDTO param) throws Exception {
-        log.debug("Set cardinality of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
         txnAstah.run( () -> {
@@ -120,8 +116,6 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO setERIndex(ERRelationshipWithERIndexDTO param) throws Exception {
-        log.debug("Set ER index of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.erIndexId());
 
@@ -133,8 +127,6 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO setLogicalName(ERRelationshipWithLogicalNameDTO param) throws Exception {
-        log.debug("Set logical name of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
         txnAstah.run( () -> {
@@ -145,8 +137,6 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO setPhysicalName(ERRelationshipWithPhysicalNameDTO param) throws Exception {
-        log.debug("Set physical name of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
         txnAstah.run( () -> {
@@ -157,8 +147,6 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO setParentRequired(ERRelationshipWithParentRequiredDTO param) throws Exception {
-        log.debug("Set parent required of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
         txnAstah.run( () -> {
@@ -169,8 +157,6 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO setVerbPhraseParent(ERRelationshipWithParentVerbPhraseDTO param) throws Exception {
-        log.debug("Set parent verb phrase of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
         txnAstah.run( () -> {
@@ -181,8 +167,6 @@ public class ERRelationshipTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO setVerbPhraseChild(ERRelationshipWithChildVerbPhraseDTO param) throws Exception {
-        log.debug("Set child verb phrase of ER relationship: {}", param);
-
         IERRelationship astahERRelationship = astahProToolSupport.getERRelationship(param.targetERRelationshipId());
 
         txnAstah.run( () -> {

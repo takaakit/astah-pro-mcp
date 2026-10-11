@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record AllNameIdTypeInfoDTO(
+    @JsonPropertyDescription("Snapshot ID that identifies this list. Pass it to get_chunk_of_all_named_elements together with the index of each of the other chunks.")
+    String snapshotId,
+
     @JsonPropertyDescription("Total number of chunks")
     int totalChunks,
 

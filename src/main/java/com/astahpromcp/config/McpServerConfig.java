@@ -106,6 +106,9 @@ public final class McpServerConfig {
     // Kept below the tool call timeout of typical MCP clients (around 30 seconds) so that the timeout response actually reaches the AI agent instead of the client giving up first.
     public static final long ASTAH_API_SCRIPT_TIMEOUT_SECONDS = 20;
 
+    // Maximum amount of print() output, and of error output, kept from one astah api script run.
+    public static final int ASTAH_API_SCRIPT_MAX_STDOUT_BYTES = 65_536;
+
     // Maximum time one run_mcp_tool_script (mcp tool script) run may execute
     public static final long MCP_TOOL_SCRIPT_TIMEOUT_SECONDS = 20;
 
@@ -116,6 +119,12 @@ public final class McpServerConfig {
 
     // Maximum number of pixels of an image fetched from a URL (about 200 MB once decoded as ARGB).
     public static final long IMAGE_URL_MAX_PIXELS = 50_000_000L;
+
+    // Maximum number of pixels an SVG is rasterized to (64 MB as ARGB).
+    public static final long SVG_MAX_RASTER_PIXELS = 4096L * 4096L;
+
+    // Maximum width and height of an SVG inserted into the project.
+    public static final int SVG_MAX_DISPLAY_DIMENSION = 4096;
 
     // ----------
     // MCP tool script limits and callable-tool discovery
@@ -158,6 +167,12 @@ public final class McpServerConfig {
 
     // Maximum time to wait for a response when fetching knowledge documents from the web.
     public static final long KNOWLEDGE_FETCH_REQUEST_TIMEOUT_SECONDS = 30;
+
+    // ----------
+    // Logging
+
+    // Environment variable that sets the lowest level the log panel of the mcp tab shows, such as DEBUG.
+    public static final String ENV_LOG_PANEL_LEVEL = "ASTAH_PRO_MCP_LOG_PANEL_LEVEL";
 
     // ----------
     // Output directories

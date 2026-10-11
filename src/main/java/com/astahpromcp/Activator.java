@@ -85,6 +85,10 @@ public class Activator implements BundleActivator {
                 McpServerConfig.PORT_FOR_DIRECT,
                 McpServerConfig.PORT_FOR_PROGRAMMATIC);
 
+        log.info("Log panel shows {} and above; the log file also keeps DEBUG. Set the environment variable {} (for example to DEBUG) to change the panel level.",
+                LogbackConfig.getLogPanelLevel(),
+                McpServerConfig.ENV_LOG_PANEL_LEVEL);
+
         log.info("MCP-BUNDLE: Starting bundle...");
 
         // The class loader must be switched to the Jetty bundle's class loader to prevent ClassNotFoundExceptions for Jetty classes.

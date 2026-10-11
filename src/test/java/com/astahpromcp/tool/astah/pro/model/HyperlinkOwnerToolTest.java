@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NamedElementWithFilePathHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.NamedElementWithNamedElementHyperlinkDTO;
@@ -13,6 +14,7 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.IHyperlink;
 import com.change_vision.jude.api.inf.model.IHyperlinkOwner;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -21,14 +23,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.change_vision.jude.api.inf.model.IHyperlink;
-
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class HyperlinkOwnerToolTest {
 
@@ -153,13 +152,13 @@ public class HyperlinkOwnerToolTest {
             namedElement.getId(),
             "https://example.com/test",
             "Test comment");
-        
+
         // Check URL hyperlinks before adding
         assertFalse(Arrays.stream(namedElement.getHyperlinks())
             .anyMatch(h -> h.isURL() && "https://example.com/test".equals(h.getName())));
 
         // ----------------------------------------
-        // Call addUrlHyperlink()
+        // Call addUrlHyperlinkToNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addUrlHyperlinkToNamedElement,
@@ -191,9 +190,9 @@ public class HyperlinkOwnerToolTest {
             null);
 
         // ----------------------------------------
-        // Call addUrlHyperlink()
+        // Call addUrlHyperlinkToNamedElement()
         // ----------------------------------------
-        Exception e = assertThrows(Exception.class, () ->
+        assertThrows(Exception.class, () ->
             TestSupport.instance().invokeToolMethodReturningDto(
                 addUrlHyperlinkToNamedElement,
                 tool,
@@ -222,7 +221,7 @@ public class HyperlinkOwnerToolTest {
             "Test comment");
 
         // ----------------------------------------
-        // Call addUrlHyperlink()
+        // Call addUrlHyperlinkToNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addUrlHyperlinkToNamedElement,
@@ -258,7 +257,7 @@ public class HyperlinkOwnerToolTest {
             .anyMatch(h -> h.isFile() && h.getPath().contains("test.txt")));
 
         // ----------------------------------------
-        // Call addFilePathHyperlink()
+        // Call addFilePathHyperlinkToNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addFilePathHyperlinkToNamedElement,
@@ -274,6 +273,44 @@ public class HyperlinkOwnerToolTest {
         // Check file path hyperlinks after adding
         assertTrue(Arrays.stream(namedElement.getHyperlinks())
             .anyMatch(h -> h.isFile() && h.getName().contains("test.txt")));
+    }
+
+    @Test
+    void addFilePathHyperlinkToNamedElement_ng_noFileName() throws Exception {
+        // Get named element
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Foo");
+
+        long fileHyperlinkCountBefore = Arrays.stream(namedElement.getHyperlinks()).filter(IHyperlink::isFile).count();
+
+        // Paths that name no file, which Astah would accept as a hyperlink with an empty file name
+        for (String filePath : new String[] { null, "", ".", "a/.." }) {
+            // Create input DTO
+            NamedElementWithFilePathHyperlinkDTO inputDTO = new NamedElementWithFilePathHyperlinkDTO(
+                namedElement.getId(),
+                filePath,
+                "File link comment");
+
+            // ----------------------------------------
+            // Call addFilePathHyperlinkToNamedElement()
+            // ----------------------------------------
+            InvocationTargetException thrown = assertThrows(InvocationTargetException.class, () ->
+                TestSupport.instance().invokeToolMethodReturningDto(
+                    addFilePathHyperlinkToNamedElement,
+                    tool,
+                    inputDTO,
+                    NamedElementDTO.class));
+
+            // Check that the error names the argument and quotes its value, so that an empty one can be told apart
+            IllegalArgumentException cause = assertInstanceOf(IllegalArgumentException.class, thrown.getCause());
+            assertTrue(cause.getMessage().startsWith("filePath"), cause.getMessage());
+            assertTrue(cause.getMessage().endsWith(filePath == null ? "null" : "\"" + filePath + "\""), cause.getMessage());
+        }
+
+        // Check that no file path hyperlink was added
+        assertEquals(fileHyperlinkCountBefore,
+            Arrays.stream(namedElement.getHyperlinks()).filter(IHyperlink::isFile).count());
     }
 
     @Test
@@ -299,7 +336,7 @@ public class HyperlinkOwnerToolTest {
             .anyMatch(h -> h.isModel() && elementToLink.getId().equals(h.getName())));
 
         // ----------------------------------------
-        // Call addNamedElementHyperlink()
+        // Call addNamedElementHyperlinkToNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             addNamedElementHyperlinkToNamedElement,
@@ -332,7 +369,7 @@ public class HyperlinkOwnerToolTest {
             .anyMatch(IHyperlink::isURL));
 
         // ----------------------------------------
-        // Call removeAllUrlHyperlinks()
+        // Call removeAllUrlHyperlinksFromNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllUrlHyperlinksFromNamedElement,
@@ -364,7 +401,7 @@ public class HyperlinkOwnerToolTest {
             .anyMatch(IHyperlink::isFile));
 
         // ----------------------------------------
-        // Call removeAllFilePathHyperlinks()
+        // Call removeAllFilePathHyperlinksFromNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllFilePathHyperlinksFromNamedElement,
@@ -396,7 +433,7 @@ public class HyperlinkOwnerToolTest {
             .anyMatch(IHyperlink::isModel));
 
         // ----------------------------------------
-        // Call removeAllNamedElementHyperlinks()
+        // Call removeAllNamedElementHyperlinksFromNamedElement()
         // ----------------------------------------
         NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             removeAllNamedElementHyperlinksFromNamedElement,
@@ -411,6 +448,99 @@ public class HyperlinkOwnerToolTest {
         // Check named element hyperlinks after removing
         assertFalse(Arrays.stream(namedElement.getHyperlinks())
             .anyMatch(IHyperlink::isModel));
+    }
+
+    @Test
+    void removeAllUrlHyperlinksFromNamedElement_ok_noneToRemoveDoesNotModifyProject() throws Exception {
+        // Get named element
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Baz");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(namedElement.getId());
+
+        // Check that there is no URL hyperlink to remove and the project is not modified before removing
+        assertFalse(Arrays.stream(namedElement.getHyperlinks()).anyMatch(IHyperlink::isURL));
+        assertFalse(projectAccessor.isProjectModified());
+
+        // ----------------------------------------
+        // Call removeAllUrlHyperlinksFromNamedElement()
+        // ----------------------------------------
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeAllUrlHyperlinksFromNamedElement,
+            tool,
+            inputDTO,
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.urlHyperlinks().isEmpty());
+
+        // Check that removing nothing does not mark the project modified
+        assertFalse(projectAccessor.isProjectModified());
+    }
+
+    @Test
+    void removeAllFilePathHyperlinksFromNamedElement_ok_noneToRemoveDoesNotModifyProject() throws Exception {
+        // Get named element
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Baz");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(namedElement.getId());
+
+        // Check that there is no file path hyperlink to remove and the project is not modified before removing
+        assertFalse(Arrays.stream(namedElement.getHyperlinks()).anyMatch(IHyperlink::isFile));
+        assertFalse(projectAccessor.isProjectModified());
+
+        // ----------------------------------------
+        // Call removeAllFilePathHyperlinksFromNamedElement()
+        // ----------------------------------------
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeAllFilePathHyperlinksFromNamedElement,
+            tool,
+            inputDTO,
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.filePathHyperlinks().isEmpty());
+
+        // Check that removing nothing does not mark the project modified
+        assertFalse(projectAccessor.isProjectModified());
+    }
+
+    @Test
+    void removeAllNamedElementHyperlinksFromNamedElement_ok_noneToRemoveDoesNotModifyProject() throws Exception {
+        // Get named element
+        INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Baz");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(namedElement.getId());
+
+        // Check that there is no named element hyperlink to remove and the project is not modified before removing
+        assertFalse(Arrays.stream(namedElement.getHyperlinks()).anyMatch(IHyperlink::isModel));
+        assertFalse(projectAccessor.isProjectModified());
+
+        // ----------------------------------------
+        // Call removeAllNamedElementHyperlinksFromNamedElement()
+        // ----------------------------------------
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeAllNamedElementHyperlinksFromNamedElement,
+            tool,
+            inputDTO,
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.namedElementHyperlinks().isEmpty());
+
+        // Check that removing nothing does not mark the project modified
+        assertFalse(projectAccessor.isProjectModified());
     }
 
     @Test
@@ -513,6 +643,47 @@ public class HyperlinkOwnerToolTest {
         // Check file path hyperlinks after adding
         assertTrue(Arrays.stream(fileHyperlinkOwner.getHyperlinks())
             .anyMatch(h -> h.isFile() && h.getName().contains("node-file.txt")));
+    }
+
+    @Test
+    void addFilePathHyperlinkToNodePresentation_ng_noFileName() throws Exception {
+        // Get node presentation
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "State",
+            "Quux");
+
+        // Get a model element of the node presentation
+        IHyperlinkOwner fileHyperlinkOwner = (IHyperlinkOwner) nodePresentation.getModel();
+
+        long fileHyperlinkCountBefore = Arrays.stream(fileHyperlinkOwner.getHyperlinks()).filter(IHyperlink::isFile).count();
+
+        // Paths that name no file, which Astah would accept as a hyperlink with an empty file name
+        for (String filePath : new String[] { null, "", ".", "a/.." }) {
+            // Create input DTO
+            NodePresentationWithFilePathHyperlinkDTO inputDTO = new NodePresentationWithFilePathHyperlinkDTO(
+                nodePresentation.getID(),
+                filePath,
+                "Node file link comment");
+
+            // ----------------------------------------
+            // Call addFilePathHyperlinkToNodePresentation()
+            // ----------------------------------------
+            InvocationTargetException thrown = assertThrows(InvocationTargetException.class, () ->
+                TestSupport.instance().invokeToolMethodReturningDto(
+                    addFilePathHyperlinkToNodePresentation,
+                    tool,
+                    inputDTO,
+                    NodePresentationDTO.class));
+
+            // Check that the error names the argument and quotes its value, so that an empty one can be told apart
+            IllegalArgumentException cause = assertInstanceOf(IllegalArgumentException.class, thrown.getCause());
+            assertTrue(cause.getMessage().startsWith("filePath"), cause.getMessage());
+            assertTrue(cause.getMessage().endsWith(filePath == null ? "null" : "\"" + filePath + "\""), cause.getMessage());
+        }
+
+        // Check that no file path hyperlink was added
+        assertEquals(fileHyperlinkCountBefore,
+            Arrays.stream(fileHyperlinkOwner.getHyperlinks()).filter(IHyperlink::isFile).count());
     }
 
     @Test
@@ -662,5 +833,107 @@ public class HyperlinkOwnerToolTest {
         // Check named element hyperlinks after removing
         assertFalse(Arrays.stream(removeElemOwner.getHyperlinks())
             .anyMatch(IHyperlink::isModel));
+    }
+
+    @Test
+    void removeAllUrlHyperlinksFromNodePresentation_ok_noneToRemoveDoesNotModifyProject() throws Exception {
+        // Get node presentation
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Frame",
+            "stm Statemachine Diagram0");
+
+        // Create input DTO
+        IdDTO removeInputDTO = new IdDTO(nodePresentation.getID());
+
+        // The frame draws no model element, so the node presentation itself owns the hyperlinks
+        IHyperlinkOwner removeUrlOwner = (IHyperlinkOwner) nodePresentation;
+
+        // Check that there is no URL hyperlink to remove and the project is not modified before removing
+        assertFalse(Arrays.stream(removeUrlOwner.getHyperlinks()).anyMatch(IHyperlink::isURL));
+        assertFalse(projectAccessor.isProjectModified());
+
+        // ----------------------------------------
+        // Call removeAllUrlHyperlinksFromNodePresentation()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeAllUrlHyperlinksFromNodePresentation,
+            tool,
+            removeInputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.urlHyperlinks().isEmpty());
+
+        // Check that removing nothing does not mark the project modified
+        assertFalse(projectAccessor.isProjectModified());
+    }
+
+    @Test
+    void removeAllFilePathHyperlinksFromNodePresentation_ok_noneToRemoveDoesNotModifyProject() throws Exception {
+        // Get node presentation
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Frame",
+            "stm Statemachine Diagram0");
+
+        // Create input DTO
+        IdDTO removeInputDTO = new IdDTO(nodePresentation.getID());
+
+        // The frame draws no model element, so the node presentation itself owns the hyperlinks
+        IHyperlinkOwner removeFileOwner = (IHyperlinkOwner) nodePresentation;
+
+        // Check that there is no file path hyperlink to remove and the project is not modified before removing
+        assertFalse(Arrays.stream(removeFileOwner.getHyperlinks()).anyMatch(IHyperlink::isFile));
+        assertFalse(projectAccessor.isProjectModified());
+
+        // ----------------------------------------
+        // Call removeAllFilePathHyperlinksFromNodePresentation()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeAllFilePathHyperlinksFromNodePresentation,
+            tool,
+            removeInputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.filePathHyperlinks().isEmpty());
+
+        // Check that removing nothing does not mark the project modified
+        assertFalse(projectAccessor.isProjectModified());
+    }
+
+    @Test
+    void removeAllNamedElementHyperlinksFromNodePresentation_ok_noneToRemoveDoesNotModifyProject() throws Exception {
+        // Get node presentation
+        INodePresentation nodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Frame",
+            "stm Statemachine Diagram0");
+
+        // Create input DTO
+        IdDTO removeInputDTO = new IdDTO(nodePresentation.getID());
+
+        // The frame draws no model element, so the node presentation itself owns the hyperlinks
+        IHyperlinkOwner removeElemOwner = (IHyperlinkOwner) nodePresentation;
+
+        // Check that there is no named element hyperlink to remove and the project is not modified before removing
+        assertFalse(Arrays.stream(removeElemOwner.getHyperlinks()).anyMatch(IHyperlink::isModel));
+        assertFalse(projectAccessor.isProjectModified());
+
+        // ----------------------------------------
+        // Call removeAllNamedElementHyperlinksFromNodePresentation()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            removeAllNamedElementHyperlinksFromNodePresentation,
+            tool,
+            removeInputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertTrue(outputDTO.namedElementHyperlinks().isEmpty());
+
+        // Check that removing nothing does not mark the project modified
+        assertFalse(projectAccessor.isProjectModified());
     }
 }

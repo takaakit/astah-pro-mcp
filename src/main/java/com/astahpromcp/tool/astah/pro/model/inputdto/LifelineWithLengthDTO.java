@@ -6,7 +6,7 @@ public record LifelineWithLengthDTO(
     @JsonPropertyDescription("Target lifeline node presentation identifier")
     String targetLifelineNodePresentationId,
 
-    @JsonPropertyDescription("Lifeline length value to set on the lifeline node presentation")
+    @JsonPropertyDescription("Lifeline length in pixels")
     int length
 ) {
 }

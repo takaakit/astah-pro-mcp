@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -351,21 +352,21 @@ public class McpClientApprovalServlet extends HttpServlet {
                 options,
                 options[0]);
 
-        java.awt.Frame tempOwner = null;
-        javax.swing.JDialog dialog = null;
+        Frame tempOwner = null;
+        JDialog dialog = null;
         try {
             // Simple approach: create a temporary invisible owner and set DOCUMENT_MODAL
-            tempOwner = new java.awt.Frame();
+            tempOwner = new Frame();
             tempOwner.setUndecorated(true);
-            tempOwner.setType(java.awt.Window.Type.UTILITY);
+            tempOwner.setType(Window.Type.UTILITY);
             tempOwner.setAlwaysOnTop(true);
             tempOwner.setLocationRelativeTo(null);
             tempOwner.setVisible(true);
 
             dialog = optionPane.createDialog(tempOwner, "MCP Connection Request");
-            dialog.setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
+            dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
             dialog.setAlwaysOnTop(true);
-            dialog.setDefaultCloseOperation(javax.swing.JDialog.DISPOSE_ON_CLOSE);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
             dialog.setVisible(true);
 
@@ -583,7 +584,7 @@ public class McpClientApprovalServlet extends HttpServlet {
 
         @Override
         public Enumeration<String> getHeaderNames() {
-            List<String> names = new java.util.ArrayList<>(Collections.list(super.getHeaderNames()));
+            List<String> names = new ArrayList<>(Collections.list(super.getHeaderNames()));
             boolean hasSessionId = names.stream().anyMatch(HttpHeaders.MCP_SESSION_ID::equalsIgnoreCase);
             if (!hasSessionId) {
                 names.add(HttpHeaders.MCP_SESSION_ID);

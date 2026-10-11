@@ -10,13 +10,14 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementTypeListDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/INamedElement.html
@@ -89,16 +90,12 @@ public class NamedElementTool extends AstahToolProvider {
     }
 
     private NamedElementDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get named element information: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementTypeListDTO getAllTypes(NoInputDTO param) throws Exception {
-        log.debug("Get all named element types: {}", param);
-
         List<String> typeNames = Arrays.stream(NamedElementDTO.Type.values())
                 .filter(type -> type != NamedElementDTO.Type.UNKNOWN)
                 .map(type -> type.typeName)
@@ -108,20 +105,29 @@ public class NamedElementTool extends AstahToolProvider {
     }
 
     private NamedElementDTO setName(NamedElementWithNameDTO param) throws Exception {
-        log.debug("Set name of named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        txnAstah.run( () -> {
-            astahNamedElement.setName(param.name());
-        });
+        try {
+            txnAstah.run( () -> {
+                astahNamedElement.setName(param.name());
+            });
+
+        } catch (InvalidEditingException e) {
+            // Most element types reject a line break in the name with the same message, while actions, use cases, comments and constraints accept one, so it is told only after Astah rejects it.
+            if (InvalidEditingException.PARAMETER_ERROR_KEY.equals(e.getKey())
+                    && (param.name().contains("\n") || param.name().contains("\r"))) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " The name of this element type cannot contain line breaks.");
+            } else {
+                throw e;
+            }
+        }
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO setAlias1(NamedElementWithAlias1DTO param) throws Exception {
-        log.debug("Set alias1 of named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         txnAstah.run( () -> {
@@ -132,8 +138,6 @@ public class NamedElementTool extends AstahToolProvider {
     }
 
     private NamedElementDTO setAlias2(NamedElementWithAlias2DTO param) throws Exception {
-        log.debug("Set alias2 of named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         txnAstah.run( () -> {
@@ -144,8 +148,6 @@ public class NamedElementTool extends AstahToolProvider {
     }
 
     private NamedElementDTO setDefinition(NamedElementWithDefinitionDTO param) throws Exception {
-        log.debug("Set definition of named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         txnAstah.run( () -> {
@@ -156,8 +158,6 @@ public class NamedElementTool extends AstahToolProvider {
     }
 
     private NamedElementDTO setVisibility(NamedElementWithVisibilityDTO param) throws Exception {
-        log.debug("Set visibility of named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
         txnAstah.run( () -> {

@@ -51,7 +51,6 @@ public class CallableToolInfoToolTest {
         return new ToolDefinition(schema, ToolDefinition.ResultKind.DTO, (exchange, request) -> ResponseSupport.success(Map.of("ok", true)));
     }
 
-    // A tool function that answers with a DTO and contents together declares no result schema, and is callable all the same.
     private static ToolDefinition definitionWithoutOutputSchema(String name, String description) {
         McpSchema.Tool schema = McpSchema.Tool.builder(name, JsonSupport.MCP_JSON_MAPPER,
                         "{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"string\"}}}")
@@ -187,9 +186,9 @@ public class CallableToolInfoToolTest {
                 definition("capture_dgm_img", "Capture a PNG image of the specified diagram."),
                 definition("get_info_of_ocl_spec", "Return the OCL specification document."));
 
-        // The reasons the catalog derives for these two, stated here because this registry has no catalog behind it
+        // The reasons the manifest gives these two, stated here because this registry has no manifest behind it
         return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of(
-                "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT,
+                "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT,
                 "get_info_of_ocl_spec", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
     }
 
@@ -197,10 +196,7 @@ public class CallableToolInfoToolTest {
         ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
         ToolManifest manifest = ToolManifest.load();
 
-        return AstahToolRegistry.from(
-                catalog,
-                manifest.namesFor(ToolManifest.Profile.DIRECT),
-                manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC));
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
     }
 
     @Test
@@ -444,7 +440,21 @@ public class CallableToolInfoToolTest {
         }
     }
 
-    // The MCP SDK checks every answer against the schema this tool function publishes, and an answer that fails the check reaches the caller as an error.
+    @Test
+    void getInfoOfToolsCallable_ok_describesTheResultOfEveryToolFunctionOverTheRealCatalog() {
+        AstahToolRegistry registry = realRegistry();
+        CallableToolInfoTool tool = new CallableToolInfoTool(registry);
+
+        List<String> undescribed = new ArrayList<>();
+        for (String name : registry.mcpToolScriptCallableNames()) {
+            if (info(tool, List.of(name)).tools().get(0).outputSchema().isEmpty()) {
+                undescribed.add(name);
+            }
+        }
+
+        assertEquals(List.of(), undescribed, "Every tool function an mcp tool script can call must describe its result");
+    }
+
     @Test
     void getInfoOfToolsCallable_ok_answersWithinItsPublishedSchemaOverTheRealCatalog() {
         AstahToolRegistry registry = realRegistry();

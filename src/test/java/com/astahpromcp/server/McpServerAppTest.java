@@ -61,7 +61,7 @@ public class McpServerAppTest {
 
             assertTrue(exception instanceof ConnectException ||
                        exception instanceof NoRouteToHostException ||
-                       exception instanceof java.net.SocketTimeoutException,
+                       exception instanceof SocketTimeoutException,
                     "Expected the connection to be refused or timeout, but got: " + exception);
         }
     }
@@ -78,9 +78,8 @@ public class McpServerAppTest {
             assertTrue(connectors.length > 0, "Expected at least one connector to be configured");
 
             for (Connector connector : connectors) {
-                assertTrue(connector instanceof ServerConnector, "Connector should be a ServerConnector");
-
-                ServerConnector serverConnector = (ServerConnector) connector;
+                ServerConnector serverConnector = assertInstanceOf(
+                        ServerConnector.class, connector, "Connector should be a ServerConnector");
                 String boundHost = serverConnector.getHost();
 
                 assertNotNull(boundHost, "ServerConnector host should be explicitly set");

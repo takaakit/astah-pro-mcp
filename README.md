@@ -125,7 +125,7 @@ This plugin experimentally implements a programmatic tool calling mode (port `88
 
 | Mode | Port | Exposed tools |
 | --- | --- | --- |
-| Programmatic tool calling | `8888` | 81 |
+| Programmatic tool calling | `8888` | 82 |
 | Direct tool calling | `18888` | 389 |
 
 <details>

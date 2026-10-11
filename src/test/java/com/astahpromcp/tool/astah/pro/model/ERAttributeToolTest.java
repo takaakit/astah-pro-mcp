@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERAttributeWithDefaultValueDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERAttributeWithERDatatypeDTO;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERAttributeToolTest {
 

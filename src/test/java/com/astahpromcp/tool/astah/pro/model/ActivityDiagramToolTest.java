@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ActivityDiagramToolTest {
 
@@ -64,7 +64,7 @@ public class ActivityDiagramToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(activityDiagram.getId());
 
@@ -87,7 +87,7 @@ public class ActivityDiagramToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(activityDiagram.getId());
 

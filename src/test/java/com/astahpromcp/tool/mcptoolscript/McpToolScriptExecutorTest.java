@@ -1,21 +1,27 @@
 package com.astahpromcp.tool.mcptoolscript;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.ResponseSupport;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.AstahApiLock;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
-import com.astahpromcp.tool.JsonSupport;
+import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.mcptoolscript.outputdto.ModelChangesKind;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,10 +51,22 @@ public class McpToolScriptExecutorTest {
     }
 
     private static class NoopTransactionManager implements ITransactionManager {
-        @Override public void beginTransaction() { }
-        @Override public void endTransaction() { }
-        @Override public void abortTransaction() { }
-        @Override public boolean isInTransaction() { return false; }
+        @Override
+        public void beginTransaction() {
+        }
+
+        @Override
+        public void endTransaction() {
+        }
+
+        @Override
+        public void abortTransaction() {
+        }
+
+        @Override
+        public boolean isInTransaction() {
+            return false;
+        }
     }
 
     private static AstahToolRegistry registry() {
@@ -71,9 +90,9 @@ public class McpToolScriptExecutorTest {
                 new ToolDefinition(schema("get_info_of_ocl_spec"), ToolDefinition.ResultKind.DTO,
                         (exchange, request) -> ResponseSupport.success(Map.of("ok", true))));
 
-        // The reasons the catalog derives for these three, stated here because this registry has no catalog behind it
+        // The reasons the manifest gives these three, stated here because this registry has no manifest behind it
         return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of(
-                "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT,
+                "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT,
                 "run_astah_api_script", NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT,
                 "get_info_of_ocl_spec", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
     }
@@ -121,7 +140,30 @@ public class McpToolScriptExecutorTest {
         assertEquals("60", result.value());
     }
 
-    // The script can catch a tool failure and keep going -- the print below proves it did -- but the run it belongs to is over: one run is one transaction, so a failure anywhere in it means nothing the script did is kept.
+    @Test
+    void execute_ok_logsHowManyToolFunctionCallsTheRunMade() {
+        Logger logger = (Logger) LoggerFactory.getLogger(McpToolScriptExecutor.class);
+        Level originalLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> captured = new ListAppender<>();
+        captured.start();
+        // logback-test.xml keeps the root at WARN
+        logger.setLevel(Level.INFO);
+        logger.addAppender(captured);
+        try {
+            McpToolScriptExecutor.Result result = executor().execute(
+                    "for (var i = 0; i < 3; i++) { tools.get_class_info({ id: '' + i }); } 'done';");
+            assertTrue(result.ok(), result.errorMessage());
+        } finally {
+            logger.detachAppender(captured);
+            logger.setLevel(originalLevel);
+            captured.stop();
+        }
+
+        assertTrue(captured.list.stream().anyMatch(event -> event.getLevel() == Level.INFO
+                        && event.getFormattedMessage().equals("MCP tool script made 3 tool function call(s)")),
+                "Expected the call count at INFO, but the log was: " + captured.list);
+    }
+
     @Test
     void execute_ng_letsTheScriptCatchAToolFailureButStillFailsTheRun() {
         McpToolScriptExecutor.Result result = executor().execute(
@@ -160,14 +202,6 @@ public class McpToolScriptExecutorTest {
         // Nashorn ends the message without a full stop, and the note must not run on from it
         assertTrue(result.errorMessage().matches("(?s).*column number \\d+\\. The run had not changed the model.*"),
                 result.errorMessage());
-    }
-
-    @Test
-    void execute_ng_failsTheRunWhenAToolFailureIsNotCaught() {
-        McpToolScriptExecutor.Result result = executor().execute("tools.capture_dgm_img({});");
-
-        assertFalse(result.ok());
-        assertTrue(result.errorMessage().contains("capture_dgm_img"), result.errorMessage());
     }
 
     // The refusal has to reach the script as the sentence that explains it. Binding only the callable tools would
@@ -615,6 +649,31 @@ public class McpToolScriptExecutorTest {
         assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS));
     }
 
+    // The suspension reason is what the next tool call is refused with, so its wording is part of what the client sees.
+    // It is read while the script is still running: the reason lifts as soon as the abandoned thread terminates.
+    @Test
+    void execute_ng_suspendsAccessWithTheTimeoutAsTheReason() throws Exception {
+        CountDownLatch releaseTool = new CountDownLatch(1);
+        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(
+                uninterruptibleRegistry(new CountDownLatch(1), releaseTool), 1, new FakeTransactionBoundary());
+
+        try {
+            McpToolScriptExecutor.Result result = timeoutExecutor.execute("tools.hold_on({});");
+
+            assertFalse(result.ok());
+            assertTrue(result.errorMessage().startsWith("MCP tool script execution timed out after 1 seconds."),
+                    result.errorMessage());
+            String reason = AstahApiLock.suspensionReason();
+            assertNotNull(reason, "The script is still running, so access must be suspended");
+            assertTrue(reason.startsWith("an mcp tool script that timed out after 1 seconds is still running. "), reason);
+
+        } finally {
+            releaseTool.countDown();
+        }
+        assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS),
+                "Astah API access should be restored once the abandoned runner terminates");
+    }
+
     // The wait can be cut short by the caller as well as by the timeout: a cancelled or disconnected request interrupts
     // the thread waiting for the run. That interrupt does not stop the runner, so the same protection has to be in place,
     // and it has to be in place before this call returns, while it still holds the Astah API lock.
@@ -640,8 +699,12 @@ public class McpToolScriptExecutorTest {
 
         assertFalse(caller.isAlive(), "The interrupted caller should have stopped waiting");
         assertFalse(result.get().ok(), "An interrupted wait must be reported as a failure");
-        assertNotNull(AstahApiLock.suspensionReason(),
-                "The abandoned runner may still be calling the Astah API, so access must be suspended");
+        assertTrue(result.get().errorMessage().startsWith("Interrupted while waiting for mcp tool script execution."),
+                result.get().errorMessage());
+        String reason = AstahApiLock.suspensionReason();
+        assertNotNull(reason, "The abandoned runner may still be calling the Astah API, so access must be suspended");
+        // What the next tool call is refused with, so its wording is part of what the client sees
+        assertTrue(reason.startsWith("an mcp tool script whose caller stopped waiting is still running. "), reason);
         assertTrue(interruptFlagKept.get(), "The caller's interrupt flag must be restored");
 
         releaseTool.countDown();
@@ -836,6 +899,36 @@ public class McpToolScriptExecutorTest {
         assertFalse(transaction.isInTransaction());
     }
 
+    @Test
+    void execute_ng_stopsAPrintLoopOnceItTimesOut() throws Exception {
+        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, new FakeTransactionBoundary());
+
+        McpToolScriptExecutor.Result result = timeoutExecutor.execute("while (true) { print('x'); }");
+
+        assertFalse(result.ok());
+        assertTrue(result.errorMessage().contains("timed out"), result.errorMessage());
+        assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS),
+                "The print loop should stop at its next print once it is interrupted");
+    }
+
+    // The runner is still interrupted while it closes the transaction of the stopped script
+    @Test
+    void execute_ng_rollsBackAStoppedPrintLoopEvenWhenTheFirstAbortIsRefused() throws Exception {
+        FakeTransactionBoundary transaction = new FakeTransactionBoundary();
+        transaction.failOnFirstAbort();
+        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, transaction);
+
+        McpToolScriptExecutor.Result result = timeoutExecutor.execute(
+                "tools.edit_class_info({ id: '1' }); while (true) { print('x'); }");
+
+        assertFalse(result.ok());
+        assertTrue(awaitAccessRestored(10, TimeUnit.SECONDS),
+                "The print loop should stop at its next print once it is interrupted");
+        assertEquals(0, transaction.commitCount());
+        assertEquals(2, transaction.abortCount(), "The refused abort has to be retried");
+        assertFalse(transaction.isInTransaction(), "The stopped run must not leave its transaction open");
+    }
+
     // Astah keeps the transaction when it refuses a commit, and changes nobody could confirm must not survive it.
     @Test
     void execute_ng_abortsWhenTheCommitIsRefused() {
@@ -927,7 +1020,7 @@ public class McpToolScriptExecutorTest {
 
     private static ToolDefinition lockedTool(
             String name,
-            java.util.function.BiFunction<io.modelcontextprotocol.server.McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler) {
+            BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler) {
         ToolProvider provider = () -> List.of(new ToolDefinition(schema(name), ToolDefinition.ResultKind.DTO, handler));
         return new ExclusiveToolProvider(provider, 30).createToolDefinitions().get(0);
     }

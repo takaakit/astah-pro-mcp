@@ -10,13 +10,13 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERIndexWithKeyDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERIndexWithUniqueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERIndexDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERIndexDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERIndex.html
@@ -75,16 +75,12 @@ public class ERIndexTool extends AstahToolProvider {
     }
 
     private ERIndexDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER index information: {}", param);
-
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.id());
 
         return ERIndexDTOAssembler.toDTO(astahERIndex);
     }
 
     private ERIndexDTO addERAttribute(ERIndexWithERAttributeDTO param) throws Exception {
-        log.debug("Add ER attribute to ER index: {}", param);
-
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.erAttributeId());
 
@@ -96,8 +92,6 @@ public class ERIndexTool extends AstahToolProvider {
     }
 
     private ERIndexDTO removeERAttribute(ERIndexWithERAttributeDTO param) throws Exception {
-        log.debug("Remove ER attribute from ER index: {}", param);
-
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.erAttributeId());
 
@@ -109,8 +103,6 @@ public class ERIndexTool extends AstahToolProvider {
     }
 
     private ERIndexDTO setKey(ERIndexWithKeyDTO param) throws Exception {
-        log.debug("Set key of ER index: {}", param);
-
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
 
         txnAstah.run( () -> {
@@ -121,8 +113,6 @@ public class ERIndexTool extends AstahToolProvider {
     }
 
     private ERIndexDTO setUnique(ERIndexWithUniqueDTO param) throws Exception {
-        log.debug("Set unique of ER index: {}", param);
-
         IERIndex astahERIndex = astahProToolSupport.getERIndex(param.targetERIndexId());
 
         txnAstah.run( () -> {

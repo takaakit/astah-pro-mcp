@@ -1,11 +1,11 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 
 public class AssociationDTOAssembler {
     public static AssociationDTO toDTO(@NonNull IAssociation astahAssociation) throws Exception {

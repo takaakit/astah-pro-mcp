@@ -9,16 +9,16 @@ public record EREntityDTO(
     @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
-    @JsonPropertyDescription("Parent ER relationships")
+    @JsonPropertyDescription("Parent ER relationships: ER relationships in which this entity is the child.")
     List<NameIdTypeDTO> parentERRelationships,
 
-    @JsonPropertyDescription("Parent ER subtype relationships")
+    @JsonPropertyDescription("Parent ER subtype relationships: ER subtype relationships in which this entity is the child.")
     List<NameIdTypeDTO> parentERSubtypeRelationships,
 
-    @JsonPropertyDescription("Child ER relationships")
+    @JsonPropertyDescription("Child ER relationships: ER relationships in which this entity is the parent.")
     List<NameIdTypeDTO> childERRelationships,
 
-    @JsonPropertyDescription("Child ER subtype relationships")
+    @JsonPropertyDescription("Child ER subtype relationships: ER subtype relationships in which this entity is the parent.")
     List<NameIdTypeDTO> childERSubtypeRelationships,
 
     @JsonPropertyDescription("ER indices")

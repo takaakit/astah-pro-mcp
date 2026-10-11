@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.EnumerationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class EnumerationToolTest {
 
@@ -56,7 +56,7 @@ public class EnumerationToolTest {
         IEnumeration enumeration = (IEnumeration) TestSupport.instance().getNamedElementByClassAndName(
             IEnumeration.class,
             "Foo");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(enumeration.getId());
 

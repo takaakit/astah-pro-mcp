@@ -6,10 +6,10 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.spec.McpSchema;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -49,8 +49,6 @@ public class PreliminaryLayoutTool extends AstahToolProvider {
     }
 
     private List<McpSchema.Content> getSteps(NoInputDTO param) throws Exception {
-        log.debug("Get preliminary layout steps: {}", param);
-
         String contents = """
 # Introspection Loop for Creating a Preliminary Layout Before Laying Out a New Diagram
 Follow these steps to create and refine a preliminary layout of a diagram before you work out where on that diagram its presentations are to be placed, so that the initial layout of the diagram is of good quality. Run this introspective loop once per diagram to be created. Do not skip, reorder, or merge steps.
@@ -285,7 +283,7 @@ Requirement Diagram:
         return McpSchema.ImageContent.builder(encoded, "image/png").build();
     }
 
-    private String loadResource(String resourcePath, java.nio.charset.Charset charset) throws Exception {
+    private String loadResource(String resourcePath, Charset charset) throws Exception {
         return new String(loadResource(resourcePath), charset);
     }
 

@@ -2,10 +2,10 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IMultiplicityRange;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 
 import java.util.Objects;
 

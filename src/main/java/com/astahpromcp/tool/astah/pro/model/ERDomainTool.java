@@ -14,13 +14,13 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERDomainWithParentERDomainD
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERDomainWithPhysicalNameDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDomainDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDomainDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDomain.html
@@ -100,16 +100,12 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER domain information: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.id());
 
         return ERDomainDTOAssembler.toDTO(astahERDomain);
     }
 
     private ERDomainDTO setDatatype(ERDomainWithERDatatypeDTO param) throws Exception {
-        log.debug("Set ER datatype of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
@@ -121,8 +117,6 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO setDefaultValue(ERDomainWithDefaultValueDTO param) throws Exception {
-        log.debug("Set default value of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
         txnAstah.run( () -> {
@@ -133,8 +127,6 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO setLengthPrecision(ERDomainWithLengthPrecisionDTO param) throws Exception {
-        log.debug("Set length/precision of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
         txnAstah.run( () -> {
@@ -145,8 +137,6 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO setLogicalName(ERDomainWithLogicalNameDTO param) throws Exception {
-        log.debug("Set logical name of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
         txnAstah.run( () -> {
@@ -157,8 +147,6 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO setPhysicalName(ERDomainWithPhysicalNameDTO param) throws Exception {
-        log.debug("Set physical name of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
         txnAstah.run( () -> {
@@ -169,8 +157,6 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO setNotNull(ERDomainWithNotNullDTO param) throws Exception {
-        log.debug("Set not null of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
 
         txnAstah.run( () -> {
@@ -181,8 +167,6 @@ public class ERDomainTool extends AstahToolProvider {
     }
 
     private ERDomainDTO setParentERDomain(ERDomainWithParentERDomainDTO param) throws Exception {
-        log.debug("Set parent ER domain of ER domain: {}", param);
-
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.targetERDomainId());
         IERDomain astahParentERDomain = astahProToolSupport.getERDomain(param.parentERDomainId());
 

@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.project;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.FilePathDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.NameDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.BooleanDTO;
@@ -10,15 +11,28 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.exception.ProjectLockedException;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ProjectAccessorToolTest {
 
@@ -137,26 +151,23 @@ public class ProjectAccessorToolTest {
     }
 
     @Test
-    void openProject_ok_1() throws Exception {
-        // Create input DTO
-        // Relative path
-        FilePathDTO inputDTO = new FilePathDTO("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta");
+    void openProject_ng_relativePath() throws Exception {
+        String projectPath = projectAccessor.getProjectPath();
+        String relativePath = "src/test/resources/modelfile/project/ProjectAccessorToolTest.asta";
 
         // ----------------------------------------
         // Call openProject()
         // ----------------------------------------
-        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             openProject,
             tool,
-            inputDTO,
-            NamedElementDTO.class);
+            new FilePathDTO(relativePath),
+            NamedElementDTO.class));
 
-        // Check output DTO
-        assertNotNull(outputDTO);
-        assertEquals(outputDTO.name(), projectAccessor.getProject().getName());
-        
-        // Check that the project was opened
-        assertNotNull(projectAccessor.getProject());
+        // Astah would resolve it against its own folder, not the agent's, so it is rejected even though the file exists here
+        assertEquals("The specified file path is not an absolute path: " + relativePath + ". Specify the absolute path, e.g., C:\\work\\model.asta.",
+            exception.getCause().getMessage());
+        assertEquals(projectPath, projectAccessor.getProjectPath());
     }
 
     @Test
@@ -177,8 +188,8 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(outputDTO.name(), projectAccessor.getProject().getName());
-        
+        assertEquals(projectAccessor.getProject().getName(), outputDTO.name());
+
         // Check that the project was opened
         assertNotNull(projectAccessor.getProject());
     }
@@ -193,7 +204,7 @@ public class ProjectAccessorToolTest {
         Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             openProject,
             tool,
-            new FilePathDTO("src/test/resources/modelfile/project/NotExisting.asta"),
+            new FilePathDTO(Path.of("src/test/resources/modelfile/project/NotExisting.asta").toAbsolutePath().toString()),
             NamedElementDTO.class));
 
         // Check that the current project is kept open
@@ -311,7 +322,7 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(outputDTO.name(), projectAccessor.getProject().getName());
+        assertEquals(projectAccessor.getProject().getName(), outputDTO.name());
     }
 
     @Test
@@ -330,7 +341,7 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(true, outputDTO.value());
+        assertTrue(outputDTO.value());
 
         // Close project
         projectAccessor.close();
@@ -346,7 +357,7 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(false, outputDTO.value());
+        assertFalse(outputDTO.value());
     }
 
     @Test
@@ -365,7 +376,7 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(false, outputDTO.value());
+        assertFalse(outputDTO.value());
 
         // Modify project
         projectAccessor.getProject().setName("New Name");
@@ -381,7 +392,7 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(true, outputDTO.value());
+        assertTrue(outputDTO.value());
     }
 
     @Test
@@ -400,8 +411,8 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(outputDTO.value().size(), 1);
-        assertEquals(outputDTO.value().get(0).name(), "Foo");
+        assertEquals(1, outputDTO.value().size());
+        assertEquals("Foo", outputDTO.value().get(0).name());
     }
 
     @Test
@@ -476,16 +487,31 @@ public class ProjectAccessorToolTest {
     }
 
     @Test
-    void saveProjectAs_ok_1() throws Exception {
-        // Create input DTO
-        // Relative path
-        FilePathDTO inputDTO = new FilePathDTO("./ProjectAccessorToolTest_2.asta");
+    void saveProjectAs_ng_relativePath() throws Exception {
+        String projectPath = projectAccessor.getProjectPath();
 
-        // Delete the stale file if it exists
-        File targetFile = new File(inputDTO.filePath());
-        if (targetFile.exists()) {
-            assertTrue(targetFile.delete(), "failed to delete stale file: " + targetFile);
+        // A file name alone, and a path with a folder
+        for (String relativePath : new String[] {"ProjectAccessorToolTest_2.asta", "./ProjectAccessorToolTest_2.asta"}) {
+            // ----------------------------------------
+            // Call saveProjectAs()
+            // ----------------------------------------
+            Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+                saveProjectAs,
+                tool,
+                new FilePathDTO(relativePath),
+                ProjectPathDTO.class));
+
+            // Astah would resolve it against its own folder (usually its install folder), not the agent's
+            assertEquals("The specified file path is not an absolute path: " + relativePath + ". Specify the absolute path, e.g., C:\\work\\model.asta.",
+                exception.getCause().getMessage());
+            assertFalse(new File(relativePath).exists());
+            assertEquals(projectPath, projectAccessor.getProjectPath());
         }
+    }
+
+    @Test
+    void saveProjectAs_ok_upperCaseExtension(@TempDir Path workspace) throws Exception {
+        Path target = workspace.resolve("UpperCase.ASTA");
 
         // ----------------------------------------
         // Call saveProjectAs()
@@ -493,18 +519,12 @@ public class ProjectAccessorToolTest {
         ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
-            inputDTO,
+            new FilePathDTO(target.toString()),
             ProjectPathDTO.class);
 
-        // Check output DTO
-        assertNotNull(outputDTO);
+        // Astah keeps the extension as written rather than appending .asta to it
         assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
-
-        // Check that the project file exists
-        assertTrue(new File(inputDTO.filePath()).exists());
-
-        // Cleanup: Delete the saved project file
-        new File(inputDTO.filePath()).delete();
+        assertEquals("UpperCase.ASTA", target.toRealPath().getFileName().toString());
     }
 
     @Test
@@ -557,25 +577,27 @@ public class ProjectAccessorToolTest {
     }
 
     @Test
-    void saveProjectAs_ng_2() throws Exception {
+    void saveProjectAs_ng_2(@TempDir Path workspace) throws Exception {
         // Create input DTO
         // Incorrect file path
-        FilePathDTO inputDTO = new FilePathDTO("./ProjectAccessorToolTest_2.txt");
+        FilePathDTO inputDTO = new FilePathDTO(workspace.resolve("ProjectAccessorToolTest_2.txt").toString());
 
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
             ProjectPathDTO.class));
+
+        assertTrue(exception.getCause().getMessage().contains("not a valid Astah project file"));
     }
 
     @Test
-    void saveProjectAs_ng_3() throws Exception {
+    void saveProjectAs_ng_3(@TempDir Path workspace) throws Exception {
         // Create input DTO
-        FilePathDTO inputDTO = new FilePathDTO("./ProjectAccessorToolTest_2.asta");
+        FilePathDTO inputDTO = new FilePathDTO(workspace.resolve("ProjectAccessorToolTest_2.asta").toString());
 
         // Create the file
         File targetFile = new File(inputDTO.filePath());
@@ -584,14 +606,14 @@ public class ProjectAccessorToolTest {
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
             ProjectPathDTO.class));
 
-        // Cleanup: Delete the created file
-        targetFile.delete();
+        assertTrue(exception.getCause().getMessage().contains("This tool does not overwrite an existing file"));
+        assertEquals(0, targetFile.length());
     }
 
     @Test
@@ -613,8 +635,8 @@ public class ProjectAccessorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(outputDTO.name(), projectName);
-        
+        assertEquals(projectName, outputDTO.name());
+
         // Check that the project was closed
         assertThrows(Exception.class, () -> projectAccessor.getProject());
     }
@@ -632,10 +654,10 @@ public class ProjectAccessorToolTest {
             tool,
             inputDTO,
             ProjectPathDTO.class);
-            
+
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(outputDTO.projectPath(), projectAccessor.getProjectPath());
+        assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
     }
 
     @Test
@@ -665,5 +687,233 @@ public class ProjectAccessorToolTest {
 
         assertNotNull(outputDTO);
         assertEquals("", outputDTO.projectPath());
+    }
+
+    @Test
+    void openProject_ng_fileIsNotAnAstahProject(@TempDir Path workspace) throws Exception {
+        Path notAProject = Files.writeString(workspace.resolve("NotAProject.asta"), "This is not an Astah project.");
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            openProject,
+            tool,
+            new FilePathDTO(notAProject.toString()),
+            NamedElementDTO.class));
+
+        // The offline API throws a StreamCorruptedException ("invalid stream header: ..."), which must be kept as the cause
+        Throwable failure = exception.getCause();
+        assertEquals("Failed to open project: " + notAProject + ". java.io.StreamCorruptedException: invalid stream header: 54686973", failure.getMessage());
+        assertInstanceOf(StreamCorruptedException.class, failure.getCause(), "The exception from Astah must be kept as the cause");
+    }
+
+    @Test
+    void openProject_ng_astahOpenedNothingWithoutThrowing(@TempDir Path workspace) throws Exception {
+        Path notAProject = Files.writeString(workspace.resolve("NotAProject.asta"), "This is not an Astah project.");
+        AtomicBoolean projectIsOpen = new AtomicBoolean(true);
+        ProjectAccessor guiLikeAccessor = mock(ProjectAccessor.class);
+        when(guiLikeAccessor.hasProject()).thenAnswer(invocation -> projectIsOpen.get());
+        when(guiLikeAccessor.getProjectPath()).thenReturn("C:\\work\\Previous.asta");
+        doAnswer(invocation -> {
+            projectIsOpen.set(false);
+            return null;
+        }).when(guiLikeAccessor).open(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
+        ProjectAccessorTool guiLikeTool = new ProjectAccessorTool(guiLikeAccessor, new AstahProToolSupport(guiLikeAccessor));
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            openProject,
+            guiLikeTool,
+            new FilePathDTO(notAProject.toString()),
+            NamedElementDTO.class));
+
+        // Without the check, getProject() would have failed next with a message that does not say the open failed
+        assertEquals("Failed to open project: " + notAProject + ". Astah opened no project from it, and its log ('get_info_of_astah_log') has the reason.",
+            exception.getCause().getMessage());
+    }
+
+    @Test
+    void openProject_ng_astahLeftAnotherProjectOpen(@TempDir Path workspace) throws Exception {
+        Path requested = Files.writeString(workspace.resolve("Requested.asta"), "This is not an Astah project.");
+        ProjectAccessor guiLikeAccessor = mock(ProjectAccessor.class);
+        when(guiLikeAccessor.hasProject()).thenReturn(true);
+        when(guiLikeAccessor.getProjectPath()).thenReturn("C:\\work\\Previous.asta");
+        ProjectAccessorTool guiLikeTool = new ProjectAccessorTool(guiLikeAccessor, new AstahProToolSupport(guiLikeAccessor));
+
+        // ----------------------------------------
+        // Call openProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            openProject,
+            guiLikeTool,
+            new FilePathDTO(requested.toString()),
+            NamedElementDTO.class));
+
+        // Without the check, the project left open would have been returned as the one opened
+        assertEquals("Failed to open project: " + requested + ". Astah opened no project from it, and its log ('get_info_of_astah_log') has the reason.",
+            exception.getCause().getMessage());
+    }
+
+    @Test
+    void saveProject_ok_savesAModifiedProject(@TempDir Path workspace) throws Exception {
+        Path project = openModifiedCopy(workspace, "Modified.asta");
+
+        // ----------------------------------------
+        // Call saveProject()
+        // ----------------------------------------
+        ProjectPathDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            saveProject,
+            tool,
+            new NoInputDTO(),
+            ProjectPathDTO.class);
+
+        // The check after the save must not mistake a save that worked for one that did not
+        assertEquals(projectAccessor.getProjectPath(), outputDTO.projectPath());
+        assertFalse(projectAccessor.isProjectModified());
+
+        // Read back from the file
+        projectAccessor.close();
+        projectAccessor.open(project.toString());
+        assertEquals(UNSAVED_WORK_DEFINITION, projectAccessor.getProject().getDefinition());
+    }
+
+    @Test
+    void saveProject_ng_astahSavedNothingWithoutThrowing(@TempDir Path workspace) throws Exception {
+        Path project = Files.writeString(workspace.resolve("Unsaved.asta"), "The file Astah failed to write.");
+        ProjectAccessor guiLikeAccessor = mock(ProjectAccessor.class);
+        when(guiLikeAccessor.hasProject()).thenReturn(true);
+        when(guiLikeAccessor.isProjectModified()).thenReturn(true);
+        when(guiLikeAccessor.getProjectPath()).thenReturn(project.toString());
+        ProjectAccessorTool guiLikeTool = new ProjectAccessorTool(guiLikeAccessor, new AstahProToolSupport(guiLikeAccessor));
+
+        // ----------------------------------------
+        // Call saveProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            saveProject,
+            guiLikeTool,
+            new NoInputDTO(),
+            ProjectPathDTO.class));
+
+        // Reported as a success, the failure would have let the agent tell the user that the work was saved
+        assertEquals("Failed to save the current project. It still has unsaved changes, so the file was not written. The file may be read-only or locked.",
+            exception.getCause().getMessage());
+    }
+
+    @Test
+    void saveProjectAs_ng_astahSavedNothingWithoutThrowing(@TempDir Path workspace) throws Exception {
+        Path target = workspace.resolve("SavedAs.asta");
+        ProjectAccessor guiLikeAccessor = mock(ProjectAccessor.class);
+        when(guiLikeAccessor.hasProject()).thenReturn(true);
+        when(guiLikeAccessor.isProjectModified()).thenReturn(false);
+        when(guiLikeAccessor.getProjectPath()).thenReturn("C:\\work\\Previous.asta");
+        ProjectAccessorTool guiLikeTool = new ProjectAccessorTool(guiLikeAccessor, new AstahProToolSupport(guiLikeAccessor));
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            saveProjectAs,
+            guiLikeTool,
+            new FilePathDTO(target.toString()),
+            ProjectPathDTO.class));
+
+        // The project had no unsaved changes before, so only the missing file and the unchanged path tell that nothing was saved
+        assertEquals("Failed to save the current project as: " + target + ". Astah did not write the file.",
+            exception.getCause().getMessage());
+    }
+
+    @Test
+    void saveProject_ng_readOnlyFile(@TempDir Path workspace) throws Exception {
+        Path project = openModifiedCopy(workspace, "ReadOnly.asta");
+        String projectPath = projectAccessor.getProjectPath();
+        byte[] contentBefore = Files.readAllBytes(project);
+        assertTrue(project.toFile().setReadOnly());
+
+        try {
+            // ----------------------------------------
+            // Call saveProject()
+            // ----------------------------------------
+            Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+                saveProject,
+                tool,
+                new NoInputDTO(),
+                ProjectPathDTO.class));
+
+            // Without the check, Astah would open its save dialog and leave the agent waiting for the user
+            assertEquals("Failed to save the current project because its file is not writable: " + projectPath + ". The file may be read-only, or you may have no permission to write to it (e.g., a file under Program Files). Save it to a writable folder with 'save_proj_as' instead.",
+                exception.getCause().getMessage());
+            assertTrue(projectAccessor.isProjectModified());
+            assertArrayEquals(contentBefore, Files.readAllBytes(project));
+        } finally {
+            // So that the temporary folder can be deleted
+            project.toFile().setWritable(true);
+        }
+    }
+
+    @Test
+    void saveProject_ng_astahThrowsWithoutMessage(@TempDir Path workspace) throws Exception {
+        Path project = Files.writeString(workspace.resolve("Unwritable.asta"), "The file Astah failed to write.");
+        ProjectAccessor guiLikeAccessor = mock(ProjectAccessor.class);
+        when(guiLikeAccessor.hasProject()).thenReturn(true);
+        when(guiLikeAccessor.isProjectModified()).thenReturn(true);
+        when(guiLikeAccessor.getProjectPath()).thenReturn(project.toString());
+        doThrow(new IOException()).when(guiLikeAccessor).save();
+        ProjectAccessorTool guiLikeTool = new ProjectAccessorTool(guiLikeAccessor, new AstahProToolSupport(guiLikeAccessor));
+
+        // ----------------------------------------
+        // Call saveProject()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            saveProject,
+            guiLikeTool,
+            new NoInputDTO(),
+            ProjectPathDTO.class));
+
+        // Astah throws an IOException with no message for a file it cannot write, so the exception alone tells the agent nothing it can act on
+        Throwable failure = exception.getCause();
+        assertEquals("Failed to save the current project: " + project + ". java.io.IOException. Astah could not write the file: another program (or another Astah) may have it open, its folder may not be writable, or the disk may be full.",
+            failure.getMessage());
+        assertInstanceOf(IOException.class, failure.getCause(), "The exception from Astah must be kept as the cause");
+    }
+
+    @Test
+    void saveProjectAs_ng_astahThrowsWithoutMessage(@TempDir Path workspace) throws Exception {
+        Path target = workspace.resolve("SavedAs.asta");
+        ProjectAccessor guiLikeAccessor = mock(ProjectAccessor.class);
+        when(guiLikeAccessor.hasProject()).thenReturn(true);
+        when(guiLikeAccessor.getProjectPath()).thenReturn("C:\\work\\Previous.asta");
+        doThrow(new ProjectLockedException()).when(guiLikeAccessor).saveAs(anyString());
+        ProjectAccessorTool guiLikeTool = new ProjectAccessorTool(guiLikeAccessor, new AstahProToolSupport(guiLikeAccessor));
+
+        // ----------------------------------------
+        // Call saveProjectAs()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            saveProjectAs,
+            guiLikeTool,
+            new FilePathDTO(target.toString()),
+            ProjectPathDTO.class));
+
+        // Astah throws a ProjectLockedException with no message for a folder it cannot write to, as if another program had the file open
+        Throwable failure = exception.getCause();
+        assertEquals("Failed to save the current project as: " + target + ". com.change_vision.jude.api.inf.exception.ProjectLockedException. Astah could not write the file: another program (or another Astah) may have it open, its folder may not be writable, or the disk may be full.",
+            failure.getMessage());
+        assertInstanceOf(ProjectLockedException.class, failure.getCause(), "The exception from Astah must be kept as the cause");
+    }
+
+    private static final String UNSAVED_WORK_DEFINITION = "Unsaved work";
+
+    // A copy of the test project, opened and given a change to save. The definition is changed rather than the name, which Astah takes from the file name.
+    private Path openModifiedCopy(Path workspace, String fileName) throws Exception {
+        Path project = Files.copy(Path.of("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta"), workspace.resolve(fileName));
+        projectAccessor.close();
+        projectAccessor.open(project.toString());
+        new TransactionSupport(projectAccessor.getTransactionManager()).run(() -> projectAccessor.getProject().setDefinition(UNSAVED_WORK_DEFINITION));
+        assertTrue(projectAccessor.isProjectModified());
+        return project;
     }
 }

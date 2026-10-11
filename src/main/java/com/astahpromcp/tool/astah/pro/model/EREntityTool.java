@@ -10,12 +10,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.EREntityWithPhysicalNameDTO
 import com.astahpromcp.tool.astah.pro.model.inputdto.EREntityWithTypeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.EREntityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.EREntityDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IEREntity.html
@@ -67,16 +67,12 @@ public class EREntityTool extends AstahToolProvider {
     }
 
     private EREntityDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER entity information: {}", param);
-
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.id());
 
         return EREntityDTOAssembler.toDTO(astahEREntity);
     }
 
     private EREntityDTO setLogicalName(EREntityWithLogicalNameDTO param) throws Exception {
-        log.debug("Set logical name of ER entity: {}", param);
-
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
 
         txnAstah.run( () -> {
@@ -87,8 +83,6 @@ public class EREntityTool extends AstahToolProvider {
     }
 
     private EREntityDTO setPhysicalName(EREntityWithPhysicalNameDTO param) throws Exception {
-        log.debug("Set physical name of ER entity: {}", param);
-
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
 
         txnAstah.run( () -> {
@@ -99,8 +93,6 @@ public class EREntityTool extends AstahToolProvider {
     }
 
     private EREntityDTO setType(EREntityWithTypeDTO param) throws Exception {
-        log.debug("Set type of ER entity: {}", param);
-
         IEREntity astahEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
 
         txnAstah.run( () -> {

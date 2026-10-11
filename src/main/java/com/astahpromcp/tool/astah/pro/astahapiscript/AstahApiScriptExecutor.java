@@ -1,7 +1,9 @@
 package com.astahpromcp.tool.astah.pro.astahapiscript;
 
 import com.astahpromcp.config.McpServerConfig;
-import com.astahpromcp.tool.astah.pro.AstahApiLock;
+import com.astahpromcp.tool.astah.pro.WatchedRunner;
+import com.astahpromcp.tool.common.BoundedWriter;
+import com.astahpromcp.tool.common.StopWhenInterruptedWriter;
 import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,11 +12,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 // Runs an astah api script -- JavaScript (the bundled Nashorn engine, via JSR-223) evaluated inside Astah's JVM with the Astah API bound as global variables.
 @Slf4j
@@ -68,73 +65,60 @@ public class AstahApiScriptExecutor {
     // Evaluates the astah api script on a dedicated thread with a bounded timeout.
     // Never throws: every failure mode is reported through the Result.
     public Result execute(String script) {
-        FutureTask<Result> task = new FutureTask<>(() -> evaluate(script));
-        // One thread per run: a lingering stuck script must not poison later runs.
-        Thread runner = new Thread(task, "astah-api-script-runner");
-        runner.setDaemon(true);
-        runner.start();
+        WatchedRunner.Outcome<Result> outcome = WatchedRunner.run(
+                "astah-api-script-runner", "an astah api script", timeoutSeconds, () -> evaluate(script));
 
-        try {
-            return task.get(timeoutSeconds, TimeUnit.SECONDS);
+        return switch (outcome.kind()) {
+            case COMPLETED -> outcome.value();
+            case TIMED_OUT -> timeoutFailure();
+            case INTERRUPTED -> interruptionFailure();
+            case FAILED -> unexpectedFailure(outcome.failure());
+        };
+    }
 
-        } catch (TimeoutException e) {
-            // Best effort: a script blocked in an interruptible call (sleep/wait/IO) stops here.
-            // A script stuck in a plain computation loop cannot be stopped at all: Java has no way to terminate a thread, and killing one mid-transaction would corrupt the model anyway.
-            runner.interrupt();
+    // The runner was interrupted but may still be running, and WatchedRunner has suspended Astah API access until it stops.
+    private Result timeoutFailure() {
+        String message = String.format(
+            "Astah API script execution timed out after %d seconds. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops. Wait and retry; restart Astah if it never stops. Keep scripts short and avoid blocking operations.",
+            timeoutSeconds);
+        log.warn(message);
 
-            String message = String.format(
-                "Astah API script execution timed out after %d seconds. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops. Wait and retry; restart Astah if it never stops. Keep scripts short and avoid blocking operations.",
-                timeoutSeconds);
-            log.warn(message);
+        return Result.failure(
+            message,
+            -1,
+            -1,
+            "",
+            "");
+    }
 
-            // The abandoned thread may still be calling the Astah API, so no tool may run until it terminates. Only the fact is recorded here: whether waiting helps or Astah must be restarted depends on whether the thread honours the interrupt, which is not known yet and is diagnosed by AstahApiLock when a later tool call is refused.
-            AstahApiLock.suspend(runner, String.format(
-                "an astah api script that timed out after %d seconds is still running", timeoutSeconds));
+    // The wait was cut short, not the script: the runner may still be running, and WatchedRunner has suspended Astah API access until it stops.
+    private Result interruptionFailure() {
+        String message = "Interrupted while waiting for astah api script execution. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops.";
+        // Logged because the caller that was waiting for this result is usually gone: what an agent sees is the next tool call being refused.
+        log.warn(message);
 
-            return Result.failure(
-                message,
-                -1,
-                -1,
-                "",
-                "");
+        return Result.failure(
+            message,
+            -1,
+            -1,
+            "",
+            "");
+    }
 
-        } catch (InterruptedException e) {
-            // The wait was cut short, not the script: this thread stopped waiting while the runner may still be calling the Astah API.
-            Thread.currentThread().interrupt();
-            runner.interrupt();
-
-            String message = "Interrupted while waiting for astah api script execution. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops.";
-            // Logged because the caller that was waiting for this result is usually gone: what an agent sees is the next tool call being refused.
-            log.warn(message);
-
-            // The abandoned thread may still be calling the Astah API, so no tool may run until it terminates.
-            // Registered before returning, while this call still holds the Astah API lock, so that whoever acquires the lock next sees it.
-            AstahApiLock.suspend(runner, "an astah api script whose caller stopped waiting is still running");
-
-            return Result.failure(
-                message,
-                -1,
-                -1,
-                "",
-                "");
-
-        } catch (ExecutionException e) {
-            // evaluate() reports its own failures through the Result; this is a safety net.
-            Throwable cause = e.getCause();
-            
-            return Result.failure(
-                String.valueOf(cause != null ? cause : e),
-                -1,
-                -1,
-                "",
-                "");
-        }
+    // evaluate() reports its own failures through the Result; this is a safety net.
+    private static Result unexpectedFailure(Throwable failure) {
+        return Result.failure(
+            String.valueOf(failure),
+            -1,
+            -1,
+            "",
+            "");
     }
 
     // Evaluates the astah api script on the calling thread. Never throws: every failure mode is reported through the Result.
     private Result evaluate(String script) {
-        StringWriter output = new StringWriter();
-        StringWriter errorOutput = new StringWriter();
+        BoundedWriter output = new BoundedWriter(McpServerConfig.ASTAH_API_SCRIPT_MAX_STDOUT_BYTES);
+        BoundedWriter errorOutput = new BoundedWriter(McpServerConfig.ASTAH_API_SCRIPT_MAX_STDOUT_BYTES);
 
         ScriptEngine engine = createEngine();
         if (engine == null) {
@@ -146,8 +130,8 @@ public class AstahApiScriptExecutor {
                 "");
         }
         // Capture print() and error output per run instead of hijacking System.out/err
-        engine.getContext().setWriter(new PrintWriter(output, true));
-        engine.getContext().setErrorWriter(new PrintWriter(errorOutput, true));
+        engine.getContext().setWriter(new PrintWriter(new StopWhenInterruptedWriter(output), true));
+        engine.getContext().setErrorWriter(new PrintWriter(new StopWhenInterruptedWriter(errorOutput), true));
         engine.put("astah", projectAccessor);
         engine.put("projectAccessor", projectAccessor);
 
@@ -161,6 +145,8 @@ public class AstahApiScriptExecutor {
 
         // Abort a dangling transaction before building the result, so that the note it appends to the error output is included in the result.
         abortDanglingTransaction(errorOutput);
+
+        appendTruncationNotes(output, errorOutput);
 
         if (error == null) {
             return Result.success(
@@ -187,7 +173,7 @@ public class AstahApiScriptExecutor {
     }
 
     // Safety net for editing astah api scripts that fail between beginTransaction and endTransaction
-    private static void abortDanglingTransaction(StringWriter errorOutput) {
+    private static void abortDanglingTransaction(BoundedWriter errorOutput) {
         try {
             if (TransactionManager.isInTransaction()) {
                 TransactionManager.abortTransaction();
@@ -198,6 +184,14 @@ public class AstahApiScriptExecutor {
             // If the abort itself fails, every later edit would be blocked; make it visible.
             log.warn("Failed to abort a transaction left open by the astah api script", t);
             errorOutput.write("Failed to abort a transaction left open by the astah api script: " + t + "\n");
+        }
+    }
+
+    private static void appendTruncationNotes(BoundedWriter output, BoundedWriter errorOutput) {
+        if (output.truncated()) {
+            errorOutput.write(String.format(
+                "Output was truncated at %d bytes; print less from the astah api script.%n",
+                McpServerConfig.ASTAH_API_SCRIPT_MAX_STDOUT_BYTES));
         }
     }
 

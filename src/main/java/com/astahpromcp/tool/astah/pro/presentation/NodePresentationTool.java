@@ -12,7 +12,9 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithLocationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithWidthDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -23,7 +25,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
@@ -84,16 +85,12 @@ public class NodePresentationTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get node presentation information: {}", param);
-
         INodePresentation nodePresentation = astahProToolSupport.getNodePresentation(param.id());
 
         return NodePresentationDTOAssembler.toDTO(nodePresentation);
     }
 
     private RectangleDTO getNodePresentationRectangle(IdDTO param) throws Exception {
-        log.debug("Get node presentation rectangle: {}", param);
-
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
 
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
@@ -101,8 +98,6 @@ public class NodePresentationTool extends AstahToolProvider {
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationLocation(NodePresentationWithLocationDTO param) throws Exception {
-        log.debug("Set node presentation location: {}", param);
-
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
         try {
@@ -111,9 +106,15 @@ public class NodePresentationTool extends AstahToolProvider {
             });
 
         } catch (InvalidEditingException e) {
-            throw new InvalidEditingException(
-                e.getKey(),
-                e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            if (Type.COMBINED_FRAGMENT.matches(astahNodePresentation.getType())) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " A combined fragment cannot be moved or resized. Change its height with set_height_of_interaction_operand, and its location or width as dgm_guide describes.");
+            } else {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            }
         }
 
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
@@ -125,8 +126,9 @@ public class NodePresentationTool extends AstahToolProvider {
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationWidth(NodePresentationWithWidthDTO param) throws Exception {
-        log.debug("Set node presentation width: {}", param);
-
+        if (param.width() <= 0) {
+            throw new IllegalArgumentException("The width of a node presentation must be greater than 0: " + param.width());
+        }
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
         try {
@@ -135,9 +137,19 @@ public class NodePresentationTool extends AstahToolProvider {
             });
 
         } catch (InvalidEditingException e) {
-            throw new InvalidEditingException(
-                e.getKey(),
-                e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            if (Type.COMBINED_FRAGMENT.matches(astahNodePresentation.getType())) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " A combined fragment cannot be moved or resized. Change its height with set_height_of_interaction_operand, and its location or width as dgm_guide describes.");
+            } else if (InvalidEditingException.UNSUPPORTED_ELEMENT_ERROR_KEY.equals(e.getKey())) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            } else {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " The width may be below the minimum this presentation allows. Try a larger width; deleting the presentation does not get around this.");
+            }
         }
 
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();
@@ -149,8 +161,9 @@ public class NodePresentationTool extends AstahToolProvider {
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> setNodePresentationHeight(NodePresentationWithHeightDTO param) throws Exception {
-        log.debug("Set node presentation height: {}", param);
-
+        if (param.height() <= 0) {
+            throw new IllegalArgumentException("The height of a node presentation must be greater than 0: " + param.height());
+        }
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
 
         try {
@@ -159,9 +172,19 @@ public class NodePresentationTool extends AstahToolProvider {
             });
 
         } catch (InvalidEditingException e) {
-            throw new InvalidEditingException(
-                e.getKey(),
-                e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            if (Type.COMBINED_FRAGMENT.matches(astahNodePresentation.getType())) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " A combined fragment cannot be moved or resized. Change its height with set_height_of_interaction_operand, and its location or width as dgm_guide describes.");
+            } else if (InvalidEditingException.UNSUPPORTED_ELEMENT_ERROR_KEY.equals(e.getKey())) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            } else {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + " The height may be below the minimum this presentation allows, or fixed, as for a lifeline on a sequence diagram. Deleting the presentation does not get around this.");
+            }
         }
 
         Rectangle2D rectangle2D = astahNodePresentation.getRectangle();

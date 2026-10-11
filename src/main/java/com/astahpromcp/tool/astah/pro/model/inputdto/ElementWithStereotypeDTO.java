@@ -6,7 +6,7 @@ public record ElementWithStereotypeDTO(
     @JsonPropertyDescription("Target element identifier")
     String id,
 
-    @JsonPropertyDescription("Stereotype")
+    @JsonPropertyDescription("Stereotype name without guillemets (e.g., entity)")
     String stereotype
 ) {
 }

@@ -9,12 +9,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithActionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.FlowDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.FlowDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IFlow;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IFlow.html
@@ -59,16 +59,12 @@ public class FlowTool extends AstahToolProvider {
     }
 
     private FlowDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get flow information: {}", param);
-
         IFlow astahFlow = astahProToolSupport.getFlow(param.id());
 
         return FlowDTOAssembler.toDTO(astahFlow);
     }
 
     private FlowDTO setAction(FlowWithActionDTO param) throws Exception {
-        log.debug("Set action of flow: {}", param);
-
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
 
         txnAstah.run( () -> {
@@ -79,8 +75,6 @@ public class FlowTool extends AstahToolProvider {
     }
 
     private FlowDTO setGuard(FlowWithGuardDTO param) throws Exception {
-        log.debug("Set guard of flow: {}", param);
-
         IFlow astahFlow = astahProToolSupport.getFlow(param.targetFlowId());
 
         txnAstah.run( () -> {

@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERModelEditorToolTest {
 
@@ -386,7 +386,7 @@ public class ERModelEditorToolTest {
         // Get created relationship
         IERRelationship createdRelationship = (IERRelationship) TestSupport.instance().getNamedElementById(
             outputDTO.namedElement().element().id());
-        
+
         // Check with the created relationship
         assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
         assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
@@ -427,7 +427,7 @@ public class ERModelEditorToolTest {
         // Get created relationship
         IERRelationship createdRelationship = (IERRelationship) TestSupport.instance().getNamedElementById(
             outputDTO.namedElement().element().id());
-        
+
         // Check with the created relationship
         assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
         assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
@@ -468,7 +468,7 @@ public class ERModelEditorToolTest {
         // Get created relationship
         IERRelationship createdRelationship = (IERRelationship) TestSupport.instance().getNamedElementById(
             outputDTO.namedElement().element().id());
-        
+
         // Check with the created relationship
         assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
         assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());
@@ -508,7 +508,7 @@ public class ERModelEditorToolTest {
         // Get created relationship
         IERSubtypeRelationship createdRelationship = (IERSubtypeRelationship) TestSupport.instance().getNamedElementById(
             outputDTO.namedElement().element().id());
-        
+
         // Check with the created relationship
         assertEquals(parentEREntity.getId(), createdRelationship.getParent().getId());
         assertEquals(childEREntity.getId(), createdRelationship.getChild().getId());

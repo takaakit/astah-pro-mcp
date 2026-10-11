@@ -3,9 +3,11 @@ package com.astahpromcp.tool.astah.pro.model;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.PointDoubleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ImageFileDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationGeometryDTO;
@@ -20,30 +22,29 @@ import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DiagramToolTest {
+
+    @TempDir
+    Path imageOutputDir;
 
     private ProjectAccessor projectAccessor;
     private DiagramTool tool;
@@ -52,7 +53,6 @@ public class DiagramToolTest {
     private Method getDiagramBoundRect;
     private Method getPresentationsOnDiagram;
     private Method getPresentationGeometriesOnDiagram;
-    private Path imageOutputDir;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -62,17 +62,12 @@ public class DiagramToolTest {
         projectAccessor.open("src/test/resources/modelfile/model/DiagramToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
-        // Create temporary directory for image output
-        imageOutputDir = Paths.get("target/test-images");
-        Files.createDirectories(imageOutputDir);
-
         // Tool
         tool = new DiagramTool(
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
-            new SystemPropertySupport(),
-            imageOutputDir);
+            new ImageCaptureSupport(astahProToolSupport, new SystemPropertySupport(), imageOutputDir));
 
         // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(
@@ -110,9 +105,6 @@ public class DiagramToolTest {
         if (projectAccessor != null) {
             projectAccessor.close();
         }
-
-        // Delete temporary directory for image output
-        deleteDirectoryRecursively(imageOutputDir);
     }
 
     @Test
@@ -121,7 +113,7 @@ public class DiagramToolTest {
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
 
@@ -144,7 +136,7 @@ public class DiagramToolTest {
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
 
@@ -169,7 +161,7 @@ public class DiagramToolTest {
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
 
@@ -273,6 +265,63 @@ public class DiagramToolTest {
         assertTrue(outputDTO.imageHeight() > 0);
     }
 
+    @Test
+    void exportPngImage_ng_transactionOpen() throws Exception {
+        // Get diagram
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IDiagram.class,
+            "Class Diagram0");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(diagram.getId());
+
+        // ----------------------------------------
+        // Call exportPngImage()
+        // ----------------------------------------
+        projectAccessor.getTransactionManager().beginTransaction();
+        InvocationTargetException thrown;
+        try {
+            thrown = assertThrows(InvocationTargetException.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+                exportPngImage,
+                tool,
+                inputDTO,
+                ImageFileDTO.class));
+        } finally {
+            projectAccessor.getTransactionManager().abortTransaction();
+        }
+
+        // Refused before Astah was asked: outside the plugin, exportImage would have failed with a message of its own.
+        String message = thrown.getCause().getMessage();
+        assertTrue(message.contains("transaction is open"), message);
+        try (Stream<Path> files = Files.list(imageOutputDir)) {
+            assertEquals(0, files.count());
+        }
+    }
+
+    @Test
+    void exportPngImage_ng_noTransactionReachesAstah() throws Exception {
+        // Get diagram
+        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IDiagram.class,
+            "Class Diagram0");
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(diagram.getId());
+
+        // ----------------------------------------
+        // Call exportPngImage()
+        // ----------------------------------------
+        InvocationTargetException thrown = assertThrows(InvocationTargetException.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            exportPngImage,
+            tool,
+            inputDTO,
+            ImageFileDTO.class));
+
+        // Not refused: the call went on to exportImage, which outside the plugin cannot draw anything and says so.
+        String message = thrown.getCause().getMessage();
+        assertTrue(message.startsWith("Astah API exportImage method failed"), message);
+    }
+
     // Check that the output lists every presentation on the diagram exactly once, with the geometry the Astah API reports for it.
     private static void assertMatchesAstahPresentations(IDiagram diagram, PresentationGeometriesDTO outputDTO) throws Exception {
         assertEquals(diagram.getId(), outputDTO.diagram().id());
@@ -329,23 +378,5 @@ public class DiagramToolTest {
             pointDTOs.add(new PointDoubleDTO(point.getX(), point.getY()));
         }
         return pointDTOs;
-    }
-
-    private void deleteDirectoryRecursively(Path directory) throws Exception {
-        if (directory == null || Files.notExists(directory)) {
-            return;
-        }
-
-        try (Stream<Path> stream = Files.walk(directory)) {
-            stream
-                .sorted(Comparator.reverseOrder())
-                .forEach(path -> {
-                    try {
-                        Files.deleteIfExists(path);
-                    } catch (Exception e) {
-                        throw new RuntimeException("Failed to delete path: " + path, e);
-                    }
-                });
-        }
     }
 }

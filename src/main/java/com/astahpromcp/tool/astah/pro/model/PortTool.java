@@ -9,12 +9,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.PortWithBehaviorDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.PortWithServiceDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.PortDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PortDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IPort;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IPort.html
@@ -59,16 +59,12 @@ public class PortTool extends AstahToolProvider {
     }
 
     private PortDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get port information: {}", param);
-
         IPort astahPort = astahProToolSupport.getPort(param.id());
 
         return PortDTOAssembler.toDTO(astahPort);
     }
 
     private PortDTO setBehavior(PortWithBehaviorDTO param) throws Exception {
-        log.debug("Set behavior of port: {}", param);
-
         IPort astahPort = astahProToolSupport.getPort(param.targetPortId());
 
         txnAstah.run( () -> {
@@ -79,8 +75,6 @@ public class PortTool extends AstahToolProvider {
     }
 
     private PortDTO setService(PortWithServiceDTO param) throws Exception {
-        log.debug("Set service of port: {}", param);
-
         IPort astahPort = astahProToolSupport.getPort(param.targetPortId());
 
         txnAstah.run( () -> {

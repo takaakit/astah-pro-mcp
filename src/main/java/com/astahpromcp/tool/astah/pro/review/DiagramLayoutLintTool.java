@@ -6,6 +6,8 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.ReportDTO;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IDiagram;
@@ -17,7 +19,6 @@ import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -28,8 +29,9 @@ import org.locationtech.jts.geom.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import java.util.Set;
 
 @Slf4j
 public class DiagramLayoutLintTool extends AstahToolProvider {
@@ -58,8 +60,6 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
     }
 
     private ReportDTO detectOverlap(IdDTO param) throws Exception {
-        log.debug("Detect overlap: {}", param);
-
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
         StringBuilder sbContents = new StringBuilder();
 
@@ -67,91 +67,91 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
         List<INodePresentation> targetNodePresentations;
         List<ILinkPresentation> targetLinkPresentations;
         if (diagram instanceof IClassDiagram) {
-            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
-                "Class",
-                "AssociationClass",
-                "InstanceSpecification",
-                "UseCase",
-                "Note"));
+            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
+                Type.CLASS,
+                Type.ASSOCIATION_CLASS,
+                Type.INSTANCE_SPECIFICATION,
+                Type.USE_CASE,
+                Type.NOTE));
 
-            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
-                "Association",
-                "Generalization",
-                "Realization",
-                "Dependency",
-                "Usage",
-                "Link"));
+            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
+                Type.ASSOCIATION,
+                Type.GENERALIZATION,
+                Type.REALIZATION,
+                Type.DEPENDENCY,
+                Type.USAGE,
+                Type.LINK));
 
         } else if (diagram instanceof IUseCaseDiagram) {
-            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
-                "Class",
-                "UseCase",
-                "Note"));
+            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
+                Type.CLASS,
+                Type.USE_CASE,
+                Type.NOTE));
 
-            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
-                "Association",
-                "Generalization",
-                "Dependency",
-                "Extend",
-                "Include"));
+            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
+                Type.ASSOCIATION,
+                Type.GENERALIZATION,
+                Type.DEPENDENCY,
+                Type.EXTEND,
+                Type.INCLUDE));
 
         } else if (diagram instanceof ISequenceDiagram) {
-            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
-                "Lifeline",
-                "Note"));
+            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
+                Type.LIFELINE,
+                Type.NOTE));
 
-            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
-                "Message"));
+            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
+                Type.MESSAGE));
 
         } else if (diagram instanceof IActivityDiagram) {
-            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
-                "InitialNode",
-                "Action",
-                "Flow Final Node",
-                "SendSignalAction",
-                "AcceptEventAction",
-                "Process",
-                "CallBehaviorAction",
-                "ActivityFinal",
-                "Decision Node & Merge Node",
-                "ForkNode",
-                "JoinNode",
-                "ObjectNode",
-                "Note"));
+            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
+                Type.INITIAL_NODE,
+                Type.ACTION,
+                Type.FLOW_FINAL_NODE,
+                Type.SEND_SIGNAL_ACTION,
+                Type.ACCEPT_EVENT_ACTION,
+                Type.PROCESS,
+                Type.CALL_BEHAVIOR_ACTION,
+                Type.ACTIVITY_FINAL,
+                Type.DECISION_NODE_AND_MERGE_NODE,
+                Type.FORK_NODE,
+                Type.JOIN_NODE,
+                Type.OBJECT_NODE,
+                Type.NOTE));
 
-            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
-                "ControlFlow/ObjectFlow"));
+            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
+                Type.CONTROL_FLOW_OR_OBJECT_FLOW));
 
         } else if (diagram instanceof IStateMachineDiagram) {
-            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
-                "InitialPseudostate",
-                "FinalState",
-                "JunctionPseudostate",
-                "ChoicePseudostate",
-                "ForkPseudostate",
-                "JoinPseudostate",
-                "Note"));
+            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
+                Type.INITIAL_PSEUDOSTATE,
+                Type.FINAL_STATE,
+                Type.JUNCTION_PSEUDOSTATE,
+                Type.CHOICE_PSEUDOSTATE,
+                Type.FORK_PSEUDOSTATE,
+                Type.JOIN_PSEUDOSTATE,
+                Type.NOTE));
 
-            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
-                "Transition"));
+            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
+                Type.TRANSITION));
 
         } else if (diagram instanceof IRequirementDiagram) {
-            targetNodePresentations = getNodePresentationsByTypeNames(diagram, List.of(
-                "Requirement",
-                "TestCase",
-                "Class",
-                "UseCase",
-                "Note"));
+            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
+                Type.REQUIREMENT,
+                Type.TEST_CASE,
+                Type.CLASS,
+                Type.USE_CASE,
+                Type.NOTE));
 
-            targetLinkPresentations = getLinkPresentationsByTypeNames(diagram, List.of(
-                "Containment",
-                "DeriveReqt",
-                "Copy",
-                "Satisfy",
-                "Verify",
-                "Refine",
-                "Trace",
-                "Dependency"));
+            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
+                Type.NEST,
+                Type.DERIVE_REQT,
+                Type.COPY,
+                Type.SATISFY,
+                Type.VERIFY,
+                Type.REFINE,
+                Type.TRACE,
+                Type.DEPENDENCY));
 
         } else {
             throw new IllegalArgumentException("The type of this diagram is excluded from overlap detection: " + diagram.getName() + "(" + diagram.getId() + ")");
@@ -165,22 +165,22 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
         return new ReportDTO(sbContents.toString());
     }
 
-    // Retrieve node presentations with the specified type names
-    private List<INodePresentation> getNodePresentationsByTypeNames(IDiagram diagram, List<String> typeNames) throws Exception {
+    // Retrieve node presentations of the specified types
+    private List<INodePresentation> getNodePresentationsByTypes(IDiagram diagram, Set<Type> types) throws Exception {
         List<INodePresentation> nodePresentations = new ArrayList<>();
-        for (IPresentation presentation : diagram.getPresentations()) {
-            if (typeNames.contains(presentation.getType()) && presentation instanceof INodePresentation) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(diagram)) {
+            if (types.contains(Type.getCorrespondingType(presentation.getType())) && presentation instanceof INodePresentation) {
                 nodePresentations.add((INodePresentation)presentation);
             }
         }
         return nodePresentations;
     }
 
-    // Retrieve link presentations with the specified type names
-    private List<ILinkPresentation> getLinkPresentationsByTypeNames(IDiagram diagram, List<String> typeNames) throws Exception {
+    // Retrieve link presentations of the specified types
+    private List<ILinkPresentation> getLinkPresentationsByTypes(IDiagram diagram, Set<Type> types) throws Exception {
         List<ILinkPresentation> linkPresentations = new ArrayList<>();
-        for (IPresentation presentation : diagram.getPresentations()) {
-            if (typeNames.contains(presentation.getType()) && presentation instanceof ILinkPresentation) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(diagram)) {
+            if (types.contains(Type.getCorrespondingType(presentation.getType())) && presentation instanceof ILinkPresentation) {
                 linkPresentations.add((ILinkPresentation)presentation);
             }
         }

@@ -2,10 +2,10 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
-import com.change_vision.jude.api.inf.model.IExtend;
-import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ExtendDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
+import com.change_vision.jude.api.inf.model.IExtend;
+import lombok.NonNull;
 
 public class ExtendDTOAssembler {
     public static ExtendDTO toDTO(@NonNull IExtend astahExtend) throws Exception {

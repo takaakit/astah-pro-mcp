@@ -9,6 +9,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERModelEditor.html
@@ -134,8 +134,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERModelDTO createERModel(NewERModelDTO param) throws Exception {
-        log.debug("Create ER model: {}", param);
-
         IModel astahProject = projectAccessor.getProject();
 
         IERModel astahERModel = txnAstah.call( () -> {
@@ -148,8 +146,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERPackageDTO createERPackage(NewERPackageInERPackageDTO param) throws Exception {
-        log.debug("Create ER package: {}", param);
-
         IERPackage parentERPackage = astahProToolSupport.getERPackage(param.parentERPackageId());
 
         IERPackage createdERPackage = txnAstah.call( () -> {
@@ -162,8 +158,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private EREntityDTO createEREntity(NewEREntityInERPackageDTO param) throws Exception {
-        log.debug("Create ER entity: {}", param);
-
         IERPackage parentERPackage = astahProToolSupport.getERPackage(param.parentERPackageId());
 
         IEREntity createdEREntity = txnAstah.call( () -> {
@@ -177,8 +171,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO createERAttribute(NewERAttributeInEREntityDTO param) throws Exception {
-        log.debug("Create ER attribute: {}", param);
-
         IEREntity targetEREntity = astahProToolSupport.getEREntity(param.targetEREntityId());
         IERDatatype erDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
@@ -194,8 +186,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERDatatypeDTO createERDatatype(NewERDatatypeInERModelDTO param) throws Exception {
-        log.debug("Create ER datatype: {}", param);
-
         IERModel erModel = astahProToolSupport.getERModel(param.targetERModelId());
 
         IERDatatype createdERDatatype = txnAstah.call( () -> {
@@ -208,8 +198,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERDomainDTO createERDomainInERModel(NewERDomainInERModelDTO param) throws Exception {
-        log.debug("Create ER domain in ER model: {}", param);
-
         IERModel erModel = astahProToolSupport.getERModel(param.targetERModelId());
         IERDatatype erDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
@@ -226,8 +214,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERDomainDTO createERDomainInERDomain(NewERDomainInERDomainDTO param) throws Exception {
-        log.debug("Create ER domain in ER domain: {}", param);
-
         IERDomain parentERDomain = astahProToolSupport.getERDomain(param.parentERDomainId());
         IERDatatype erDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
@@ -244,8 +230,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO createIdentifyingRelationship(NewIdentifyingRelationshipDTO param) throws Exception {
-        log.debug("Create identifying relationship: {}", param);
-
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
@@ -261,8 +245,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO createNonIdentifyingRelationship(NewNonIdentifyingRelationshipDTO param) throws Exception {
-        log.debug("Create non-identifying relationship: {}", param);
-
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
@@ -278,8 +260,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERRelationshipDTO createManyToManyRelationship(NewManyToManyRelationshipDTO param) throws Exception {
-        log.debug("Create many-to-many relationship: {}", param);
-
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
@@ -295,8 +275,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERSubtypeRelationshipDTO createSubtypeRelationship(NewSubtypeRelationshipDTO param) throws Exception {
-        log.debug("Create subtype relationship: {}", param);
-
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
         IEREntity childEREntity = astahProToolSupport.getEREntity(param.childEREntityId());
 
@@ -312,8 +290,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ERIndexDTO createERIndex(NewERIndexDTO param) throws Exception {
-        log.debug("Create ER index: {}", param);
-
         IEREntity parentEREntity = astahProToolSupport.getEREntity(param.parentEREntityId());
 
         List<IERAttribute> erAttributes = new ArrayList<>();
@@ -334,8 +310,6 @@ public class ERModelEditorTool extends AstahToolProvider {
     }
 
     private ElementDTO delete(IdDTO param) throws Exception {
-        log.debug("Delete ER model or ER element: {}", param);
-
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         ElementDTO deletedElementDTO = ElementDTOAssembler.toDTO(astahElement);

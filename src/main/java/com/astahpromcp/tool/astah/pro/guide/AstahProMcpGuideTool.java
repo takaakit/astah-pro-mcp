@@ -24,14 +24,14 @@ public class AstahProMcpGuideTool implements ToolProvider {
     @Override
     public List<ToolDefinition> createToolDefinitions() {
         try {
-	        return List.of(
-	            ToolSupport.toolDefinitionReturningDto(
-	                "astah_pro_mcp_guide",
-	                "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server.",
-	                this::getGuide,
-	                NoInputDTO.class,
-	                GuideDTO.class)
-	        );
+            return List.of(
+                ToolSupport.toolDefinitionReturningDto(
+                    "astah_pro_mcp_guide",
+                    "MCP client (you) MUST call this tool function before referencing or editing an Astah project to understand how to use this MCP server.",
+                    this::getGuide,
+                    NoInputDTO.class,
+                    GuideDTO.class)
+            );
 
         } catch (Exception e) {
             log.error("Failed to create astah pro mcp guide tools", e);
@@ -40,14 +40,12 @@ public class AstahProMcpGuideTool implements ToolProvider {
     }
 
     private GuideDTO getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get Astah Pro MCP Guide: {}", param);
-
         // If the Astah project is not open, create a new one.
         if (!projectAccessor.hasProject()) {
             try {
                 projectAccessor.create();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create project (root package).");
+                throw new RuntimeException("Failed to create project (root package).", e);
             }
         }
 
@@ -88,7 +86,7 @@ IMPORTANT POINTS to Keep in Mind:
 * When new node/link presentations are placed on diagrams or existing ones are affected by your edits, adjust the layout of those presentations in accordance with the diagram layout guide and to avoid diagram layout anti-patterns.
 * After you have finished editing the model elements and diagrams, and immediately before performing the final diagram layout check and adjustment, you MUST maintain terminology consistency across the names, labels, and definitions of model elements and diagrams.
 * After you have finished editing the model elements and diagrams, and immediately before performing the final diagram layout check and adjustment, you MUST maintain the semantic consistency of the diagrams, eliminating semantic inconsistencies both within each diagram and across diagrams.
-* Make sure to detect any overlaps caused by your edits, including newly added node/link presentations, using the tool and resolve them. However, NEVER take the incorrect approach of resolving overlaps by simply hiding the node/link presentations.
+* Make sure to detect any overlaps caused by your edits, including newly added node/link presentations, using the tool and resolve them. To tell these apart from overlaps that were already there, also run the tool before your first edit, on every diagram that existed before your edits and that your edits may change. Do this even if your first edit changes only model elements, because renaming a model element or adding an attribute to it resizes its presentations. For each overlap reported then, record the IDs of the two overlapping presentations rather than their labels, because renaming changes labels. However, NEVER take the incorrect approach of resolving overlaps by simply hiding the node/link presentations.
 * Draw all node/link presentations related to the content intended to be represented in the diagram, without omission. In particular, be careful not to forget to draw any link presentations that should be included.
 * You can place presentations at negative X or Y coordinates on the diagram. For example, a node/link presentation can be placed at (-100, -100).
 * After you have finished editing the model elements and diagrams, you MUST review all definitions of the model elements and diagrams and the text of all notes, and revise any such text that is inconsistent with the corresponding model element or diagram.

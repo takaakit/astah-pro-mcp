@@ -15,10 +15,9 @@ var diagramId = diagram.namedElement.element.id;
 // function below takes a presentation ID, and set_name and set_definition have nothing to work on.
 // set_label is what names a topic once it is there.
 //
-// The root topic comes with the diagram and is the only presentation on it, so it is the first of
-// the diagram's. get_mind_map_dgm_info({ id: diagramId }).rootTopic.id answers the same for a mind
-// map that is already in the project.
-var rootTopic = diagram.namedElement.element.correspondingPresentationIds[0];
+// The root topic comes with the diagram. get_mind_map_dgm_info names it, for a new mind map and for
+// one that is already in the project alike.
+var rootTopic = tools.get_mind_map_dgm_info({ id: diagramId }).rootTopic.id;
 
 
 // ============================================================

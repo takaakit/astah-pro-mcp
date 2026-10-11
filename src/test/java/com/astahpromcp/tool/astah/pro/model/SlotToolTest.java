@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.SlotWithValueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTO;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class SlotToolTest {
 
@@ -64,7 +64,7 @@ public class SlotToolTest {
         ISlot slot = (ISlot) TestSupport.instance().getNamedElementByClassAndName(
             ISlot.class,
             "attribute0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(slot.getId());
 
@@ -87,7 +87,7 @@ public class SlotToolTest {
         ISlot slot = (ISlot) TestSupport.instance().getNamedElementByClassAndName(
             ISlot.class,
             "attribute0");
-        
+
         // Create input DTO
         SlotWithValueDTO inputDTO = new SlotWithValueDTO(
             slot.getId(),

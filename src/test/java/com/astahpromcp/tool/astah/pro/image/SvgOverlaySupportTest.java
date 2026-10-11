@@ -7,7 +7,6 @@ import com.astahpromcp.tool.common.ImageConvertSupport;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -15,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -151,8 +151,44 @@ public class SvgOverlaySupportTest {
         SvgOverlaySupport svgOverlaySupport = newSvgOverlaySupport(
                 mockedExport(new Rectangle2D.Double(0, 0, 200, 200), 200, 200));
 
-        assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> svgOverlaySupport.createSvgOverlayContents("dgm", svgAt(500_000, 500_000, 100, 100)));
+
+        assertTrue(e.getMessage().contains("far away from the diagram"), e.getMessage());
+    }
+
+    @Test
+    void createSvgOverlayContents_ng_refusesAnOversizedSvgForItsSizeRatherThanItsPlacement() throws Exception {
+        // The SVG sits at the diagram origin, so only its own size can be at fault.
+        SvgOverlaySupport svgOverlaySupport = newSvgOverlaySupport(
+                mockedExport(new Rectangle2D.Double(0, 0, 200, 200), 200, 200));
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> svgOverlaySupport.createSvgOverlayContents("dgm", svgAt(0, 0, 6000, 6000)));
+
+        assertTrue(e.getMessage().contains("6000x6000"), e.getMessage());
+        assertTrue(e.getMessage().contains("Reduce the width and height"), e.getMessage());
+        assertFalse(e.getMessage().contains("far away"), e.getMessage());
+    }
+
+    @Test
+    void createSvgOverlayContents_ng_refusesAnOversizedStandaloneSvgForItsSize() throws Exception {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> newSvgOverlaySupport(mock(ImageCaptureSupport.class)).createSvgOverlayContents("", svgAt(0, 0, 6000, 6000)));
+
+        assertTrue(e.getMessage().contains("Reduce the width and height"), e.getMessage());
+        assertFalse(e.getMessage().contains("far away"), e.getMessage());
+    }
+
+    @Test
+    void createSvgOverlayContents_ok_keepsTheNaturalAspectRatioOfAStandaloneSvgSizedByItsViewBoxOnly() throws Exception {
+        // The natural size of an SVG with a viewBox only is 400x400, which is also the size insert_svg_img_on_dgm displays it at.
+        List<McpSchema.Content> contents = newSvgOverlaySupport(mock(ImageCaptureSupport.class)).createSvgOverlayContents("",
+                "<svg viewBox=\"0 0 640 480\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"640\" height=\"480\" fill=\"red\"/></svg>");
+
+        BufferedImage composed = decodeOnlyImage(contents);
+        assertEquals(533, composed.getWidth());
+        assertEquals(533, composed.getHeight());
     }
 
     @Test

@@ -6,12 +6,11 @@ import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.StepsDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
 public class DiagramConsistencyTool extends AstahToolProvider {
@@ -38,8 +37,6 @@ public class DiagramConsistencyTool extends AstahToolProvider {
     }
 
     private StepsDTO getSteps(NoInputDTO param) throws Exception {
-        log.debug("Get diagram consistency maintenance steps: {}", param);
-
         String contents = """
 Follow these steps to maintain the semantic consistency of diagrams. Do not skip, reorder, or merge steps. Every rule has an ID (e.g., CLS-05); every rule of every applicable group MUST appear as one row in the verdict table of step 5 — silently omitting a rule is forbidden.
 

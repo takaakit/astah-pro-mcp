@@ -3,6 +3,8 @@ package com.astahpromcp.tool.manifest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,13 +24,17 @@ public class ToolManifestTest {
         return category.label() + "\t" + name + "\t" + direct + "\t" + programmatic;
     }
 
+    private static String row(String name, String direct, String programmatic, String reason) {
+        return row(name, direct, programmatic) + "\t" + reason;
+    }
+
     @Test
     void load_ok_readsTheShippedManifest() {
         ToolManifest manifest = ToolManifest.load();
 
         assertEquals(452, manifest.size(), "every tool definition the six factories produce needs a row");
         assertEquals(389, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
-        assertEquals(81, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
+        assertEquals(82, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
         assertEquals(58, manifest.withheldNames().size());
     }
 
@@ -52,6 +58,18 @@ public class ToolManifestTest {
     }
 
     @Test
+    void load_ok_givesARowAReasonExactlyWhenItPublishesToBothProfiles() {
+        ToolManifest manifest = ToolManifest.load();
+
+        for (String name : manifest.allNames()) {
+            ToolManifest.Entry entry = manifest.find(name);
+            assertEquals(entry.direct() && entry.programmatic(), entry.reason() != null, name);
+        }
+        // 77 = rows with both direct = x and programmatic = x
+        assertEquals(77, manifest.notMcpToolScriptCallableReasons().size());
+    }
+
+    @Test
     void parse_ok_readsCategoryAndFlagsAndIgnoresCommentsBlankLinesAndPadding() {
         ToolManifest manifest = parse(
                 "# a comment",
@@ -61,9 +79,65 @@ public class ToolManifestTest {
 
         assertEquals(2, manifest.size());
         assertEquals(new ToolManifest.Entry(ToolManifest.Category.CLASS_DIAGRAM,
-                        "get_class_info", true, false, false),
+                        "get_class_info", true, false, false, null),
                 manifest.find("get_class_info"));
         assertNull(manifest.find("no_such_tool"));
+    }
+
+    @Test
+    void parse_ok_readsTheReasonOfARowPublishedToBothProfiles() {
+        ToolManifest manifest = parse(
+                "  Class Diagram  \t   open_dgm    \t  x  \t  x  \t  view  ",
+                row("get_class_info", "x", "-"));
+
+        assertEquals(new ToolManifest.Entry(ToolManifest.Category.CLASS_DIAGRAM,
+                        "open_dgm", true, true, false, NotMcpToolScriptCallableReason.DRIVES_THE_VIEW),
+                manifest.find("open_dgm"));
+        assertEquals(Map.of("open_dgm", NotMcpToolScriptCallableReason.DRIVES_THE_VIEW),
+                manifest.notMcpToolScriptCallableReasons());
+    }
+
+    @Test
+    void parse_ok_readsEveryReasonCode() {
+        for (NotMcpToolScriptCallableReason reason : NotMcpToolScriptCallableReason.values()) {
+            ToolManifest manifest = parse(row("get_class_info", "x", "x", reason.code()));
+
+            assertEquals(reason, manifest.find("get_class_info").reason());
+        }
+    }
+
+    @Test
+    void parse_ok_treatsAnEmptyReasonColumnAsNoReason() {
+        ToolManifest manifest = parse(row("get_class_info", "x", "-", "  "));
+
+        assertNull(manifest.find("get_class_info").reason());
+    }
+
+    @Test
+    void parse_ng_rejectsAnUnknownReason() {
+        Exception e = assertThrows(IllegalStateException.class,
+                () -> parse(row("open_dgm", "x", "x", "drives_view")));
+        assertTrue(e.getMessage().contains("column 'reason'"), e.getMessage());
+    }
+
+    @Test
+    void parse_ng_rejectsARowPublishedToBothProfilesWithoutAReason() {
+        Exception e = assertThrows(IllegalStateException.class,
+                () -> parse(row("open_dgm", "x", "x")));
+        assertTrue(e.getMessage().contains("open_dgm"), e.getMessage());
+        assertTrue(e.getMessage().contains("column 'reason'"), e.getMessage());
+    }
+
+    @Test
+    void parse_ng_rejectsAReasonOnARowNotPublishedToBothProfiles() {
+        Exception onTheDirectProfileOnly = assertThrows(IllegalStateException.class,
+                () -> parse(row("get_class_info", "x", "-", "direct")));
+        assertTrue(onTheDirectProfileOnly.getMessage().contains("get_class_info"), onTheDirectProfileOnly.getMessage());
+
+        Exception withheld = assertThrows(IllegalStateException.class, () -> parse(
+                "#@withheld",
+                row("create_er_attr", "-", "-", "direct")));
+        assertTrue(withheld.getMessage().contains("create_er_attr"), withheld.getMessage());
     }
 
     @Test
@@ -91,16 +165,21 @@ public class ToolManifestTest {
                 "# ER: too many editing tools",
                 row("create_er_attr", "-", "-"));
 
-        assertEquals(java.util.Set.of("create_er_attr"), manifest.withheldNames());
+        assertEquals(Set.of("create_er_attr"), manifest.withheldNames());
         assertFalse(manifest.find("get_class_info").withheld());
     }
 
     @Test
     void parse_ng_rejectsAWrongColumnCount() {
-        // A five-column row
-        Exception e = assertThrows(IllegalStateException.class,
-                () -> parse("Class Diagram\tget_class_info\tx\tx\t-"));
-        assertTrue(e.getMessage().contains("columns"), e.getMessage());
+        // A three-column row
+        Exception tooFew = assertThrows(IllegalStateException.class,
+                () -> parse("Class Diagram\tget_class_info\tx"));
+        assertTrue(tooFew.getMessage().contains("columns"), tooFew.getMessage());
+
+        // A six-column row
+        Exception tooMany = assertThrows(IllegalStateException.class,
+                () -> parse("Class Diagram\tget_class_info\tx\tx\tdirect\t-"));
+        assertTrue(tooMany.getMessage().contains("columns"), tooMany.getMessage());
     }
 
     @Test
@@ -119,7 +198,7 @@ public class ToolManifestTest {
     void parse_ng_rejectsADuplicateName() {
         Exception e = assertThrows(IllegalStateException.class, () -> parse(
                 row("get_class_info", "x", "-"),
-                row("get_class_info", "x", "x")));
+                row("get_class_info", "x", "x", "direct")));
         assertTrue(e.getMessage().contains("more than once"), e.getMessage());
     }
 

@@ -72,8 +72,8 @@ print('Node ' + nodeId + ' draws ' + element.type + ' ' + element.nameSpace + '.
 // ============================================================
 
 // The same model element can be drawn on several diagrams, so this direction gives a list rather
-// than one ID. Ask each presentation which diagram it sits on instead of pairing this list with
-// renderedInDiagrams by index: the two are built separately and need not run in step.
+// than one ID. renderedInDiagrams lists each diagram once even when the element is drawn on it
+// twice, so it cannot be paired with this list by index: ask each presentation which diagram it sits on.
 var presentationIds = element.element.correspondingPresentationIds;
 
 print('');

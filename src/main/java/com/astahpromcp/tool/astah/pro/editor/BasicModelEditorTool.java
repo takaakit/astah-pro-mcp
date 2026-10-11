@@ -4,18 +4,20 @@ import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.ConditionTextSupport;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
+import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicModelEditor.html
@@ -23,13 +25,15 @@ import com.astahpromcp.tool.astah.pro.TransactionSupport;
 public class BasicModelEditorTool extends AstahToolProvider {
 
     private final BasicModelEditor basicModelEditor;
+    private final ERModelEditor erModelEditor;
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final SystemPropertySupport systemPropertySupport;
 
-    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport) {
+    public BasicModelEditorTool(BasicModelEditor basicModelEditor, ERModelEditor erModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport) {
         this.basicModelEditor = basicModelEditor;
+        this.erModelEditor = erModelEditor;
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
@@ -287,8 +291,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private NamedElementDTO changeParent(NamedElementWithParentDTO param) throws Exception {
-        log.debug("Change parent: {}", param);
-
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
         INamedElement newParentAstahNamedElement = astahProToolSupport.getNamedElement(param.newParentNamedElementId());
 
@@ -300,8 +302,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ArtifactDTO createArtifact(NewArtifactInPackageDTO param) throws Exception {
-        log.debug("Create artifact in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IArtifact createdAstahArtifact = txnAstah.call( () -> {
@@ -312,8 +312,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private PackageDTO createPackageInParentPackage(NewPackageInPackageDTO param) throws Exception {
-        log.debug("Create package in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IPackage createdAstahPackage = txnAstah.call( () -> {
@@ -324,8 +322,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ClassDTO createClassInParentPackage(NewClassInPackageDTO param) throws Exception {
-        log.debug("Create class in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IClass createdAstahClass = txnAstah.call( () -> {
@@ -336,8 +332,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ClassDTO createClassInParentClass(NewClassInClassDTO param) throws Exception {
-        log.debug("Create class in parent class: {}", param);
-
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
         IClass createdAstahClass = txnAstah.call( () -> {
@@ -348,8 +342,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private EnumerationDTO createEnumerationInParentPackage(NewEnumerationInPackageDTO param) throws Exception {
-        log.debug("Create enumeration in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IEnumeration createdAstahEnumeration = txnAstah.call( () -> {
@@ -360,8 +352,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ClassDTO createInterfaceInParentPackage(NewInterfaceInPackageDTO param) throws Exception {
-        log.debug("Create interface in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IClass createdAstahInterface = txnAstah.call( () -> {
@@ -372,8 +362,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ClassDTO createInterfaceInParentClass(NewInterfaceInClassDTO param) throws Exception {
-        log.debug("Create interface in parent class: {}", param);
-
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
         IClass createdAstahInterface = txnAstah.call( () -> {
@@ -384,8 +372,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ComponentDTO createComponent(NewComponentInPackageDTO param) throws Exception {
-        log.debug("Create component in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IComponent createdAstahComponent = txnAstah.call( () -> {
@@ -396,8 +382,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private PortDTO createPort(NewPortInClassDTO param) throws Exception {
-        log.debug("Create port: {}", param);
-
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
         IPort createdAstahPort = txnAstah.call( () -> {
@@ -408,8 +392,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private AttributeDTO createAttribute(NewAttributeInClassDTO param) throws Exception {
-        log.debug("Create attribute: {}", param);
-
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
         IAttribute createdAstahAttribute = txnAstah.call( () -> {
@@ -420,8 +402,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private EnumerationLiteralDTO createEnumerationLiteral(NewEnumerationLiteralInEnumerationDTO param) throws Exception {
-        log.debug("Create enumeration literal: {}", param);
-
         IEnumeration astahEnumeration = astahProToolSupport.getEnumeration(param.parentEnumerationId());
 
         IEnumerationLiteral createdAstahEnumerationLiteral = txnAstah.call( () -> {
@@ -432,8 +412,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private OperationDTO createOperation(NewOperationInClassDTO param) throws Exception {
-        log.debug("Create operation: {}", param);
-
         IClass parentAstahClass = astahProToolSupport.getClass(param.parentClassId());
 
         IOperation createdAstahOperation = txnAstah.call( () -> {
@@ -444,8 +422,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ParameterDTO createParameter(NewParameterToOperationDTO param) throws Exception {
-        log.debug("Create parameter: {}", param);
-
         IOperation astahTargetOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         IParameter createdAstahParameter = txnAstah.call( () -> {
@@ -459,8 +435,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private AssociationDTO createAssociation(NewAssociationDTO param) throws Exception {
-        log.debug("Create association: {}", param);
-
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
 
@@ -483,8 +457,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private AssociationClassDTO createAssociationClass(NewAssociationClassDTO param) throws Exception {
-        log.debug("Create association class: {}", param);
-
         IClass astahSourceClass = astahProToolSupport.getClass(param.sourceClassId());
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
 
@@ -501,12 +473,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createDependency(NewDependencyDTO param) throws Exception {
-        log.debug("Create dependency: {}", param);
-
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         INamedElement targetAstahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             return basicModelEditor.createDependency(
                 targetAstahNamedElement,
@@ -518,8 +488,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private GeneralizationDTO createGeneralization(NewGeneralizationDTO param) throws Exception {
-        log.debug("Create generalization: {}", param);
-
         IClass astahSubClass = astahProToolSupport.getClass(param.subClassId());
         IClass astahSuperClass = astahProToolSupport.getClass(param.superClassId());
 
@@ -534,8 +502,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private RealizationDTO createRealization(NewRealizationDTO param) throws Exception {
-        log.debug("Create realization: {}", param);
-
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
         IClass astahSupplierClass = astahProToolSupport.getClass(param.supplierClassId());
 
@@ -550,8 +516,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private UsageDTO createUsage(NewUsageDTO param) throws Exception {
-        log.debug("Create usage: {}", param);
-
         IClass astahClientClass = astahProToolSupport.getClass(param.clientClassId());
         IClass astahSupplierClass = astahProToolSupport.getClass(param.supplierClassId());
 
@@ -566,8 +530,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private AttributeDTO createQualifier(NewQualifierToAssociationEndDTO param) throws Exception {
-        log.debug("Create qualifier: {}", param);
-
         IAttribute astahAssociationEnd = astahProToolSupport.getAttribute(param.targetAssociationEndId());
         IClass astahType = astahProToolSupport.getClassOrPrimitiveType(param.qualifierTypeId());
 
@@ -583,8 +545,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ElementDTO createTaggedValue(NewTaggedValueToElementDTO param) throws Exception {
-        log.debug("Create tagged value: {}", param);
-
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
 
         txnAstah.run( () -> {
@@ -598,8 +558,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ClassDTO createTemplateParameter(NewTemplateParameterToClassDTO param) throws Exception {
-        log.debug("Create template parameter: {}", param);
-
         IClass astahTargetClass = astahProToolSupport.getClass(param.targetClassId());
         IClass astahType = astahProToolSupport.getClassOrPrimitiveType(param.templateParameterTypeId());
 
@@ -615,15 +573,19 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ElementDTO deleteElement(IdDTO param) throws Exception {
-        log.debug("Delete element: {}", param);
-
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         ElementDTO deletedElementDTO = ElementDTOAssembler.toDTO(astahElement);
 
         systemPropertySupport.deleteWithoutConfirmationDialog( () -> {
             txnAstah.run( () -> {
-                basicModelEditor.delete(astahElement);
+                if (astahElement instanceof IERModel || astahElement instanceof IEREntity || astahElement instanceof IERAttribute
+                        || astahElement instanceof IERRelationship || astahElement instanceof IERSubtypeRelationship
+                        || astahElement instanceof IERDatatype || astahElement instanceof IERDomain) {
+                    erModelEditor.delete(astahElement);
+                } else {
+                    basicModelEditor.delete(astahElement);
+                }
             });
         });
 
@@ -633,8 +595,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private RequirementDTO createRequirementInParentPackage(NewRequirementInPackageDTO param) throws Exception {
-        log.debug("Create requirement in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IRequirement createdAstahRequirement = txnAstah.call( () -> {
@@ -647,8 +607,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private RequirementDTO createRequirementInParentRequirement(NewRequirementInRequirementDTO param) throws Exception {
-        log.debug("Create requirement in parent requirement: {}", param);
-
         IRequirement parentAstahRequirement = astahProToolSupport.getRequirement(param.parentRequirementId());
 
         IRequirement createdAstahRequirement = txnAstah.call( () -> {
@@ -661,8 +619,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private TestCaseDTO createTestCaseInParentPackage(NewTestCaseInPackageDTO param) throws Exception {
-        log.debug("Create test case in parent package: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         ITestCase createdAstahTestCase = txnAstah.call( () -> {
@@ -676,8 +632,6 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private TestCaseDTO createTestCaseInParentTestCase(NewTestCaseInTestCaseDTO param) throws Exception {
-        log.debug("Create test case in parent test case: {}", param);
-
         ITestCase parentAstahTestCase = astahProToolSupport.getTestCase(param.parentTestCaseId());
 
         ITestCase createdAstahTestCase = txnAstah.call( () -> {
@@ -690,12 +644,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createCopyDependency(NewCopyDependencyDTO param) throws Exception {
-        log.debug("Create copy dependency: {}", param);
-
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
@@ -709,12 +661,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createDeriveReqtDependency(NewDeriveReqtDependencyDTO param) throws Exception {
-        log.debug("Create derive reqt dependency: {}", param);
-
         IRequirement sourceAstahRequirement = astahProToolSupport.getRequirement(param.sourceRequirementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
@@ -728,12 +678,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createRefineDependency(NewRefineDependencyDTO param) throws Exception {
-        log.debug("Create refine dependency: {}", param);
-
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
@@ -747,12 +695,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createSatisfyDependency(NewSatisfyDependencyDTO param) throws Exception {
-        log.debug("Create satisfy dependency: {}", param);
-
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
@@ -766,12 +712,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createTraceDependency(NewTraceDependencyDTO param) throws Exception {
-        log.debug("Create trace dependency: {}", param);
-
         INamedElement sourceAstahNamedElement = astahProToolSupport.getNamedElement(param.sourceNamedElementId());
         INamedElement targetAstahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             IDependency dependency = basicModelEditor.createDependency(
                 targetAstahNamedElement,
@@ -785,12 +729,10 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private DependencyDTO createVerifyDependency(NewVerifyDependencyDTO param) throws Exception {
-        log.debug("Create verify dependency: {}", param);
-
         ITestCase sourceAstahTestCase = astahProToolSupport.getTestCase(param.sourceTestCaseId());
         IRequirement targetAstahRequirement = astahProToolSupport.getRequirement(param.targetRequirementId());
 
-        // Note: In the API implementation, unlike in the API document, the source and target dependency arguments are reversed.
+        // Note: BasicModelEditor.createDependency takes the supplier first and the client second, unlike createUsage and createRealization, so the target is passed before the source.
         IDependency createdAstahDependency = txnAstah.call( () -> {
             IDependency dependency = basicModelEditor.createDependency(
                 targetAstahRequirement,
@@ -804,14 +746,19 @@ public class BasicModelEditorTool extends AstahToolProvider {
     }
 
     private ConstraintDTO createConstraint(NewConstraintDTO param) throws Exception {
-        log.debug("Create constraint: {}", param);
-
         INamedElement astahTargetNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
+        String newConstraintName = ConditionTextSupport.normalize("constraint", param.newConstraintName());
+        ConditionTextSupport.requireAbsent(
+            "constraint",
+            astahTargetNamedElement.getId(),
+            newConstraintName,
+            astahTargetNamedElement.getConstraints(),
+            IConstraint::getSpecification);
 
         IConstraint createdAstahConstraint = txnAstah.call( () -> {
             return basicModelEditor.createConstraint(
                 astahTargetNamedElement,
-                param.newConstraintName());
+                newConstraintName);
         });
 
         return ConstraintDTOAssembler.toDTO(createdAstahConstraint);

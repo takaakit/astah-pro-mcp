@@ -4,12 +4,12 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.VertexDTO;
 import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.model.IVertex;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.VertexDTO;
 
 import java.util.ArrayList;
 import java.util.List;

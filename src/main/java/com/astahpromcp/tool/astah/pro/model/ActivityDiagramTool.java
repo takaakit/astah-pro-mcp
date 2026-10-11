@@ -9,12 +9,12 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActivityDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActivityDiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IActivityDiagram.html
@@ -51,16 +51,12 @@ public class ActivityDiagramTool extends AstahToolProvider {
     }
 
     private ActivityDiagramDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get activity diagram information: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.id());
 
         return ActivityDiagramDTOAssembler.toDTO(astahActivityDiagram);
     }
 
     private ActivityDTO getActivity(IdDTO param) throws Exception {
-        log.debug("Get activity of activity diagram: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.id());
 
         return ActivityDTOAssembler.toDTO(astahActivityDiagram.getActivity());

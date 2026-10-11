@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.OperationDTO;
@@ -14,13 +15,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class OperationToolTest {
 
     private ProjectAccessor projectAccessor;
+    private TransactionSupport transactionSupport;
     private OperationTool tool;
     private Method getInfo;
     private Method setAbstract;
@@ -39,7 +41,7 @@ public class OperationToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+        transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/OperationToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -135,7 +137,7 @@ public class OperationToolTest {
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(operation.getId());
 
@@ -158,7 +160,7 @@ public class OperationToolTest {
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Create input DTO
         OperationWithAbstractDTO inputDTO = new OperationWithAbstractDTO(
             operation.getId(),
@@ -189,7 +191,7 @@ public class OperationToolTest {
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Create input DTO
         OperationWithLeafDTO inputDTO = new OperationWithLeafDTO(
             operation.getId(),
@@ -220,7 +222,7 @@ public class OperationToolTest {
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Create input DTO
         OperationWithStaticDTO inputDTO = new OperationWithStaticDTO(
             operation.getId(),
@@ -251,12 +253,12 @@ public class OperationToolTest {
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Get class
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
-        
+
         // Create input DTO
         OperationWithReturnTypeDTO inputDTO = new OperationWithReturnTypeDTO(
             operation.getId(),
@@ -287,7 +289,7 @@ public class OperationToolTest {
         IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
             IOperation.class,
             "operation0");
-        
+
         // Create input DTO
         OperationWithReturnTypeExpressionDTO inputDTO = new OperationWithReturnTypeExpressionDTO(
             operation.getId(),
@@ -535,5 +537,248 @@ public class OperationToolTest {
 
         // Check body condition after removing
         assertEquals("", operation.getBodyCondition());
+    }
+
+    @Test
+    void addPrecondition_ok_stripsSurroundingWhitespace() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // ----------------------------------------
+        // Call addPrecondition()
+        // ----------------------------------------
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addPrecondition,
+            tool,
+            new OperationWithPreconditionDTO(operation.getId(), "  x > 0\n  y > 0 \n"),
+            OperationDTO.class);
+
+        // Check that the surrounding whitespace is removed and the inner whitespace is kept
+        String[] preconditions = operation.getPreConditions();
+        assertEquals("x > 0\n  y > 0", preconditions[preconditions.length - 1]);
+    }
+
+    @Test
+    void addPrecondition_ng_alreadyHas() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Add a precondition first
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addPrecondition,
+            tool,
+            new OperationWithPreconditionDTO(operation.getId(), "x > 0"),
+            OperationDTO.class);
+        String[] preconditionsBefore = operation.getPreConditions();
+
+        // ----------------------------------------
+        // Call addPrecondition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                addPrecondition,
+                tool,
+                new OperationWithPreconditionDTO(operation.getId(), " x > 0 "),
+                OperationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("already has the precondition 'x > 0'"));
+        assertTrue(exception.getCause().getMessage().contains("Existing preconditions: " + Arrays.asList(preconditionsBefore)));
+
+        // Check that the precondition is not duplicated
+        assertArrayEquals(preconditionsBefore, operation.getPreConditions());
+    }
+
+    @Test
+    void addPrecondition_ng_blank() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+        String[] preconditionsBefore = operation.getPreConditions();
+
+        // ----------------------------------------
+        // Call addPrecondition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                addPrecondition,
+                tool,
+                new OperationWithPreconditionDTO(operation.getId(), "   "),
+                OperationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertEquals("The precondition must not be empty or blank.", exception.getCause().getMessage());
+
+        // Check that nothing was added
+        assertArrayEquals(preconditionsBefore, operation.getPreConditions());
+    }
+
+    @Test
+    void addPostcondition_ng_alreadyHas() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Add a postcondition first
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addPostcondition,
+            tool,
+            new OperationWithPostconditionDTO(operation.getId(), "result > 0"),
+            OperationDTO.class);
+        String[] postconditionsBefore = operation.getPostConditions();
+
+        // ----------------------------------------
+        // Call addPostcondition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                addPostcondition,
+                tool,
+                new OperationWithPostconditionDTO(operation.getId(), "result > 0\n"),
+                OperationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("already has the postcondition 'result > 0'"));
+
+        // Check that the postcondition is not duplicated
+        assertArrayEquals(postconditionsBefore, operation.getPostConditions());
+    }
+
+    @Test
+    void removePrecondition_ok_removesEveryMatchAsStored() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+        int beforeCount = operation.getPreConditions().length;
+
+        // Add duplicates directly, as they may have been added before the tool rejected them or stripped them
+        transactionSupport.run(() -> {
+            operation.addPreCondition("x > 0");
+            operation.addPreCondition(" x > 0 ");
+        });
+        assertEquals(beforeCount + 2, operation.getPreConditions().length);
+
+        // ----------------------------------------
+        // Call removePrecondition()
+        // ----------------------------------------
+        TestSupport.instance().invokeToolMethodReturningDto(
+            removePrecondition,
+            tool,
+            new OperationWithPreconditionDTO(operation.getId(), "x > 0"),
+            OperationDTO.class);
+
+        // Check that both are removed
+        String[] preconditions = operation.getPreConditions();
+        assertEquals(beforeCount, preconditions.length);
+        for (String precondition : preconditions) {
+            assertNotEquals("x > 0", precondition.strip());
+        }
+    }
+
+    @Test
+    void removePrecondition_ng_notFound() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+
+        // Add a precondition first
+        TestSupport.instance().invokeToolMethodReturningDto(
+            addPrecondition,
+            tool,
+            new OperationWithPreconditionDTO(operation.getId(), "x >= 0"),
+            OperationDTO.class);
+        String[] preconditionsBefore = operation.getPreConditions();
+
+        // ----------------------------------------
+        // Call removePrecondition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                removePrecondition,
+                tool,
+                new OperationWithPreconditionDTO(operation.getId(), "x > 0"),
+                OperationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("has no precondition 'x > 0'"));
+        assertTrue(exception.getCause().getMessage().contains("Existing preconditions: " + Arrays.asList(preconditionsBefore)));
+
+        // Check that nothing was removed
+        assertArrayEquals(preconditionsBefore, operation.getPreConditions());
+    }
+
+    @Test
+    void removePostcondition_ok_removesEveryMatchAsStored() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+        int beforeCount = operation.getPostConditions().length;
+
+        // Add duplicates directly, as they may have been added before the tool rejected them or stripped them
+        transactionSupport.run(() -> {
+            operation.addPostCondition("result > 0");
+            operation.addPostCondition("result > 0\n");
+        });
+        assertEquals(beforeCount + 2, operation.getPostConditions().length);
+
+        // ----------------------------------------
+        // Call removePostcondition()
+        // ----------------------------------------
+        TestSupport.instance().invokeToolMethodReturningDto(
+            removePostcondition,
+            tool,
+            new OperationWithPostconditionDTO(operation.getId(), "result > 0"),
+            OperationDTO.class);
+
+        // Check that both are removed
+        String[] postconditions = operation.getPostConditions();
+        assertEquals(beforeCount, postconditions.length);
+        for (String postcondition : postconditions) {
+            assertNotEquals("result > 0", postcondition.strip());
+        }
+    }
+
+    @Test
+    void removePostcondition_ng_notFound() throws Exception {
+        // Get operation
+        IOperation operation = (IOperation) TestSupport.instance().getNamedElementByClassAndName(
+            IOperation.class,
+            "operation0");
+        String[] postconditionsBefore = operation.getPostConditions();
+
+        // ----------------------------------------
+        // Call removePostcondition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                removePostcondition,
+                tool,
+                new OperationWithPostconditionDTO(operation.getId(), "result > 0"),
+                OperationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("has no postcondition 'result > 0'"));
+
+        // Check that nothing was removed
+        assertArrayEquals(postconditionsBefore, operation.getPostConditions());
     }
 }

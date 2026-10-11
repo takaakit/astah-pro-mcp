@@ -2,17 +2,19 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
-import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.MindmapEditor;
 import com.change_vision.jude.api.inf.model.IMindMapDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
@@ -21,13 +23,17 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class MindmapEditorToolTest {
 
@@ -225,6 +231,87 @@ public class MindmapEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void createTopic_ng_parentIsNotTopic() throws Exception {
+        // Get mind map diagram and root topic
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IMindMapDiagram.class,
+            "Mindmap0");
+        INodePresentation rootTopic = mindMapDiagram.getRoot();
+
+        // Show a boundary, which is a node on the same mind map diagram but not a topic
+        TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            setBoundaryOfTopic,
+            tool,
+            new TopicWithBoundaryVisibilityDTO(mindMapDiagram.getId(), rootTopic.getID(), true),
+            NodePresentationDTO.class);
+        IPresentation boundary = Arrays.stream(mindMapDiagram.getPresentations())
+            .filter(presentation -> "MMBoundary".equals(presentation.getType()))
+            .findFirst()
+            .orElseThrow();
+
+        int presentationCountBefore = mindMapDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createTopic()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createTopic,
+                tool,
+                new NewTopicDTO(mindMapDiagram.getId(), boundary.getID(), "Test Child Topic"),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The parent topic must be a topic on the target mind map diagram (actual type: MMBoundary, actual diagram: Mindmap0)."), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, mindMapDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createTopic_ng_parentOnAnotherMindMap() throws Exception {
+        // Get mind map diagram
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IMindMapDiagram.class,
+            "Mindmap0");
+
+        // Another mind map diagram, whose root topic an agent may pass by mistake
+        TestSupport.instance().invokeToolMethodReturningDto(
+            createMindmapDiagram,
+            tool,
+            new NewDiagramInPackageDTO(projectAccessor.getProject().getId(), "Another Mind Map Diagram"),
+            DiagramDTO.class);
+        IMindMapDiagram anotherMindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IMindMapDiagram.class,
+            "Another Mind Map Diagram");
+        INodePresentation anotherRootTopic = anotherMindMapDiagram.getRoot();
+
+        int presentationCountBefore = mindMapDiagram.getPresentations().length;
+        int anotherPresentationCountBefore = anotherMindMapDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createTopic()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createTopic,
+                tool,
+                new NewTopicDTO(mindMapDiagram.getId(), anotherRootTopic.getID(), "Test Child Topic"),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The parent topic must be a topic on the target mind map diagram (actual type: Topic, actual diagram: Another Mind Map Diagram)."), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on either diagram
+        assertEquals(presentationCountBefore, mindMapDiagram.getPresentations().length);
+        assertEquals(anotherPresentationCountBefore, anotherMindMapDiagram.getPresentations().length);
     }
 
     @Test

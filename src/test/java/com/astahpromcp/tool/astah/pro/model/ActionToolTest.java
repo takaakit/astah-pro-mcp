@@ -2,12 +2,15 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ActionWithCallingActivityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActionDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IActivity;
+import com.change_vision.jude.api.inf.model.IActivityNode;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ActionToolTest {
 
@@ -65,7 +67,7 @@ public class ActionToolTest {
         IAction action = (IAction) TestSupport.instance().getNamedElementByClassAndName(
             IAction.class,
             "Action0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(action.getId());
 
@@ -117,5 +119,83 @@ public class ActionToolTest {
         // Check calling activity after setting
         assertNotNull(action.getCallingActivity());
         assertEquals(activity.getId(), action.getCallingActivity().getId());
+    }
+
+    @Test
+    void setCallingActivity_ng_notCallBehaviorAction() throws Exception {
+        // Get action
+        IAction action = (IAction) TestSupport.instance().getNamedElementByClassAndName(
+            IAction.class,
+            "Action0");
+        assertFalse(action.isCallBehaviorAction());
+
+        // Get activity
+        IActivity activity = (IActivity) TestSupport.instance().getNamedElementByClassAndName(
+            IActivity.class,
+            "Activity1");
+
+        // Create input DTO
+        ActionWithCallingActivityDTO inputDTO = new ActionWithCallingActivityDTO(
+            action.getId(),
+            activity.getId());
+
+        // ----------------------------------------
+        // Call setCallingActivity()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setCallingActivity,
+                tool,
+                inputDTO,
+                ActionDTO.class);
+        });
+
+        // Check error message
+        assertTrue(exception.getCause().getMessage().contains("The action 'Action0' (ID: " + action.getId() + ") is not a call behavior action."));
+        assertTrue(exception.getCause().getMessage().contains("create_call_behavior_act"));
+
+        // Check calling activity is not set
+        assertNull(action.getCallingActivity());
+    }
+
+    @Test
+    void setCallingActivity_ng_ownActivity() throws Exception {
+        // Get call behavior action
+        IAction action = (IAction) TestSupport.instance().getNamedElementByClassAndName(
+            IAction.class,
+            "CallBehaviorAction0");
+
+        // Get activity that contains the action
+        IActivity ownActivity = null;
+        for (INamedElement namedElement : TestSupport.instance().getNamedElementsByClass(IActivity.class)) {
+            for (IActivityNode activityNode : ((IActivity) namedElement).getActivityNodes()) {
+                if (activityNode.getId().equals(action.getId())) {
+                    ownActivity = (IActivity) namedElement;
+                }
+            }
+        }
+        assertNotNull(ownActivity);
+
+        // Create input DTO
+        ActionWithCallingActivityDTO inputDTO = new ActionWithCallingActivityDTO(
+            action.getId(),
+            ownActivity.getId());
+
+        // ----------------------------------------
+        // Call setCallingActivity()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setCallingActivity,
+                tool,
+                inputDTO,
+                ActionDTO.class);
+        });
+
+        // Check error message
+        assertTrue(exception.getCause().getMessage().contains("The action 'CallBehaviorAction0' (ID: " + action.getId() + ") is in the activity '" + ownActivity.getName() + "' (ID: " + ownActivity.getId() + "), so it cannot call that activity itself."));
+
+        // Check calling activity is not set
+        assertNull(action.getCallingActivity());
     }
 }

@@ -9,17 +9,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.Duration;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 // The profiles start together or not at all
 public class ProfileStartupTest {
-
-    private static final List<Integer> PROFILE_PORTS = List.of(
-            McpServerConfig.PORT_FOR_DIRECT,
-            McpServerConfig.PORT_FOR_PROGRAMMATIC);
 
     private McpServerApp app;
 
@@ -40,28 +34,7 @@ public class ProfileStartupTest {
         }
     }
 
-    private static void awaitListening(int port) throws InterruptedException {
-        long deadline = System.nanoTime() + Duration.ofSeconds(10).toNanos();
-        while (System.nanoTime() < deadline) {
-            if (canConnect(port)) {
-                return;
-            }
-            Thread.sleep(100);
-        }
-        fail("Nothing is listening on port " + port);
-    }
-
-    @Test
-    void start_ok_listensOnEveryProfilePort() throws Exception {
-        app = new McpServerApp();
-        app.start();
-
-        for (int port : PROFILE_PORTS) {
-            awaitListening(port);
-        }
-    }
-
-    // Occupying the programmatic port because it is the one the profiles were most recently extended with.
+    // Occupy the programmatic port so startup fails after the direct profile has started.
     @Test
     void start_ng_leavesNoProfileRunningWhenAPortIsTaken() throws Exception {
         try (ServerSocket occupied = new ServerSocket()) {

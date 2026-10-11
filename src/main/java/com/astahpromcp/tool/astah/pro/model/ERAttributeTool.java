@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERAttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERAttributeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
@@ -15,7 +16,6 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERAttribute.html
@@ -102,16 +102,12 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER attribute information: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.id());
 
         return ERAttributeDTOAssembler.toDTO(astahERAttribute);
     }
 
     private ERAttributeDTO setDatatype(ERAttributeWithERDatatypeDTO param) throws Exception {
-        log.debug("Set ER datatype of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.erDatatypeId());
 
@@ -123,8 +119,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setDomain(ERAttributeWithERDomainDTO param) throws Exception {
-        log.debug("Set ER domain of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
         IERDomain astahERDomain = astahProToolSupport.getERDomain(param.erDomainId());
 
@@ -136,8 +130,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setDefaultValue(ERAttributeWithDefaultValueDTO param) throws Exception {
-        log.debug("Set default value of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
         txnAstah.run( () -> {
@@ -148,8 +140,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setLengthPrecision(ERAttributeWithLengthPrecisionDTO param) throws Exception {
-        log.debug("Set length/precision of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
         txnAstah.run( () -> {
@@ -160,8 +150,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setLogicalName(ERAttributeWithLogicalNameDTO param) throws Exception {
-        log.debug("Set logical name of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
         txnAstah.run( () -> {
@@ -172,8 +160,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setPhysicalName(ERAttributeWithPhysicalNameDTO param) throws Exception {
-        log.debug("Set physical name of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
         txnAstah.run( () -> {
@@ -184,8 +170,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setPrimaryKey(ERAttributeWithPrimaryKeyDTO param) throws Exception {
-        log.debug("Set primary key of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
         txnAstah.run( () -> {
@@ -196,8 +180,6 @@ public class ERAttributeTool extends AstahToolProvider {
     }
 
     private ERAttributeDTO setNotNull(ERAttributeWithNotNullDTO param) throws Exception {
-        log.debug("Set not null of ER attribute: {}", param);
-
         IERAttribute astahERAttribute = astahProToolSupport.getERAttribute(param.targetERAttributeId());
 
         txnAstah.run( () -> {

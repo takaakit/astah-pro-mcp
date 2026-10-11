@@ -5,22 +5,22 @@ import com.astahpromcp.tool.astah.pro.common.NavigabilityKind;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record NewAssociationDTO(
-        @JsonPropertyDescription("Source class identifier")
-        String sourceClassId,
+    @JsonPropertyDescription("Source class identifier")
+    String sourceClassId,
 
-        @JsonPropertyDescription("Target class identifier")
-        String targetClassId,
+    @JsonPropertyDescription("Target class identifier")
+    String targetClassId,
 
-        @JsonPropertyDescription("Navigability of the source association end")
-        NavigabilityKind sourceNavigability,
+    @JsonPropertyDescription("Navigability of the source association end")
+    NavigabilityKind sourceNavigability,
 
-        @JsonPropertyDescription("Navigability of the target association end")
-        NavigabilityKind targetNavigability,
+    @JsonPropertyDescription("Navigability of the target association end")
+    NavigabilityKind targetNavigability,
 
-        @JsonPropertyDescription("Aggregation kind of the source association end. The diamond is placed at the source class, and is not shown if sourceNavigability is 'navigable'.")
-        AggregationKind sourceAggregationKind,
+    @JsonPropertyDescription("Aggregation kind of the source association end. The diamond is placed at the source class, and is not shown if sourceNavigability is 'navigable'.")
+    AggregationKind sourceAggregationKind,
 
-        @JsonPropertyDescription("Aggregation kind of the target association end. The diamond is placed at the target class, and is not shown if targetNavigability is 'navigable'.")
-        AggregationKind targetAggregationKind
+    @JsonPropertyDescription("Aggregation kind of the target association end. The diamond is placed at the target class, and is not shown if targetNavigability is 'navigable'.")
+    AggregationKind targetAggregationKind
 ) {
 }

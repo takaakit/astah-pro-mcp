@@ -1,10 +1,20 @@
-# category                   	name                                               	direct	programmatic
+# category                   	name                                               	direct	programmatic	reason
 #
 # This file is the only record of which tools each profile publishes.
 # One row per tool. 'x' publishes the tool to that profile, '-' withholds it.
 #
 #   direct       = port 18888, the direct tool calling mode
 #   programmatic = port 8888, published directly on the programmatic tool calling mode
+#   reason       = why an mcp tool script cannot call the tool. Required on a row that publishes to both profiles, and left out on every other row:
+#                    no_structured_content  answers with content such as an image or text instead of structured content
+#                    astah_api_script       runs an astah api script
+#                    network                may fetch over the network or convert a PDF
+#                    view                   drives the Astah view
+#                    project_file           creates, opens or saves a project
+#                    standalone             answers a standalone question about the project, the Astah view, the MCP server or the logs
+#                    direct                 published directly for none of the reasons above
+#
+# On the programmatic profile, a tool with direct = x and programmatic = - is called from an mcp tool script.
 
 Common                       	add_file_path_hyperlink_to_named_elem              	x	-
 Common                       	add_file_path_hyperlink_to_node_prst               	x	-
@@ -13,19 +23,19 @@ Common                       	add_named_element_hyperlink_to_node_prst          
 Common                       	add_stereotype                                     	x	-
 Common                       	add_url_hyperlink_to_named_elem                    	x	-
 Common                       	add_url_hyperlink_to_node_prst                     	x	-
-Common                       	architectural_design_smells                        	x	x
-Common                       	astah_api_script_guide                             	x	x
-Common                       	astah_pro_mcp_guide                                	x	x
-Common                       	bring_prsts_to_front                               	x	x
-Common                       	capture_astah_window                               	x	x
-Common                       	capture_dgm_img                                    	x	x
-Common                       	center_prst_in_dgm                                 	x	x
+Common                       	architectural_design_smells                        	x	x	direct
+Common                       	astah_api_script_guide                             	x	x	no_structured_content
+Common                       	astah_pro_mcp_guide                                	x	x	direct
+Common                       	bring_prsts_to_front                               	x	x	view
+Common                       	capture_astah_window                               	x	x	no_structured_content
+Common                       	capture_dgm_img                                    	x	x	no_structured_content
+Common                       	center_prst_in_dgm                                 	x	x	view
 Common                       	change_fill_color                                  	x	-
 Common                       	change_font_color                                  	x	-
 Common                       	change_line_color                                  	x	-
 Common                       	change_parent                                      	x	-
 Common                       	change_tagged_val                                  	x	-
-Common                       	close_dgm                                          	x	x
+Common                       	close_dgm                                          	x	x	view
 Common                       	create_artifact                                    	x	-
 Common                       	create_asso                                        	x	-
 Common                       	create_asso_class                                  	x	-
@@ -51,7 +61,7 @@ Common                       	create_ope                                        
 Common                       	create_param                                       	x	-
 Common                       	create_pkg_in_parent_pkg                           	x	-
 Common                       	create_port                                        	x	-
-Common                       	create_proj                                        	x	x
+Common                       	create_proj                                        	x	x	project_file
 Common                       	create_qualifier                                   	x	-
 Common                       	create_real                                        	x	-
 Common                       	create_refine_dep                                  	x	-
@@ -65,84 +75,84 @@ Common                       	create_test_case_in_parent_test_case              
 Common                       	create_trace_dep                                   	x	-
 Common                       	create_usage                                       	x	-
 Common                       	create_verify_dep                                  	x	-
-Common                       	crop_dgm_img                                       	x	x
+Common                       	crop_dgm_img                                       	x	x	no_structured_content
 Common                       	delete_dgm                                         	x	-
 Common                       	delete_elem                                        	x	-
 Common                       	delete_prst                                        	x	-
-Common                       	detect_overlap                                     	x	x
-Common                       	dgm_guide                                          	x	x
-Common                       	dgm_layout_anti_patterns                           	x	x
-Common                       	dgm_layout_guide                                   	x	x
-Common                       	diagram_consistency_maintenance_steps              	x	x
-Common                       	export_dgm_png_img                                 	x	-
+Common                       	detect_overlap                                     	x	x	direct
+Common                       	dgm_guide                                          	x	x	direct
+Common                       	dgm_layout_anti_patterns                           	x	x	no_structured_content
+Common                       	dgm_layout_guide                                   	x	x	no_structured_content
+Common                       	diagram_consistency_maintenance_steps              	x	x	direct
+Common                       	export_dgm_png_img                                 	x	x	direct
 Common                       	find_named_elements_by_name                        	x	-
-Common                       	generate_dgm_img_from_puml                         	x	x
-Common                       	generate_graph_img_from_dot                        	x	x
+Common                       	generate_dgm_img_from_puml                         	x	x	no_structured_content
+Common                       	generate_graph_img_from_dot                        	x	x	no_structured_content
 Common                       	get_all_constraints_and_conditions                 	x	-
-Common                       	get_all_prst_types                                 	x	x
-Common                       	get_astah_api_script_example                       	x	x
-Common                       	get_astah_pro_mcp_version                          	x	x
+Common                       	get_all_prst_types                                 	x	x	direct
+Common                       	get_astah_api_script_example                       	x	x	no_structured_content
+Common                       	get_astah_pro_mcp_version                          	x	x	standalone
 Common                       	get_chunk_of_all_definitions                       	x	-
 Common                       	get_chunk_of_all_named_elements                    	x	-
 Common                       	get_chunk_of_all_prsts                             	x	-
-Common                       	get_chunk_of_astah_pro_user_guide                  	x	x
-Common                       	get_chunk_of_color_palette_guide                   	x	x
-Common                       	get_chunk_of_conceptual_model_conventions          	x	x
-Common                       	get_chunk_of_ddd_reference                         	x	x
-Common                       	get_chunk_of_object_relational_impedance_mismatch  	x	x
-Common                       	get_chunk_of_ocl_spec                              	x	x
-Common                       	get_chunk_of_puml_guide                            	x	x
-Common                       	get_chunk_of_systems_engineering                   	x	x
+Common                       	get_chunk_of_astah_pro_user_guide                  	x	x	direct
+Common                       	get_chunk_of_color_palette_guide                   	x	x	direct
+Common                       	get_chunk_of_conceptual_model_conventions          	x	x	direct
+Common                       	get_chunk_of_ddd_reference                         	x	x	direct
+Common                       	get_chunk_of_object_relational_impedance_mismatch  	x	x	direct
+Common                       	get_chunk_of_ocl_spec                              	x	x	direct
+Common                       	get_chunk_of_puml_guide                            	x	x	direct
+Common                       	get_chunk_of_systems_engineering                   	x	x	direct
 Common                       	get_chunk_of_tools_callable_from_mcp_tool_script   	-	x
 Common                       	get_comment_info                                   	x	-
 Common                       	get_constraint_info                                	x	-
-Common                       	get_current_dgm                                    	x	x
+Common                       	get_current_dgm                                    	x	x	standalone
 Common                       	get_dgm_info                                       	x	-
 Common                       	get_dgm_rectangle                                  	x	-
 Common                       	get_dgms_of_element                                	x	-
 Common                       	get_element_of_prst                                	x	-
-Common                       	get_highlighted_prsts_within_dgm                   	x	x
+Common                       	get_highlighted_prsts_within_dgm                   	x	x	standalone
 Common                       	get_info_of_all_definitions                        	x	-
 Common                       	get_info_of_all_named_elements                     	x	-
 Common                       	get_info_of_all_prsts                              	x	-
-Common                       	get_info_of_astah_log                              	x	x
-Common                       	get_info_of_astah_pro_user_guide                   	x	x
-Common                       	get_info_of_color_palette_guide                    	x	x
-Common                       	get_info_of_conceptual_model_conventions           	x	x
-Common                       	get_info_of_ddd_reference                          	x	x
+Common                       	get_info_of_astah_log                              	x	x	standalone
+Common                       	get_info_of_astah_pro_user_guide                   	x	x	network
+Common                       	get_info_of_color_palette_guide                    	x	x	network
+Common                       	get_info_of_conceptual_model_conventions           	x	x	network
+Common                       	get_info_of_ddd_reference                          	x	x	network
 Common                       	get_info_of_dgm_prsts                              	x	-
-Common                       	get_info_of_mcp_server_log                         	x	x
-Common                       	get_info_of_object_relational_impedance_mismatch   	x	x
-Common                       	get_info_of_ocl_spec                               	x	x
-Common                       	get_info_of_puml_guide                             	x	x
-Common                       	get_info_of_systems_engineering                    	x	x
+Common                       	get_info_of_mcp_server_log                         	x	x	standalone
+Common                       	get_info_of_object_relational_impedance_mismatch   	x	x	network
+Common                       	get_info_of_ocl_spec                               	x	x	network
+Common                       	get_info_of_puml_guide                             	x	x	network
+Common                       	get_info_of_systems_engineering                    	x	x	network
 Common                       	get_info_of_tools_callable_from_mcp_tool_script    	-	x
 Common                       	get_link_prst_info                                 	x	-
 Common                       	get_mcp_tool_script_example                        	-	x
 Common                       	get_node_info                                      	x	-
 Common                       	get_node_prst_rectangle                            	x	-
 Common                       	get_proj                                           	x	-
-Common                       	get_proj_path                                      	x	x
+Common                       	get_proj_path                                      	x	x	standalone
 Common                       	get_prst_geometries_on_dgm                         	x	-
 Common                       	get_prsts_on_dgm                                   	x	-
-Common                       	get_selected_elements                              	x	x
-Common                       	get_selected_prst                                  	x	x
-Common                       	get_workspace_dir_path                             	x	x
-Common                       	get_zoom_factor                                    	x	x
-Common                       	highlight_prst                                     	x	x
-Common                       	insert_png_or_jpg_img_on_dgm                       	x	x
+Common                       	get_selected_elements                              	x	x	standalone
+Common                       	get_selected_prst                                  	x	x	standalone
+Common                       	get_workspace_dir_path                             	x	x	standalone
+Common                       	get_zoom_factor                                    	x	x	standalone
+Common                       	highlight_prst                                     	x	x	view
+Common                       	insert_png_or_jpg_img_on_dgm                       	x	x	network
 Common                       	insert_rect_on_dgm                                 	x	-
-Common                       	insert_svg_img_on_dgm                              	x	x
+Common                       	insert_svg_img_on_dgm                              	x	x	direct
 Common                       	insert_txt_on_dgm                                  	x	-
-Common                       	is_proj_modified                                   	x	x
-Common                       	is_proj_opened                                     	x	x
+Common                       	is_proj_modified                                   	x	x	standalone
+Common                       	is_proj_opened                                     	x	x	standalone
 Common                       	mcp_tool_script_guide                              	-	x
-Common                       	open_dgm                                           	x	x
-Common                       	open_proj                                          	x	x
-Common                       	overlay_svg_img_on_dgm_img                         	x	x
-Common                       	preliminary_layout_steps                           	x	x
-Common                       	read_architectural_design_smells                   	x	x
-Common                       	read_uml_modeling_architecture_insights            	x	x
+Common                       	open_dgm                                           	x	x	view
+Common                       	open_proj                                          	x	x	project_file
+Common                       	overlay_svg_img_on_dgm_img                         	x	x	no_structured_content
+Common                       	preliminary_layout_steps                           	x	x	no_structured_content
+Common                       	read_architectural_design_smells                   	x	x	direct
+Common                       	read_uml_modeling_architecture_insights            	x	x	direct
 Common                       	remove_all_file_path_hyperlinks_from_named_elem    	x	-
 Common                       	remove_all_file_path_hyperlinks_from_node_prst     	x	-
 Common                       	remove_all_named_elem_hyperlinks_from_named_elem   	x	-
@@ -152,17 +162,17 @@ Common                       	remove_all_url_hyperlinks_from_node_prst          
 Common                       	remove_stereotype                                  	x	-
 Common                       	retrieve_classifiers_that_ref_or_be_refed_by       	x	-
 Common                       	retrieve_classifiers_within_pkg                    	x	-
-Common                       	retrieve_pkg_structure_as_puml                     	x	x
-Common                       	retrieve_relationships_as_puml                     	x	x
-Common                       	run_astah_api_script                               	x	x
+Common                       	retrieve_pkg_structure_as_puml                     	x	x	direct
+Common                       	retrieve_relationships_as_puml                     	x	x	direct
+Common                       	run_astah_api_script                               	x	x	astah_api_script
 Common                       	run_mcp_tool_script                                	-	x
-Common                       	save_proj                                          	x	x
-Common                       	save_proj_as                                       	x	x
+Common                       	save_proj                                          	x	x	project_file
+Common                       	save_proj_as                                       	x	x	project_file
 Common                       	search_within_named_elements                       	x	-
 Common                       	search_within_prsts                                	x	-
-Common                       	select_all_prsts                                   	x	x
-Common                       	select_prsts                                       	x	x
-Common                       	send_prsts_to_back                                 	x	x
+Common                       	select_all_prsts                                   	x	x	view
+Common                       	select_prsts                                       	x	x	view
+Common                       	send_prsts_to_back                                 	x	x	view
 Common                       	set_label                                          	x	-
 Common                       	set_line_style_of_link_prst                        	x	-
 Common                       	set_node_prst_height                               	x	-
@@ -171,16 +181,16 @@ Common                       	set_node_prst_width                               
 Common                       	set_points_of_link_prst                            	x	-
 Common                       	set_specification_of_constraint                    	x	-
 Common                       	set_type_modifier                                  	x	-
-Common                       	show_in_property_view                              	x	x
-Common                       	show_in_structure_tree                             	x	x
-Common                       	store_architectural_design_smells                  	x	x
-Common                       	store_uml_modeling_architecture_insights           	x	x
-Common                       	terminology_consistency_maintenance_steps          	x	x
-Common                       	uml_modeling_architecture_insights                 	x	x
-Common                       	unhighlight_prst                                   	x	x
-Common                       	unselect_all_prsts                                 	x	x
-Common                       	zoom                                               	x	x
-Common                       	zoom_fit                                           	x	x
+Common                       	show_in_property_view                              	x	x	view
+Common                       	show_in_structure_tree                             	x	x	view
+Common                       	store_architectural_design_smells                  	x	x	direct
+Common                       	store_uml_modeling_architecture_insights           	x	x	direct
+Common                       	terminology_consistency_maintenance_steps          	x	x	direct
+Common                       	uml_modeling_architecture_insights                 	x	x	direct
+Common                       	unhighlight_prst                                   	x	x	view
+Common                       	unselect_all_prsts                                 	x	x	view
+Common                       	zoom                                               	x	x	view
+Common                       	zoom_fit                                           	x	x	view
 
 Class Diagram                	add_invariant_to_class                             	x	-
 Class Diagram                	add_ope_postcond                                   	x	-
@@ -189,7 +199,7 @@ Class Diagram                	create_asso_class_prst                            
 Class Diagram                	create_class_dgm                                   	x	-
 Class Diagram                	create_instance_spec                               	x	-
 Class Diagram                	create_link_between_instance_specs                 	x	-
-Class Diagram                	get_all_named_element_types                        	x	x
+Class Diagram                	get_all_named_element_types                        	x	x	direct
 Class Diagram                	get_asso_class_info                                	x	-
 Class Diagram                	get_asso_end_a_info                                	x	-
 Class Diagram                	get_asso_end_b_info                                	x	-
@@ -406,7 +416,7 @@ Mind Map Diagram             	create_topic                                      
 Mind Map Diagram             	delete_child_topics                                	x	-
 Mind Map Diagram             	delete_img_from_topic                              	x	-
 Mind Map Diagram             	get_mind_map_dgm_info                              	x	-
-Mind Map Diagram             	insert_png_or_jpg_img_into_topic                   	x	x
+Mind Map Diagram             	insert_png_or_jpg_img_into_topic                   	x	x	network
 Mind Map Diagram             	insert_svg_img_into_topic                          	x	-
 Mind Map Diagram             	move_topic_within_sibling_order                    	x	-
 Mind Map Diagram             	set_boundary_of_topic                              	x	-

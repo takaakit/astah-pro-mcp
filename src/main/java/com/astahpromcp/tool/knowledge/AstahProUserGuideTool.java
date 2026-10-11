@@ -18,7 +18,7 @@ import java.util.List;
 
 // Tool that fetches the astah pro user guide web pages and returns them in chunks
 @Slf4j
-public class AstahProUserGuideTool implements ToolProvider, RemoteDocumentTool {
+public class AstahProUserGuideTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
     private final Path outputDirectory;
@@ -59,8 +59,6 @@ public class AstahProUserGuideTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentDTO getAstahProUserGuide(NoInputDTO param) throws IOException {
-        log.debug("Get astah pro user guide: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("astah pro user guide already loaded, returning from cache.");
@@ -84,8 +82,6 @@ public class AstahProUserGuideTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentChunkDTO getAstahProUserGuideChunk(ChunkDTO param) {
-        log.debug("Get astah pro user guide chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

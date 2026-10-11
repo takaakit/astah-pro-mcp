@@ -6,10 +6,10 @@ public record NewPartitionDTO(
     @JsonPropertyDescription("Target activity diagram identifier")
     String targetActivityDiagramId,
 
-    @JsonPropertyDescription("Super partition identifier. In the absence of a super partition, set an empty string.")
+    @JsonPropertyDescription("Super partition presentation identifier. Set an empty string for a top-level partition, or to place the new partition next to the previous partition.")
     String superPartitionId,
 
-    @JsonPropertyDescription("Previous partition identifier. In the absence of a previous partition, set an empty string.")
+    @JsonPropertyDescription("Presentation identifier of the partition right before the new partition. It must be a sub partition of the super partition. Set an empty string to append the new partition after the last one.")
     String previousPartitionId,
 
     @JsonPropertyDescription("New partition name")

@@ -40,8 +40,6 @@ public class McpServerLogFileTool implements ToolProvider {
     }
 
     private LogFileDTO getMcpServerLogFile(NoInputDTO param) throws IOException {
-        log.debug("Get information of mcp server log: {}", param);
-        
         String mcpServerLogFilePath = LogbackConfig.getLogFilePath().toString();
         return getLogFileStats(mcpServerLogFilePath);
     }

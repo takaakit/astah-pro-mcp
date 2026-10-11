@@ -12,6 +12,8 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Typ
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.LifelineDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -20,7 +22,6 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ILifeline.html
@@ -57,7 +58,7 @@ public class LifelineTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_length_of_lifeline",
-                "Set the length of the specified lifeline (specified by the ID of its node presentation), and return the node presentation of the lifeline after it is set.",
+                "Set the length of the specified lifeline (specified by the ID of its node presentation), and return the node presentation of the lifeline after it is set. The length is measured from the bottom of the lifeline head. The actual lengths are adjusted for various reasons (e.g., a lifeline cannot end above what is on it, and the other lifelines on the same diagram that do not end with a termination (X) are aligned to the same end).",
                 this::setLength,
                 LifelineWithLengthDTO.class,
                 NodePresentationDTO.class)
@@ -65,16 +66,12 @@ public class LifelineTool extends AstahToolProvider {
     }
 
     private LifelineDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get lifeline information: {}", param);
-
         ILifeline astahLifeline = astahProToolSupport.getLifeline(param.id());
 
         return LifelineDTOAssembler.toDTO(astahLifeline);
     }
 
     private LifelineDTO setBaseClass(LifelineWithBaseClassDTO param) throws Exception {
-        log.debug("Set base class of lifeline: {}", param);
-
         ILifeline astahLifeline = astahProToolSupport.getLifeline(param.targetLifelineId());
         IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
 
@@ -86,15 +83,19 @@ public class LifelineTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO setLength(LifelineWithLengthDTO param) throws Exception {
-        log.debug("Set length of lifeline: {}", param);
-
         INodePresentation astahLifelinePresentation = astahProToolSupport.getNodePresentation(param.targetLifelineNodePresentationId());
         if (!Type.LIFELINE.matches(astahLifelinePresentation.getType())) {
             throw new IllegalArgumentException("Lifeline node must be one of the following node presentation types: Lifeline.");
         }
 
         txnAstah.run( () -> {
-            astahLifelinePresentation.setProperty(Key.LIFELINE_LENGTH, String.valueOf(param.length()));
+            try {
+                astahLifelinePresentation.setProperty(Key.LIFELINE_LENGTH, String.valueOf(param.length()));
+            } catch (InvalidEditingException e) {
+                throw new IllegalArgumentException(String.format(
+                    "Cannot set the length of the lifeline '%s' to %d: it is too short for what is on the lifeline (current length: %s).",
+                    astahLifelinePresentation.getLabel(), param.length(), astahLifelinePresentation.getProperty(Key.LIFELINE_LENGTH)));
+            }
         });
 
         return NodePresentationDTOAssembler.toDTO(astahLifelinePresentation);

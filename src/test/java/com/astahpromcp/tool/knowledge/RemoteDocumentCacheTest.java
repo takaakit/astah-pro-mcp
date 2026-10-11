@@ -7,11 +7,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +69,7 @@ public class RemoteDocumentCacheTest {
     }
 
     private static List<Path> filesIn(Path directory) throws Exception {
-        try (var entries = java.nio.file.Files.list(directory)) {
+        try (Stream<Path> entries = Files.list(directory)) {
             return entries.toList();
         }
     }

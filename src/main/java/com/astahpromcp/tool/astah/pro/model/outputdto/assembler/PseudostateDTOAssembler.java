@@ -1,9 +1,9 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.PseudostateKind;
+import com.astahpromcp.tool.astah.pro.model.outputdto.PseudostateDTO;
 import com.change_vision.jude.api.inf.model.IPseudostate;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.PseudostateDTO;
 
 public class PseudostateDTOAssembler {
     public static PseudostateDTO toDTO(@NonNull IPseudostate astahPseudostate) throws Exception {

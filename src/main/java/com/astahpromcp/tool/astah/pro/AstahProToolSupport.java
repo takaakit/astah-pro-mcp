@@ -1,5 +1,7 @@
 package com.astahpromcp.tool.astah.pro;
 
+import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
+import com.change_vision.jude.api.inf.exception.InvalidUsingException;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -8,13 +10,21 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class AstahProToolSupport {
     
+    private static final Pattern RRGGBB = Pattern.compile("#[0-9A-Fa-f]{6}");
+
+    private static final Pattern MULTIPLICITY_BOUND = Pattern.compile("(\\d+|\\*|[A-Za-z_]\\w*)?");
+
     private final ProjectAccessor projectAccessor;
     
     public AstahProToolSupport(ProjectAccessor projectAccessor) {
@@ -34,13 +44,23 @@ public class AstahProToolSupport {
                     typeName, id, astahPrimitiveType.getName()));
             }
 
-            throw new NullPointerException(String.format("Failed to get %s (ID: %s) due to an incorrect ID.", typeName, id));
+            throw new IllegalArgumentException(String.format("Failed to get %s (ID: %s) due to an incorrect ID.", typeName, id));
         }
 
         if (!clazz.isInstance(astahEntity)) {
-            throw new RuntimeException(String.format("Failed to get %s (ID: %s) due to an incorrect type.", typeName, id));
+            String actualType = "";
+            if (astahEntity instanceof IPresentation astahPresentation) {
+                actualType = String.format(" (actual type: %s presentation)", astahPresentation.getType());
+            } else {
+                NamedElementDTO.Type type = NamedElementDTO.Type.getCorrespondingType(astahEntity);
+                if (type != NamedElementDTO.Type.UNKNOWN && type != NamedElementDTO.Type.ENTITY) {
+                    actualType = String.format(" (actual type: %s)", type.typeName);
+                }
+            }
+
+            throw new IllegalArgumentException(String.format("Failed to get %s (ID: %s) due to an incorrect type%s.", typeName, id, actualType));
         }
-        
+
         return clazz.cast(astahEntity);
     }
 
@@ -100,7 +120,73 @@ public class AstahProToolSupport {
     public IDiagram getDiagram(String id) {
         return getEntity(id, IDiagram.class, "diagram");
     }
-    
+
+    public static String requireRrggbbColor(String color) {
+
+        if (color == null || !RRGGBB.matcher(color).matches()) {
+            throw new IllegalArgumentException(String.format(
+                "Invalid color '%s'. Pass # followed by exactly 6 hexadecimal digits (#RRGGBB), such as #FFFFFF. Shorthand (#FFF), transparency (#RRGGBBAA) and color names (red) are not accepted.",
+                color));
+        }
+
+        return color;
+    }
+
+    public static String requireMultiplicityBound(String bound) {
+
+        if (bound == null || !MULTIPLICITY_BOUND.matcher(bound).matches()) {
+            throw new IllegalArgumentException(String.format(
+                "Invalid multiplicity bound '%s'. Pass a single bound to each of lowerMultiplicity and upperMultiplicity: a non-negative integer, '*', or a name such as MAX. For example, pass '0' and '1' for 0..1.",
+                bound));
+        }
+
+        return bound;
+    }
+
+    public static List<IPresentation> getPresentationsOnDiagram(IDiagram astahDiagram) throws InvalidUsingException {
+
+        List<IPresentation> astahPresentations = new ArrayList<>();
+        for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+            // getPresentations() also returns the header cells that show this diagram on a CRUD, which are drawn on the CRUD rather than on this diagram, so skip such elements
+            if (astahDiagram.equals(astahPresentation.getDiagram())) {
+                astahPresentations.add(astahPresentation);
+            }
+        }
+
+        return astahPresentations;
+    }
+
+    public static List<IPresentation> getCorrespondingPresentations(IElement astahElement) throws InvalidUsingException {
+
+        if (!(astahElement instanceof IDiagram astahDiagram)) {
+            return Arrays.asList(astahElement.getPresentations());
+        }
+
+        List<IPresentation> astahPresentations = new ArrayList<>();
+        for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+            // For a diagram, getPresentations() returns the presentations drawn on it as well as the ones that show the diagram itself, such as the header cells of a CRUD, so only the latter are taken
+            if (!astahDiagram.equals(astahPresentation.getDiagram())) {
+                astahPresentations.add(astahPresentation);
+            }
+        }
+
+        return astahPresentations;
+    }
+
+    public static List<IDiagram> getRenderedInDiagrams(IElement astahElement) throws InvalidUsingException {
+
+        // Keyed by ID, since the API can hand back a different object for the same element (the model of a data store's presentation, for one), so equals() is not relied on
+        Map<String, IDiagram> astahDiagrams = new LinkedHashMap<>();
+        for (IPresentation astahPresentation : getCorrespondingPresentations(astahElement)) {
+            IDiagram astahDiagram = astahPresentation.getDiagram();
+            if (astahDiagram != null) {
+                astahDiagrams.putIfAbsent(astahDiagram.getId(), astahDiagram);
+            }
+        }
+
+        return new ArrayList<>(astahDiagrams.values());
+    }
+
     public IClassDiagram getClassDiagram(String id) {
         return getEntity(id, IClassDiagram.class, "class diagram");
     }
@@ -123,6 +209,18 @@ public class AstahProToolSupport {
 
     public IClass getClass(String id) {
         return getEntity(id, IClass.class, "class");
+    }
+
+    public IClass getInterface(String id) {
+        IClass astahClass = getEntity(id, IClass.class, "interface");
+
+        if (!astahClass.hasStereotype("interface")) {
+            throw new IllegalArgumentException(String.format(
+                "Failed to get interface (ID: %s) because '%s' is a class without the 'interface' stereotype.",
+                id, astahClass.getName()));
+        }
+
+        return astahClass;
     }
 
     public IAttribute getAttribute(String id) {
@@ -149,8 +247,27 @@ public class AstahProToolSupport {
         return getEntity(id, IAssociation.class, "association");
     }
 
-    public IAttribute getAssociationEnd(String id) {
-        return getEntity(id, IAttribute.class, "association end");
+    public IAttribute getAssociationEnd(String id, int endIndex) {
+        IAttribute astahAttribute = getEntity(id, IAttribute.class, "association end");
+
+        // An ordinary attribute and a port are attributes too, but belong to no association
+        IAssociation astahAssociation = astahAttribute.getAssociation();
+        if (astahAssociation == null) {
+            throw new IllegalArgumentException(String.format(
+                "Failed to get association end (ID: %s) because it is not an end of an association, such as an ordinary attribute or a port. Pass an ID listed as associationEndA or associationEndB by get_asso_info.", id));
+        }
+
+        // End A is the first member end and end B the second
+        IAttribute astahExpectedEnd = astahAssociation.getMemberEnds()[endIndex];
+        if (!astahExpectedEnd.getId().equals(id)) {
+            char wantedEnd = (char) ('A' + endIndex);
+            char actualEnd = (char) ('B' - endIndex);
+            throw new IllegalArgumentException(String.format(
+                "Failed to get association end %c (ID: %s) because it is association end %c. Use the tool function for association end %c, or pass association end %c (ID: %s).",
+                wantedEnd, id, actualEnd, actualEnd, wantedEnd, astahExpectedEnd.getId()));
+        }
+
+        return astahAttribute;
     }
 
     public IAssociationClass getAssociationClass(String id) {

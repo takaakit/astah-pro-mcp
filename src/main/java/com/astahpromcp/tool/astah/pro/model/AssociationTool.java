@@ -10,13 +10,13 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AssociationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.AttributeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAssociation.html
@@ -102,14 +102,14 @@ public class AssociationTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_aggregation_kind_of_asso_end_a",
-                "Set the aggregation kind of the specified association end A (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed at the type of association end A. When 'composite' is specified, a filled (black) diamond is placed at the type of association end A. The diamond is not shown while association end A is navigable.",
+                "Set the aggregation kind of the specified association end A (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed at the type of association end A. When 'composite' is specified, a filled (black) diamond is placed at the type of association end A. The diamond is not shown while association end A is navigable. Only one end of an association can be an aggregation or a composition, so setting 'aggregate' or 'composite' resets association end B to 'none'.",
                 this::setAggregationKindOfAssociationEndA,
                 AssociationEndWithAggregationKindDTO.class,
                 AttributeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_aggregation_kind_of_asso_end_b",
-                "Set the aggregation kind of the specified association end B (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed at the type of association end B. When 'composite' is specified, a filled (black) diamond is placed at the type of association end B. The diamond is not shown while association end B is navigable.",
+                "Set the aggregation kind of the specified association end B (specified by ID), and return the model element of the association end after it is set. When 'aggregate' is specified, a hollow diamond is placed at the type of association end B. When 'composite' is specified, a filled (black) diamond is placed at the type of association end B. The diamond is not shown while association end B is navigable. Only one end of an association can be an aggregation or a composition, so setting 'aggregate' or 'composite' resets association end A to 'none'.",
                 this::setAggregationKindOfAssociationEndB,
                 AssociationEndWithAggregationKindDTO.class,
                 AttributeDTO.class),
@@ -131,33 +131,25 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AssociationDTO getAssociationInfo(IdDTO param) throws Exception {
-        log.debug("Get association information: {}", param);
-
         IAssociation astahAssociation = astahProToolSupport.getAssociation(param.id());
 
         return AssociationDTOAssembler.toDTO(astahAssociation);
     }
 
     private AttributeDTO getAssociationEndAInfo(IdDTO param) throws Exception {
-        log.debug("Get association end A information: {}", param);
-
-        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.id());
+        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.id(), 0);
 
         return AttributeDTOAssembler.toDTO(astahAssociationEndA);
     }
 
     private AttributeDTO getAssociationEndBInfo(IdDTO param) throws Exception {
-        log.debug("Get association end B information: {}", param);
-
-        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.id());
+        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.id(), 1);
 
         return AttributeDTOAssembler.toDTO(astahAssociationEndB);
     }
 
     private AttributeDTO setInitialValueOfAssociationEndA(AttributeWithInitialValueDTO param) throws Exception {
-        log.debug("Set initial value of association end A: {}", param);
-
-        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
+        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId(), 0);
 
         txnAstah.run( () -> {
             astahAssociationEndA.setInitialValue(param.initialValue());
@@ -167,9 +159,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setInitialValueOfAssociationEndB(AttributeWithInitialValueDTO param) throws Exception {
-        log.debug("Set initial value of association end B: {}", param);
-
-        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
+        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId(), 1);
 
         txnAstah.run( () -> {
             astahAssociationEndB.setInitialValue(param.initialValue());
@@ -179,9 +169,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setStaticOfAssociationEndA(AttributeWithStaticDTO param) throws Exception {
-        log.debug("Set static of association end A: {}", param);
-
-        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
+        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId(), 0);
 
         txnAstah.run( () -> {
             astahAssociationEndA.setStatic(param.isStatic());
@@ -191,9 +179,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setStaticOfAssociationEndB(AttributeWithStaticDTO param) throws Exception {
-        log.debug("Set static of association end B: {}", param);
-
-        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
+        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId(), 1);
 
         txnAstah.run( () -> {
             astahAssociationEndB.setStatic(param.isStatic());
@@ -203,12 +189,10 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setMultiplicityOfAssociationEndA(AttributeWithMultiplicityDTO param) throws Exception {
-        log.debug("Set multiplicity of association end A: {}", param);
+        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId(), 0);
 
-        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
-
-        String lowerStringMultiplicity = param.lowerMultiplicity();
-        String upperStringMultiplicity = param.upperMultiplicity();
+        String lowerStringMultiplicity = AstahProToolSupport.requireMultiplicityBound(param.lowerMultiplicity());
+        String upperStringMultiplicity = AstahProToolSupport.requireMultiplicityBound(param.upperMultiplicity());
 
         if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
             txnAstah.run( () -> {
@@ -230,12 +214,10 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setMultiplicityOfAssociationEndB(AttributeWithMultiplicityDTO param) throws Exception {
-        log.debug("Set multiplicity of association end B: {}", param);
+        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId(), 1);
 
-        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAttributeId());
-
-        String lowerStringMultiplicity = param.lowerMultiplicity();
-        String upperStringMultiplicity = param.upperMultiplicity();
+        String lowerStringMultiplicity = AstahProToolSupport.requireMultiplicityBound(param.lowerMultiplicity());
+        String upperStringMultiplicity = AstahProToolSupport.requireMultiplicityBound(param.upperMultiplicity());
 
         if (!lowerStringMultiplicity.isEmpty() && !upperStringMultiplicity.isEmpty()) {
             txnAstah.run( () -> {
@@ -257,9 +239,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setAggregationKindOfAssociationEndA(AssociationEndWithAggregationKindDTO param) throws Exception {
-        log.debug("Set aggregation kind of association end A: {}", param);
-
-        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
+        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId(), 0);
 
         txnAstah.run( () -> {
             astahAssociationEndA.setAggregationKind(param.aggregationKind().astahValue);
@@ -269,9 +249,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setAggregationKindOfAssociationEndB(AssociationEndWithAggregationKindDTO param) throws Exception {
-        log.debug("Set aggregation kind of association end B: {}", param);
-
-        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
+        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId(), 1);
 
         txnAstah.run( () -> {
             astahAssociationEndB.setAggregationKind(param.aggregationKind().astahValue);
@@ -281,9 +259,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setNavigabilityOfAssociationEndA(AssociationEndWithNavigabilityDTO param) throws Exception {
-        log.debug("Set navigability of association end A: {}", param);
-
-        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
+        IAttribute astahAssociationEndA = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId(), 0);
 
         txnAstah.run( () -> {
             astahAssociationEndA.setNavigability(param.navigabilityKind().astahValue);
@@ -293,9 +269,7 @@ public class AssociationTool extends AstahToolProvider {
     }
 
     private AttributeDTO setNavigabilityOfAssociationEndB(AssociationEndWithNavigabilityDTO param) throws Exception {
-        log.debug("Set navigability of association end B: {}", param);
-
-        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId());
+        IAttribute astahAssociationEndB = astahProToolSupport.getAssociationEnd(param.targetAssociationEndId(), 1);
 
         txnAstah.run( () -> {
             astahAssociationEndB.setNavigability(param.navigabilityKind().astahValue);

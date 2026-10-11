@@ -106,8 +106,6 @@ For more sample scripts, refer to:
     }
 
     private List<McpSchema.Content> getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get astah api script guide: {}", param);
-
         List<McpSchema.Content> contents = new ArrayList<>();
         contents.add(catalogue(CORE_EXAMPLES));
         contents.add(McpSchema.TextContent.builder(ENVIRONMENT_NOTE).build());
@@ -119,8 +117,6 @@ For more sample scripts, refer to:
     }
 
     private List<McpSchema.Content> getExample(AstahApiScriptExampleDTO param) throws Exception {
-        log.debug("Get astah api script example: {}", param);
-
         Example example = EXAMPLES.stream()
                 .filter(candidate -> candidate.file().equals(param.exampleName()))
                 .findFirst()

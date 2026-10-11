@@ -3,10 +3,10 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 import com.astahpromcp.tool.astah.pro.common.CombinedFragmentKind;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 
 import java.util.ArrayList;
 import java.util.List;

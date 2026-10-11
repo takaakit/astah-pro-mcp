@@ -2,13 +2,13 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.EREntityDTO;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.model.IERSubtypeRelationship;
 import com.change_vision.jude.api.inf.model.IERIndex;
 import com.change_vision.jude.api.inf.model.IERAttribute;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.EREntityDTO;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewUseCaseDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class UseCaseDiagramEditorToolTest {
 
@@ -59,7 +59,7 @@ public class UseCaseDiagramEditorToolTest {
         IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
-        
+
         // Create input DTO
         NewUseCaseDiagramDTO inputDTO = new NewUseCaseDiagramDTO(
             astahPackage.getId(),

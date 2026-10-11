@@ -8,13 +8,13 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.PartitionWithRepresentsDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.PartitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.PartitionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IPartition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IPartition.html
@@ -60,16 +60,12 @@ public class PartitionTool extends AstahToolProvider {
     }
 
     private PartitionDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get partition information: {}", param);
-
         IPartition astahPartition = astahProToolSupport.getPartition(param.id());
 
         return PartitionDTOAssembler.toDTO(astahPartition);
     }
 
     private PartitionDTO setRepresents(PartitionWithRepresentsDTO param) throws Exception {
-        log.debug("Set represents of partition: {}", param);
-
         IPartition astahPartition = astahProToolSupport.getPartition(param.targetPartitionId());
         INamedElement astahRepresents = astahProToolSupport.getNamedElement(param.representsId());
 
@@ -81,8 +77,6 @@ public class PartitionTool extends AstahToolProvider {
     }
 
     private PartitionDTO removeRepresents(IdDTO param) throws Exception {
-        log.debug("Remove represents from partition: {}", param);
-
         IPartition astahPartition = astahProToolSupport.getPartition(param.id());
 
         txnAstah.run( () -> {

@@ -13,11 +13,18 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPrese
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
+import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.model.ILifeline;
+import com.change_vision.jude.api.inf.model.IMessage;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +32,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/SequenceDiagramEditor.html
@@ -121,7 +127,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_termination",
-                "Create a new termination on the specified sequence diagram (specified by ID), and return the newly created node presentation of the termination along with the updated diagram image in low resolution.",
+                "Create a new termination (X) at the end of the specified lifeline (specified by presentation ID) on the specified sequence diagram (specified by ID), and return the newly created node presentation of the termination along with the updated diagram image in low resolution.",
                 this::createTermination,
                 NewTerminationDTO.class,
                 NodePresentationDTO.class)
@@ -129,8 +135,6 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private SequenceDiagramDTO createSequenceDiagram(NewSequenceDiagramInPackageDTO param) throws Exception {
-        log.debug("Create sequence diagram: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         ISequenceDiagram createdAstahSequenceDiagram = txnAstah.call( () -> {
@@ -143,9 +147,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createCombinedFragment(NewCombinedFragmentDTO param) throws Exception {
-        log.debug("Create combined fragment: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -168,9 +170,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createMessage(NewMessageDTO param) throws Exception {
-        log.debug("Create message: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
         String senderType = senderNode.getType();
@@ -207,9 +207,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createCreateMessage(NewCreateMessageDTO param) throws Exception {
-        log.debug("Create create message: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
         String senderType = senderNode.getType();
@@ -255,9 +253,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDestroyMessage(NewDestroyMessageDTO param) throws Exception {
-        log.debug("Create destroy message: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
         String senderType = senderNode.getType();
@@ -291,22 +287,75 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createReturnMessage(NewReturnMessageDTO param) throws Exception {
-        log.debug("Create return message: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         ILinkPresentation targetMessage = astahProToolSupport.getLinkPresentation(param.targetMessageLinkPresentationId());
         if (!Type.MESSAGE.matches(targetMessage.getType())) {
             throw new IllegalArgumentException("Target message for return message must be one of the following link presentation types: Message.");
         }
 
+        if (!astahSequenceDiagram.equals(targetMessage.getDiagram())) {
+            throw new IllegalArgumentException("The target message is not on the target sequence diagram: " + param.targetMessageLinkPresentationId());
+        }
+
+        IMessage astahTargetMessage = (IMessage) targetMessage.getModel();
+
+        if (targetMessage.getSourceEnd() == null) {
+            throw new IllegalArgumentException(String.format(
+                "Message '%s' is a found message, which has no sender to return to. A return message can be created only for a synchronous message that has both a sender and a receiver.",
+                astahTargetMessage.getName()));
+        }
+        
+        if (targetMessage.getTargetEnd() == null) {
+            throw new IllegalArgumentException(String.format(
+                "Message '%s' is a lost message, which has no receiver to return from. A return message can be created only for a synchronous message that has both a sender and a receiver.",
+                astahTargetMessage.getName()));
+        }
+
+        if (astahTargetMessage.isReturnMessage()) {
+            throw new IllegalArgumentException(String.format(
+                "Message '%s' is itself a return message. Specify the synchronous message it returns from instead.",
+                astahTargetMessage.getName()));
+        }
+        
+        if (!astahTargetMessage.isSynchronous()) {
+            throw new IllegalArgumentException(String.format(
+                "Message '%s' is asynchronous. A return message can be created only for a synchronous message.",
+                astahTargetMessage.getName()));
+        }
+
+        ILinkPresentation existingReturnMessage = findReturnMessageOf(astahSequenceDiagram, astahTargetMessage);
+        if (existingReturnMessage != null) {
+            throw new IllegalArgumentException(String.format(
+                "Message '%s' already has a return message (ID: %s). Only one return message can be created for each message, so use the existing one.",
+                astahTargetMessage.getName(),
+                existingReturnMessage.getID()));
+        }
+
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
-        ILinkPresentation returnMessage = txnAstah.call( () -> {
-            return sequenceDiagramEditor.createReturnMessage(
-                param.newReturnMessageName(),
-                targetMessage);
-        });
+        ILinkPresentation returnMessage;
+        try {
+            returnMessage = txnAstah.call( () -> {
+                return sequenceDiagramEditor.createReturnMessage(
+                    param.newReturnMessageName(),
+                    targetMessage);
+            });
+
+        } catch (InvalidEditingException e) {
+            // Astah fails inside createReturnMessage(), with a message that tells nothing, whenever a combined fragment covers the lifeline the return message goes back to, wherever on that lifeline the combined fragment lies.
+            ICombinedFragment covering = findCombinedFragmentCovering(astahTargetMessage.getSource());
+            if (covering == null) {
+                throw e;
+            }
+            throw new InvalidEditingException(
+                e.getKey(),
+                String.format("Astah cannot create a return message to message '%s', because the combined fragment %s covers lifeline '%s', which the return message goes back to (%s). Create return messages before creating the combined fragments on their lifelines.",
+                    astahTargetMessage.getName(),
+                    covering.getName().isEmpty() ? "(unnamed, ID: " + covering.getId() + ")" : "'" + covering.getName() + "'",
+                    astahTargetMessage.getSource().getName(),
+                    e.getMessage()));
+        }
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(returnMessage);
 
@@ -315,10 +364,33 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
         return Pair.of(dto, List.of(thumbnailContent));
     }
 
-    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(NewLostMessageDTO param) throws Exception {
-        log.debug("Create lost message: {}", param);
+    // The return message drawn for the call message, if any.
+    private static ILinkPresentation findReturnMessageOf(ISequenceDiagram diagram, IMessage callMessage) throws Exception {
+        for (IPresentation presentation : diagram.getPresentations()) {
+            if (presentation instanceof ILinkPresentation link
+                && link.getModel() instanceof IMessage message
+                && message.isReturnMessage()
+                && callMessage.equals(message.getActivator())) {
+                return link;
+            }
+        }
+        return null;
+    }
 
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+    // A combined fragment that Astah records as covering the lifeline, if the element is a lifeline.
+    private static ICombinedFragment findCombinedFragmentCovering(INamedElement element) {
+        if (element instanceof ILifeline lifeline) {
+            for (INamedElement fragment : lifeline.getFragments()) {
+                if (fragment instanceof ICombinedFragment combinedFragment) {
+                    return combinedFragment;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLostMessage(NewLostMessageDTO param) throws Exception {
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         INodePresentation senderNode = astahProToolSupport.getNodePresentation(param.senderNodePresentationId());
         String senderType = senderNode.getType();
@@ -346,9 +418,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFoundMessage(NewFoundMessageDTO param) throws Exception {
-        log.debug("Create found message: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         INodePresentation receiverNode = astahProToolSupport.getNodePresentation(param.receiverNodePresentationId());
         String receiverType = receiverNode.getType();
@@ -375,9 +445,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInteractionUse(NewInteractionUseDTO param) throws Exception {
-        log.debug("Create interaction use: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -401,9 +469,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createLifeline(NewLifelineDTO param) throws Exception {
-        log.debug("Create lifeline: {}", param);
-
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
@@ -421,16 +487,39 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createTermination(NewTerminationDTO param) throws Exception {
-        log.debug("Create termination: {}", param);
+        ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 
-        ISequenceDiagram astahSequenceDiagram = (ISequenceDiagram) astahProToolSupport.getDiagram(param.targetSequenceDiagramId());
         INodePresentation targetNode = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
+        if (!(targetNode.getModel() instanceof ILifeline astahLifeline)) {
+            throw new IllegalArgumentException("Termination target node must be one of the following node presentation types: Lifeline.");
+        }
+        
+        if (!astahSequenceDiagram.equals(targetNode.getDiagram())) {
+            throw new IllegalArgumentException("The target lifeline is not on the target sequence diagram: " + param.targetNodePresentationId());
+        }
+        
+        if (astahLifeline.isDestroyed()) {
+            throw new IllegalArgumentException(String.format(
+                "The lifeline '%s' already ends with a termination (X). A lifeline can have only one termination, and a destroy message to the lifeline also ends it with one. Use the existing termination.",
+                targetNode.getLabel()));
+        }
 
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
 
         INodePresentation termination = txnAstah.call( () -> {
-            return sequenceDiagramEditor.createTermination(
+            INodePresentation astahTermination = sequenceDiagramEditor.createTermination(
                 targetNode);
+
+            // Note: createTermination() does not throw when it cannot create a termination (e.g., the lifeline already has one). It returns a presentation that has neither a model nor a diagram instead.
+            if (astahTermination == null
+                || astahTermination.getModel() == null
+                || astahTermination.getDiagram() == null) {
+                throw new IllegalArgumentException(String.format(
+                    "Failed to create a termination on the lifeline '%s'.",
+                    targetNode.getLabel()));
+            }
+
+            return astahTermination;
         });
 
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(termination);

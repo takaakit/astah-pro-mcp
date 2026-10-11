@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
@@ -18,12 +19,10 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class StructureDiagramEditorToolTest {
 
@@ -78,12 +77,12 @@ public class StructureDiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
-        
+
         // Get class
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Create input DTO
         NewNodePresentationDTO inputDTO = new NewNodePresentationDTO(
             classDiagram.getId(),
@@ -121,7 +120,7 @@ public class StructureDiagramEditorToolTest {
         INodePresentation classBar = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Bar");
-        
+
         // Get class (target node presentation)
         INodePresentation classBaz = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",

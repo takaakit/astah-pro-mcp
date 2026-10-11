@@ -2,15 +2,16 @@ package com.astahpromcp.tool.astah.pro.review;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.ReportDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.model.IClassDiagram;
-import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
-import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
-import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
+import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.model.ISequenceDiagram;
+import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
+import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DiagramLayoutLintToolTest {
 
@@ -43,9 +43,9 @@ public class DiagramLayoutLintToolTest {
 
         // detectOverlap() method
         detectOverlap = TestSupport.getAccessibleMethod(
-                DiagramLayoutLintTool.class,
-                "detectOverlap",
-                IdDTO.class);
+            DiagramLayoutLintTool.class,
+            "detectOverlap",
+            IdDTO.class);
     }
 
     @AfterEach
@@ -59,8 +59,8 @@ public class DiagramLayoutLintToolTest {
     void detectOverlap_ok_classDiagram() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
-                IClassDiagram.class,
-                "Class Diagram0");
+            IClassDiagram.class,
+            "Class Diagram0");
 
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
@@ -69,10 +69,10 @@ public class DiagramLayoutLintToolTest {
         // Call detectOverlap()
         // ----------------------------------------
         ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                detectOverlap,
-                tool,
-                inputDTO,
-                ReportDTO.class);
+            detectOverlap,
+            tool,
+            inputDTO,
+            ReportDTO.class);
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
@@ -93,8 +93,8 @@ public class DiagramLayoutLintToolTest {
     void detectOverlap_ok_usecaseDiagram() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
-                IUseCaseDiagram.class,
-                "UseCase Diagram0");
+            IUseCaseDiagram.class,
+            "UseCase Diagram0");
 
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
@@ -103,10 +103,10 @@ public class DiagramLayoutLintToolTest {
         // Call detectOverlap()
         // ----------------------------------------
         ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                detectOverlap,
-                tool,
-                inputDTO,
-                ReportDTO.class);
+            detectOverlap,
+            tool,
+            inputDTO,
+            ReportDTO.class);
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
@@ -124,8 +124,8 @@ public class DiagramLayoutLintToolTest {
     void detectOverlap_ok_sequenceDiagram() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
-                ISequenceDiagram.class,
-                "Sequence Diagram0");
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
 
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
@@ -134,10 +134,10 @@ public class DiagramLayoutLintToolTest {
         // Call detectOverlap()
         // ----------------------------------------
         ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                detectOverlap,
-                tool,
-                inputDTO,
-                ReportDTO.class);
+            detectOverlap,
+            tool,
+            inputDTO,
+            ReportDTO.class);
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
@@ -151,8 +151,8 @@ public class DiagramLayoutLintToolTest {
     void detectOverlap_ok_activityDiagram() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
-                IActivityDiagram.class,
-                "Activity Diagram0");
+            IActivityDiagram.class,
+            "Activity Diagram0");
 
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
@@ -161,10 +161,10 @@ public class DiagramLayoutLintToolTest {
         // Call detectOverlap()
         // ----------------------------------------
         ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                detectOverlap,
-                tool,
-                inputDTO,
-                ReportDTO.class);
+            detectOverlap,
+            tool,
+            inputDTO,
+            ReportDTO.class);
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.
@@ -185,8 +185,8 @@ public class DiagramLayoutLintToolTest {
     void detectOverlap_ok_stateMachineDiagram() throws Exception {
         // Get diagram
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
-                IStateMachineDiagram.class,
-                "Statemachine Diagram0");
+            IStateMachineDiagram.class,
+            "Statemachine Diagram0");
 
         // Create input DTO
         IdDTO inputDTO = new IdDTO(diagram.getId());
@@ -195,10 +195,10 @@ public class DiagramLayoutLintToolTest {
         // Call detectOverlap()
         // ----------------------------------------
         ReportDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                detectOverlap,
-                tool,
-                inputDTO,
-                ReportDTO.class);
+            detectOverlap,
+            tool,
+            inputDTO,
+            ReportDTO.class);
 
         // Check output DTO
         // Check if overlaps are detected correctly, with none missing or extra.

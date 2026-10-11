@@ -7,6 +7,8 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -14,11 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 // Tool that fetches conceptual model convention content and returns it in chunks
 @Slf4j
-public class ConceptualModelConventionTool implements ToolProvider, RemoteDocumentTool {
+public class ConceptualModelConventionTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
     private final Path outputDirectory;
@@ -59,8 +59,6 @@ public class ConceptualModelConventionTool implements ToolProvider, RemoteDocume
     }
 
     private DocumentDTO getConceptualModelConventionInfo(NoInputDTO param) throws IOException {
-        log.debug("Get Conceptual Model Conventions: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("Conceptual Model Conventions already loaded, returning from cache.");
@@ -84,8 +82,6 @@ public class ConceptualModelConventionTool implements ToolProvider, RemoteDocume
     }
 
     private DocumentChunkDTO getConceptualModelConventionChunk(ChunkDTO param) {
-        log.debug("Get Conceptual Model Conventions chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

@@ -2,7 +2,6 @@ package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
-import com.astahpromcp.tool.manifest.ToolCatalog;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -35,23 +34,24 @@ public final class AstahToolRegistry {
         this.notMcpToolScriptCallableReasons = notMcpToolScriptCallableReasons;
     }
 
-    // Build the registry from the catalog, holding the tools the given names select.
-    public static AstahToolRegistry from(ToolCatalog catalog, Set<String> names, Set<String> publishedDirectly) {
+    // Build the registry from the given definitions, holding the tools the given names select, with the reasons the manifest declares for the ones published directly.
+    public static AstahToolRegistry from(Collection<ToolDefinition> candidates, Set<String> names, Map<String, NotMcpToolScriptCallableReason> declaredReasons) {
+        Map<String, ToolDefinition> candidatesByName = new LinkedHashMap<>();
+        for (ToolDefinition candidate : candidates) {
+            candidatesByName.put(candidate.toolSchema().name(), candidate);
+        }
+
         Map<String, ToolDefinition> definitions = new LinkedHashMap<>();
         Map<String, NotMcpToolScriptCallableReason> reasons = new LinkedHashMap<>();
 
         for (String name : names) {
-            ToolDefinition definition = catalog.find(name);
+            ToolDefinition definition = candidatesByName.get(name);
             if (definition == null) {
                 continue;
             }
             definitions.put(name, definition);
 
-            // The derived reason wins when there is one.
-            NotMcpToolScriptCallableReason reason = catalog.notMcpToolScriptCallableReason(name);
-            if (reason == null && publishedDirectly.contains(name)) {
-                reason = NotMcpToolScriptCallableReason.PUBLISHED_DIRECTLY;
-            }
+            NotMcpToolScriptCallableReason reason = declaredReasons.get(name);
             if (reason != null) {
                 reasons.put(name, reason);
             }
@@ -60,7 +60,7 @@ public final class AstahToolRegistry {
         return of(definitions.values(), reasons);
     }
 
-    // Build the registry from definitions that do not come from a catalog, with the reason each withheld one cannot be called from an mcp tool script.
+    // Build the registry from exactly the given definitions, with the reason each withheld one cannot be called from an mcp tool script.
     public static AstahToolRegistry of(Collection<ToolDefinition> toolDefinitions,
                                        Map<String, NotMcpToolScriptCallableReason> notMcpToolScriptCallableReasons) {
         Map<String, ToolDefinition> definitions = new LinkedHashMap<>();

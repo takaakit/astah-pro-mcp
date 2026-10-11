@@ -6,29 +6,29 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public record PresentationDTO(
-        @JsonPropertyDescription("Presentation identifier")
-        String id,
+    @JsonPropertyDescription("Presentation identifier")
+    String id,
 
-        @JsonPropertyDescription("Label text")
-        String label,
+    @JsonPropertyDescription("Label text")
+    String label,
 
-        @JsonPropertyDescription("Diagram where this presentation is rendered")
-        NameIdTypeDTO renderedInDiagram,
+    @JsonPropertyDescription("Diagram where this presentation is rendered")
+    NameIdTypeDTO renderedInDiagram,
 
-        @JsonPropertyDescription("Corresponding model element (named element)")
-        NameIdTypeDTO correspondingModelElement,
-        
-        @JsonPropertyDescription("Presentation type name")
-        String type,
+    @JsonPropertyDescription("Corresponding model element (named element)")
+    NameIdTypeDTO correspondingModelElement,
 
-        @JsonPropertyDescription("Presentation fill color")
-        String fillColor,
+    @JsonPropertyDescription("Presentation type name")
+    String type,
 
-        @JsonPropertyDescription("Presentation line color")
-        String lineColor,
+    @JsonPropertyDescription("Presentation fill color")
+    String fillColor,
 
-        @JsonPropertyDescription("Presentation font color")
-        String fontColor
+    @JsonPropertyDescription("Presentation line color")
+    String lineColor,
+
+    @JsonPropertyDescription("Presentation font color")
+    String fontColor
 ) {
     public enum Type {
         FRAME("Frame"),
@@ -81,7 +81,7 @@ public record PresentationDTO(
         PARTITION("Partition"),
         INITIAL_NODE("InitialNode"),
         ACTION("Action"),
-        FLOW_FINAL_NODE("Flow Final Node"),
+        FLOW_FINAL_NODE("FlowFinalNode"),
         ACCEPT_TIME_EVENT_ACTION("AcceptTimeEventAction"),
         INPUT_PIN("InputPin"),
         OUTPUT_PIN("OutputPin"),
@@ -106,10 +106,7 @@ public record PresentationDTO(
         DURATION_CONSTRAINT("DurationConstraint"),
         TIME_CONSTRAINT("TimeConstraint"),
         LANE("Lane"),
-        FINAL_NODE("FinalNode"),
         CONDITION_JUDGEMENT("ConditionJudgement"),
-        FORK("Fork"),
-        JOIN("Join"),
         EXTERNAL_ENTITY("ExternalEntity"),
         PROCESS_BOX("ProcessBox"),
         DATA_STORE("DataStore"),
@@ -137,7 +134,7 @@ public record PresentationDTO(
         HEADER_CELL_IN_CRUD("HeaderCell"),
         TOTAL_HEADER_CELL_IN_CRUD("TotalHeaderCell"),
         UNKNOWN("Unknown");
-        
+
         public final String typeName;
 
         private Type(String typeName) {

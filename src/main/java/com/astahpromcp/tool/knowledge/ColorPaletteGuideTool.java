@@ -7,6 +7,7 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -15,11 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 // Tool that fetches Color Palette guide content and returns it in chunks
 @Slf4j
-public class ColorPaletteGuideTool implements ToolProvider, RemoteDocumentTool {
+public class ColorPaletteGuideTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
     private final Path outputDirectory;
@@ -60,8 +59,6 @@ public class ColorPaletteGuideTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentDTO getColorPaletteGuideInfo(NoInputDTO param) throws IOException {
-        log.debug("Get Color Palette guide: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("Color Palette guide already loaded, returning from cache.");
@@ -85,8 +82,6 @@ public class ColorPaletteGuideTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentChunkDTO getColorPaletteGuideChunk(ChunkDTO param) {
-        log.debug("Get Color Palette guide chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

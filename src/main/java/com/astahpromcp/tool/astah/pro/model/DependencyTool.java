@@ -7,12 +7,12 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DependencyDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DependencyDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IDependency;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDependency.html
@@ -42,8 +42,6 @@ public class DependencyTool extends AstahToolProvider {
     }
 
     private DependencyDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get dependency information: {}", param);
-
         IDependency astahDependency = astahProToolSupport.getDependency(param.id());
 
         return DependencyDTOAssembler.toDTO(astahDependency);

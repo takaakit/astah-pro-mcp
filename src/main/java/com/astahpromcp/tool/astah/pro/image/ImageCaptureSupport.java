@@ -9,17 +9,23 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Locale;
 
 @Slf4j
@@ -59,16 +65,54 @@ public class ImageCaptureSupport {
     ) {
     }
 
+    // An exported diagram image file and its size in pixels.
+    public record ExportedImageFile(
+        Path path,
+        int width,
+        int height
+    ) {
+    }
+
     // Exports the specified diagram to a PNG file and reads it back into memory
     ExportedImage exportDiagramImage(String diagramId) throws Exception {
         IDiagram astahDiagram = astahProToolSupport.getDiagram(diagramId);
+        String relativeImagePath = exportPng(astahDiagram);
+        Path absoluteImagePath = imageOutputDir.resolve(relativeImagePath);
 
+        // Read the exported image file
+        BufferedImage image;
+        try {
+            image = ImageIO.read(absoluteImagePath.toFile());
+        } catch (Exception e) {
+            throw new Exception("Failed to read exported image file: " + e.getMessage(), e);
+        }
+        if (image == null) {
+            throw new Exception("Failed to read image file: " + absoluteImagePath.toString());
+        }
+
+        Rectangle2D boundRect = astahDiagram.getBoundRect();
+
+        return new ExportedImage(image, relativeImagePath, boundRect);
+    }
+
+    // Exports the specified diagram to a PNG file without reading its pixels: at a high export dpi they decode into hundreds of megabytes.
+    public ExportedImageFile exportDiagramImageFile(String diagramId) throws Exception {
+        IDiagram astahDiagram = astahProToolSupport.getDiagram(diagramId);
+        Path absoluteImagePath = imageOutputDir.resolve(exportPng(astahDiagram));
+
+        Dimension size = readImageSize(absoluteImagePath);
+
+        return new ExportedImageFile(absoluteImagePath, size.width, size.height);
+    }
+
+    // Exports the diagram with the Astah API and returns the PNG file's path relative to the output directory
+    private String exportPng(IDiagram astahDiagram) throws Exception {
         // Ensure the output directory exists and create it when needed
         log.debug("Create output directory: {}", imageOutputDir);
         try {
             Files.createDirectories(imageOutputDir);
         } catch (Exception e) {
-            throw new Exception("Failed to create output directory: " + e.getMessage());
+            throw new Exception("Failed to create output directory: " + e.getMessage(), e);
         }
 
         // Verify that the directory is writable
@@ -81,7 +125,7 @@ public class ImageCaptureSupport {
         try {
             relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", systemPropertySupport.imageExportDpi());
         } catch (Exception e) {
-            throw new Exception("Astah API exportImage method failed: " + e.getMessage());
+            throw new Exception("Astah API exportImage method failed: " + e.getMessage(), e);
         }
 
         if (relativeImagePath == null || relativeImagePath.trim().isEmpty()) {
@@ -93,20 +137,29 @@ public class ImageCaptureSupport {
             throw new Exception("Exported image file does not exist: " + absoluteImagePath.toString());
         }
 
-        // Read the exported image file
-        BufferedImage image;
-        try {
-            image = ImageIO.read(absoluteImagePath.toFile());
-        } catch (Exception e) {
-            throw new Exception("Failed to read exported image file: " + e.getMessage());
-        }
-        if (image == null) {
-            throw new Exception("Failed to read image file: " + absoluteImagePath.toString());
-        }
+        return relativeImagePath;
+    }
 
-        Rectangle2D boundRect = astahDiagram.getBoundRect();
+    // Reads the size from the image header, leaving the pixels undecoded
+    static Dimension readImageSize(Path imagePath) throws Exception {
+        try (ImageInputStream imageInputStream = ImageIO.createImageInputStream(imagePath.toFile())) {
+            Iterator<ImageReader> readers = imageInputStream == null
+                    ? Collections.emptyIterator()
+                    : ImageIO.getImageReaders(imageInputStream);
+            if (!readers.hasNext()) {
+                throw new Exception("Failed to read image file: " + imagePath.toString());
+            }
 
-        return new ExportedImage(image, relativeImagePath, boundRect);
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(imageInputStream, true, true);
+                return new Dimension(reader.getWidth(0), reader.getHeight(0));
+            } finally {
+                reader.dispose();
+            }
+        } catch (IOException e) {
+            throw new Exception("Failed to read exported image file: " + e.getMessage(), e);
+        }
     }
 
     private McpSchema.ImageContent createImageContent(String diagramId, ImageRegion region, PngSizeTarget sizeTarget) throws Exception {
@@ -319,7 +372,7 @@ public class ImageCaptureSupport {
         // Encode at full resolution first and measure the real compressed size.
         byte[] fullBytes = encodePng(image, sourceRegion, 1.0);
         if (fullBytes.length <= targetPngSizeBytes) {
-            return new EncodedPng(fullBytes, 1.0);  // common case: figures compress well, no downscale needed
+            return new EncodedPng(fullBytes, 1.0);  // Common case: figures compress well, no downscale needed
         }
 
         // Too large: derive the scale from the measured PNG size (bytes ~ pixel area ~ scale^2) and re-encode once.

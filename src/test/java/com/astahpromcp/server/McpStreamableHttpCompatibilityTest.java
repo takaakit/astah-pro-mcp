@@ -26,13 +26,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 // End-to-end checks against a real Jetty server running the real SDK transport behind the approval servlet.
-class McpStreamableHttpCompatibilityTest {
+public class McpStreamableHttpCompatibilityTest {
 
     // Small enough that an oversized body costs nothing to build. McpClientApprovalServletTest pins the production
     // value, and McpServerApp states that same constant on the transport builder.
@@ -51,7 +48,7 @@ class McpStreamableHttpCompatibilityTest {
     private String rawEndpoint;
 
     @BeforeEach
-    void startServer() throws Exception {
+    void setUp() throws Exception {
         transport = HttpServletStreamableServerTransportProvider.builder()
                 .mcpEndpoint("/mcp")
                 .jsonMapper(JsonSupport.MCP_JSON_MAPPER)
@@ -117,7 +114,7 @@ class McpStreamableHttpCompatibilityTest {
     }
 
     @AfterEach
-    void stopServer() throws Exception {
+    void tearDown() throws Exception {
         if (mcpServer != null) {
             mcpServer.closeGracefully();
         }
@@ -260,6 +257,6 @@ class McpStreamableHttpCompatibilityTest {
                 return JsonSupport.OBJ_MAPPER.readTree(line.substring("data:".length()).trim());
             }
         }
-        throw new AssertionError("No SSE data frame in the response body: " + sseBody);
+        return fail("No SSE data frame in the response body: " + sseBody);
     }
 }

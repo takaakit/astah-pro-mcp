@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERIndexWithERAttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERIndexWithKeyDTO;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERIndexToolTest {
 
@@ -144,7 +144,7 @@ public class ERIndexToolTest {
         IERIndex erIndex = (IERIndex) TestSupport.instance().getNamedElementByClassAndName(
             IERIndex.class,
             "Index0");
-        
+
         // Get ER attribute
         IERAttribute targetAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IERAttribute.class,

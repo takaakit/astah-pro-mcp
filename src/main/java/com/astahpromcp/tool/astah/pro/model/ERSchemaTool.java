@@ -7,12 +7,12 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERSchemaDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERSchemaDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERSchema;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERSchema.html
@@ -42,8 +42,6 @@ public class ERSchemaTool extends AstahToolProvider {
     }
 
     private ERSchemaDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER schema information: {}", param);
-
         IERSchema astahERSchema = astahProToolSupport.getERSchema(param.id());
 
         return ERSchemaDTOAssembler.toDTO(astahERSchema);

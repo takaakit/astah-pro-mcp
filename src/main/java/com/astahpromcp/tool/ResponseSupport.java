@@ -28,7 +28,7 @@ public final class ResponseSupport {
 
     // Return a DTO as structured content and other McpSchema contents
     public static McpSchema.CallToolResult success(Object dto, List<McpSchema.Content> contents) {
-        return successWithStructuredContent(dto, contents == null ? List.of() : contents);
+        return successWithStructuredContent(dto, contents);
     }
 
     private static McpSchema.CallToolResult successWithStructuredContent(

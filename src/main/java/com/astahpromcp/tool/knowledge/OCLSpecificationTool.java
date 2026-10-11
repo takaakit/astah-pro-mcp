@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
-public class OCLSpecificationTool implements ToolProvider, RemoteDocumentTool {
+public class OCLSpecificationTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
 
@@ -53,8 +53,6 @@ public class OCLSpecificationTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentDTO getOCLSpecification(NoInputDTO param) throws IOException {
-        log.debug("Get OCL specification: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("OCL Specification already loaded, returning from cache.");
@@ -79,8 +77,6 @@ public class OCLSpecificationTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentChunkDTO getOCLSpecificationChunk(ChunkDTO param) {
-        log.debug("Get OCL specification chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

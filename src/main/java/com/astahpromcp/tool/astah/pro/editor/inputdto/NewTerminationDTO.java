@@ -6,7 +6,7 @@ public record NewTerminationDTO(
     @JsonPropertyDescription("Target sequence diagram identifier")
     String targetSequenceDiagramId,
     
-    @JsonPropertyDescription("Target node presentation identifier")
+    @JsonPropertyDescription("Target node presentation identifier. Must be one of the following node presentation types: Lifeline.")
     String targetNodePresentationId
 ) {
 }

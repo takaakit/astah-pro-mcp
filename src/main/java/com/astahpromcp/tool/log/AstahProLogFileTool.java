@@ -39,8 +39,6 @@ public class AstahProLogFileTool implements ToolProvider {
     }
 
     private LogFileDTO getAstahProLogFile(NoInputDTO param) throws IOException {
-        log.debug("Get information of astah pro log: {}", param);
-        
         String userHome = System.getProperty("user.home");
         String astahProLogFilePath = Paths.get(userHome, ".astah", "professional", "astah.log").toString();
         return getLogFileStats(astahProLogFilePath);

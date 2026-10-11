@@ -2,9 +2,9 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.GateDTO;
 import com.change_vision.jude.api.inf.model.IGate;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.GateDTO;
 
 public class GateDTOAssembler {
     public static GateDTO toDTO(@NonNull IGate astahGate) throws Exception {

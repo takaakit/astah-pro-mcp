@@ -8,13 +8,13 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InstanceSpecificationWithClassifierDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InstanceSpecificationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IInstanceSpecification;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInstanceSpecification.html
@@ -53,16 +53,12 @@ public class InstanceSpecificationTool extends AstahToolProvider {
     }
 
     private InstanceSpecificationDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get instance specification information: {}", param);
-
         IInstanceSpecification astahInstanceSpecification = astahProToolSupport.getInstanceSpecification(param.id());
 
         return InstanceSpecificationDTOAssembler.toDTO(astahInstanceSpecification);
     }
 
     private InstanceSpecificationDTO setClassifier(InstanceSpecificationWithClassifierDTO param) throws Exception {
-        log.debug("Set classifier to instance specification: {}", param);
-
         IClass astahClass = astahProToolSupport.getClassOrPrimitiveType(param.targetClassifierId());
         IInstanceSpecification astahInstanceSpecification = astahProToolSupport.getInstanceSpecification(param.targetInstanceSpecificationId());
 

@@ -2,20 +2,18 @@ package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.JsonSupport;
+import com.astahpromcp.tool.ToolCallStatistics;
 import com.astahpromcp.tool.ToolDefinition;
+import com.astahpromcp.tool.astah.pro.EdtSupport;
 import com.astahpromcp.tool.common.ScriptLine;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import io.modelcontextprotocol.spec.McpSchema;
-import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.JsonNode;
 
-import javax.swing.SwingUtilities;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // The only Java entry point an mcp tool script can reach, and therefore the only place the limits of one run are enforced.
@@ -25,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 // inside a DTO rather than at the call. Stringifying on the JavaScript side and parsing here removes that class of bug.
 //
 // One instance serves one mcp tool script run: the call counter, the first failure and the abandoned flag are per-run state.
-@Slf4j
 public final class McpToolScriptDispatcher {
 
     private final AstahToolRegistry registry;
@@ -105,25 +102,38 @@ public final class McpToolScriptDispatcher {
         // The exchange is unused: every handler this server builds ignores it (the three factory methods in
         // ToolSupport all bind it as an ignored parameter), and ExclusiveToolProvider only passes it through.
         McpSchema.CallToolResult result = definition.toolHandler().apply(null, request);
+        ToolCallStatistics.record(ToolCallStatistics.Route.MCP_TOOL_SCRIPT, toolName, result);
 
         // The lock wrapper drains the EDT after every single tool call before it releases the lock, so on the direct
         // profile one call means one drain. Calling the unwrapped handler skips that, which would let a script read
         // back a value before Astah had finished applying the edit that produced it. Draining here keeps a tool
         // function behaving the same whether it is called directly or from an mcp tool script.
-        drainEventDispatchThread(toolName);
+        EdtSupport.drain(toolName, "continuing the mcp tool script");
 
         if (result == null) {
             throw new IllegalStateException("'" + toolName + "' returned no result.");
         }
 
         if (Boolean.TRUE.equals(result.isError())) {
-            throw new RuntimeException(errorMessageOf(result, toolName));
+            StringBuilder message = new StringBuilder();
+            if (result.content() != null) {
+                for (McpSchema.Content content : result.content()) {
+                    if (content instanceof McpSchema.TextContent text && text.text() != null) {
+                        if (!message.isEmpty()) {
+                            message.append('\n');
+                        }
+                        message.append(text.text());
+                    }
+                }
+            }
+
+            throw new RuntimeException(message.isEmpty() ? "'" + toolName + "' failed." : message.toString());
         }
 
         Object structuredContent = result.structuredContent();
         if (structuredContent == null) {
             // Runtime guard for a tool that stopped returning structured content without its result kind changing.
-            throw new IllegalStateException(NotMcpToolScriptCallableReason.missingStructuredContentMessage(toolName));
+            throw new IllegalStateException("'" + toolName + "' returned no structured content, so it cannot be called from an mcp tool script. Call '" + toolName + "' directly as an MCP tool instead.");
         }
 
         // Wrapped so that every failure leaving this method names the tool function it came from, which is what the run reports when the script catches the exception and the original is gone.
@@ -232,50 +242,5 @@ public final class McpToolScriptDispatcher {
             }
         }
         return deepest;
-    }
-
-    private static String errorMessageOf(McpSchema.CallToolResult result, String toolName) {
-        if (result.content() == null || result.content().isEmpty()) {
-            return "'" + toolName + "' failed.";
-        }
-
-        StringBuilder message = new StringBuilder();
-        for (McpSchema.Content content : result.content()) {
-            if (content instanceof McpSchema.TextContent text && text.text() != null) {
-                if (!message.isEmpty()) {
-                    message.append('\n');
-                }
-                message.append(text.text());
-            }
-        }
-
-        return message.isEmpty() ? "'" + toolName + "' failed." : message.toString();
-    }
-
-    // Wait until everything Astah queued on the event dispatch thread has run.
-    private static void drainEventDispatchThread(String toolName) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            return;
-        }
-
-        // A thread told to stop does not wait, and keeps its interrupt. Posting to the EDT from it could also lose that
-        // interrupt: when AWT has to restart a stopped EDT, AWTAutoShutdown.activateBlockerThread() swallows it.
-        if (Thread.currentThread().isInterrupted()) {
-            log.warn("Interrupted while draining the EDT after a tool call from an mcp tool script @tool={}", toolName);
-            return;
-        }
-
-        CountDownLatch latch = new CountDownLatch(1);
-        SwingUtilities.invokeLater(latch::countDown);
-        try {
-            if (!latch.await(McpServerConfig.EDT_FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                log.warn("EDT did not drain within {} seconds; continuing the mcp tool script anyway @tool={}",
-                        McpServerConfig.EDT_FLUSH_TIMEOUT_SECONDS, toolName);
-            }
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("Interrupted while draining the EDT after a tool call from an mcp tool script @tool={}", toolName);
-        }
     }
 }

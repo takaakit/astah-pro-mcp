@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.view;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementListDTO;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Disabled("ProjectViewManager is not available in non-plugin")
 public class ProjectViewManagerToolTest {
@@ -45,7 +45,7 @@ public class ProjectViewManagerToolTest {
             projectViewManager,
             transactionSupport,
             astahProToolSupport);
-        
+
         // getSelectedElements() method
         getSelectedElements = TestSupport.getAccessibleMethod(
             ProjectViewManagerTool.class,
@@ -76,7 +76,7 @@ public class ProjectViewManagerToolTest {
     void getSelectedElements_ok() throws Exception {
         // Create input DTO
         NoInputDTO inputDTO = new NoInputDTO();
-        
+
         // ----------------------------------------
         // Call getSelectedElements()
         // ----------------------------------------
@@ -85,7 +85,7 @@ public class ProjectViewManagerToolTest {
             tool,
             inputDTO,
             ElementListDTO.class);
-        
+
         // Check output DTO
         assertNotNull(outputDTO);
     }
@@ -96,7 +96,7 @@ public class ProjectViewManagerToolTest {
         IElement element = TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(element.getId());
 
@@ -119,7 +119,7 @@ public class ProjectViewManagerToolTest {
         IElement element = TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(element.getId());
 

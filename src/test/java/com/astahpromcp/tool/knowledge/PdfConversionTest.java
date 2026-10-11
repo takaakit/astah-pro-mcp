@@ -15,12 +15,13 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PdfConversionTest {
+public class PdfConversionTest {
+
     @TempDir
     Path directory;
 
     @Test
-    void convertsRealPdfAndPreservesPageOrderAndRequestedFileName() throws Exception {
+    void convertPdfToMarkdown_ok_preservesPageOrderAndRequestedFileName() throws Exception {
         Path pdf = directory.resolve("input.pdf");
         Files.write(pdf, documentBytes());
 
@@ -33,7 +34,7 @@ class PdfConversionTest {
     }
 
     @Test
-    void convertsPdfBytesAndRemovesTemporaryPdf() throws Exception {
+    void convertPdfToMarkdown_ok_convertsBytesAndRemovesTemporaryPdf() throws Exception {
         Path output = directory.resolve("nested");
 
         String markdown = KnowledgeToolSupport.convertPdfToMarkdown(documentBytes(), output, "guide");
@@ -44,7 +45,7 @@ class PdfConversionTest {
     }
 
     @Test
-    void keepsOclOperatorsRatherThanHtmlEntities() throws Exception {
+    void convertPdfToMarkdown_ok_preservesOclOperators() throws Exception {
         String ocl = "self.employees->size() <> 0 and a <= b & c";
 
         String markdown = KnowledgeToolSupport.convertPdfToMarkdown(documentBytes(ocl), directory, "ocl");

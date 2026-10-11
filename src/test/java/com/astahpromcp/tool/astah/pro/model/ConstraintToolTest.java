@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ConstraintWithSpecificationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ConstraintDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ConstraintToolTest {
 
@@ -65,10 +65,10 @@ public class ConstraintToolTest {
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Get constraint from class
         IConstraint constraint = clazz.getConstraints()[0];
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(constraint.getId());
 
@@ -92,10 +92,10 @@ public class ConstraintToolTest {
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Get constraint from class
         IConstraint constraint = clazz.getConstraints()[0];
-        
+
         // Create input DTO
         String newSpecification = "new specification contents";
         ConstraintWithSpecificationDTO inputDTO = new ConstraintWithSpecificationDTO(

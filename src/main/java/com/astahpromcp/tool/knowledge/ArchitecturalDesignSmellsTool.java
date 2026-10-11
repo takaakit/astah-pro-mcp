@@ -10,8 +10,10 @@ import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.SmellsDTO;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 @Slf4j
@@ -58,8 +60,6 @@ public class ArchitecturalDesignSmellsTool implements ToolProvider {
     }
 
     private GuideDTO recallSmells(NoInputDTO param) throws Exception {
-        log.debug("Recall architectural and design smells: {}", param);
-
         Path smellsFile = workspaceDir.resolve(SMELLS_FILE_NAME);
         String absolutePath = smellsFile.toAbsolutePath().toString();
 
@@ -91,24 +91,24 @@ Follow these steps to recall architectural smells and design smells that should 
     }
 
     private AbsoluteFilePathDTO storeSmells(TextContentsDTO param) throws Exception {
-        log.debug("Store architectural and design smells: {}", param);
-
         Path smellsFile = workspaceDir.resolve(SMELLS_FILE_NAME);
         String absolutePath = smellsFile.toAbsolutePath().toString();
 
-        if (Files.exists(smellsFile)) {
-            throw new IllegalStateException("The file storing architectural and design smells already exists: " + absolutePath);
+        if (param.contents().isBlank()) {
+            throw new IllegalArgumentException("The architectural and design smells to store must not be blank.");
         }
 
-        Files.writeString(smellsFile, param.contents());
+        try {
+            Files.writeString(smellsFile, param.contents(), StandardOpenOption.CREATE_NEW);
+        } catch (FileAlreadyExistsException e) {
+            throw new IllegalStateException("The file storing architectural and design smells already exists: " + absolutePath);
+        }
         log.info("Stored smells file: {}", absolutePath);
 
         return new AbsoluteFilePathDTO(absolutePath);
     }
 
     private SmellsDTO readSmells(NoInputDTO param) throws Exception {
-        log.debug("Read architectural and design smells: {}", param);
-
         Path smellsFile = workspaceDir.resolve(SMELLS_FILE_NAME);
         String absolutePath = smellsFile.toAbsolutePath().toString();
 

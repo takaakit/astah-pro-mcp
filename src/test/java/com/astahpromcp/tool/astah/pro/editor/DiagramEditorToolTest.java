@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
-import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeletePresentationDTO;
@@ -15,6 +15,7 @@ import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
+import com.astahpromcp.tool.common.ImageConvertSupport;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
@@ -22,8 +23,8 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -33,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class DiagramEditorToolTest {
 
@@ -120,12 +120,12 @@ public class DiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
-        
+
         // Create SVG code for a simple red circle
         String svgCode = "<svg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\">" +
                         "<circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"red\" stroke=\"black\" stroke-width=\"2\"/>" +
                         "</svg>";
-        
+
         // Create input DTO
         NewSvgImageWithPointDTO inputDTO = new NewSvgImageWithPointDTO(
             classDiagram.getId(),
@@ -153,11 +153,11 @@ public class DiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
-        
+
         // Use a small test PNG image file from test resources
         Path imagePath = Paths.get("src/test/resources/images/test.png").toAbsolutePath();
         String imageUrl = imagePath.toUri().toASCIIString();
-        
+
         // Create input DTO
         NewPngOrJpgImageWithPointDTO inputDTO = new NewPngOrJpgImageWithPointDTO(
             classDiagram.getId(),
@@ -185,11 +185,11 @@ public class DiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
-        
+
         // Use a small test JPG image file from test resources
         Path imagePath = Paths.get("src/test/resources/images/test.jpg").toAbsolutePath();
         String imageUrl = imagePath.toUri().toASCIIString();
-        
+
         // Create input DTO
         NewPngOrJpgImageWithPointDTO inputDTO = new NewPngOrJpgImageWithPointDTO(
             classDiagram.getId(),
@@ -250,7 +250,7 @@ public class DiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
-        
+
         // Create input DTO
         NewTextWithPointDTO inputDTO = new NewTextWithPointDTO(
             classDiagram.getId(),
@@ -277,7 +277,7 @@ public class DiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
-        
+
         // Create input DTO
         DeleteDiagramDTO inputDTO = new DeleteDiagramDTO(
             classDiagram.getId());

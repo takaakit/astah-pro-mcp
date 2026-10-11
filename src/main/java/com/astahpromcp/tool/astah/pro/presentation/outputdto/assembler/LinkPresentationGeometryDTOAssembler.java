@@ -17,8 +17,8 @@ public class LinkPresentationGeometryDTOAssembler {
             label,
             astahLinkPresentation.getType(),
             PresentationDTOAssembler.correspondingModelElementOf(astahLinkPresentation),
-            LinkPresentationDTOAssembler.endOf(astahLinkPresentation.getSourceEnd()),
-            LinkPresentationDTOAssembler.endOf(astahLinkPresentation.getTargetEnd()),
+            LinkPresentationDTOAssembler.endOf(LinkPresentationDTOAssembler.sourceEndOf(astahLinkPresentation)),
+            LinkPresentationDTOAssembler.endOf(LinkPresentationDTOAssembler.targetEndOf(astahLinkPresentation)),
             LinkPresentationDTOAssembler.drawnPointsOf(astahLinkPresentation),
             LineStyleKind.getCorrespondingType(astahLinkPresentation.getProperty(Key.LINE_SHAPE)));
     }

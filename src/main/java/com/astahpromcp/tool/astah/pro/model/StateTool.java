@@ -11,12 +11,14 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithExitDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.StateWithInternalTransitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.StateDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.model.IFinalState;
 import com.change_vision.jude.api.inf.model.IState;
+import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IState.html
@@ -82,31 +84,52 @@ public class StateTool extends AstahToolProvider {
     }
 
     private StateDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get state information: {}", param);
-
         IState astahState = astahProToolSupport.getState(param.id());
 
         return StateDTOAssembler.toDTO(astahState);
     }
 
     private StateDTO addInternalTransition(StateWithInternalTransitionDTO param) throws Exception {
-        log.debug("Add internal transition to state: {}", param);
-
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
+        if (astahState instanceof IFinalState) {
+            throw new IllegalArgumentException(String.format(
+                "The state (ID: %s) is a final state.",
+                astahState.getId()));
+        }
+
+        // IState.addInternalTransition() stores null as the text "null", so a null guard or action means none
+        String event = stripOrEmpty(param.event());
+        String guard = stripOrEmpty(param.guard());
+        String action = stripOrEmpty(param.action());
+
+        if (event.isEmpty()) {
+            throw new IllegalArgumentException("The event of an internal transition must not be empty or blank.");
+        }
+
+        // IState.addInternalTransition() accepts the same internal transition twice
+        for (ITransition astahTransition : astahState.getInternalTransitions()) {
+            if (event.equals(stripOrEmpty(astahTransition.getEvent()))
+                && guard.equals(stripOrEmpty(astahTransition.getGuard()))
+                && action.equals(stripOrEmpty(astahTransition.getAction()))) {
+                throw new IllegalArgumentException(String.format(
+                    "Failed to add the internal transition because the state '%s' (ID: %s) already has the internal transition '%s' (ID: %s).",
+                    astahState.getName(), astahState.getId(), astahTransition.getName(), astahTransition.getId()));
+            }
+        }
+
         txnAstah.run( () -> {
-            astahState.addInternalTransition(
-                param.event(),
-                param.guard(),
-                param.action());
+            astahState.addInternalTransition(event, guard, action);
         });
 
         return StateDTOAssembler.toDTO(astahState);
     }
 
-    private StateDTO deleteAllInternalTransitions(IdDTO param) throws Exception {
-        log.debug("Delete all internal transitions from state: {}", param);
+    private static String stripOrEmpty(String text) {
+        return text == null ? "" : text.strip();
+    }
 
+    private StateDTO deleteAllInternalTransitions(IdDTO param) throws Exception {
         IState astahState = astahProToolSupport.getState(param.id());
 
         txnAstah.run( () -> {
@@ -117,8 +140,6 @@ public class StateTool extends AstahToolProvider {
     }
 
     private StateDTO setEntry(StateWithEntryDTO param) throws Exception {
-        log.debug("Set entry of state: {}", param);
-
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         txnAstah.run( () -> {
@@ -129,8 +150,6 @@ public class StateTool extends AstahToolProvider {
     }
 
     private StateDTO setDoActivity(StateWithDoActivityDTO param) throws Exception {
-        log.debug("Set doActivity of state: {}", param);
-
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         txnAstah.run( () -> {
@@ -141,8 +160,6 @@ public class StateTool extends AstahToolProvider {
     }
 
     private StateDTO setExit(StateWithExitDTO param) throws Exception {
-        log.debug("Set exit of state: {}", param);
-
         IState astahState = astahProToolSupport.getState(param.targetStateId());
 
         txnAstah.run( () -> {

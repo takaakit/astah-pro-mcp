@@ -1,21 +1,20 @@
-package com.astahpromcp.tool.mcptoolscript;
+package com.astahpromcp.tool.common;
 
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 // A writer that keeps at most a fixed number of bytes and remembers that it dropped the rest.
 //
-// The astah api script executor collects output in an unbounded StringWriter, which is tolerable there because one
-// run is one operation. An mcp tool script that drives tool functions in a loop can print on every iteration, so its output
-// needs a ceiling; silently returning a truncated string would be worse than saying so, hence truncated().
-final class BoundedWriter extends Writer {
+// What a script prints stays in Astah's own heap until the run ends, so a script that prints in a loop -- an mcp tool
+// script driving tool functions, or any script whose loop went wrong -- would exhaust it without a ceiling.
+public final class BoundedWriter extends Writer {
 
     private final StringBuilder buffer = new StringBuilder();
     private final int maxBytes;
     private int bytesWritten;
     private boolean truncated;
 
-    BoundedWriter(int maxBytes) {
+    public BoundedWriter(int maxBytes) {
         this.maxBytes = maxBytes;
     }
 
@@ -72,7 +71,7 @@ final class BoundedWriter extends Writer {
         // Nothing to release
     }
 
-    synchronized boolean truncated() {
+    public synchronized boolean truncated() {
         return truncated;
     }
 

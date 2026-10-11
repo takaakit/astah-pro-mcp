@@ -36,12 +36,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class KnowledgeToolSupport {
 
-    static final int MAX_CHUNK_CHARS = 49152; // characters 48KB (48 * 1024)
+    static final int MAX_CHUNK_CHARS = 49152; // Characters 48KB (48 * 1024)
 
-    static final int CHUNK_OVERLAP_MAX_CHARS = 2048; // characters 2KB (2 * 1024)
+    static final int CHUNK_OVERLAP_MAX_CHARS = 2048; // Characters 2KB (2 * 1024)
 
-    private static final int CHUNK_SIZE = MAX_CHUNK_CHARS - CHUNK_OVERLAP_MAX_CHARS; // characters, before the overlap prefix is added
-    private static final int CHUNK_OVERLAP_LINES = 3; // lines of the previous chunk repeated at the start of the next chunk
+    private static final int CHUNK_SIZE = MAX_CHUNK_CHARS - CHUNK_OVERLAP_MAX_CHARS; // Characters, before the overlap prefix is added
+    private static final int CHUNK_OVERLAP_LINES = 3; // Lines of the previous chunk repeated at the start of the next chunk
 
     // Reusable, thread-safe HTML-to-Markdown converter
     private static final FlexmarkHtmlConverter HTML_TO_MARKDOWN_CONVERTER = FlexmarkHtmlConverter.builder(
@@ -219,8 +219,9 @@ public class KnowledgeToolSupport {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (!line.trim().isEmpty()) {
-                        urls.add(line.trim());
+                    String url = line.trim();
+                    if (!url.isEmpty()) {
+                        urls.add(url);
                     }
                 }
             }

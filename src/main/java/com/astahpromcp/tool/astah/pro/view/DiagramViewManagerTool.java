@@ -4,6 +4,7 @@ import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.EdtSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdListDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
@@ -12,11 +13,13 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
 import com.astahpromcp.tool.astah.pro.view.inputdto.PresentationWithHighlightColorDTO;
+import com.astahpromcp.tool.astah.pro.view.outputdto.DiagramWithZoomFactorDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.exception.InvalidUsingException;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
-import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IDiagramViewManager;
@@ -24,11 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import java.util.stream.Collectors;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IDiagramViewManager.html
@@ -40,6 +42,9 @@ public class DiagramViewManagerTool extends AstahToolProvider {
 
     private static final String BRING_TO_FRONT_MENU_ITEM_NAME = "managementview.menu.edit.arrange_depth.front";
     private static final String SEND_TO_BACK_MENU_ITEM_NAME = "managementview.menu.edit.arrange_depth.back";
+
+    private static final double MIN_ZOOM_FACTOR = 0.05;
+    private static final double MAX_ZOOM_FACTOR = 4.0;
 
     private final ProjectAccessor projectAccessor;
     private final IDiagramViewManager diagramViewManager;
@@ -72,7 +77,7 @@ public class DiagramViewManagerTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "select_prsts",
-                "Select the specified presentations (specified by ID) in current diagram, and return the selected presentations.",
+                "Select the specified presentations (specified by ID) in current diagram, replacing the current selection, and return the selected presentations. Every presentation must be on the current diagram, so open its diagram first.",
                 this::selectPresentations,
                 IdListDTO.class,
                 PresentationListDTO.class),
@@ -93,10 +98,10 @@ public class DiagramViewManagerTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "zoom",
-                "Zoom in current diagram, and return the model element of the zoomed diagram.",
+                "Set the zoom factor of current diagram to the specified absolute value, and return the model element of the zoomed diagram with the zoom factor actually applied. The zoom factor must be between 0.05 and 4.0 (1.0 is 100%); a value outside this range is rejected with an error. The value is not relative to the current zoom factor. Astah rounds a value within the range to its own zoom steps, so the applied zoom factor can differ slightly from the specified one (e.g., 1.25 may become 1.26); check it in the result.",
                 this::zoom,
                 com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO.class,
-                DiagramDTO.class),
+                DiagramWithZoomFactorDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "zoom_fit",
@@ -128,14 +133,14 @@ public class DiagramViewManagerTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_zoom_factor",
-                "Return the zoom factor (4.0 - 0.05) of the current diagram. Return 0.0 if the diagram is not opened.",
+                "Return the zoom factor of the current diagram (0.05 - 4.0, where 1.0 is 100%). Return 0.0 if the diagram is not opened.",
                 this::getZoomFactor,
                 NoInputDTO.class,
                 com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_highlighted_prsts_within_dgm",
-                "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information.",
+                "Get the highlighted presentations within the specified diagram (specified by ID), and return the highlighted presentations information. Highlights exist only while the diagram is open, so an empty list is returned if the diagram is not open.",
                 this::getHighlightedPresentationsWithinDiagram,
                 IdDTO.class,
                 PresentationListDTO.class),
@@ -181,28 +186,24 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private DiagramDTO openDiagram(IdDTO param) throws Exception {
-        log.debug("Open diagram: {}", param);
-
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
 
         try {
             diagramViewManager.open(diagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to open diagram.");
+            throw new RuntimeException("Failed to open diagram.", e);
         }
 
         return DiagramDTOAssembler.toDTO(diagram);
     }
 
     private DiagramDTO closeDiagram(IdDTO param) throws Exception {
-        log.debug("Close diagram: {}", param);
-
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
 
         try {
             diagramViewManager.close(diagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to close diagram.");
+            throw new RuntimeException("Failed to close diagram.", e);
         }
 
         return DiagramDTOAssembler.toDTO(diagram);
@@ -226,14 +227,10 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private DiagramDTO getCurrentDiagram(NoInputDTO param) throws Exception {
-        log.debug("Get current diagram: {}", param);
-
         return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
     private PresentationListDTO getSelectedPresentations(NoInputDTO param) throws Exception {
-        log.debug("Get selected presentations: {}", param);
-
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
         for (IPresentation presentation : diagramViewManager.getSelectedPresentations()) {
             presentationDTOs.add(PresentationDTOAssembler.toDTO(presentation));
@@ -243,22 +240,46 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private PresentationListDTO selectPresentations(IdListDTO param) throws Exception {
-        log.debug("Select presentations: {}", param);
+        if (param.value() == null || param.value().isEmpty()) {
+            throw new IllegalArgumentException("Specify at least one presentation ID.");
+        }
+
+        IDiagram currentDiagram = requireCurrentDiagram();
 
         List<IPresentation> presentations = new ArrayList<>();
         for (String id : param.value().stream().map(IdDTO::id).toList()) {
             IPresentation presentation = astahProToolSupport.getPresentation(id);
+            requireOnDiagram(presentation, currentDiagram);
             presentations.add(presentation);
         }
 
+        IPresentation[] previousSelection = diagramViewManager.getSelectedPresentations();
         try {
             diagramViewManager.select(presentations.toArray(IPresentation[]::new));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to select presentations.");
+            throw new RuntimeException("Failed to select presentations.", e);
+        }
+
+        // select() silently skips a presentation it cannot select, so check the selection took
+        List<IPresentation> selectedPresentations = Arrays.asList(diagramViewManager.getSelectedPresentations());
+        List<IPresentation> unselectedPresentations = presentations.stream()
+                .filter(presentation -> !selectedPresentations.contains(presentation))
+                .distinct()
+                .toList();
+        if (!unselectedPresentations.isEmpty()) {
+            diagramViewManager.unselectAll();
+            if (previousSelection.length > 0) {
+                diagramViewManager.select(previousSelection);
+            }
+            throw new IllegalArgumentException(String.format(
+                    "Presentations cannot be selected: %s. The selection was left unchanged.",
+                    unselectedPresentations.stream()
+                            .map(presentation -> String.format("(ID: %s, type: %s)", presentation.getID(), presentation.getType()))
+                            .collect(Collectors.joining(", "))));
         }
 
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
-        for (IPresentation presentation : presentations) {
+        for (IPresentation presentation : selectedPresentations) {
             presentationDTOs.add(PresentationDTOAssembler.toDTO(presentation));
         }
 
@@ -266,12 +287,10 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private PresentationListDTO selectAllPresentations(NoInputDTO param) throws Exception {
-        log.debug("Select all presentations: {}", param);
-
         try {
             diagramViewManager.selectAll();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to select all presentations.");
+            throw new RuntimeException("Failed to select all presentations.", e);
         }
 
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
@@ -283,26 +302,22 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private DiagramDTO unselectAllPresentations(NoInputDTO param) throws Exception {
-        log.debug("Unselect all presentations: {}", param);
-
         try {
             diagramViewManager.unselectAll();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to unselect all presentations.");
+            throw new RuntimeException("Failed to unselect all presentations.", e);
         }
 
         return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
     }
 
     private PresentationDTO centerPresentationInDiagram(IdDTO param) throws Exception {
-        log.debug("Center presentation in diagram: {}", param);
-
         IPresentation presentation = astahProToolSupport.getPresentation(param.id());
 
         try {
             diagramViewManager.showInDiagramEditor(presentation);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to center presentation in diagram.");
+            throw new RuntimeException("Failed to center presentation in diagram.", e);
         }
 
         return PresentationDTOAssembler.toDTO(presentation);
@@ -322,26 +337,32 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO getZoomFactor(NoInputDTO param) throws Exception {
-        log.debug("Get zoom factor: {}", param);
-
         return new com.astahpromcp.tool.astah.pro.view.outputdto.ZoomFactorDTO(diagramViewManager.getZoomFactor());
     }
 
-    private DiagramDTO zoom(com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO param) throws Exception {
-        log.debug("Zoom: {}", param);
+    private DiagramWithZoomFactorDTO zoom(com.astahpromcp.tool.astah.pro.view.inputdto.ZoomFactorDTO param) throws Exception {
+        double zoomFactor = param.zoomFactorValue();
+        // Negated so that NaN is rejected too
+        if (!(zoomFactor >= MIN_ZOOM_FACTOR && zoomFactor <= MAX_ZOOM_FACTOR)) {
+            throw new IllegalArgumentException(String.format(
+                    "The zoom factor must be between %s and %s (1.0 is 100%%). It is absolute, not relative to the current zoom factor: %s",
+                    MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR, zoomFactor));
+        }
+        IDiagram currentDiagram = requireCurrentDiagram();
 
         try {
-            diagramViewManager.zoom(param.zoomFactorValue(), false);
+            diagramViewManager.zoom(zoomFactor, false);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to zoom.");
+            throw new RuntimeException("Failed to zoom.", e);
         }
 
-        return DiagramDTOAssembler.toDTO(requireCurrentDiagram());
+        // Astah rounds the value to its own zoom steps without telling, so return the zoom factor it actually applied
+        return new DiagramWithZoomFactorDTO(
+                DiagramDTOAssembler.toDTO(currentDiagram),
+                diagramViewManager.getZoomFactor());
     }
 
     private DiagramDTO zoomFit(NoInputDTO param) throws Exception {
-        log.debug("Zoom fit: {}", param);
-
         IDiagram currentDiagram = requireCurrentDiagram();
 
         JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();
@@ -349,34 +370,17 @@ public class DiagramViewManagerTool extends AstahToolProvider {
             throw new RuntimeException("Main window is unavailable.");
         }
 
-        Component fitControl = findComponentByName(mainFrame, FIT_WINDOW_TOOLBAR_BUTTON_NAME);
-        if (fitControl == null) {
-            throw new RuntimeException("Fit window button not found (name=" + FIT_WINDOW_TOOLBAR_BUTTON_NAME + ").");
-        }
-
-        AbstractButton button = resolveClickableFitButton(fitControl);
-        clickButtonOnEdt(button);
+        // Find and click in one EDT task
+        EdtSupport.call(() -> {
+            Component fitControl = findComponentByName(mainFrame, FIT_WINDOW_TOOLBAR_BUTTON_NAME);
+            if (fitControl == null) {
+                throw new RuntimeException("Fit window button not found (name=" + FIT_WINDOW_TOOLBAR_BUTTON_NAME + ").");
+            }
+            resolveClickableFitButton(fitControl).doClick();
+            return null;
+        });
 
         return DiagramDTOAssembler.toDTO(currentDiagram);
-    }
-
-    private static void clickButtonOnEdt(AbstractButton button) throws Exception {
-        Runnable click = button::doClick;
-        try {
-            if (SwingUtilities.isEventDispatchThread()) {
-                click.run();
-            } else {
-                SwingUtilities.invokeAndWait(click);
-            }
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while clicking button.", e);
-
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            throw new RuntimeException("Failed to click button.", cause != null ? cause : e);
-        }
     }
 
     private static AbstractButton resolveClickableFitButton(Component fitControl) {
@@ -446,46 +450,47 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private PresentationDTO highlightPresentation(PresentationWithHighlightColorDTO param) throws Exception {
-        log.debug("Highlight presentation: {}", param);
-
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
+        Color highlightColor = Color.decode(AstahProToolSupport.requireRrggbbColor(param.highlightColor()));
 
-        txnAstah.run( () -> {
-            if (astahPresentation instanceof INodePresentation) {
-                diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, Color.decode(param.highlightColor()));
-            } else if (astahPresentation instanceof ILinkPresentation) {
-                diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.LINE_COLOR, Color.decode(param.highlightColor()));
-            } else {
-                diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, Color.decode(param.highlightColor()));
-            }
-        });
+        if (astahPresentation instanceof ILinkPresentation) {
+            diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.LINE_COLOR, highlightColor);
+        } else {
+            diagramViewManager.setViewProperty(astahPresentation, IDiagramViewManager.BACKGROUND_COLOR, highlightColor);
+        }
 
         return PresentationDTOAssembler.toDTO(astahPresentation);
     }
 
     private PresentationDTO unhighlightPresentation(IdDTO param) throws Exception {
-        log.debug("Unhighlight presentation: {}", param);
-
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.id());
 
-        txnAstah.run( () -> {
-            diagramViewManager.clearAllViewProperties(astahPresentation);
-        });
+        diagramViewManager.clearAllViewProperties(astahPresentation);
 
-        
         return PresentationDTOAssembler.toDTO(astahPresentation);
     }
 
     private PresentationListDTO getHighlightedPresentationsWithinDiagram(IdDTO param) throws Exception {
-        log.debug("Get highlighted presentations within diagram: {}", param);
-
         IDiagram diagram = astahProToolSupport.getDiagram(param.id());
-        
+
+        // Highlights are discarded when the diagram is closed
+        if (!Arrays.asList(diagramViewManager.getOpenDiagrams()).contains(diagram)) {
+            return new PresentationListDTO(List.of());
+        }
+
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
-        for (IPresentation presentation : diagram.getPresentations()) {
-            if (diagramViewManager.getViewProperty(presentation, IDiagramViewManager.BORDER_COLOR) != null
-                || diagramViewManager.getViewProperty(presentation, IDiagramViewManager.LINE_COLOR) != null
-                || diagramViewManager.getViewProperty(presentation, IDiagramViewManager.BACKGROUND_COLOR) != null) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(diagram)) {
+            // The cells of a CRUD and a generalization group reject view properties, so they can never be highlighted
+            boolean highlighted;
+            try {
+                highlighted = diagramViewManager.getViewProperty(presentation, IDiagramViewManager.BORDER_COLOR) != null
+                    || diagramViewManager.getViewProperty(presentation, IDiagramViewManager.LINE_COLOR) != null
+                    || diagramViewManager.getViewProperty(presentation, IDiagramViewManager.BACKGROUND_COLOR) != null;
+            } catch (InvalidUsingException e) {
+                continue;
+            }
+
+            if (highlighted) {
                 presentationDTOs.add(PresentationDTOAssembler.toDTO(presentation));
             }
         }
@@ -494,21 +499,29 @@ public class DiagramViewManagerTool extends AstahToolProvider {
     }
 
     private PresentationListDTO bringPresentationsToFront(IdListDTO param) throws Exception {
-        log.debug("Bring presentations to front: {}", param);
-
         return arrangeDepthOfPresentations(param, BRING_TO_FRONT_MENU_ITEM_NAME);
     }
 
     private PresentationListDTO sendPresentationsToBack(IdListDTO param) throws Exception {
-        log.debug("Send presentations to back: {}", param);
-
         return arrangeDepthOfPresentations(param, SEND_TO_BACK_MENU_ITEM_NAME);
     }
 
     private PresentationListDTO arrangeDepthOfPresentations(IdListDTO param, String menuItemName) throws Exception {
+        IDiagram currentDiagram = requireCurrentDiagram();
+
         List<IPresentation> presentations = new ArrayList<>();
         for (String id : param.value().stream().map(IdDTO::id).toList()) {
-            presentations.add(astahProToolSupport.getPresentation(id));
+            IPresentation presentation = astahProToolSupport.getPresentation(id);
+            requireOnDiagram(presentation, currentDiagram);
+            presentations.add(presentation);
+        }
+
+        for (IPresentation presentation : presentations) {
+            if (!selectOnly(presentation)) {
+                throw new IllegalArgumentException(String.format(
+                        "Presentation (ID: %s, type: %s) cannot be selected, so its Z-order cannot be changed.",
+                        presentation.getID(), presentation.getType()));
+            }
         }
 
         // Sort Z-order
@@ -519,11 +532,9 @@ public class DiagramViewManagerTool extends AstahToolProvider {
         }
 
         for (IPresentation presentation : presentations) {
-            try {
-                diagramViewManager.unselectAll();
-                diagramViewManager.select(new IPresentation[]{presentation});
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to select presentation: " + presentation.getLabel());
+            // The arrange depth menu items stay enabled with nothing selected, so a click without a selection would do nothing
+            if (!selectOnly(presentation)) {
+                throw new IllegalStateException(String.format("Failed to select presentation (ID: %s).", presentation.getID()));
             }
             clickArrangeDepthMenuItem(menuItemName);
         }
@@ -536,45 +547,50 @@ public class DiagramViewManagerTool extends AstahToolProvider {
         return new PresentationListDTO(presentationDTOs);
     }
 
+    private static void requireOnDiagram(IPresentation presentation, IDiagram diagram) {
+        IDiagram actualDiagram = presentation.getDiagram();
+        if (actualDiagram != null && diagram.getId().equals(actualDiagram.getId())) {
+            return;
+        }
+
+        throw new IllegalArgumentException(String.format(
+                "Presentation (ID: %s) is not on the current diagram '%s'%s. Open its diagram first (e.g., with the 'open_dgm' tool).",
+                presentation.getID(), diagram.getName(),
+                actualDiagram == null ? "" : " but on '" + actualDiagram.getName() + "'"));
+    }
+
+    // Select only the given presentation, and return whether the selection took
+    private boolean selectOnly(IPresentation presentation) {
+        try {
+            diagramViewManager.unselectAll();
+            diagramViewManager.select(new IPresentation[]{presentation});
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed to select presentation (ID: %s).", presentation.getID()), e);
+        }
+
+        return Arrays.asList(diagramViewManager.getSelectedPresentations()).contains(presentation);
+    }
+
     private void clickArrangeDepthMenuItem(String menuItemName) throws Exception {
         JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();
         if (mainFrame == null) {
             throw new RuntimeException("Main window is unavailable.");
         }
 
-        // The Edit menu-bar item is stable and always present (unlike the toolbar dropdown,
-        // whose lazily-built popup items are not reachable until shown).
-        Component component = findComponentByName(mainFrame, menuItemName);
-        if (!(component instanceof AbstractButton item)) {
-            throw new RuntimeException("Arrange depth menu item not found (name=" + menuItemName + ").");
-        }
-
-        // Check isEnabled() and click together on the EDT so that any pending EDT events
-        // from diagramViewManager.select() are flushed before reading the enabled state.
-        AtomicReference<Exception> error = new AtomicReference<>();
-        Runnable action = () -> {
+        // Find and click in one EDT task
+        EdtSupport.call(() -> {
+            // The Edit menu-bar item is stable and always present (unlike the toolbar dropdown,
+            // whose lazily-built popup items are not reachable until shown).
+            Component component = findComponentByName(mainFrame, menuItemName);
+            if (!(component instanceof AbstractButton item)) {
+                throw new RuntimeException("Arrange depth menu item not found (name=" + menuItemName + ").");
+            }
             if (!item.isEnabled()) {
-                error.set(new RuntimeException("Arrange depth menu item is disabled (name=" + menuItemName + ")."));
-                return;
+                throw new RuntimeException("Arrange depth menu item is disabled (name=" + menuItemName + ").");
             }
             item.doClick();
-        };
-        try {
-            if (SwingUtilities.isEventDispatchThread()) {
-                action.run();
-            } else {
-                SwingUtilities.invokeAndWait(action);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while clicking menu item.", e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            throw (cause instanceof Exception ex) ? ex : new RuntimeException("Unexpected error", cause);
-        }
-        if (error.get() != null) {
-            throw error.get();
-        }
+            return null;
+        });
     }
 
 }

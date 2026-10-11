@@ -2,6 +2,7 @@ package com.astahpromcp.server;
 
 import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.JsonSupport;
+import com.astahpromcp.tool.astah.pro.TestSupport;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
@@ -62,8 +63,9 @@ public class ProfileResourceReleaseTest {
     }
 
     private static boolean keepAliveRunning(HttpServletStreamableServerTransportProvider transport) throws Exception {
-        Field field = HttpServletStreamableServerTransportProvider.class.getDeclaredField("keepAliveScheduler");
-        field.setAccessible(true);
+        Field field = TestSupport.getAccessibleField(
+                HttpServletStreamableServerTransportProvider.class,
+                "keepAliveScheduler");
         KeepAliveScheduler scheduler = (KeepAliveScheduler) field.get(transport);
 
         return scheduler != null && scheduler.isRunning();

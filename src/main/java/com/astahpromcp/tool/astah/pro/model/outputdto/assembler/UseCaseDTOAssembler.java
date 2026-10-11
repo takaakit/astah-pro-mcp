@@ -2,12 +2,12 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.UseCaseDTO;
 import com.change_vision.jude.api.inf.model.IExtend;
 import com.change_vision.jude.api.inf.model.IExtentionPoint;
 import com.change_vision.jude.api.inf.model.IInclude;
 import com.change_vision.jude.api.inf.model.IUseCase;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.UseCaseDTO;
 
 import java.util.ArrayList;
 import java.util.List;

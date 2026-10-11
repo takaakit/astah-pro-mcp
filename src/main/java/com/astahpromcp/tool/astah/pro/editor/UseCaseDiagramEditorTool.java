@@ -7,6 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewUseCaseDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
@@ -14,7 +15,6 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseDiagramEditor.html
@@ -47,8 +47,6 @@ public class UseCaseDiagramEditorTool extends AstahToolProvider {
     }
 
     private DiagramDTO createUseCaseDiagram(NewUseCaseDiagramDTO param) throws Exception {
-        log.debug("Create usecase diagram: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IUseCaseDiagram astahUseCaseDiagram = txnAstah.call( () -> {

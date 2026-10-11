@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.CombinedFragmentKind;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
@@ -10,6 +11,9 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
+import com.change_vision.jude.api.inf.model.IClassDiagram;
+import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
@@ -22,19 +26,15 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class SequenceDiagramEditorToolTest {
 
     private ProjectAccessor projectAccessor;
+    private TransactionSupport transactionSupport;
     private SequenceDiagramEditorTool tool;
     private Method createCombinedFragment;
     private Method createSequenceDiagram;
@@ -52,7 +52,7 @@ public class SequenceDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+        transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/editor/SequenceDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
         SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
@@ -148,7 +148,7 @@ public class SequenceDiagramEditorToolTest {
         IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
-        
+
         // Create input DTO
         NewSequenceDiagramInPackageDTO inputDTO = new NewSequenceDiagramInPackageDTO(
             astahPackage.getId(),
@@ -174,7 +174,7 @@ public class SequenceDiagramEditorToolTest {
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Create input DTO
         NewCombinedFragmentDTO inputDTO = new NewCombinedFragmentDTO(
             sequenceDiagram.getId(),
@@ -205,7 +205,7 @@ public class SequenceDiagramEditorToolTest {
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Get lifelines
         INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
@@ -213,7 +213,7 @@ public class SequenceDiagramEditorToolTest {
         INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
-        
+
         // Create input DTO
         NewMessageDTO inputDTO = new NewMessageDTO(
             sequenceDiagram.getId(),
@@ -250,7 +250,7 @@ public class SequenceDiagramEditorToolTest {
         INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
-        
+
         // Create input DTO
         NewCreateMessageDTO inputDTO = new NewCreateMessageDTO(
             sequenceDiagram.getId(),
@@ -321,7 +321,7 @@ public class SequenceDiagramEditorToolTest {
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Get lifelines
         INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
@@ -329,7 +329,7 @@ public class SequenceDiagramEditorToolTest {
         INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
-        
+
         // Create input DTO
         NewDestroyMessageDTO inputDTO = new NewDestroyMessageDTO(
             sequenceDiagram.getId(),
@@ -363,7 +363,7 @@ public class SequenceDiagramEditorToolTest {
         ILinkPresentation targetMessage = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Message",
             "Message0()");
-        
+
         // Create input DTO
         NewReturnMessageDTO inputDTO = new NewReturnMessageDTO(
             sequenceDiagram.getId(),
@@ -384,17 +384,367 @@ public class SequenceDiagramEditorToolTest {
     }
 
     @Test
+    void createReturnMessage_ng_lifelinesCoveredByCombinedFragment() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get target message
+        ILinkPresentation targetMessage = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Message",
+            "Message0()");
+
+        // A combined fragment that covers both lifelines of the target message, foo and bar
+        TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createCombinedFragment,
+            tool,
+            new NewCombinedFragmentDTO(
+                sequenceDiagram.getId(),
+                "Test Combined Fragment",
+                CombinedFragmentKind.ALT,
+                100,
+                200,
+                420,
+                100),
+            NodePresentationDTO.class);
+
+        // Create input DTO
+        NewReturnMessageDTO inputDTO = new NewReturnMessageDTO(
+            sequenceDiagram.getId(),
+            targetMessage.getID(),
+            "Test Return Message");
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                inputDTO,
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(InvalidEditingException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("covers lifeline 'foo', which the return message goes back to"));
+    }
+
+    @Test
+    void createReturnMessage_ok_nestedCall() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get outer message
+        ILinkPresentation outerMessage = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Message",
+            "Message0()");
+
+        // Get lifeline
+        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "bar : Bar");
+
+        // A nested call into bar, sent from the activation of foo while the activation of bar from the outer message is still open
+        LinkPresentationDTO innerMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createMessage,
+            tool,
+            new NewMessageDTO(sequenceDiagram.getId(), "Inner Message", outerMessage.getSourceEnd().getID(), receiverNode.getID(), 150),
+            LinkPresentationDTO.class);
+        ILinkPresentation innerMessage = (ILinkPresentation) TestSupport.instance().getPresentationById(innerMessageDTO.presentation().id());
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        LinkPresentationDTO outerReturnMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createReturnMessage,
+            tool,
+            new NewReturnMessageDTO(sequenceDiagram.getId(), outerMessage.getID(), "Outer Return Message"),
+            LinkPresentationDTO.class);
+        LinkPresentationDTO innerReturnMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createReturnMessage,
+            tool,
+            new NewReturnMessageDTO(sequenceDiagram.getId(), innerMessage.getID(), "Inner Return Message"),
+            LinkPresentationDTO.class);
+
+        // Check that each return message returns from its own message
+        IMessage outerReturnMessage = (IMessage) TestSupport.instance().getPresentationById(outerReturnMessageDTO.presentation().id()).getModel();
+        IMessage innerReturnMessage = (IMessage) TestSupport.instance().getPresentationById(innerReturnMessageDTO.presentation().id()).getModel();
+        assertEquals(outerMessage.getModel(), outerReturnMessage.getActivator());
+        assertEquals(innerMessage.getModel(), innerReturnMessage.getActivator());
+    }
+
+    @Test
+    void createReturnMessage_ng_alreadyHasReturnMessage() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get message to a lifeline
+        ILinkPresentation lifelineMessage = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Message",
+            "Message0()");
+
+        // Get lifeline and frame
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+        INodePresentation frameNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Frame",
+            "sd Sequence Diagram0");
+
+        // A message to a gate, whose receiver end is the frame rather than an activation
+        LinkPresentationDTO gateMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createMessage,
+            tool,
+            new NewMessageDTO(sequenceDiagram.getId(), "Gate Message", senderNode.getID(), frameNode.getID(), 300),
+            LinkPresentationDTO.class);
+
+        for (String targetMessageId : new String[] { lifelineMessage.getID(), gateMessageDTO.presentation().id() }) {
+            // The first return message
+            LinkPresentationDTO firstReturnMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                new NewReturnMessageDTO(sequenceDiagram.getId(), targetMessageId, "First Return Message"),
+                LinkPresentationDTO.class);
+
+            int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+            // ----------------------------------------
+            // Call createReturnMessage()
+            // ----------------------------------------
+            Exception exception = assertThrows(Exception.class, () -> {
+                TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                    createReturnMessage,
+                    tool,
+                    new NewReturnMessageDTO(sequenceDiagram.getId(), targetMessageId, "Second Return Message"),
+                    LinkPresentationDTO.class);
+            });
+
+            // Check exception
+            assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+            assertTrue(exception.getCause().getMessage().contains("already has a return message (ID: " + firstReturnMessageDTO.presentation().id() + ")"));
+
+            // Check that no second return message was drawn
+            assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+        }
+    }
+
+    @Test
+    void createReturnMessage_ng_returnMessage() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get message
+        ILinkPresentation message = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Message",
+            "Message0()");
+
+        // A return message to be specified by mistake
+        LinkPresentationDTO returnMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createReturnMessage,
+            tool,
+            new NewReturnMessageDTO(sequenceDiagram.getId(), message.getID(), "Test Return Message"),
+            LinkPresentationDTO.class);
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                new NewReturnMessageDTO(sequenceDiagram.getId(), returnMessageDTO.presentation().id(), "Return Of Return Message"),
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Message 'Test Return Message' is itself a return message"));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createReturnMessage_ng_asynchronousMessage() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get lifelines
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "bar : Bar");
+
+        // An asynchronous message
+        LinkPresentationDTO asynchronousMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createMessage,
+            tool,
+            new NewMessageDTO(sequenceDiagram.getId(), "Asynchronous Message", senderNode.getID(), receiverNode.getID(), 300),
+            LinkPresentationDTO.class);
+        IMessage asynchronousMessage = (IMessage) TestSupport.instance().getPresentationById(asynchronousMessageDTO.presentation().id()).getModel();
+        transactionSupport.run(() -> asynchronousMessage.setAsynchronous(true));
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                new NewReturnMessageDTO(sequenceDiagram.getId(), asynchronousMessageDTO.presentation().id(), "Test Return Message"),
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Message 'Asynchronous Message' is asynchronous"));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createReturnMessage_ng_foundMessage() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get receiver node
+        INodePresentation receiverNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "bar : Bar");
+
+        // A found message, which Astah reports as synchronous
+        LinkPresentationDTO foundMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createFoundMessage,
+            tool,
+            new NewFoundMessageDTO(sequenceDiagram.getId(), "Test Found Message", 50, 300, receiverNode.getID()),
+            LinkPresentationDTO.class);
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                new NewReturnMessageDTO(sequenceDiagram.getId(), foundMessageDTO.presentation().id(), "Test Return Message"),
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Message 'Test Found Message' is a found message"));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createReturnMessage_ng_lostMessage() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get sender node
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+
+        // A lost message, which Astah reports as synchronous
+        LinkPresentationDTO lostMessageDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createLostMessage,
+            tool,
+            new NewLostMessageDTO(sequenceDiagram.getId(), "Test Lost Message", senderNode.getID(), 300, 300),
+            LinkPresentationDTO.class);
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                new NewReturnMessageDTO(sequenceDiagram.getId(), lostMessageDTO.presentation().id(), "Test Return Message"),
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Message 'Test Lost Message' is a lost message"));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createReturnMessage_ng_notOnTargetDiagram() throws Exception {
+        // Get message on Sequence Diagram0
+        ILinkPresentation message = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Message",
+            "Message0()");
+
+        // Another sequence diagram, whose ID an agent may pass by mistake
+        ISequenceDiagram anotherSequenceDiagram = transactionSupport.call(() ->
+            projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor().createSequenceDiagram(
+                projectAccessor.getProject(),
+                "Another Sequence Diagram"));
+
+        int presentationCountBefore = anotherSequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createReturnMessage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createReturnMessage,
+                tool,
+                new NewReturnMessageDTO(anotherSequenceDiagram.getId(), message.getID(), "Test Return Message"),
+                LinkPresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The target message is not on the target sequence diagram: " + message.getID()));
+
+        // Check that nothing was drawn on the other sequence diagram
+        assertEquals(presentationCountBefore, anotherSequenceDiagram.getPresentations().length);
+    }
+
+    @Test
     void createLostMessage_ok() throws Exception {
         // Get sequence diagram
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Get target sender node
         INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
-        
+
         // Create input DTO
         NewLostMessageDTO inputDTO = new NewLostMessageDTO(
             sequenceDiagram.getId(),
@@ -423,12 +773,12 @@ public class SequenceDiagramEditorToolTest {
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Get target receiver node
         INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "bar : Bar");
-        
+
         // Create input DTO
         NewFoundMessageDTO inputDTO = new NewFoundMessageDTO(
             sequenceDiagram.getId(),
@@ -457,7 +807,7 @@ public class SequenceDiagramEditorToolTest {
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Create input DTO
         NewInteractionUseDTO inputDTO = new NewInteractionUseDTO(
             sequenceDiagram.getId(),
@@ -487,7 +837,7 @@ public class SequenceDiagramEditorToolTest {
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Create input DTO
         NewLifelineDTO inputDTO = new NewLifelineDTO(
             sequenceDiagram.getId(),
@@ -509,17 +859,53 @@ public class SequenceDiagramEditorToolTest {
     }
 
     @Test
+    void createLifeline_ng_notSequenceDiagram() throws Exception {
+        // Create a class diagram, whose ID an agent may pass by mistake
+        IClassDiagram classDiagram = transactionSupport.call(() ->
+            projectAccessor.getDiagramEditorFactory().getClassDiagramEditor().createClassDiagram(
+                projectAccessor.getProject(),
+                "Not Sequence Diagram"));
+
+        int presentationCountBefore = classDiagram.getPresentations().length;
+
+        // Create input DTO
+        NewLifelineDTO inputDTO = new NewLifelineDTO(
+            classDiagram.getId(),
+            "Test Lifeline",
+            100
+        );
+
+        // ----------------------------------------
+        // Call createLifeline()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createLifeline,
+                tool,
+                inputDTO,
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertTrue(exception.getCause().getMessage().contains("Failed to get sequence diagram"));
+        assertTrue(exception.getCause().getMessage().contains(classDiagram.getId()));
+
+        // Check that nothing was drawn on the class diagram
+        assertEquals(presentationCountBefore, classDiagram.getPresentations().length);
+    }
+
+    @Test
     void createTermination_ok() throws Exception {
         // Get sequence diagram
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,
             "Sequence Diagram0");
-        
+
         // Get target node
         INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Lifeline",
             "foo : Foo");
-        
+
         // Create input DTO
         NewTerminationDTO inputDTO = new NewTerminationDTO(
             sequenceDiagram.getId(),
@@ -537,5 +923,158 @@ public class SequenceDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void createTermination_ng_notLifeline() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get message
+        ILinkPresentation message = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Message",
+            "Message0()");
+
+        // The activation of foo, which an agent may pass by mistake
+        String activationId = message.getSourceEnd().getID();
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createTermination()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createTermination,
+                tool,
+                new NewTerminationDTO(sequenceDiagram.getId(), activationId),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Termination target node must be one of the following node presentation types: Lifeline."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createTermination_ng_notOnTargetDiagram() throws Exception {
+        // Get lifeline on Sequence Diagram0
+        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+
+        // Another sequence diagram, whose ID an agent may pass by mistake
+        ISequenceDiagram anotherSequenceDiagram = transactionSupport.call(() ->
+            projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor().createSequenceDiagram(
+                projectAccessor.getProject(),
+                "Another Sequence Diagram"));
+
+        int presentationCountBefore = anotherSequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createTermination()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createTermination,
+                tool,
+                new NewTerminationDTO(anotherSequenceDiagram.getId(), targetNode.getID()),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The target lifeline is not on the target sequence diagram: " + targetNode.getID()));
+
+        // Check that nothing was drawn on the other sequence diagram
+        assertEquals(presentationCountBefore, anotherSequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createTermination_ng_alreadyTerminated() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get target node
+        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+
+        // The first termination
+        TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createTermination,
+            tool,
+            new NewTerminationDTO(sequenceDiagram.getId(), targetNode.getID()),
+            NodePresentationDTO.class);
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createTermination()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createTermination,
+                tool,
+                new NewTerminationDTO(sequenceDiagram.getId(), targetNode.getID()),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The lifeline 'foo : Foo' already ends with a termination (X)"));
+
+        // Check that no second termination was drawn
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createTermination_ng_destroyedByDestroyMessage() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Get lifelines
+        INodePresentation senderNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "foo : Foo");
+        INodePresentation targetNode = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Lifeline",
+            "bar : Bar");
+
+        // A destroy message, which ends bar with a termination
+        TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createDestroyMessage,
+            tool,
+            new NewDestroyMessageDTO(sequenceDiagram.getId(), "Test Destroy Message", senderNode.getID(), targetNode.getID(), 140),
+            LinkPresentationDTO.class);
+
+        int presentationCountBefore = sequenceDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createTermination()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createTermination,
+                tool,
+                new NewTerminationDTO(sequenceDiagram.getId(), targetNode.getID()),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The lifeline 'bar : Bar' already ends with a termination (X)"));
+
+        // Check that no second termination was drawn
+        assertEquals(presentationCountBefore, sequenceDiagram.getPresentations().length);
     }
 }

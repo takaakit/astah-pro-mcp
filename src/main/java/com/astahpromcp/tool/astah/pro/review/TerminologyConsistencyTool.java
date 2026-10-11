@@ -1,17 +1,16 @@
 package com.astahpromcp.tool.astah.pro.review;
 
-import java.util.List;
-
 import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.outputdto.StepsDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
-
-import lombok.extern.slf4j.Slf4j;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.project.ProjectAccessor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 public class TerminologyConsistencyTool extends AstahToolProvider {
@@ -38,8 +37,6 @@ public class TerminologyConsistencyTool extends AstahToolProvider {
     }
 
     private StepsDTO getSteps(NoInputDTO param) throws Exception {
-        log.debug("Get terminology consistency maintenance steps: {}", param);
-
         String contents = """
 Follow these steps to maintain terminology consistency across model elements and diagrams:
 

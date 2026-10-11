@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.mcptoolscript;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 // The check has to run in its own process: if it failed in the test JVM the run would not report a failure, it
 // would simply disappear.
 public class McpToolScriptExecutorIsolationTest {
+
+    @TempDir
+    Path outputDirectory;
 
     @Test
     void execute_ok_cannotTerminateTheJvm() throws Exception {
@@ -37,36 +41,31 @@ public class McpToolScriptExecutorIsolationTest {
                 + ExitCanaryRunner.CANARY_EXIT_CODE + ")\");");
     }
 
-    private static void assertSurvives(String script) throws Exception {
-        Path outputFile = Files.createTempFile("astah-mcp-exit-canary", ".log");
-        try {
-            List<String> command = new ArrayList<>();
-            command.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());
-            command.add("-cp");
-            command.add(System.getProperty("java.class.path"));
-            command.add(ExitCanaryRunner.class.getName());
-            command.add(script);
+    private void assertSurvives(String script) throws Exception {
+        Path outputFile = outputDirectory.resolve("astah-mcp-exit-canary.log");
+        List<String> command = new ArrayList<>();
+        command.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());
+        command.add("-cp");
+        command.add(System.getProperty("java.class.path"));
+        command.add(ExitCanaryRunner.class.getName());
+        command.add(script);
 
-            Process process = new ProcessBuilder(command)
-                    .redirectErrorStream(true)
-                    .redirectOutput(outputFile.toFile())
-                    .start();
+        Process process = new ProcessBuilder(command)
+                .redirectErrorStream(true)
+                .redirectOutput(outputFile.toFile())
+                .start();
 
-            assertTrue(process.waitFor(120, TimeUnit.SECONDS), "The canary process did not finish in time");
+        assertTrue(process.waitFor(120, TimeUnit.SECONDS), "The canary process did not finish in time");
 
-            int exitCode = process.exitValue();
-            String output = Files.readString(outputFile, StandardCharsets.UTF_8);
+        int exitCode = process.exitValue();
+        String output = Files.readString(outputFile, StandardCharsets.UTF_8);
 
-            assertNotEquals(ExitCanaryRunner.CANARY_EXIT_CODE, exitCode,
-                    "The script shut the JVM down, so a script on this port could close Astah. Output: " + output);
-            assertEquals(0, exitCode, "The canary process ended unexpectedly. Output: " + output);
-            assertTrue(output.contains(ExitCanaryRunner.SURVIVED_PREFIX),
-                    "The canary process did not report back. Output: " + output);
-            assertTrue(output.contains(ExitCanaryRunner.SURVIVED_PREFIX + "false"),
-                    "The script should have failed rather than succeeded. Output: " + output);
-
-        } finally {
-            Files.deleteIfExists(outputFile);
-        }
+        assertNotEquals(ExitCanaryRunner.CANARY_EXIT_CODE, exitCode,
+                "The script shut the JVM down, so a script on this port could close Astah. Output: " + output);
+        assertEquals(0, exitCode, "The canary process ended unexpectedly. Output: " + output);
+        assertTrue(output.contains(ExitCanaryRunner.SURVIVED_PREFIX),
+                "The canary process did not report back. Output: " + output);
+        assertTrue(output.contains(ExitCanaryRunner.SURVIVED_PREFIX + "false"),
+                "The script should have failed rather than succeeded. Output: " + output);
     }
 }

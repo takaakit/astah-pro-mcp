@@ -3,16 +3,13 @@ package com.astahpromcp.tool.astah.pro.guide;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.spec.McpSchema;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DiagramLayoutGuideToolTest {
 
@@ -36,11 +33,6 @@ public class DiagramLayoutGuideToolTest {
             DiagramLayoutGuideTool.class,
             "getAntiPatterns",
             NoInputDTO.class);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        // Cleanup if needed
     }
 
     @Test

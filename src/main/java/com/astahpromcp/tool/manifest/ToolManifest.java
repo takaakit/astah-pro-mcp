@@ -21,7 +21,9 @@ public final class ToolManifest {
     // The directive that ends the body section and begins the withheld section
     private static final String WITHHELD_DIRECTIVE = "#@withheld";
 
-    private static final int COLUMN_COUNT = 4;
+    // category, name, direct and programmatic, then the reason, which a row without one may leave out.
+    private static final int COLUMN_COUNT_WITHOUT_REASON = 4;
+    private static final int COLUMN_COUNT_WITH_REASON = 5;
 
     public enum Profile {
         DIRECT,
@@ -60,18 +62,17 @@ public final class ToolManifest {
             }
             return null;
         }
-
-        static List<String> labels() {
-            List<String> labels = new ArrayList<>();
-            for (Category category : values()) {
-                labels.add(category.label);
-            }
-            return labels;
-        }
     }
 
     // One row of the manifest
-    public record Entry(Category category, String name, boolean direct, boolean programmatic, boolean withheld) {
+    public record Entry(
+        Category category,
+        String name,
+        boolean direct,
+        boolean programmatic,
+        boolean withheld,
+        NotMcpToolScriptCallableReason reason
+    ) {
 
         // Whether this row publishes to the given profile
         public boolean publishesTo(Profile profile) {
@@ -160,12 +161,12 @@ public final class ToolManifest {
         return new ToolManifest(entries);
     }
 
-    // Exactly four columns, a known category, a non-empty name, and every flag either 'x' or '-'
+    // Four or five columns, a known category, a non-empty name, every flag either 'x' or '-', and a known reason exactly when the row publishes to both profiles
     private static Entry parseRow(String raw, int lineNumber, String source, boolean withheld) {
         String[] columns = raw.split("\t", -1);
-        if (columns.length != COLUMN_COUNT) {
-            throw new IllegalStateException(source + ":" + lineNumber + ": expected " + COLUMN_COUNT
-                    + " tab-separated columns but found " + columns.length + ": " + raw.trim());
+        if (columns.length != COLUMN_COUNT_WITHOUT_REASON && columns.length != COLUMN_COUNT_WITH_REASON) {
+            throw new IllegalStateException(source + ":" + lineNumber + ": expected " + COLUMN_COUNT_WITHOUT_REASON
+                    + " or " + COLUMN_COUNT_WITH_REASON + " tab-separated columns but found " + columns.length + ": " + raw.trim());
         }
 
         Category category = parseCategory(columns[0], lineNumber, source);
@@ -175,18 +176,38 @@ public final class ToolManifest {
             throw new IllegalStateException(source + ":" + lineNumber + ": the tool name is empty");
         }
 
-        return new Entry(category,
-                name,
-                parseFlag(columns[2], "direct", lineNumber, source),
-                parseFlag(columns[3], "programmatic", lineNumber, source),
-                withheld);
+        boolean direct = parseFlag(columns[2], "direct", lineNumber, source);
+        boolean programmatic = parseFlag(columns[3], "programmatic", lineNumber, source);
+        NotMcpToolScriptCallableReason reason = columns.length == COLUMN_COUNT_WITH_REASON
+                ? parseReason(columns[4], lineNumber, source)
+                : null;
+
+        // A row that publishes to both profiles hands the tool to the agent directly on the programmatic profile, so an mcp tool script cannot call it and the row has to say why.
+        boolean publishedDirectlyOnTheProgrammaticProfile = direct && programmatic;
+        if (publishedDirectlyOnTheProgrammaticProfile && reason == null) {
+            throw new IllegalStateException(source + ":" + lineNumber + ": tool '" + name
+                    + "' is published on both profiles, so column 'reason' has to say why an mcp tool script cannot call it: one of "
+                    + NotMcpToolScriptCallableReason.codes());
+        }
+        if (!publishedDirectlyOnTheProgrammaticProfile && reason != null) {
+            throw new IllegalStateException(source + ":" + lineNumber + ": tool '" + name
+                    + "' is not published on both profiles, so nothing would ever show its reason '" + reason.code()
+                    + "'. Leave column 'reason' empty");
+        }
+
+        return new Entry(category, name, direct, programmatic, withheld, reason);
     }
 
     private static Category parseCategory(String column, int lineNumber, String source) {
         String value = column.trim();
         Category category = Category.ofLabel(value);
         if (category == null) {
-            throw new IllegalStateException(source + ":" + lineNumber + ": column 'category' must be one of " + Category.labels() + " but was '" + value + "'");
+            List<String> labels = new ArrayList<>();
+            for (Category candidate : Category.values()) {
+                labels.add(candidate.label());
+            }
+
+            throw new IllegalStateException(source + ":" + lineNumber + ": column 'category' must be one of " + labels + " but was '" + value + "'");
         }
         return category;
     }
@@ -201,6 +222,20 @@ public final class ToolManifest {
         }
         throw new IllegalStateException(source + ":" + lineNumber + ": column '" + columnName
                 + "' must be 'x' or '-' but was '" + value + "'");
+    }
+
+    // An empty column is no reason
+    private static NotMcpToolScriptCallableReason parseReason(String column, int lineNumber, String source) {
+        String value = column.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+        NotMcpToolScriptCallableReason reason = NotMcpToolScriptCallableReason.ofCode(value);
+        if (reason == null) {
+            throw new IllegalStateException(source + ":" + lineNumber + ": column 'reason' must be one of "
+                    + NotMcpToolScriptCallableReason.codes() + " but was '" + value + "'");
+        }
+        return reason;
     }
 
     // The tools the given profile publishes, in file order
@@ -223,6 +258,17 @@ public final class ToolManifest {
             }
         }
         return names;
+    }
+
+    // Why an mcp tool script cannot call each tool the programmatic profile publishes directly, in file order
+    public Map<String, NotMcpToolScriptCallableReason> notMcpToolScriptCallableReasons() {
+        Map<String, NotMcpToolScriptCallableReason> reasons = new LinkedHashMap<>();
+        for (Entry entry : entriesByName.values()) {
+            if (entry.reason() != null) {
+                reasons.put(entry.name(), entry.reason());
+            }
+        }
+        return reasons;
     }
 
     public Set<String> allNames() {

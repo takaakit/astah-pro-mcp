@@ -11,7 +11,6 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.project.inputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.assembler.*;
-import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.visualization.outputdto.PlantumlDTO;
 import com.change_vision.jude.api.inf.model.*;
@@ -26,32 +25,18 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ProjectInfoTool extends AstahToolProvider {
 
     private static final int CHUNK_SIZE = 400;
-    private static final long CHUNK_CACHE_TTL_NANOS = TimeUnit.SECONDS.toNanos(180);
 
     private final ProjectAccessor projectAccessor;
     private final AstahProToolSupport astahProToolSupport;
-    private final List<List<NameIdTypeDTO>> nameIdTypeDTOChunksCache;
-    private final List<List<LabelIdTypeDTO>> labelIdTypeDTOChunksCache;
-    private final List<List<DefinitionNameIdTypeDTO>> definitionNameIdTypeDTOChunksCache;
-    private long nameIdTypeDTOChunksCacheUpdatedAtNanos = -1L;
-    private long labelIdTypeDTOChunksCacheUpdatedAtNanos = -1L;
-    private long definitionNameIdTypeDTOChunksCacheUpdatedAtNanos = -1L;
-    private final Object nameCacheLock = new Object();
-    private final Object labelCacheLock = new Object();
-    private final Object definitionCacheLock = new Object();
 
     public ProjectInfoTool(ProjectAccessor projectAccessor, AstahProToolSupport astahProToolSupport) {
         this.projectAccessor = projectAccessor;
         this.astahProToolSupport = astahProToolSupport;
-        this.nameIdTypeDTOChunksCache = new ArrayList<>();
-        this.labelIdTypeDTOChunksCache = new ArrayList<>();
-        this.definitionNameIdTypeDTOChunksCache = new ArrayList<>();
     }
 
     @Override
@@ -59,44 +44,44 @@ public class ProjectInfoTool extends AstahToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_named_elements",
-                "Return the total number of chunks and the data of the first chunk of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
+                "Return the snapshot ID, the total number of chunks and the data of the first chunk of all named elements in the project. To read the other chunks, pass the snapshot ID to get_chunk_of_all_named_elements. The chunk data is a simplified information: name, identifier, and type.",
                 this::getAllNamedElements,
                 NoInputDTO.class,
                 AllNameIdTypeInfoDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_all_named_elements",
-                "Return the chunk data of all named elements in the project. The chunk data is a simplified information: name, identifier, and type.",
+                "Return the chunk data of all named elements in the project, from the list identified by the snapshot ID that get_info_of_all_named_elements returned. If that list has changed since then, because the model was edited or another project was opened, this tool fails instead of returning a chunk of the changed list: call get_info_of_all_named_elements again and read every chunk with the new snapshot ID. Read the remaining chunks right away, in parallel where you can, to keep that from happening. The chunk data is a simplified information: name, identifier, and type.",
                 this::getNamedElementsChunk,
-                ChunkDTO.class,
+                SnapshotChunkDTO.class,
                 NameIdTypeListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_prsts",
-                "Return the total number of chunks and the data of the first chunk of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
+                "Return the snapshot ID, the total number of chunks and the data of the first chunk of all presentations in the project. To read the other chunks, pass the snapshot ID to get_chunk_of_all_prsts. The chunk data is a simplified information: label, identifier, and type.",
                 this::getAllPresentations,
                 NoInputDTO.class,
                 AllLabelIdTypeInfoDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_all_prsts",
-                "Return the chunk data of all presentations in the project. The chunk data is a simplified information: label, identifier, and type.",
+                "Return the chunk data of all presentations in the project, from the list identified by the snapshot ID that get_info_of_all_prsts returned. If that list has changed since then, because the model was edited or another project was opened, this tool fails instead of returning a chunk of the changed list: call get_info_of_all_prsts again and read every chunk with the new snapshot ID. Read the remaining chunks right away, in parallel where you can, to keep that from happening. The chunk data is a simplified information: label, identifier, and type.",
                 this::getPresentationsChunk,
-                ChunkDTO.class,
+                SnapshotChunkDTO.class,
                 LabelIdTypeListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_info_of_all_definitions",
-                "Return the total number of chunks and the data of the first chunk of all definitions in the project. The chunk data is a simplified information: definition, name, identifier, and type.",
+                "Return the snapshot ID, the total number of chunks and the data of the first chunk of all definitions in the project. To read the other chunks, pass the snapshot ID to get_chunk_of_all_definitions. The chunk data is a simplified information: definition, name, identifier, and type.",
                 this::getAllDefinitions,
                 NoInputDTO.class,
                 AllDefinitionNameIdTypeDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "get_chunk_of_all_definitions",
-                "Return the chunk data of all definitions in the project. The chunk data is a simplified information: definition, name, identifier, and type.",
+                "Return the chunk data of all definitions in the project, from the list identified by the snapshot ID that get_info_of_all_definitions returned. If that list has changed since then, because the model was edited or another project was opened, this tool fails instead of returning a chunk of the changed list: call get_info_of_all_definitions again and read every chunk with the new snapshot ID. Read the remaining chunks right away, in parallel where you can, to keep that from happening. The chunk data is a simplified information: definition, name, identifier, and type.",
                 this::getDefinitionsChunk,
-                ChunkDTO.class,
+                SnapshotChunkDTO.class,
                 DefinitionNameIdTypeListDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
@@ -158,178 +143,83 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private AllNameIdTypeInfoDTO getAllNamedElements(NoInputDTO param) throws Exception {
-        log.debug("Get information of all named elements: {}", param);
-
-        INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
-        List<NameIdTypeDTO> namedIdTypeDTOs = new ArrayList<>();
-        for (INamedElement astahNamedElement : astahNamedElements) {
-            try {
-                namedIdTypeDTOs.add(NameIdTypeDTOAssembler.toDTO(astahNamedElement));
-            } catch (Exception e) {
-                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to NameIdTypeDTO: " + e.getMessage());
-            }
-        }
-
-        List<List<NameIdTypeDTO>> newCache = new ArrayList<>();
-        if (namedIdTypeDTOs.isEmpty()) {
-            newCache.add(new ArrayList<>());
-        } else {
-            for (int i = 0; i < namedIdTypeDTOs.size(); i += CHUNK_SIZE) {
-                newCache.add(new ArrayList<>(namedIdTypeDTOs.subList(i, Math.min(namedIdTypeDTOs.size(), i + CHUNK_SIZE))));
-            }
-        }
-
-        List<NameIdTypeDTO> firstChunk;
-        int totalChunks;
-        synchronized (nameCacheLock) {
-            nameIdTypeDTOChunksCache.clear();
-            nameIdTypeDTOChunksCache.addAll(newCache);
-            nameIdTypeDTOChunksCacheUpdatedAtNanos = System.nanoTime();
-            totalChunks = nameIdTypeDTOChunksCache.size();
-            firstChunk = nameIdTypeDTOChunksCache.get(0);
-        }
-
-        return new AllNameIdTypeInfoDTO(totalChunks, firstChunk);
+        ListSnapshot<NameIdTypeDTO> snapshot = ListSnapshot.of(listNamedElements(), CHUNK_SIZE);
+        return new AllNameIdTypeInfoDTO(snapshot.id(), snapshot.chunks().size(), snapshot.chunks().get(0));
     }
 
-    private NameIdTypeListDTO getNamedElementsChunk(ChunkDTO param) throws Exception {
-        log.debug("Get named elements chunk: {}", param);
-
-        int chunkIndex = param.chunkIndex();
-        List<NameIdTypeDTO> chunk;
-        synchronized (nameCacheLock) {
-            if (nameIdTypeDTOChunksCacheUpdatedAtNanos < 0) {
-                throw new RuntimeException("Chunk cache is not initialized. Call get_info_of_all_named_elements first, then call get_chunk_of_all_named_elements.");
-            }
-            if (System.nanoTime() - nameIdTypeDTOChunksCacheUpdatedAtNanos >= CHUNK_CACHE_TTL_NANOS) {
-                throw new RuntimeException("The cached chunk data was generated 180 or more seconds ago. The Astah model may have been updated. Call get_info_of_all_named_elements again, then call get_chunk_of_all_named_elements.");
-            }
-            if (chunkIndex < 0 || chunkIndex >= nameIdTypeDTOChunksCache.size()) {
-                throw new RuntimeException("Invalid chunk index: " + chunkIndex);
-            }
-            chunk = nameIdTypeDTOChunksCache.get(chunkIndex);
-        }
-
+    private NameIdTypeListDTO getNamedElementsChunk(SnapshotChunkDTO param) throws Exception {
+        // The list is built again rather than kept, so that the snapshot ID is checked against the project as it is now
+        List<NameIdTypeDTO> chunk = ListSnapshot.of(listNamedElements(), CHUNK_SIZE)
+                .chunk(param.snapshotId(), param.chunkIndex(), "get_info_of_all_named_elements");
         return new NameIdTypeListDTO(chunk);
     }
 
-    private AllDefinitionNameIdTypeDTO getAllDefinitions(NoInputDTO param) throws Exception {
-        log.debug("Get information of all definitions: {}", param);
+    private List<NameIdTypeDTO> listNamedElements() throws Exception {
+        INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
+        List<NameIdTypeDTO> nameIdTypeDTOs = new ArrayList<>();
+        for (INamedElement astahNamedElement : astahNamedElements) {
+            try {
+                nameIdTypeDTOs.add(NameIdTypeDTOAssembler.toDTO(astahNamedElement));
+            } catch (Exception e) {
+                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to NameIdTypeDTO: {}", e.getMessage());
+            }
+        }
+        return nameIdTypeDTOs;
+    }
 
+    private AllDefinitionNameIdTypeDTO getAllDefinitions(NoInputDTO param) throws Exception {
+        ListSnapshot<DefinitionNameIdTypeDTO> snapshot = ListSnapshot.of(listDefinitions(), CHUNK_SIZE);
+        return new AllDefinitionNameIdTypeDTO(snapshot.id(), snapshot.chunks().size(), snapshot.chunks().get(0));
+    }
+
+    private DefinitionNameIdTypeListDTO getDefinitionsChunk(SnapshotChunkDTO param) throws Exception {
+        // The list is built again rather than kept, so that the snapshot ID is checked against the project as it is now
+        List<DefinitionNameIdTypeDTO> chunk = ListSnapshot.of(listDefinitions(), CHUNK_SIZE)
+                .chunk(param.snapshotId(), param.chunkIndex(), "get_info_of_all_definitions");
+        return new DefinitionNameIdTypeListDTO(chunk);
+    }
+
+    private List<DefinitionNameIdTypeDTO> listDefinitions() throws Exception {
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
         List<DefinitionNameIdTypeDTO> definitionNameIdTypeDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
             try {
                 definitionNameIdTypeDTOs.add(DefinitionNameIdTypeDTOAssembler.toDTO(astahNamedElement));
             } catch (Exception e) {
-                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to DefinitionNameIdTypeDTO: " + e.getMessage());
+                log.debug("Due to an issue on the Astah side, failed to convert INamedElement to DefinitionNameIdTypeDTO: {}", e.getMessage());
             }
         }
-
-        List<List<DefinitionNameIdTypeDTO>> newCache = new ArrayList<>();
-        if (definitionNameIdTypeDTOs.isEmpty()) {
-            newCache.add(new ArrayList<>());
-        } else {
-            for (int i = 0; i < definitionNameIdTypeDTOs.size(); i += CHUNK_SIZE) {
-                newCache.add(new ArrayList<>(definitionNameIdTypeDTOs.subList(i, Math.min(definitionNameIdTypeDTOs.size(), i + CHUNK_SIZE))));
-            }
-        }
-
-        List<DefinitionNameIdTypeDTO> firstChunk;
-        int totalChunks;
-        synchronized (definitionCacheLock) {
-            definitionNameIdTypeDTOChunksCache.clear();
-            definitionNameIdTypeDTOChunksCache.addAll(newCache);
-            definitionNameIdTypeDTOChunksCacheUpdatedAtNanos = System.nanoTime();
-            totalChunks = definitionNameIdTypeDTOChunksCache.size();
-            firstChunk = definitionNameIdTypeDTOChunksCache.get(0);
-        }
-
-        return new AllDefinitionNameIdTypeDTO(totalChunks, firstChunk);
-    }
-
-    private DefinitionNameIdTypeListDTO getDefinitionsChunk(ChunkDTO param) throws Exception {
-        log.debug("Get definitions chunk: {}", param);
-
-        int chunkIndex = param.chunkIndex();
-        List<DefinitionNameIdTypeDTO> chunk;
-        synchronized (definitionCacheLock) {
-            if (definitionNameIdTypeDTOChunksCacheUpdatedAtNanos < 0) {
-                throw new RuntimeException("Chunk cache is not initialized. Call get_info_of_all_definitions first, then call get_chunk_of_all_definitions.");
-            }
-            if (System.nanoTime() - definitionNameIdTypeDTOChunksCacheUpdatedAtNanos >= CHUNK_CACHE_TTL_NANOS) {
-                throw new RuntimeException("The cached chunk data was generated 180 or more seconds ago. The Astah model may have been updated. Call get_info_of_all_definitions again, then call get_chunk_of_all_definitions.");
-            }
-            if (chunkIndex < 0 || chunkIndex >= definitionNameIdTypeDTOChunksCache.size()) {
-                throw new RuntimeException("Invalid chunk index: " + chunkIndex);
-            }
-            chunk = definitionNameIdTypeDTOChunksCache.get(chunkIndex);
-        }
-
-        return new DefinitionNameIdTypeListDTO(chunk);
+        return definitionNameIdTypeDTOs;
     }
 
     private AllLabelIdTypeInfoDTO getAllPresentations(NoInputDTO param) throws Exception {
-        log.debug("Get information of all presentations: {}", param);
+        ListSnapshot<LabelIdTypeDTO> snapshot = ListSnapshot.of(listPresentations(), CHUNK_SIZE);
+        return new AllLabelIdTypeInfoDTO(snapshot.id(), snapshot.chunks().size(), snapshot.chunks().get(0));
+    }
 
+    private LabelIdTypeListDTO getPresentationsChunk(SnapshotChunkDTO param) throws Exception {
+        // The list is built again rather than kept, so that the snapshot ID is checked against the project as it is now
+        List<LabelIdTypeDTO> chunk = ListSnapshot.of(listPresentations(), CHUNK_SIZE)
+                .chunk(param.snapshotId(), param.chunkIndex(), "get_info_of_all_prsts");
+        return new LabelIdTypeListDTO(chunk);
+    }
+
+    private List<LabelIdTypeDTO> listPresentations() throws Exception {
         INamedElement[] astahNamedElements = projectAccessor.findElements(IDiagram.class);
         List<LabelIdTypeDTO> labelIdTypeDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
             IDiagram astahDiagram = (IDiagram) astahNamedElement;
-            for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+            for (IPresentation astahPresentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
                 labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
             }
         }
-
-        List<List<LabelIdTypeDTO>> newCache = new ArrayList<>();
-        if (labelIdTypeDTOs.isEmpty()) {
-            newCache.add(new ArrayList<>());
-        } else {
-            for (int i = 0; i < labelIdTypeDTOs.size(); i += CHUNK_SIZE) {
-                newCache.add(new ArrayList<>(labelIdTypeDTOs.subList(i, Math.min(labelIdTypeDTOs.size(), i + CHUNK_SIZE))));
-            }
-        }
-
-        List<LabelIdTypeDTO> firstChunk;
-        int totalChunks;
-        synchronized (labelCacheLock) {
-            labelIdTypeDTOChunksCache.clear();
-            labelIdTypeDTOChunksCache.addAll(newCache);
-            labelIdTypeDTOChunksCacheUpdatedAtNanos = System.nanoTime();
-            totalChunks = labelIdTypeDTOChunksCache.size();
-            firstChunk = labelIdTypeDTOChunksCache.get(0);
-        }
-
-        return new AllLabelIdTypeInfoDTO(totalChunks, firstChunk);
-    }
-
-    private LabelIdTypeListDTO getPresentationsChunk(ChunkDTO param) throws Exception {
-        log.debug("Get presentations chunk: {}", param);
-
-        int chunkIndex = param.chunkIndex();
-        List<LabelIdTypeDTO> chunk;
-        synchronized (labelCacheLock) {
-            if (labelIdTypeDTOChunksCacheUpdatedAtNanos < 0) {
-                throw new RuntimeException("Chunk cache is not initialized. Call get_info_of_all_prsts first, then call get_chunk_of_all_prsts.");
-            }
-            if (System.nanoTime() - labelIdTypeDTOChunksCacheUpdatedAtNanos >= CHUNK_CACHE_TTL_NANOS) {
-                throw new RuntimeException("The cached chunk data was generated 180 or more seconds ago. The Astah model may have been updated. Call get_info_of_all_prsts again, then call get_chunk_of_all_prsts.");
-            }
-            if (chunkIndex < 0 || chunkIndex >= labelIdTypeDTOChunksCache.size()) {
-                throw new RuntimeException("Invalid chunk index: " + chunkIndex);
-            }
-            chunk = labelIdTypeDTOChunksCache.get(chunkIndex);
-        }
-
-        return new LabelIdTypeListDTO(chunk);
+        return labelIdTypeDTOs;
     }
 
     private LabelIdTypeListDTO getAllPresentationsOnDiagram(IdDTO param) throws Exception {
-        log.debug("Get information of all presentations on diagram: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
         List<LabelIdTypeDTO> labelIdTypeDTOs = new ArrayList<>();
-        for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+        for (IPresentation astahPresentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
             labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
         }
 
@@ -337,8 +227,6 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private ReportDTO getAllConstraintsAndConditions(NoInputDTO param) throws Exception {
-        log.debug("Get all constraints and conditions: {}", param);
-
         StringBuilder contents = new StringBuilder();
 
         for (INamedElement astahNamedElement : projectAccessor.findElements(IConstraint.class)) {
@@ -382,8 +270,6 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private SourceTargetNameIdTypeListDTO retrieveClassifiersThatReferenceOrBeReferencedBy(IdDTO param) throws Exception {
-        log.debug("Retrieve classifiers that reference or are referenced by: {}", param);
-
         IClass astahTargetClass = astahProToolSupport.getClass(param.id());
 
         Set<NameIdTypeDTO> inheritanceSourceClassifier = new LinkedHashSet<>();
@@ -620,8 +506,6 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private NameIdTypeDefinitionListDTO searchWithinNamedElements(SearchDTO param) throws Exception {
-        log.debug("Search within named elements: {}", param);
-
         // An empty search string targets all named elements
         String searchString = param.searchString() == null ? "" : param.searchString();
         boolean matchAll = searchString.isEmpty();
@@ -640,8 +524,6 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private LabelIdTypeListDTO searchWithinPresentations(SearchDTO param) throws Exception {
-        log.debug("Search within presentations: {}", param);
-
         // An empty search string targets all presentations
         String searchString = param.searchString() == null ? "" : param.searchString();
         boolean matchAll = searchString.isEmpty();
@@ -650,7 +532,7 @@ public class ProjectInfoTool extends AstahToolProvider {
         List<LabelIdTypeDTO> labelIdTypeDTOs = new ArrayList<>();
         for (INamedElement astahNamedElement : astahNamedElements) {
             IDiagram astahDiagram = (IDiagram) astahNamedElement;
-            for (IPresentation astahPresentation : astahDiagram.getPresentations()) {
+            for (IPresentation astahPresentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
                 if (matchAll
                     || Strings.CI.containsAny(astahPresentation.getLabel(), searchString)) {
                     labelIdTypeDTOs.add(LabelIdTypeDTOAssembler.toDTO(astahPresentation));
@@ -662,8 +544,6 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private NameIdTypeNamespaceListDTO retrieveClassifiersWithinPackage(IdDTO param) throws Exception {
-        log.debug("Retrieve classifiers within package: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.id());
 
         List<NameIdTypeNamespaceDTO> nameIdTypeNamespaceDTOs = new ArrayList<>();
@@ -684,13 +564,11 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private PlantumlDTO retrievePackageStructureAsPlantuml(NoInputDTO param) throws Exception {
-        log.debug("Retrieve package structure as PlantUML: {}", param);
-
         IModel astahProject;
         try {
             astahProject = projectAccessor.getProject();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current project.");
+            throw new RuntimeException("Failed to get the current project.", e);
         }
 
         StringBuilder plantumlCode = new StringBuilder();
@@ -747,8 +625,6 @@ public class ProjectInfoTool extends AstahToolProvider {
     }
 
     private PlantumlDTO retrieveRelationshipsAsPlantuml(NoInputDTO param) throws Exception {
-        log.debug("Retrieve relationships as PlantUML: {}", param);
-
         StringBuilder plantumlCode = new StringBuilder("@startuml\n");
 
         List<INamedElement> namedElements = new ArrayList<>(Arrays.asList(projectAccessor.findElements(INamedElement.class)));

@@ -4,6 +4,7 @@ import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport.ParsedSvg;
 import com.astahpromcp.tool.common.ImageConvertSupport.RasterizedSvgImage;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
@@ -22,6 +23,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.DiagramEditor;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IDiagram;
@@ -38,7 +40,6 @@ import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/DiagramEditor.html
@@ -113,8 +114,6 @@ public class DiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> insertSvgImage(NewSvgImageWithPointDTO param) throws Exception {
-        log.debug("Insert SVG image: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
         DiagramEditor diagramEditor;
@@ -142,10 +141,16 @@ public class DiagramEditorTool extends AstahToolProvider {
 
     private INodePresentation createSvgImagePresentation(IDiagram astahDiagram, DiagramEditor diagramEditor, String imageSvgCode, double locationX, double locationY) throws Exception {
 
-        RasterizedSvgImage svgImage = imageConvertSupport.svgToRasterizedImage(imageSvgCode, SVG_IMAGE_RASTERIZATION_SCALE);
+        ParsedSvg svg = imageConvertSupport.parseSvg(imageSvgCode);
+        imageConvertSupport.requireInsertableSize(svg);
+
+        RasterizedSvgImage svgImage = imageConvertSupport.rasterizeScaled(svg, SVG_IMAGE_RASTERIZATION_SCALE);
         int displayWidth = svgImage.displayWidth();
         int displayHeight = svgImage.displayHeight();
-        Set<String> beforePresentationIds = presentationIds(astahDiagram);
+        Set<String> beforePresentationIds = new HashSet<>();
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
+            beforePresentationIds.add(presentation.getID());
+        }
 
         try {
             // Insert the high-resolution image and shrink only its display size, so that the image stays sharp when the diagram is zoomed in or exported.
@@ -170,7 +175,7 @@ public class DiagramEditorTool extends AstahToolProvider {
             // Note: Some diagrams (e.g. sequence diagrams) reject resizing of an image presentation.
             log.info("Resizing an image presentation is not supported on {}. Inserting an image rasterized at {}x{} instead.", astahDiagram.getClass().getName(), displayWidth, displayHeight);
 
-            Image exactSizeImage = imageConvertSupport.svgToImage(imageSvgCode, displayWidth, displayHeight);
+            Image exactSizeImage = imageConvertSupport.rasterize(svg, displayWidth, displayHeight);
 
             return txnAstah.call( () -> {
                 INodePresentation createdPresentation = diagramEditor.createImage(
@@ -187,18 +192,9 @@ public class DiagramEditorTool extends AstahToolProvider {
         }
     }
 
-    private Set<String> presentationIds(IDiagram astahDiagram) throws Exception {
-        Set<String> ids = new HashSet<>();
-        for (IPresentation presentation : astahDiagram.getPresentations()) {
-            ids.add(presentation.getID());
-        }
-
-        return ids;
-    }
-
     private INodePresentation findNewNodePresentation(IDiagram astahDiagram, Set<String> beforePresentationIds) throws Exception {
 
-        for (IPresentation presentation : astahDiagram.getPresentations()) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
             if (beforePresentationIds.contains(presentation.getID())) {
                 continue;
             }
@@ -211,8 +207,6 @@ public class DiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<RectangleDTO, List<McpSchema.Content>> insertPngOrJpgImage(NewPngOrJpgImageWithPointDTO param) throws Exception {
-        log.debug("Insert PNG or JPG image: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
         DiagramEditor diagramEditor;
@@ -247,8 +241,6 @@ public class DiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertRect(NewRectDTO param) throws Exception {
-        log.debug("Insert rectangle: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
         DiagramEditor diagramEditor;
@@ -277,8 +269,6 @@ public class DiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertText(NewTextWithPointDTO param) throws Exception {
-        log.debug("Insert text: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
         DiagramEditor diagramEditor;
@@ -306,8 +296,6 @@ public class DiagramEditorTool extends AstahToolProvider {
     }
 
     private DiagramDTO deleteDiagram(DeleteDiagramDTO param) throws Exception {
-        log.debug("Deleting diagram: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
         // Delete target diagram
@@ -334,8 +322,6 @@ public class DiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> deletePresentation(DeletePresentationDTO param) throws Exception {
-        log.debug("Deleting presentation: {}", param);
-
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.targetPresentationId());
 
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());

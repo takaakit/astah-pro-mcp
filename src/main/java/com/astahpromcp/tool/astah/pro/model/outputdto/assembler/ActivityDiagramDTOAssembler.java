@@ -2,9 +2,9 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
 
 public class ActivityDiagramDTOAssembler {
     public static ActivityDiagramDTO toDTO(@NonNull IActivityDiagram astahActivityDiagram) throws Exception {

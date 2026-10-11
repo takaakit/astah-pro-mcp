@@ -3,18 +3,13 @@ package com.astahpromcp.tool.astah.pro.preliminary;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.spec.McpSchema;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PreliminaryLayoutToolTest {
 
@@ -31,11 +26,6 @@ public class PreliminaryLayoutToolTest {
             PreliminaryLayoutTool.class,
             "getSteps",
             NoInputDTO.class);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        // Cleanup if needed
     }
 
     // The tool holds no Astah state, so the method is invoked directly rather than through TestSupport.instance(),

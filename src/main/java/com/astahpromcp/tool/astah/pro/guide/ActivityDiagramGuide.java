@@ -10,7 +10,7 @@ final class ActivityDiagramGuide {
 IMPORTANT POINTS to Keep in Mind:
 * When the size of a partition is changed, the drawing positions of the presentations contained within that partition are also automatically changed as a result. Therefore, when newly placing node/link presentations within the partition, be sure to finish adjusting the partition size beforehand.
 * To move an action to a different lane, enlarge the destination lane enough to accommodate the action being moved, and then change the coordinates of the action so that it is positioned within the destination lane.
-* A partition with a represents shows the name of the represented element in its header instead of its own label.
+* A partition with a represents shows the name of the represented element in its header, but keeps its own name: tools return that name as its label, and the header shows it again if the represents is removed. Setting the represents or renaming the represented element does not change the partition's own name, so whenever you do either, rename the partition to the name of the represented element.
 * The Activity owned by an activity diagram has its own name (initially a default such as Activity0), which does not follow the diagram name. Set it as well when you create or rename the diagram.
 
 

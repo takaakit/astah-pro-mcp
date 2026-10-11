@@ -12,6 +12,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.StructureDiagramEditor;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IElement;
@@ -28,7 +29,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/StructureDiagramEditor.html
@@ -76,8 +76,6 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(NewNodePresentationDTO param) throws Exception {
-        log.debug("Create node presentation on diagram: {}", param);
-
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
         IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
 
@@ -85,7 +83,7 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
         try {
             structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram, astahElement);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get structure diagram editor.");
+            throw new RuntimeException("Failed to get structure diagram editor.", e);
         }
 
         structureDiagramEditor.setDiagram(astahStructureDiagram);
@@ -119,8 +117,6 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(NewLinkPresentationDTO param) throws Exception {
-        log.debug("Create link presentation on diagram: {}", param);
-
         IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
         INodePresentation astahSourceNode = astahProToolSupport.getNodePresentation(param.sourceNodePresentationId());
@@ -130,7 +126,7 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
         try {
             structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram, astahElement);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get structure diagram editor.");
+            throw new RuntimeException("Failed to get structure diagram editor.", e);
         }
 
         structureDiagramEditor.setDiagram(astahStructureDiagram);
@@ -147,8 +143,6 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createNestingLinkPresentation(NewNestingLinkPresentationDTO param) throws Exception {
-        log.debug("Create nesting link presentation on diagram: {}", param);
-
         IDiagram astahStructureDiagram = astahProToolSupport.getDiagram(param.targetDiagramId());
         INodePresentation astahParentNode = astahProToolSupport.getNodePresentation(param.parentNodePresentationId());
         INodePresentation astahChildNode = astahProToolSupport.getNodePresentation(param.childNodePresentationId());
@@ -157,7 +151,7 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
         try {
             structureDiagramEditor = (StructureDiagramEditor) diagramEditorSupport.getCorrespondingDiagramEditor(astahStructureDiagram);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get structure diagram editor.");
+            throw new RuntimeException("Failed to get structure diagram editor.", e);
         }
 
         structureDiagramEditor.setDiagram(astahStructureDiagram);

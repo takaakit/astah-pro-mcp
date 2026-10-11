@@ -13,6 +13,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.CombinedFragment
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.model.IConstraint;
@@ -23,12 +24,13 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ICombinedFragment.html
 @Slf4j
 public class CombinedFragmentTool extends AstahToolProvider {
+
+    private static final int MIN_INTERACTION_OPERAND_HEIGHT = 10;
 
     private final BasicModelEditor basicModelEditor;
     private final ProjectAccessor projectAccessor;
@@ -70,7 +72,7 @@ public class CombinedFragmentTool extends AstahToolProvider {
             // Note: To set the height of an interaction operand, the index of the operand known by the combined fragment is required. Therefore, this tool is defined as a tool for the combined fragment rather than for the interaction operand.
             ToolSupport.toolDefinitionReturningDto(
                 "set_height_of_interaction_operand",
-                "Set the height of the specified interaction operand (specified by 1-based index) of the specified combined fragment (specified by the ID of its node presentation), and return the node presentation of the combined fragment after it is set. Note that, since there is no node presentation for an interaction operand, the node presentation returned is that of the combined fragment containing the interaction operand.",
+                "Set the height of the specified interaction operand (specified by 1-based index) of the specified combined fragment (specified by the ID of its node presentation), and return the node presentation of the combined fragment after it is set. The height must be at least 10, and, for an operand other than the last one, must keep every message drawn in the operand above its bottom; otherwise nothing is changed and an error is returned. Note that, since there is no node presentation for an interaction operand, the node presentation returned is that of the combined fragment containing the interaction operand.",
                 this::setHeightOfInteractionOperand,
                 InteractionOperandIndexWithHeightDTO.class,
                 NodePresentationDTO.class)
@@ -78,16 +80,12 @@ public class CombinedFragmentTool extends AstahToolProvider {
     }
 
     private CombinedFragmentDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get combined fragment information: {}", param);
-
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.id());
 
         return CombinedFragmentDTOAssembler.toDTO(astahCombinedFragment);
     }
 
     private CombinedFragmentDTO addInteractionOperand(NewInteractionOperandDTO param) throws Exception {
-        log.debug("Add interaction operand: {}", param);
-
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
 
         // A null or blank guard means no guard, and surrounding whitespace is removed.
@@ -120,8 +118,6 @@ public class CombinedFragmentTool extends AstahToolProvider {
     }
 
     private CombinedFragmentDTO setCombinedFragmentKind(CombinedFragmentWithKindDTO param) throws Exception {
-        log.debug("Set combined fragment kind: {}", param);
-
         ICombinedFragment astahCombinedFragment = astahProToolSupport.getCombinedFragment(param.targetCombinedFragmentId());
 
         txnAstah.run( () -> {
@@ -132,8 +128,6 @@ public class CombinedFragmentTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO setHeightOfInteractionOperand(InteractionOperandIndexWithHeightDTO param) throws Exception {
-        log.debug("Set height of interaction operand: {}", param);
-
         INodePresentation astahCombinedFragmentPresentation = astahProToolSupport.getNodePresentation(param.targetCombinedFragmentNodePresentationId());
         if (!Type.COMBINED_FRAGMENT.matches(astahCombinedFragmentPresentation.getType())) {
             throw new IllegalArgumentException("Combined fragment node must be one of the following node presentation types: CombinedFragment.");
@@ -145,15 +139,35 @@ public class CombinedFragmentTool extends AstahToolProvider {
         if (param.targetInteractionOperandIndex() < 1 || param.targetInteractionOperandIndex() > astahCombinedFragment.getInteractionOperands().length) {
             throw new IllegalArgumentException("Invalid interaction operand index: " + param.targetInteractionOperandIndex());
         }
+        
+        if (param.height() < MIN_INTERACTION_OPERAND_HEIGHT) {
+            throw new IllegalArgumentException(String.format(
+                "The height of an interaction operand must be at least %d: %d", MIN_INTERACTION_OPERAND_HEIGHT, param.height()));
+        }
+        
         // Get the key for the operand length property
         String key = PresentationPropertyUtil.createOperandLengthKey(param.targetInteractionOperandIndex());
-        // Get the target interaction operand
-        IInteractionOperand astahInteractionOperand = astahCombinedFragment.getInteractionOperands()[param.targetInteractionOperandIndex() - 1];
 
         txnAstah.run( () -> {
             astahCombinedFragmentPresentation.setProperty(key, String.valueOf(param.height()));
+
+            // Workaround: Astah does not apply a height that would leave a message drawn in the operand below its bottom, yet still moves the presentations below and resizes the combined fragment. So check the height it kept, and fail inside the transaction so that those changes are rolled back as well.
+            String appliedHeight = astahCombinedFragmentPresentation.getProperty(key);
+            if (!hasLength(appliedHeight, param.height())) {
+                throw new IllegalArgumentException(String.format(
+                    "Astah did not apply the height %d to interaction operand %d (it kept %s), so nothing was changed. Something drawn in the operand, such as a message, probably lies below that height. Specify a height that keeps everything drawn in the operand above its bottom.",
+                    param.height(), param.targetInteractionOperandIndex(), appliedHeight));
+            }
         });
 
         return NodePresentationDTOAssembler.toDTO(astahCombinedFragmentPresentation);
+    }
+
+    private static boolean hasLength(String length, int expected) {
+        try {
+            return length != null && Double.parseDouble(length) == expected;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

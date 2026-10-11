@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ObjectNodeWithBaseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ObjectNodeDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ObjectNodeToolTest {
 
@@ -65,7 +65,7 @@ public class ObjectNodeToolTest {
         IObjectNode objectNode = (IObjectNode) TestSupport.instance().getNamedElementByClassAndName(
             IObjectNode.class,
             "Object0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(objectNode.getId());
 
@@ -88,12 +88,12 @@ public class ObjectNodeToolTest {
         IObjectNode objectNode = (IObjectNode) TestSupport.instance().getNamedElementByClassAndName(
             IObjectNode.class,
             "Object0");
-        
+
         // Get base class
         IClass baseClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Create input DTO
         ObjectNodeWithBaseDTO inputDTO = new ObjectNodeWithBaseDTO(
             objectNode.getId(),

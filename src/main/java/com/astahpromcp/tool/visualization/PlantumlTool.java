@@ -38,8 +38,6 @@ public class PlantumlTool implements ToolProvider {
     }
 
     private List<McpSchema.Content> generateDiagramImageFromPlantuml(PlantumlDTO param) throws Exception {
-        log.debug("Generate diagram image from PlantUML code: {}", param);
-
         McpSchema.ImageContent content = createPngImageContent(param.plantumlCode());
         List<McpSchema.Content> contents = new ArrayList<>();
         contents.add(content);

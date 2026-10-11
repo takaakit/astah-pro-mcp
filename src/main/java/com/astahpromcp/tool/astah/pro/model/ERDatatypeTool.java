@@ -11,12 +11,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERDatatypeWithLengthConstra
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERDatatypeWithPrecisionConstraintDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDatatypeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDatatypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDatatype.html
@@ -75,16 +75,12 @@ public class ERDatatypeTool extends AstahToolProvider {
     }
 
     private ERDatatypeDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER datatype information: {}", param);
-
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.id());
 
         return ERDatatypeDTOAssembler.toDTO(astahERDatatype);
     }
 
     private ERDatatypeDTO setLengthConstraint(ERDatatypeWithLengthConstraintDTO param) throws Exception {
-        log.debug("Set length constraint of ER datatype: {}", param);
-
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
         txnAstah.run( () -> {
@@ -95,8 +91,6 @@ public class ERDatatypeTool extends AstahToolProvider {
     }
 
     private ERDatatypeDTO setPrecisionConstraint(ERDatatypeWithPrecisionConstraintDTO param) throws Exception {
-        log.debug("Set precision constraint of ER datatype: {}", param);
-
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
         txnAstah.run( () -> {
@@ -107,8 +101,6 @@ public class ERDatatypeTool extends AstahToolProvider {
     }
 
     private ERDatatypeDTO setDefaultLengthPrecision(ERDatatypeWithDefaultLengthPrecisionDTO param) throws Exception {
-        log.debug("Set default length/precision of ER datatype: {}", param);
-
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
         txnAstah.run( () -> {
@@ -119,8 +111,6 @@ public class ERDatatypeTool extends AstahToolProvider {
     }
 
     private ERDatatypeDTO setDescription(ERDatatypeWithDescriptionDTO param) throws Exception {
-        log.debug("Set description of ER datatype: {}", param);
-
         IERDatatype astahERDatatype = astahProToolSupport.getERDatatype(param.targetERDatatypeId());
 
         txnAstah.run( () -> {

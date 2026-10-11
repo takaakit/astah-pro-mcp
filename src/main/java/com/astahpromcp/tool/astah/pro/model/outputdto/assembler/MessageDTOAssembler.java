@@ -2,9 +2,9 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
 import com.change_vision.jude.api.inf.model.IMessage;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
 
 public class MessageDTOAssembler {
     public static MessageDTO toDTO(@NonNull IMessage astahMessage) throws Exception {

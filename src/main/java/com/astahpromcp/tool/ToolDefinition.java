@@ -7,9 +7,9 @@ import java.util.function.BiFunction;
 
 // A record to encapsulate a tool's schema and its handler function
 public record ToolDefinition(
-        McpSchema.Tool toolSchema,
-        ResultKind resultKind,
-        BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> toolHandler
+    McpSchema.Tool toolSchema,
+    ResultKind resultKind,
+    BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> toolHandler
 ) {
 
     // What kind of result the handler answers with.

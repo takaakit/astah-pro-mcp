@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ParameterWithTypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ParameterWithTypeExpressionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ParameterDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ParameterToolTest {
 
@@ -65,12 +65,12 @@ public class ParameterToolTest {
         IParameter parameter = (IParameter) TestSupport.instance().getNamedElementByClassAndName(
             IParameter.class,
             "param0");
-        
+
         // Get class
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
-        
+
         // Create input DTO
         ParameterWithTypeDTO inputDTO = new ParameterWithTypeDTO(
             parameter.getId(),
@@ -101,7 +101,7 @@ public class ParameterToolTest {
         IParameter parameter = (IParameter) TestSupport.instance().getNamedElementByClassAndName(
             IParameter.class,
             "param1");
-        
+
         // Create input DTO
         ParameterWithTypeExpressionDTO inputDTO = new ParameterWithTypeExpressionDTO(
             parameter.getId(),

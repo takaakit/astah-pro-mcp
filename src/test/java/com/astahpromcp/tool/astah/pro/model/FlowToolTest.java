@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithActionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.FlowWithGuardDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class FlowToolTest {
 
@@ -72,7 +72,7 @@ public class FlowToolTest {
         IFlow flow = (IFlow) TestSupport.instance().getNamedElementByClassAndName(
             IFlow.class,
             "");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(flow.getId());
 
@@ -95,7 +95,7 @@ public class FlowToolTest {
         IFlow flow = (IFlow) TestSupport.instance().getNamedElementByClassAndName(
             IFlow.class,
             "");
-        
+
         // Create input DTO
         FlowWithActionDTO inputDTO = new FlowWithActionDTO(
             flow.getId(),
@@ -126,7 +126,7 @@ public class FlowToolTest {
         IFlow flow = (IFlow) TestSupport.instance().getNamedElementByClassAndName(
             IFlow.class,
             "");
-        
+
         // Create input DTO
         FlowWithGuardDTO inputDTO = new FlowWithGuardDTO(
             flow.getId(),

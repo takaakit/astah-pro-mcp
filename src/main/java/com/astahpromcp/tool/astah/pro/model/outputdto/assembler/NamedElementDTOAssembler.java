@@ -1,11 +1,9 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
+import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.VisibilityKind;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
-import com.change_vision.jude.api.inf.model.*;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DependencyDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.FilePathHyperlinkDTO;
@@ -13,6 +11,9 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.UrlHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.RealizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.UsageDTO;
+import com.change_vision.jude.api.inf.model.*;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;
@@ -54,14 +55,20 @@ public class NamedElementDTOAssembler {
             supplierUsages.add(UsageDTOAssembler.toDTO(usage));
         }
 
-        List<NameIdTypeDTO> renderedInDiagrams = new ArrayList<>();
+        List<NameIdTypeDTO> ownedDiagrams = new ArrayList<>();
         // Workaround: Some diagrams caused an exception when trying to cast them.
         try {
             for (IDiagram diagram : astahNamedElement.getDiagrams()) {
-                renderedInDiagrams.add(NameIdTypeDTOAssembler.toDTO(diagram));
+                ownedDiagrams.add(NameIdTypeDTOAssembler.toDTO(diagram));
             }
         } catch (Exception e) {
             log.warn("Failed to get diagrams: {}", e.getMessage());
+        }
+
+        // Each diagram is listed once, even when this element is drawn on it more than once
+        List<NameIdTypeDTO> renderedInDiagrams = new ArrayList<>();
+        for (IDiagram diagram : AstahProToolSupport.getRenderedInDiagrams(astahNamedElement)) {
+            renderedInDiagrams.add(NameIdTypeDTOAssembler.toDTO(diagram));
         }
 
         List<NameIdTypeDTO> constraints = new ArrayList<>();
@@ -127,6 +134,7 @@ public class NamedElementDTOAssembler {
             supplierRealizations,
             clientUsages,
             supplierUsages,
+            ownedDiagrams,
             renderedInDiagrams,
             constraints,
             urlHyperlinks,

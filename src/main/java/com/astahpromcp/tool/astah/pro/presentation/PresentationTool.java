@@ -14,6 +14,8 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationTypeListDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IComment;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
@@ -25,7 +27,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/IPresentation.html
@@ -93,8 +94,6 @@ public class PresentationTool extends AstahToolProvider {
     }
 
     private ElementDTO getElement(IdDTO param) throws Exception {
-        log.debug("Get element corresponding to presentation: {}", param);
-
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.id());
 
         IElement astahElement = astahPresentation.getModel();
@@ -107,8 +106,6 @@ public class PresentationTool extends AstahToolProvider {
     }
 
     private PresentationTypeListDTO getAllTypes(NoInputDTO param) throws Exception {
-        log.debug("Get all presentation types: {}", param);
-
         List<String> typeNames = Arrays.stream(PresentationDTO.Type.values())
                 .filter(type -> type != PresentationDTO.Type.UNKNOWN)
                 .map(type -> type.typeName)
@@ -118,8 +115,6 @@ public class PresentationTool extends AstahToolProvider {
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> setLabel(PresentationWithLabelDTO param) throws Exception {
-        log.debug("Set label of presentation: {}", param);
-
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
 
         txnAstah.run( () -> {
@@ -139,44 +134,36 @@ public class PresentationTool extends AstahToolProvider {
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeFillColor(PresentationWithColorDTO param) throws Exception {
-        log.debug("Change fill color of presentation: {}", param);
-
-        IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
-
-        txnAstah.run( () -> {
-            astahPresentation.setProperty(Key.FILL_COLOR, param.color());
-        });
-
-        PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
-
-        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahPresentation.getDiagram().getId());
-
-        return Pair.of(dto, List.of(thumbnailContent));
+        return changeColor(param, Key.FILL_COLOR, "fill color");
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeLineColor(PresentationWithColorDTO param) throws Exception {
-        log.debug("Change line color of presentation: {}", param);
-
-        IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
-
-        txnAstah.run( () -> {
-            astahPresentation.setProperty(Key.LINE_COLOR, param.color());
-        });
-
-        PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);
-
-        McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahPresentation.getDiagram().getId());
-
-        return Pair.of(dto, List.of(thumbnailContent));
+        return changeColor(param, Key.LINE_COLOR, "line color");
     }
 
     private Pair<PresentationDTO, List<McpSchema.Content>> changeFontColor(PresentationWithColorDTO param) throws Exception {
-        log.debug("Change font color of presentation: {}", param);
+        return changeColor(param, Key.FONT_COLOR, "font color");
+    }
 
+    private Pair<PresentationDTO, List<McpSchema.Content>> changeColor(PresentationWithColorDTO param, String key, String colorName) throws Exception {
         IPresentation astahPresentation = astahProToolSupport.getPresentation(param.presentationId());
+        String color = AstahProToolSupport.requireRrggbbColor(param.color());
+
+        String noSuchColor = String.format("The presentation (ID: %s, type: %s) has no %s.",
+            astahPresentation.getID(), astahPresentation.getType(), colorName);
 
         txnAstah.run( () -> {
-            astahPresentation.setProperty(Key.FONT_COLOR, param.color());
+            try {
+                astahPresentation.setProperty(key, color);
+            } catch (InvalidEditingException e) {
+                // The color is valid by now, so Astah rejects it only because this presentation has no such color, as a link has no fill color.
+                throw new IllegalArgumentException(noSuchColor, e);
+            }
+
+            // Some presentations accept a color without keeping it
+            if (!color.equalsIgnoreCase(astahPresentation.getProperty(key))) {
+                throw new IllegalArgumentException(noSuchColor);
+            }
         });
 
         PresentationDTO dto = PresentationDTOAssembler.toDTO(astahPresentation);

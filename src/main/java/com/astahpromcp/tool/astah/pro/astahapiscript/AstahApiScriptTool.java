@@ -33,8 +33,6 @@ public class AstahApiScriptTool extends AstahToolProvider {
     }
 
     private ScriptResultDTO runScript(RunAstahApiScriptDTO param) throws Exception {
-        log.debug("Run astah api script: {}", param);
-
         if (param.script() == null || param.script().trim().isEmpty()) {
             throw new IllegalArgumentException("The astah api script is empty.");
         }

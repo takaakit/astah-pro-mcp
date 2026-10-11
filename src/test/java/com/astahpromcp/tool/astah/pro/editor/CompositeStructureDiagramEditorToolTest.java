@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
@@ -25,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class CompositeStructureDiagramEditorToolTest {
 
@@ -468,6 +468,137 @@ public class CompositeStructureDiagramEditorToolTest {
     }
 
     @Test
+    void createProvidedInterfacePresentation_ng_notPortOrPart() throws Exception {
+        // Get composite structure diagram
+        ICompositeStructureDiagram compositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Composite Structure Diagram0");
+
+        // Get structured class
+        INodePresentation structuredClass = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "StructuredClass",
+            "Class0");
+
+        // Get interface
+        IClass targetInterface = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Interface0");
+
+        int presentationCountBefore = compositeStructureDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createProvidedInterfacePresentation()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createProvidedInterfacePresentation,
+                tool,
+                new NewProvidedInterfacePresentationDTO(compositeStructureDiagram.getId(), structuredClass.getID(), targetInterface.getId(), 300, 430),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Target node for provided interface presentation must be one of the following node presentation types: Port, or Part (actual type: StructuredClass)."), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, compositeStructureDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createProvidedInterfacePresentation_ng_notOnTargetDiagram() throws Exception {
+        // Get port on Composite Structure Diagram0
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class4");
+        IPort port = portOwner.getPorts()[0];
+        INodePresentation portPresentation = (INodePresentation) port.getPresentations()[0];
+        ICompositeStructureDiagram portDiagram = (ICompositeStructureDiagram) portPresentation.getDiagram();
+
+        // Get interface
+        IClass targetInterface = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Interface0");
+
+        // Another composite structure diagram, whose ID an agent may pass by mistake
+        TestSupport.instance().invokeToolMethodReturningDto(
+            createCompositeStructureDiagram,
+            tool,
+            new NewDiagramInPackageDTO(projectAccessor.getProject().getId(), "Another Composite Structure Diagram"),
+            DiagramDTO.class);
+        ICompositeStructureDiagram anotherCompositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Another Composite Structure Diagram");
+
+        int portDiagramPresentationCountBefore = portDiagram.getPresentations().length;
+        int anotherDiagramPresentationCountBefore = anotherCompositeStructureDiagram.getPresentations().length;
+        int realizationCountBefore = port.getClientRealizations().length;
+
+        // ----------------------------------------
+        // Call createProvidedInterfacePresentation()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createProvidedInterfacePresentation,
+                tool,
+                new NewProvidedInterfacePresentationDTO(anotherCompositeStructureDiagram.getId(), portPresentation.getID(), targetInterface.getId(), 300, 430),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The target node presentation is not on the target composite structure diagram: " + portPresentation.getID()), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on either diagram and no realization was created
+        assertEquals(portDiagramPresentationCountBefore, portDiagram.getPresentations().length);
+        assertEquals(anotherDiagramPresentationCountBefore, anotherCompositeStructureDiagram.getPresentations().length);
+        assertEquals(realizationCountBefore, port.getClientRealizations().length);
+    }
+
+    @Test
+    void createProvidedInterfacePresentation_ng_notInterface() throws Exception {
+        // Get composite structure diagram
+        ICompositeStructureDiagram compositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Composite Structure Diagram0");
+
+        // Get port
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class4");
+        IPort port = portOwner.getPorts()[0];
+        INodePresentation portPresentation = (INodePresentation) port.getPresentations()[0];
+
+        // Get an ordinary class
+        IClass ordinaryClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class0");
+        assertFalse(ordinaryClass.hasStereotype("interface"));
+
+        int presentationCountBefore = compositeStructureDiagram.getPresentations().length;
+        int realizationCountBefore = port.getClientRealizations().length;
+
+        // ----------------------------------------
+        // Call createProvidedInterfacePresentation()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createProvidedInterfacePresentation,
+                tool,
+                new NewProvidedInterfacePresentationDTO(compositeStructureDiagram.getId(), portPresentation.getID(), ordinaryClass.getId(), 300, 430),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Failed to get interface (ID: " + ordinaryClass.getId() + ") because 'Class0' is a class without the 'interface' stereotype."), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on the diagram and no realization was created
+        assertEquals(presentationCountBefore, compositeStructureDiagram.getPresentations().length);
+        assertEquals(realizationCountBefore, port.getClientRealizations().length);
+    }
+
+    @Test
     void createRequiredInterfacePresentation_ok() throws Exception {
         // Get composite structure diagram
         ICompositeStructureDiagram compositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
@@ -510,6 +641,137 @@ public class CompositeStructureDiagramEditorToolTest {
         // Check that the interface became a required interface of the port
         assertEquals(1, port.getClientUsages().length);
         assertEquals(targetInterface.getId(), port.getClientUsages()[0].getSupplier().getId());
+    }
+
+    @Test
+    void createRequiredInterfacePresentation_ng_notPortOrPart() throws Exception {
+        // Get composite structure diagram
+        ICompositeStructureDiagram compositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Composite Structure Diagram0");
+
+        // Get structured class, which an agent may pass by mistake
+        INodePresentation structuredClass = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "StructuredClass",
+            "Class0");
+
+        // Get interface
+        IClass targetInterface = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Interface1");
+
+        int presentationCountBefore = compositeStructureDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call createRequiredInterfacePresentation()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createRequiredInterfacePresentation,
+                tool,
+                new NewRequiredInterfacePresentationDTO(compositeStructureDiagram.getId(), structuredClass.getID(), targetInterface.getId(), 200, 430),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Target node for required interface presentation must be one of the following node presentation types: Port, or Part (actual type: StructuredClass)."), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, compositeStructureDiagram.getPresentations().length);
+    }
+
+    @Test
+    void createRequiredInterfacePresentation_ng_notOnTargetDiagram() throws Exception {
+        // Get port on Composite Structure Diagram0
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class3");
+        IPort port = portOwner.getPorts()[0];
+        INodePresentation portPresentation = (INodePresentation) port.getPresentations()[0];
+        ICompositeStructureDiagram portDiagram = (ICompositeStructureDiagram) portPresentation.getDiagram();
+
+        // Get interface
+        IClass targetInterface = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Interface1");
+
+        // Another composite structure diagram, whose ID an agent may pass by mistake
+        TestSupport.instance().invokeToolMethodReturningDto(
+            createCompositeStructureDiagram,
+            tool,
+            new NewDiagramInPackageDTO(projectAccessor.getProject().getId(), "Another Composite Structure Diagram"),
+            DiagramDTO.class);
+        ICompositeStructureDiagram anotherCompositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Another Composite Structure Diagram");
+
+        int portDiagramPresentationCountBefore = portDiagram.getPresentations().length;
+        int anotherDiagramPresentationCountBefore = anotherCompositeStructureDiagram.getPresentations().length;
+        int usageCountBefore = port.getClientUsages().length;
+
+        // ----------------------------------------
+        // Call createRequiredInterfacePresentation()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createRequiredInterfacePresentation,
+                tool,
+                new NewRequiredInterfacePresentationDTO(anotherCompositeStructureDiagram.getId(), portPresentation.getID(), targetInterface.getId(), 200, 430),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The target node presentation is not on the target composite structure diagram: " + portPresentation.getID()), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on either diagram and no usage was created
+        assertEquals(portDiagramPresentationCountBefore, portDiagram.getPresentations().length);
+        assertEquals(anotherDiagramPresentationCountBefore, anotherCompositeStructureDiagram.getPresentations().length);
+        assertEquals(usageCountBefore, port.getClientUsages().length);
+    }
+
+    @Test
+    void createRequiredInterfacePresentation_ng_notInterface() throws Exception {
+        // Get composite structure diagram
+        ICompositeStructureDiagram compositeStructureDiagram = (ICompositeStructureDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ICompositeStructureDiagram.class,
+            "Composite Structure Diagram0");
+
+        // Get port
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class3");
+        IPort port = portOwner.getPorts()[0];
+        INodePresentation portPresentation = (INodePresentation) port.getPresentations()[0];
+
+        // Get an ordinary class, which an agent may have created instead of an interface
+        IClass ordinaryClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class0");
+        assertFalse(ordinaryClass.hasStereotype("interface"));
+
+        int presentationCountBefore = compositeStructureDiagram.getPresentations().length;
+        int usageCountBefore = port.getClientUsages().length;
+
+        // ----------------------------------------
+        // Call createRequiredInterfacePresentation()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createRequiredInterfacePresentation,
+                tool,
+                new NewRequiredInterfacePresentationDTO(compositeStructureDiagram.getId(), portPresentation.getID(), ordinaryClass.getId(), 200, 430),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Failed to get interface (ID: " + ordinaryClass.getId() + ") because 'Class0' is a class without the 'interface' stereotype."), exception.getCause().getMessage());
+
+        // Check that nothing was drawn on the diagram and no usage was created
+        assertEquals(presentationCountBefore, compositeStructureDiagram.getPresentations().length);
+        assertEquals(usageCountBefore, port.getClientUsages().length);
     }
 
     @Test

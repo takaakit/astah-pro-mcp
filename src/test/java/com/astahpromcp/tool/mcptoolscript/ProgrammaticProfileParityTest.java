@@ -32,10 +32,12 @@ public class ProgrammaticProfileParityTest {
         return ToolManifest.load();
     }
 
-    // The programmatic profile as McpServerApp assembles it: its own two tools, plus what the programmatic column selects
+    // The programmatic profile as McpServerApp assembles it: what the programmatic column selects among the tools that run
+    // mcp tool scripts and the tools of the catalog
     private List<ToolProvider> programmaticProfileProviders(ToolCatalog catalog, ToolManifest manifest) {
-        List<ToolProvider> providers = new ArrayList<>(new McpToolScriptProviderFactory().createToolProviders(catalog, manifest));
-        providers.addAll(catalog.select(manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC)).withAstahLock());
+        Set<String> names = manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC);
+        List<ToolProvider> providers = new ArrayList<>(new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).select(names));
+        providers.addAll(catalog.select(names).withAstahLock());
         return providers;
     }
 
@@ -49,24 +51,19 @@ public class ProgrammaticProfileParityTest {
         return names;
     }
 
-    // The programmatic profile as McpToolScriptProviderFactory builds it: the direct profile can be reached, the programmatic column cannot
+    // The programmatic profile as McpToolScriptProviderFactory builds it: the direct profile can be reached, the rows with a reason cannot
     private static AstahToolRegistry registryOf(ToolCatalog catalog, ToolManifest manifest) {
-        return AstahToolRegistry.from(
-                catalog,
-                manifest.namesFor(ToolManifest.Profile.DIRECT),
-                manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC));
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
     }
 
     @Test
-    void mcpToolScriptCallableNames_ok_isTheRegistryWithoutTheToolsDerivedAsUncallableOrPublishedDirectly() {
+    void mcpToolScriptCallableNames_ok_isTheRegistryWithoutTheToolsTheManifestGivesAReason() {
         ToolCatalog catalog = catalog(DiagramThumbnails.OMIT);
         ToolManifest manifest = manifest();
         AstahToolRegistry registry = registryOf(catalog, manifest);
 
         Set<String> withheld = new TreeSet<>(registry.names());
-        Set<String> reasons = new TreeSet<>(catalog.notMcpToolScriptCallableNames());
-        reasons.addAll(manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC));
-        withheld.retainAll(reasons);
+        withheld.retainAll(manifest.notMcpToolScriptCallableReasons().keySet());
 
         assertEquals(registry.size() - withheld.size(), registry.mcpToolScriptCallableNames().size());
         assertFalse(withheld.isEmpty(), "the comparison is only meaningful if some tools are actually withheld");
@@ -87,8 +84,7 @@ public class ProgrammaticProfileParityTest {
         assertTrue(both.isEmpty(), "reachable both directly and from a script: " + both);
     }
 
-    // The reason for the test above, stated as the thing that would break it: every tool the programmatic column names
-    // and the catalog holds is withheld from a script, whatever the catalog itself thinks of its shape.
+    // The reason for the test above, stated as the thing that would break it: every tool the programmatic column names is withheld from a script, and the ones the registry holds say why.
     @Test
     void mcpToolScriptCallableNames_ok_holdsNoToolTheProgrammaticColumnPublishes() {
         ToolCatalog catalog = catalog(DiagramThumbnails.OMIT);
@@ -96,11 +92,10 @@ public class ProgrammaticProfileParityTest {
         AstahToolRegistry registry = registryOf(catalog, manifest);
 
         for (String name : manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC)) {
-            if (!catalog.contains(name)) {
-                continue;
-            }
             assertFalse(registry.mcpToolScriptCallableNames().contains(name), name);
-            assertNotNull(registry.notMcpToolScriptCallableReason(name), name);
+            if (registry.find(name) != null) {
+                assertNotNull(registry.notMcpToolScriptCallableReason(name), name);
+            }
         }
     }
 
@@ -116,7 +111,8 @@ public class ProgrammaticProfileParityTest {
 
         Set<String> unreachable = new TreeSet<>();
         for (String name : manifest.namesFor(ToolManifest.Profile.DIRECT)) {
-            if (!catalog.contains(name)) {
+            // The registry holds every tool of the direct column that exists, so a name it lacks names no tool here
+            if (registry.find(name) == null) {
                 continue;
             }
             if (!registry.mcpToolScriptCallableNames().contains(name) && !publishedDirectly.contains(name)) {

@@ -3,16 +3,16 @@
  */
 
 // A project holds more named elements than fit in one response, so they are handed over in chunks.
-// get_info_of_all_named_elements is what builds those chunks: it returns how many there are along with the
-// first of them, and get_chunk_of_all_named_elements throws until it has been called. Those chunks are
-// then held for a limited time only, which is why this walk belongs in a script: every call of it runs
-// back to back, whereas the same walk done as one MCP call per chunk has a conversation happening in
-// between and can outlive the cache.
+// get_info_of_all_named_elements returns how many there are along with the first of them and a snapshot ID,
+// and get_chunk_of_all_named_elements takes that snapshot ID with the index of each further chunk. If the
+// list changes in between, because the model was edited or another project was opened, it throws rather
+// than hand over a chunk of the changed list, so the chunks put together are always one and the same list.
 var info = tools.get_info_of_all_named_elements({});
 
-// find_named_elements_by_name and search_within_named_elements both match on text, so neither can answer
-// "every element of this type". Walking the chunks is what does, and get_all_named_element_types names the
-// types worth asking for.
+// find_named_elements_by_name matches on text, so it cannot answer "every element of this type".
+// search_within_named_elements with an empty string does return every named element, but all in one
+// result, which a large project outgrows. Walking the chunks works at any size, and
+// get_all_named_element_types names the types worth asking for.
 var wantedType = 'Class';
 
 var counts = {};
@@ -23,7 +23,7 @@ for (var i = 0; i < info.totalChunks; i++) {
   // Chunk 0 is the one the info call already returned, so take it from there rather than fetching it twice.
   var chunk = i === 0
     ? info.firstChunk
-    : tools.get_chunk_of_all_named_elements({ chunkIndex: i }).value;
+    : tools.get_chunk_of_all_named_elements({ snapshotId: info.snapshotId, chunkIndex: i }).value;
 
   // Each entry is { name, id, type }.
   for (var e = 0; e < chunk.length; e++) {

@@ -11,6 +11,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongPredicate;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -49,7 +50,7 @@ public class WorkspaceDirectoriesTest {
         WorkspaceDirectories.prepare(workspaceDir, aliveAre(OWN_PID));
 
         assertTrue(Files.isDirectory(workspaceDir));
-        try (var entries = Files.list(workspaceDir)) {
+        try (Stream<Path> entries = Files.list(workspaceDir)) {
             assertEquals(0, entries.count(), "Files of an earlier session must not be carried over");
         }
     }

@@ -12,10 +12,13 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.ActivityDiagramEditor;
 import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
+import com.change_vision.jude.api.inf.model.IPartition;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -25,7 +28,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ActivityDiagramEditor.html
@@ -163,7 +165,7 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_partition",
-                "Create a new partition by specifying the super partition (specified by presentation ID) and the previous partition (specified by presentation ID) on the specified activity diagram (specified by ID), and return the newly created node presentation of the partition along with the updated diagram image in low resolution. In cases where no super partition or previous partition exists, set the ID of those partitions to an empty string.",
+                "Create a new partition by specifying the super partition (specified by presentation ID) and the previous partition (specified by presentation ID) on the specified activity diagram (specified by ID), and return the newly created node presentation of the partition along with the updated diagram image in low resolution. The super partition and the previous partition must be partitions on the target activity diagram with the same orientation as the new partition, and the previous partition must be a sub partition of the super partition. The new partition is inserted right after the previous partition. If the previous partition is an empty string, the new partition is appended after the last partition (the last sub partition of the super partition, if specified), so it cannot be inserted before the first one. If the super partition is an empty string, the new partition is placed in the super partition of the previous partition, or at the top level when the previous partition is also empty. When the new partition is inserted between existing partitions, every presentation whose left edge (top edge for a horizontal partition) is at or beyond the insertion position moves right (down) by the width (height) of the new partition, whether it is inside a partition or not. When it is appended after the last partition, nothing moves, so presentations placed beyond the last partition may end up inside the new one.",
                 this::createPartition,
                 NewPartitionDTO.class,
                 NodePresentationDTO.class),
@@ -192,8 +194,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptEventAction(NewAcceptEventActionDTO param) throws Exception {
-        log.debug("Create accept event action: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -214,8 +214,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAcceptTimeEventAction(NewAcceptTimeEventActionDTO param) throws Exception {
-        log.debug("Create accept time event action: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -236,8 +234,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createAction(NewActionDTO param) throws Exception {
-        log.debug("Create action: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -258,8 +254,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private ActivityDiagramDTO createActivityDiagram(NewActivityDiagramDTO param) throws Exception {
-        log.debug("Create activity diagram: {}", param);
-
         IPackage astahParentPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IActivityDiagram astahActivityDiagram = txnAstah.call( () -> {
@@ -272,8 +266,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createActivityParameterNode(NewActivityParameterNodeDTO param) throws Exception {
-        log.debug("Create activity parameter node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
         IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
 
@@ -296,8 +288,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createCallBehaviorAction(NewCallBehaviorActionDTO param) throws Exception {
-        log.debug("Create call behavior action: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
         IActivityDiagram astahReferenceActivityDiagram = astahProToolSupport.getActivityDiagram(param.referenceActivityDiagramId());
 
@@ -320,8 +310,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createConnector(NewConnectorDTO param) throws Exception {
-        log.debug("Create connector: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -342,8 +330,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createDecisionMergeNode(NewDecisionMergeNodeDTO param) throws Exception {
-        log.debug("Create decision merge node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -364,8 +350,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createDependency(NewDependencyDTO param) throws Exception {
-        log.debug("Create dependency: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
         INodePresentation astahClientNodePresentation = astahProToolSupport.getNodePresentation(param.clientNodePresentationId());
         INodePresentation astahSupplierNodePresentation = astahProToolSupport.getNodePresentation(param.supplierNodePresentationId());
@@ -387,8 +371,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFinalNode(NewFinalNodeDTO param) throws Exception {
-        log.debug("Create final node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -409,8 +391,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createFlow(NewFlowDTO param) throws Exception {
-        log.debug("Create flow: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
         INodePresentation astahSourceNodePresentation = astahProToolSupport.getNodePresentation(param.sourceNodePresentationId());
         INodePresentation astahTargetNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
@@ -431,8 +411,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFlowFinalNode(NewFlowFinalNodeDTO param) throws Exception {
-        log.debug("Create flow final node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -453,8 +431,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createForkNode(NewForkNodeDTO param) throws Exception {
-        log.debug("Create fork node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -475,8 +451,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createInitialNode(NewInitialNodeDTO param) throws Exception {
-        log.debug("Create initial node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -497,8 +471,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createJoinNode(NewJoinNodeDTO param) throws Exception {
-        log.debug("Create join node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -519,8 +491,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createObjectNode(NewObjectNodeDTO param) throws Exception {
-        log.debug("Create object node: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
         IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
 
@@ -543,15 +513,10 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartition(NewPartitionDTO param) throws Exception {
-        log.debug("Create partition: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
-        INodePresentation astahSuperNodePresentation = param.superPartitionId().isEmpty()
-            ? null
-            : astahProToolSupport.getNodePresentation(param.superPartitionId());
-        INodePresentation astahPreviousNodePresentation = param.previousPartitionId().isEmpty()
-            ? null
-            : astahProToolSupport.getNodePresentation(param.previousPartitionId());
+        INodePresentation astahSuperNodePresentation = getPartitionOnDiagramOrNull(param.superPartitionId(), "super partition", astahActivityDiagram);
+        INodePresentation astahPreviousNodePresentation = getPartitionOnDiagramOrNull(param.previousPartitionId(), "previous partition", astahActivityDiagram);
+        requirePartitionArrangement(astahSuperNodePresentation, astahPreviousNodePresentation, param.isHorizontal());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
 
@@ -570,9 +535,69 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
         return Pair.of(dto, List.of(thumbnailContent));
     }
 
-    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(NewPinWithBaseClassAndParentActionDTO param) throws Exception {
-        log.debug("Create pin: {}", param);
+    private INodePresentation getPartitionOnDiagramOrNull(String partitionId, String role, IActivityDiagram astahActivityDiagram) {
+        if (partitionId == null || partitionId.isEmpty()) {
+            return null;
+        }
 
+        INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(partitionId);
+        if (!(astahNodePresentation.getModel() instanceof IPartition)) {
+            throw new IllegalArgumentException(String.format(
+                "The %s (ID: %s, type: %s) is not a partition. Specify the presentation ID of a partition, or an empty string.",
+                role, partitionId, astahNodePresentation.getType()));
+        }
+
+        IDiagram actualDiagram = astahNodePresentation.getDiagram();
+        if (actualDiagram == null || !astahActivityDiagram.getId().equals(actualDiagram.getId())) {
+            throw new IllegalArgumentException(String.format(
+                "The %s (ID: %s) is not on the target activity diagram '%s' (ID: %s)%s. Specify a partition on the target activity diagram.",
+                role, partitionId, astahActivityDiagram.getName(), astahActivityDiagram.getId(),
+                actualDiagram == null ? "" : " but on '" + actualDiagram.getName() + "' (ID: " + actualDiagram.getId() + ")"));
+        }
+
+        return astahNodePresentation;
+    }
+
+    // Astah rejects these arrangements with only "Parameter should be set correctly.", or fails inside with a NullPointerException
+    private static void requirePartitionArrangement(INodePresentation astahSuperNodePresentation, INodePresentation astahPreviousNodePresentation, boolean isHorizontal) {
+        String requested = isHorizontal ? "horizontal" : "vertical";
+        String opposite = isHorizontal ? "vertical" : "horizontal";
+
+        if (astahSuperNodePresentation != null
+            && ((IPartition) astahSuperNodePresentation.getModel()).isHorizontal() != isHorizontal) {
+            throw new IllegalArgumentException(String.format(
+                "The super partition '%s' (ID: %s) is %s, but isHorizontal specifies a %s partition. A partition has the same orientation as its super partition.",
+                astahSuperNodePresentation.getLabel(), astahSuperNodePresentation.getID(), opposite, requested));
+        }
+
+        if (astahPreviousNodePresentation == null) {
+            return;
+        }
+
+        IPartition astahPreviousPartition = (IPartition) astahPreviousNodePresentation.getModel();
+        IPartition astahPreviousSuperPartition = astahPreviousPartition.getSuperPartition();
+        if (astahPreviousSuperPartition == null) {
+            throw new IllegalArgumentException(String.format(
+                "The previous partition (ID: %s) is the dimension that Astah creates to hold the partitions of one orientation. Specify one of the partitions in it, or an empty string to append the new partition after the last one.",
+                astahPreviousNodePresentation.getID()));
+        }
+
+        if (astahPreviousPartition.isHorizontal() != isHorizontal) {
+            throw new IllegalArgumentException(String.format(
+                "The previous partition '%s' (ID: %s) is %s, but isHorizontal specifies a %s partition. A partition has the same orientation as the partitions next to it.",
+                astahPreviousNodePresentation.getLabel(), astahPreviousNodePresentation.getID(), opposite, requested));
+        }
+
+        if (astahSuperNodePresentation != null
+            && !astahSuperNodePresentation.getModel().getId().equals(astahPreviousSuperPartition.getId())) {
+            throw new IllegalArgumentException(String.format(
+                "The previous partition '%s' (ID: %s) is not a sub partition of the super partition '%s' (ID: %s). Specify a sub partition of the super partition, or an empty string to append the new partition after its last sub partition.",
+                astahPreviousNodePresentation.getLabel(), astahPreviousNodePresentation.getID(),
+                astahSuperNodePresentation.getLabel(), astahSuperNodePresentation.getID()));
+        }
+    }
+
+    private Pair<NodePresentationDTO, List<McpSchema.Content>> createPin(NewPinWithBaseClassAndParentActionDTO param) throws Exception {
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
         IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
         INodePresentation astahParentAction = astahProToolSupport.getNodePresentation(param.parentActionId());
@@ -598,8 +623,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createProcess(NewProcessDTO param) throws Exception {
-        log.debug("Create process: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);
@@ -620,8 +643,6 @@ public class ActivityDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createSendSignalAction(NewSendSignalActionDTO param) throws Exception {
-        log.debug("Create send signal action: {}", param);
-
         IActivityDiagram astahActivityDiagram = astahProToolSupport.getActivityDiagram(param.targetActivityDiagramId());
 
         activityDiagramEditor.setDiagram(astahActivityDiagram);

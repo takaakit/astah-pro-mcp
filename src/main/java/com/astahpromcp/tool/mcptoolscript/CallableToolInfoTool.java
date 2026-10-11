@@ -21,31 +21,51 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 // Tool for listing the tool functions an mcp tool script can call.
 @Slf4j
 public class CallableToolInfoTool implements ToolProvider {
 
-    private final AstahToolRegistry registry;
+    // The list split into chunks, and how many tool functions it holds
+    private record Listing(List<List<CallableToolSummaryDTO>> chunks, int totalTools) {
+    }
 
-    private final List<List<CallableToolSummaryDTO>> chunks;
-    private final int totalTools;
+    // Read on use rather than taken at construction
+    private final Supplier<AstahToolRegistry> registry;
+    private final int chunkMaxBytes;
+
+    private Listing listing;
 
     public CallableToolInfoTool(AstahToolRegistry registry) {
+        this(() -> registry);
+    }
+
+    public CallableToolInfoTool(Supplier<AstahToolRegistry> registry) {
         this(registry, McpServerConfig.CALLABLE_TOOL_CHUNK_MAX_BYTES);
     }
 
     CallableToolInfoTool(AstahToolRegistry registry, int chunkMaxBytes) {
+        this(() -> registry, chunkMaxBytes);
+    }
+
+    CallableToolInfoTool(Supplier<AstahToolRegistry> registry, int chunkMaxBytes) {
         this.registry = registry;
+        this.chunkMaxBytes = chunkMaxBytes;
+    }
 
-        List<CallableToolSummaryDTO> summaries = new ArrayList<>();
-        for (ToolDefinition definition : registry.mcpToolScriptCallableDefinitions()) {
-            McpSchema.Tool schema = definition.toolSchema();
-            summaries.add(new CallableToolSummaryDTO(schema.name(), nullToEmpty(schema.description()), argumentNames(schema)));
+    // Built on the first call and kept, since the registry does not change once the server has started
+    private synchronized Listing listing() {
+        if (listing == null) {
+            List<CallableToolSummaryDTO> summaries = new ArrayList<>();
+            for (ToolDefinition definition : registry.get().mcpToolScriptCallableDefinitions()) {
+                McpSchema.Tool schema = definition.toolSchema();
+                summaries.add(new CallableToolSummaryDTO(schema.name(), nullToEmpty(schema.description()), argumentNames(schema)));
+            }
+
+            listing = new Listing(splitIntoChunks(summaries, chunkMaxBytes), summaries.size());
         }
-
-        this.chunks = splitIntoChunks(summaries, chunkMaxBytes);
-        this.totalTools = summaries.size();
+        return listing;
     }
 
     @Override
@@ -68,7 +88,8 @@ public class CallableToolInfoTool implements ToolProvider {
     }
 
     private CallableToolChunkDTO getChunkOfCallableTools(ChunkDTO param) throws Exception {
-        log.debug("Get a chunk of the tool functions callable from an mcp tool script: {}", param);
+        Listing listing = listing();
+        List<List<CallableToolSummaryDTO>> chunks = listing.chunks();
 
         int index = param.chunkIndex();
         if (index < 0 || index >= chunks.size()) {
@@ -78,20 +99,19 @@ public class CallableToolInfoTool implements ToolProvider {
             throw new IllegalArgumentException("'chunkIndex' is " + index + ", but " + range + ".");
         }
 
-        return new CallableToolChunkDTO(index, chunks.size(), totalTools, chunks.get(index));
+        return new CallableToolChunkDTO(index, chunks.size(), listing.totalTools(), chunks.get(index));
     }
 
     private CallableToolInfoListDTO getInfoOfCallableTools(CallableToolNamesDTO param) throws Exception {
-        log.debug("Get info of tool functions callable from an mcp tool script: {}", param);
-
         Set<String> names = requestedNames(param.toolNames());
+        AstahToolRegistry registry = this.registry.get();
 
         List<CallableToolInfoDTO> tools = new ArrayList<>();
         List<String> problems = new ArrayList<>();
         int responseBytes = 0;
 
         for (String name : names) {
-            String problem = problemWith(name);
+            String problem = problemWith(registry, name);
             if (problem != null) {
                 problems.add(problem);
                 continue;
@@ -167,7 +187,7 @@ public class CallableToolInfoTool implements ToolProvider {
     }
 
     // Why the given tool function cannot be described, or null when it can
-    private String problemWith(String name) {
+    private static String problemWith(AstahToolRegistry registry, String name) {
         if (registry.find(name) == null) {
             return "There is no tool function named '" + name + "'. Read the chunks of 'get_chunk_of_tools_callable_from_mcp_tool_script' for the names, spelled as this server spells them.";
         }

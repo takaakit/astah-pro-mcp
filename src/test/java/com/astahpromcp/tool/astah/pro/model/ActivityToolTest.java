@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -13,8 +14,12 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ActivityToolTest {
 
@@ -56,7 +61,7 @@ public class ActivityToolTest {
         IActivity activity = (IActivity) TestSupport.instance().getNamedElementByClassAndName(
             IActivity.class,
             "Activity0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(activity.getId());
 
@@ -71,5 +76,38 @@ public class ActivityToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+
+    @Test
+    void getInfo_ng_activityBehindDataFlowDiagram() throws Exception {
+        IActivity activity = mock(IActivity.class);
+        when(activity.getName()).thenReturn("Activity0");
+        when(activity.getId()).thenReturn("activity-behind-dfd");
+        when(activity.getActivityDiagram()).thenThrow(new ClassCastException(
+            "class xR cannot be cast to class com.change_vision.jude.api.inf.model.IActivityDiagram"));
+
+        AstahProToolSupport astahProToolSupport = mock(AstahProToolSupport.class);
+        when(astahProToolSupport.getActivity("activity-behind-dfd")).thenReturn(activity);
+
+        ActivityTool toolWithMock = new ActivityTool(
+            projectAccessor,
+            new TransactionSupport(projectAccessor.getTransactionManager()),
+            astahProToolSupport);
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                getInfo,
+                toolWithMock,
+                new IdDTO("activity-behind-dfd"),
+                ActivityDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains(
+            "The activity 'Activity0' (ID: activity-behind-dfd) is the one Astah keeps behind a data flow diagram"));
     }
 }

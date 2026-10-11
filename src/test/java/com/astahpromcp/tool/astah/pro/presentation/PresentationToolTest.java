@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.presentation;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
@@ -15,6 +16,7 @@ import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IComment;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -26,13 +28,13 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Point2D;
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class PresentationToolTest {
 
@@ -114,7 +116,7 @@ public class PresentationToolTest {
         IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(presentation.getID());
 
@@ -157,7 +159,7 @@ public class PresentationToolTest {
         IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
-        
+
         // Create input DTO
         PresentationWithLabelDTO inputDTO = new PresentationWithLabelDTO(
             presentation.getID(),
@@ -258,7 +260,7 @@ public class PresentationToolTest {
         IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
-        
+
         // Create input DTO
         PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
             presentation.getID(),
@@ -290,7 +292,7 @@ public class PresentationToolTest {
         IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
-        
+
         // Create input DTO
         PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
             presentation.getID(),
@@ -319,7 +321,7 @@ public class PresentationToolTest {
         IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
-        
+
         // Create input DTO
         PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
             presentation.getID(),
@@ -340,5 +342,156 @@ public class PresentationToolTest {
 
         // Check presentation after setting
         assertEquals("#0000FF", presentation.getProperty(Key.FONT_COLOR));
+    }
+
+    @Test
+    void changeFillColor_ok_lowerCase() throws Exception {
+        // Get presentation
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Class",
+            "Foo");
+
+        // Create input DTO
+        PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
+            presentation.getID(),
+            "#ff0000");
+
+        // ----------------------------------------
+        // Call changeFillColor()
+        // ----------------------------------------
+        PresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            changeFillColor,
+            tool,
+            inputDTO,
+            PresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals("#FF0000", outputDTO.fillColor());
+
+        // Check presentation after setting
+        assertEquals("#FF0000", presentation.getProperty(Key.FILL_COLOR));
+    }
+
+    @Test
+    void changeColor_ng_invalidColor() throws Exception {
+        // Get presentation
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Class",
+            "Foo");
+        String fillColorBefore = presentation.getProperty(Key.FILL_COLOR);
+        String lineColorBefore = presentation.getProperty(Key.LINE_COLOR);
+        String fontColorBefore = presentation.getProperty(Key.FONT_COLOR);
+
+        // Astah accepts "#FFF" as #000FFF and "#00FF0080" as #FF0080 without an error, and rejects the others with an unclear message.
+        for (Method changeColor : List.of(changeFillColor, changeLineColor, changeFontColor)) {
+            for (String color : Arrays.asList("#FFF", "#00FF0080", "red", "FF0000", " #FFFFFF", "", null)) {
+                // Create input DTO
+                PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
+                    presentation.getID(),
+                    color);
+
+                // ----------------------------------------
+                // Call changeFillColor(), changeLineColor() or changeFontColor()
+                // ----------------------------------------
+                Exception exception = assertThrows(Exception.class, () -> {
+                    TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                        changeColor,
+                        tool,
+                        inputDTO,
+                        PresentationDTO.class);
+                }, changeColor.getName() + "() accepted " + color);
+
+                // Check exception
+                assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+                assertTrue(exception.getCause().getMessage().contains("#RRGGBB"));
+            }
+        }
+
+        // Check that no color is changed
+        assertEquals(fillColorBefore, presentation.getProperty(Key.FILL_COLOR));
+        assertEquals(lineColorBefore, presentation.getProperty(Key.LINE_COLOR));
+        assertEquals(fontColorBefore, presentation.getProperty(Key.FONT_COLOR));
+    }
+
+    @Test
+    void changeFillColor_ng_link() throws Exception {
+        // Get class diagram and presentation
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+        IPresentation presentation = (IPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Class",
+            "Foo");
+
+        // Create note anchor on the class diagram
+        ClassDiagramEditor editor = projectAccessor.getDiagramEditorFactory().getClassDiagramEditor();
+        editor.setDiagram(classDiagram);
+        ILinkPresentation noteAnchor = transactionSupport.call( () -> {
+            INodePresentation note = editor.createNote("Note", new Point2D.Double(100, 300));
+            return editor.createNoteAnchor(note, presentation);
+        });
+        String fillColorBefore = noteAnchor.getProperty(Key.FILL_COLOR);
+
+        // Create input DTO
+        PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
+            noteAnchor.getID(),
+            "#FF0000");
+
+        // ----------------------------------------
+        // Call changeFillColor()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                changeFillColor,
+                tool,
+                inputDTO,
+                PresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("has no fill color"));
+
+        // Check that the fill color of the note anchor is not changed
+        assertEquals(fillColorBefore, noteAnchor.getProperty(Key.FILL_COLOR));
+    }
+
+    @Test
+    void changeFillColor_ng_notKept() throws Exception {
+        // A message on a communication diagram accepts a fill color without keeping it, but the Astah API cannot create a communication diagram, so a presentation that behaves the same is mocked.
+        IPresentation presentation = mock(IPresentation.class);
+        when(presentation.getID()).thenReturn("message-id");
+        when(presentation.getType()).thenReturn("Message");
+        when(presentation.getProperty(Key.FILL_COLOR)).thenReturn("#FFFFFF");
+
+        AstahProToolSupport astahProToolSupport = mock(AstahProToolSupport.class);
+        when(astahProToolSupport.getPresentation("message-id")).thenReturn(presentation);
+
+        PresentationTool toolWithMock = new PresentationTool(
+            projectAccessor,
+            transactionSupport,
+            astahProToolSupport,
+            mock(ImageCaptureSupport.class));
+
+        // Create input DTO
+        PresentationWithColorDTO inputDTO = new PresentationWithColorDTO(
+            "message-id",
+            "#FF0000");
+
+        // ----------------------------------------
+        // Call changeFillColor()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                changeFillColor,
+                toolWithMock,
+                inputDTO,
+                PresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("has no fill color"));
     }
 }

@@ -1,11 +1,11 @@
 package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.tool.astah.pro.AstahApiLock;
+import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
-import com.astahpromcp.tool.astah.pro.AstahApiLock;
-import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,12 +53,12 @@ public class McpToolScriptCallCostTest {
     @Test
     void execute_ok_recordsTheCostOfManyToolCallsInOneRun() {
         ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
-        // Nothing is passed as published directly, so every tool the direct profile has stays script callable here.
+        // No reason from the manifest is passed, so every tool the direct profile has is script callable here.
         // The programmatic profile withholds 'get_astah_pro_mcp_version' from a script because calling it once is all
         // anyone ever does, but that is exactly what makes it the right handler to measure the dispatch path with:
         // it needs no project, no GUI and no arguments, so what the figure below reports is the path itself.
         AstahToolRegistry registry = AstahToolRegistry.from(
-                catalog, ToolManifest.load().namesFor(ToolManifest.Profile.DIRECT), Set.of());
+                catalog.all(), ToolManifest.load().namesFor(ToolManifest.Profile.DIRECT), Map.of());
 
         McpToolScriptExecutor executor = new McpToolScriptExecutor(registry, 60, new FakeTransactionBoundary());
 

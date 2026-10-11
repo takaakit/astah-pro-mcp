@@ -7,6 +7,7 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewDiagramInPackageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.RequirementDiagramEditor;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IRequirementDiagram;
@@ -14,7 +15,6 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/RequirementDiagramEditor.html
@@ -46,8 +46,6 @@ public class RequirementDiagramEditorTool extends AstahToolProvider {
     }
 
     private DiagramDTO createRequirementDiagram(NewDiagramInPackageDTO param) throws Exception {
-        log.debug("Create requirement diagram: {}", param);
-
         IPackage parentAstahPackage = astahProToolSupport.getPackage(param.targetPackageId());
 
         IRequirementDiagram createdAstahRequirementDiagram = txnAstah.call( () -> {

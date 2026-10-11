@@ -8,13 +8,13 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ObjectNodeWithBaseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ObjectNodeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ObjectNodeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IObjectNode;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
 public class ObjectNodeTool extends AstahToolProvider {
@@ -50,16 +50,12 @@ public class ObjectNodeTool extends AstahToolProvider {
     }
 
     private ObjectNodeDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get object node information: {}", param);
-
         IObjectNode astahObjectNode = astahProToolSupport.getObjectNode(param.id());
 
         return ObjectNodeDTOAssembler.toDTO(astahObjectNode);
     }
 
     private ObjectNodeDTO setBase(ObjectNodeWithBaseDTO param) throws Exception {
-        log.debug("Set base class of object node: {}", param);
-
         IObjectNode astahObjectNode = astahProToolSupport.getObjectNode(param.targetObjectNodeId());
         IClass astahBaseClass = astahProToolSupport.getClassOrPrimitiveType(param.baseClassId());
 

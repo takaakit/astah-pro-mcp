@@ -6,11 +6,11 @@ import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAss
 import com.astahpromcp.tool.astah.pro.model.outputdto.FilePathHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.UrlHyperlinkDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.model.IHyperlink;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;

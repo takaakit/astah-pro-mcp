@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InstanceSpecificationWithClassifierDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InstanceSpecificationDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class InstanceSpecificationToolTest {
 
@@ -65,7 +65,7 @@ public class InstanceSpecificationToolTest {
         IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElementByClassAndName(
             IInstanceSpecification.class,
             "foo");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(instanceSpecification.getId());
 
@@ -88,7 +88,7 @@ public class InstanceSpecificationToolTest {
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Bar");
-        
+
         // Get instance specification
         IInstanceSpecification instanceSpecification = (IInstanceSpecification) TestSupport.instance().getNamedElementByClassAndName(
             IInstanceSpecification.class,

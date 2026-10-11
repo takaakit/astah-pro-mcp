@@ -8,7 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.RectangleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.RectangleDTOAssembler;
-import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
+import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ImageFileDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
@@ -20,6 +20,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationGeo
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationGeometriesDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationGeometryDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationGeometryDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
@@ -28,15 +29,8 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IDiagram.html
@@ -46,16 +40,14 @@ public class DiagramTool extends AstahToolProvider {
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
-    private final SystemPropertySupport systemPropertySupport;
-    private final Path imageOutputDir;
+    private final ImageCaptureSupport imageCaptureSupport;
 
-    public DiagramTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport, Path imageOutputDir) {
+    public DiagramTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
-        this.systemPropertySupport = systemPropertySupport;
-        this.imageOutputDir = imageOutputDir;
-   }
+        this.imageCaptureSupport = imageCaptureSupport;
+    }
 
     @Override
     protected List<ToolDefinition> createTools() {
@@ -98,16 +90,12 @@ public class DiagramTool extends AstahToolProvider {
     }
 
     private DiagramDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get diagram information: {}", param);
-        
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
         
         return DiagramDTOAssembler.toDTO(astahDiagram);
     }
 
     private RectangleDTO getDiagramBoundRect(IdDTO param) throws Exception {
-        log.debug("Get diagram bound rect: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
 
         Rectangle2D astahRectangle = astahDiagram.getBoundRect();
@@ -115,12 +103,10 @@ public class DiagramTool extends AstahToolProvider {
     }
 
     private PresentationListDTO getPresentationsOnDiagram(IdDTO param) throws Exception {
-        log.debug("Get presentations on diagram: {}", param);
-        
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
 
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
-        for (IPresentation presentation : astahDiagram.getPresentations()) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
             presentationDTOs.add(PresentationDTOAssembler.toDTO(presentation));
         }
         
@@ -128,13 +114,11 @@ public class DiagramTool extends AstahToolProvider {
     }
 
     private PresentationGeometriesDTO getPresentationGeometriesOnDiagram(IdDTO param) throws Exception {
-        log.debug("Get presentation geometries on diagram: {}", param);
-
         IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
 
         List<NodePresentationGeometryDTO> nodePrstGeoDTOs = new ArrayList<>();
         List<LinkPresentationGeometryDTO> linkPrstGeoDTOs = new ArrayList<>();
-        for (IPresentation presentation : astahDiagram.getPresentations()) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
             if (presentation instanceof INodePresentation nodePresentation) {
                 nodePrstGeoDTOs.add(NodePresentationGeometryDTOAssembler.toDTO(nodePresentation));
             } else if (presentation instanceof ILinkPresentation linkPresentation) {
@@ -150,45 +134,12 @@ public class DiagramTool extends AstahToolProvider {
     }
 
     private ImageFileDTO exportPngImage(IdDTO param) throws Exception {
-        log.debug("Export PNG image: {}", param);
-
-        IDiagram astahDiagram = astahProToolSupport.getDiagram(param.id());
-
-        // Ensure the output directory exists and create it when needed
-        log.debug("Create output directory: {}", imageOutputDir);
-        try {
-            Files.createDirectories(imageOutputDir);
-        } catch (Exception e) {
-            throw new Exception("Failed to create output directory: " + e.getMessage());
+        if (projectAccessor.getTransactionManager().isInTransaction()) {
+            throw new Exception("A diagram cannot be exported while an Astah transaction is open, which in an mcp tool script means after the run's first edit. Remove this call, run the edits again, and export in a separate run that makes no edits once they have been committed.");
         }
 
-        // Verify that the directory is writable
-        if (!Files.isWritable(imageOutputDir)) {
-            throw new Exception("Output directory is not writable: " + imageOutputDir);
-        }
+        ImageCaptureSupport.ExportedImageFile exported = imageCaptureSupport.exportDiagramImageFile(param.id());
 
-        // Export an image using the Astah API
-        String relativeImagePath;
-        try {
-            relativeImagePath = astahDiagram.exportImage(imageOutputDir.toString(), "png", systemPropertySupport.imageExportDpi());
-        } catch (Exception e) {
-            throw new Exception("Astah API exportImage method failed: " + e.getMessage());
-        }
-        
-        if (relativeImagePath == null || relativeImagePath.trim().isEmpty()) {
-            throw new Exception("exportImage returned null or empty file path");
-        }
-        
-        Path absoluteImagePath = Paths.get(imageOutputDir.toString(), relativeImagePath);
-        if (!Files.exists(absoluteImagePath)) {
-            throw new Exception("Exported image file does not exist: " + absoluteImagePath.toString());
-        }
-        
-        // Get the image width and height
-        BufferedImage image = ImageIO.read(absoluteImagePath.toFile());
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-        
-        return new ImageFileDTO(absoluteImagePath.toString(), "png", imageWidth, imageHeight);
+        return new ImageFileDTO(exported.path().toString(), "png", exported.width(), exported.height());
     }
 }

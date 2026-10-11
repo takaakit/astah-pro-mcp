@@ -7,11 +7,15 @@ import com.github.victools.jsonschema.module.jackson.JacksonSchemaModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 // JSON schema utility
 public final class SchemaSupport {
 
     private static final SchemaGenerator GENERATOR = createSchemaGenerator();
+
+    // One schema per type, generated on first use
+    private static final Map<Class<?>, String> SCHEMAS = new ConcurrentHashMap<>();
 
     private SchemaSupport() {
     }
@@ -50,6 +54,10 @@ public final class SchemaSupport {
 
     // Generate a formatted JSON schema from a record type
     public static String generateSchema(Class<?> recordClass) {
+        return SCHEMAS.computeIfAbsent(recordClass, SchemaSupport::generateUncached);
+    }
+
+    private static String generateUncached(Class<?> recordClass) {
         JsonNode schemaNode = GENERATOR.generateSchema(recordClass);
         try {
             return JsonSupport.OBJ_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(schemaNode);

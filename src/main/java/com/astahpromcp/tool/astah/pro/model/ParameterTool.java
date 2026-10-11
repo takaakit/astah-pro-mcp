@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ParameterWithTypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ParameterWithTypeExpressionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ParameterDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ParameterDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IParameter;
@@ -15,7 +16,6 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IParameter.html
@@ -52,8 +52,6 @@ public class ParameterTool extends AstahToolProvider {
     }
 
     private ParameterDTO setType(ParameterWithTypeDTO param) throws Exception {
-        log.debug("Set type of parameter: {}", param);
-
         IParameter astahParameter = astahProToolSupport.getParameter(param.targetParameterId());
         IClass astahType = astahProToolSupport.getClassOrPrimitiveType(param.parameterTypeId());
 
@@ -65,8 +63,6 @@ public class ParameterTool extends AstahToolProvider {
     }
 
     private ParameterDTO setTypeExpression(ParameterWithTypeExpressionDTO param) throws Exception {
-        log.debug("Set type expression of parameter: {}", param);
-
         IParameter astahParameter = astahProToolSupport.getParameter(param.targetParameterId());
 
         try {

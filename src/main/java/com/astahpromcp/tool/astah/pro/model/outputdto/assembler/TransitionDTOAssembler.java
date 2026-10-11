@@ -1,9 +1,9 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 import com.change_vision.jude.api.inf.model.ITransition;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 
 public class TransitionDTOAssembler {
     public static TransitionDTO toDTO(@NonNull ITransition astahTransition) throws Exception {

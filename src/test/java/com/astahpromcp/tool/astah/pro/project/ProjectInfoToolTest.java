@@ -6,16 +6,17 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
 import com.astahpromcp.tool.astah.pro.project.inputdto.SearchDTO;
+import com.astahpromcp.tool.astah.pro.project.inputdto.SnapshotChunkDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllDefinitionNameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllLabelIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.AllNameIdTypeInfoDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeDefinitionListDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeNamespaceListDTO;
 import com.astahpromcp.tool.astah.pro.project.outputdto.SourceTargetNameIdTypeListDTO;
-import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.visualization.outputdto.PlantumlDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IPackage;
@@ -24,11 +25,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,9 +48,6 @@ public class ProjectInfoToolTest {
     private Method retrieveClassifiersWithinPackage;
     private Method retrievePackageStructureAsPlantuml;
     private Method retrieveRelationshipsAsPlantuml;
-    private Field nameIdTypeDTOChunksCacheUpdatedAtNanosField;
-    private Field labelIdTypeDTOChunksCacheUpdatedAtNanosField;
-    private Field definitionNameIdTypeDTOChunksCacheUpdatedAtNanosField;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -75,7 +71,7 @@ public class ProjectInfoToolTest {
         getNamedElementsChunk = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getNamedElementsChunk",
-            ChunkDTO.class);
+            SnapshotChunkDTO.class);
 
         // getAllPresentations() method
         getAllPresentations = TestSupport.getAccessibleMethod(
@@ -87,7 +83,7 @@ public class ProjectInfoToolTest {
         getPresentationsChunk = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getPresentationsChunk",
-            ChunkDTO.class);
+            SnapshotChunkDTO.class);
 
         // getAllDefinitions() method
         getAllDefinitions = TestSupport.getAccessibleMethod(
@@ -99,8 +95,8 @@ public class ProjectInfoToolTest {
         getDefinitionsChunk = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
             "getDefinitionsChunk",
-            ChunkDTO.class);
-        
+            SnapshotChunkDTO.class);
+
         // getAllConstraintsAndConditions() method
         getAllConstraintsAndConditions = TestSupport.getAccessibleMethod(
             ProjectInfoTool.class,
@@ -142,21 +138,6 @@ public class ProjectInfoToolTest {
             ProjectInfoTool.class,
             "retrieveRelationshipsAsPlantuml",
             NoInputDTO.class);
-
-        // nameIdTypeDTOChunksCacheUpdatedAtNanos field
-        nameIdTypeDTOChunksCacheUpdatedAtNanosField = TestSupport.getAccessibleField(
-            ProjectInfoTool.class,
-            "nameIdTypeDTOChunksCacheUpdatedAtNanos");
-
-        // labelIdTypeDTOChunksCacheUpdatedAtNanos field
-        labelIdTypeDTOChunksCacheUpdatedAtNanosField = TestSupport.getAccessibleField(
-            ProjectInfoTool.class,
-            "labelIdTypeDTOChunksCacheUpdatedAtNanos");
-
-        // definitionNameIdTypeDTOChunksCacheUpdatedAtNanos field
-        definitionNameIdTypeDTOChunksCacheUpdatedAtNanosField = TestSupport.getAccessibleField(
-            ProjectInfoTool.class,
-            "definitionNameIdTypeDTOChunksCacheUpdatedAtNanos");
     }
 
     @AfterEach
@@ -185,16 +166,21 @@ public class ProjectInfoToolTest {
     }
 
     @Test
+    void getAllNamedElements_ok_sameSnapshotIdWhileTheModelIsUnchanged() throws Exception {
+        AllNameIdTypeInfoDTO first = getInfoOfAllNamedElements();
+        AllNameIdTypeInfoDTO second = getInfoOfAllNamedElements();
+
+        // Check output DTO
+        assertEquals(first.snapshotId(), second.snapshotId());
+        assertEquals(first.firstChunk(), second.firstChunk());
+    }
+
+    @Test
     void getNamedElementsChunk_ok() throws Exception {
-        // Initialize chunk cache
-        TestSupport.instance().invokeToolMethodReturningDto(
-            getAllNamedElements,
-            tool,
-            new NoInputDTO(),
-            AllNameIdTypeInfoDTO.class);
+        AllNameIdTypeInfoDTO info = getInfoOfAllNamedElements();
 
         // Create input DTO
-        ChunkDTO inputDTO = new ChunkDTO(0);
+        SnapshotChunkDTO inputDTO = new SnapshotChunkDTO(info.snapshotId(), 0);
 
         // ----------------------------------------
         // Call getNamedElementsChunk()
@@ -206,37 +192,81 @@ public class ProjectInfoToolTest {
             NameIdTypeListDTO.class);
 
         // Check output DTO
-        assertNotNull(outputDTO);
+        assertEquals(info.firstChunk(), outputDTO.value());
     }
 
     @Test
-    void getNamedElementsChunk_ng_cacheExpired() throws Exception {
-        // Initialize chunk cache
-        TestSupport.instance().invokeToolMethodReturningDto(
-            getAllNamedElements,
+    void getNamedElementsChunk_ok_changeTheListDoesNotShow() throws Exception {
+        AllNameIdTypeInfoDTO info = getInfoOfAllNamedElements();
+
+        // A definition is not part of the list of names, identifiers and types
+        INamedElement element = projectAccessor.findElements(IClass.class)[0];
+        inTransaction(() -> element.setDefinition("Changed after the snapshot."));
+
+        NameIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getNamedElementsChunk,
             tool,
-            new NoInputDTO(),
-            AllNameIdTypeInfoDTO.class);
-        nameIdTypeDTOChunksCacheUpdatedAtNanosField.setLong(tool, System.nanoTime() - TimeUnit.SECONDS.toNanos(181));
+            new SnapshotChunkDTO(info.snapshotId(), 0),
+            NameIdTypeListDTO.class);
 
-        // Create input DTO
-        ChunkDTO inputDTO = new ChunkDTO(0);
+        // Check output DTO
+        assertEquals(info.firstChunk(), outputDTO.value());
+    }
 
-        // ----------------------------------------
-        // Call getNamedElementsChunk()
-        // ----------------------------------------
+    @Test
+    void getNamedElementsChunk_ng_modelEditedSinceTheSnapshot() throws Exception {
+        AllNameIdTypeInfoDTO info = getInfoOfAllNamedElements();
+
+        // Another agent adds a class between the two calls
+        inTransaction(() -> projectAccessor.getModelEditorFactory().getBasicModelEditor()
+            .createClass(projectAccessor.getProject(), "AddedAfterTheSnapshot"));
+
         Exception exception = assertThrows(Exception.class, () -> {
             TestSupport.instance().invokeToolMethodReturningDto(
                 getNamedElementsChunk,
                 tool,
-                inputDTO,
+                new SnapshotChunkDTO(info.snapshotId(), 0),
                 NameIdTypeListDTO.class);
         });
-        
-        // Check output DTO
-        assertNotNull(exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("get_info_of_all_named_elements again"));
-        assertTrue(exception.getCause().getMessage().contains("get_chunk_of_all_named_elements"));
+
+        // Check the error
+        assertListChangedError(exception, "get_info_of_all_named_elements");
+    }
+
+    @Test
+    void getNamedElementsChunk_ng_anotherProjectOpened() throws Exception {
+        AllNameIdTypeInfoDTO info = getInfoOfAllNamedElements();
+
+        projectAccessor.close();
+        projectAccessor.open("src/test/resources/modelfile/project/ProjectAccessorToolTest.asta");
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                getNamedElementsChunk,
+                tool,
+                new SnapshotChunkDTO(info.snapshotId(), 0),
+                NameIdTypeListDTO.class);
+        });
+
+        // Check the error
+        assertListChangedError(exception, "get_info_of_all_named_elements");
+    }
+
+    @Test
+    void getNamedElementsChunk_ng_chunkIndexOutOfRange() throws Exception {
+        AllNameIdTypeInfoDTO info = getInfoOfAllNamedElements();
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                getNamedElementsChunk,
+                tool,
+                new SnapshotChunkDTO(info.snapshotId(), info.totalChunks()),
+                NameIdTypeListDTO.class);
+        });
+
+        // Check the error
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("'chunkIndex' is " + info.totalChunks()), exception.getCause().getMessage());
     }
 
     @Test
@@ -259,15 +289,14 @@ public class ProjectInfoToolTest {
 
     @Test
     void getPresentationsChunk_ok() throws Exception {
-        // Initialize chunk cache
-        TestSupport.instance().invokeToolMethodReturningDto(
+        AllLabelIdTypeInfoDTO info = TestSupport.instance().invokeToolMethodReturningDto(
             getAllPresentations,
             tool,
             new NoInputDTO(),
             AllLabelIdTypeInfoDTO.class);
 
         // Create input DTO
-        ChunkDTO inputDTO = new ChunkDTO(0);
+        SnapshotChunkDTO inputDTO = new SnapshotChunkDTO(info.snapshotId(), 0);
 
         // ----------------------------------------
         // Call getPresentationsChunk()
@@ -279,37 +308,39 @@ public class ProjectInfoToolTest {
             LabelIdTypeListDTO.class);
 
         // Check output DTO
-        assertNotNull(outputDTO);
+        assertEquals(info.firstChunk(), outputDTO.value());
     }
 
     @Test
-    void getPresentationsChunk_ng_cacheExpired() throws Exception {
-        // Initialize chunk cache
-        TestSupport.instance().invokeToolMethodReturningDto(
+    void getPresentationsChunk_ng_labelChangedSinceTheSnapshot() throws Exception {
+        AllLabelIdTypeInfoDTO info = TestSupport.instance().invokeToolMethodReturningDto(
             getAllPresentations,
             tool,
             new NoInputDTO(),
             AllLabelIdTypeInfoDTO.class);
-        labelIdTypeDTOChunksCacheUpdatedAtNanosField.setLong(tool, System.nanoTime() - TimeUnit.SECONDS.toNanos(181));
 
-        // Create input DTO
-        ChunkDTO inputDTO = new ChunkDTO(0);
+        // Renaming a class that is drawn on a diagram changes the label of its presentation
+        INamedElement drawnClass = null;
+        for (INamedElement element : projectAccessor.findElements(IClass.class)) {
+            if (element.getPresentations().length > 0) {
+                drawnClass = element;
+                break;
+            }
+        }
+        assertNotNull(drawnClass, "The test project has no class drawn on a diagram.");
+        INamedElement renamedClass = drawnClass;
+        inTransaction(() -> renamedClass.setName(renamedClass.getName() + "Renamed"));
 
-        // ----------------------------------------
-        // Call getPresentationsChunk()
-        // ----------------------------------------
         Exception exception = assertThrows(Exception.class, () -> {
             TestSupport.instance().invokeToolMethodReturningDto(
                 getPresentationsChunk,
                 tool,
-                inputDTO,
+                new SnapshotChunkDTO(info.snapshotId(), 0),
                 LabelIdTypeListDTO.class);
         });
-        
-        // Check output DTO
-        assertNotNull(exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("get_info_of_all_prsts again"));
-        assertTrue(exception.getCause().getMessage().contains("get_chunk_of_all_prsts"));
+
+        // Check the error
+        assertListChangedError(exception, "get_info_of_all_prsts");
     }
 
     @Test
@@ -332,15 +363,14 @@ public class ProjectInfoToolTest {
 
     @Test
     void getDefinitionsChunk_ok() throws Exception {
-        // Initialize chunk cache
-        TestSupport.instance().invokeToolMethodReturningDto(
+        AllDefinitionNameIdTypeDTO info = TestSupport.instance().invokeToolMethodReturningDto(
             getAllDefinitions,
             tool,
             new NoInputDTO(),
             AllDefinitionNameIdTypeDTO.class);
 
         // Create input DTO
-        ChunkDTO inputDTO = new ChunkDTO(0);
+        SnapshotChunkDTO inputDTO = new SnapshotChunkDTO(info.snapshotId(), 0);
 
         // ----------------------------------------
         // Call getDefinitionsChunk()
@@ -352,37 +382,30 @@ public class ProjectInfoToolTest {
             DefinitionNameIdTypeListDTO.class);
 
         // Check output DTO
-        assertNotNull(outputDTO);
+        assertEquals(info.firstChunk(), outputDTO.value());
     }
 
     @Test
-    void getDefinitionsChunk_ng_cacheExpired() throws Exception {
-        // Initialize chunk cache
-        TestSupport.instance().invokeToolMethodReturningDto(
+    void getDefinitionsChunk_ng_definitionChangedSinceTheSnapshot() throws Exception {
+        AllDefinitionNameIdTypeDTO info = TestSupport.instance().invokeToolMethodReturningDto(
             getAllDefinitions,
             tool,
             new NoInputDTO(),
             AllDefinitionNameIdTypeDTO.class);
-        definitionNameIdTypeDTOChunksCacheUpdatedAtNanosField.setLong(tool, System.nanoTime() - TimeUnit.SECONDS.toNanos(181));
 
-        // Create input DTO
-        ChunkDTO inputDTO = new ChunkDTO(0);
+        INamedElement element = projectAccessor.findElements(IClass.class)[0];
+        inTransaction(() -> element.setDefinition("Changed after the snapshot."));
 
-        // ----------------------------------------
-        // Call getDefinitionsChunk()
-        // ----------------------------------------
         Exception exception = assertThrows(Exception.class, () -> {
             TestSupport.instance().invokeToolMethodReturningDto(
                 getDefinitionsChunk,
                 tool,
-                inputDTO,
+                new SnapshotChunkDTO(info.snapshotId(), 0),
                 DefinitionNameIdTypeListDTO.class);
         });
-        
-        // Check output DTO
-        assertNotNull(exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("get_info_of_all_definitions again"));
-        assertTrue(exception.getCause().getMessage().contains("get_chunk_of_all_definitions"));
+
+        // Check the error
+        assertListChangedError(exception, "get_info_of_all_definitions");
     }
 
     @Test
@@ -410,10 +433,10 @@ public class ProjectInfoToolTest {
         IClass classifier = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Baz");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(classifier.getId());
-        
+
         // ----------------------------------------
         // Call retrieveClassifiersThatReferenceOrBeReferencedBy()
         // ----------------------------------------
@@ -422,7 +445,7 @@ public class ProjectInfoToolTest {
             tool,
             inputDTO,
             SourceTargetNameIdTypeListDTO.class);
-        
+
         // Get classifier
         IClass quux01 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
@@ -469,7 +492,7 @@ public class ProjectInfoToolTest {
         IClass quux15 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quux15");
-        
+
         IClass quuy01 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy01");
@@ -518,7 +541,7 @@ public class ProjectInfoToolTest {
         IClass quuy16 = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Quuy16");
-        
+
         // Check output DTO
         assertNotNull(outputDTO);
 
@@ -577,7 +600,7 @@ public class ProjectInfoToolTest {
         NameIdTypeDTO quuy14DTO = NameIdTypeDTOAssembler.toDTO(quuy14);
         NameIdTypeDTO quuy15DTO = NameIdTypeDTOAssembler.toDTO(quuy15);
         NameIdTypeDTO quuy16DTO = NameIdTypeDTOAssembler.toDTO(quuy16);
-        
+
         List<NameIdTypeDTO> associationTargetClassifier = outputDTO.associationTargetClassifier();
         assertTrue(associationTargetClassifier.contains(quuy01DTO));
         assertTrue(associationTargetClassifier.contains(quuy02DTO));
@@ -634,10 +657,10 @@ public class ProjectInfoToolTest {
         // Call searchWithinNamedElements()
         // ----------------------------------------
         NameIdTypeDefinitionListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                searchWithinNamedElements,
-                tool,
-                inputDTO,
-                NameIdTypeDefinitionListDTO.class);
+            searchWithinNamedElements,
+            tool,
+            inputDTO,
+            NameIdTypeDefinitionListDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);
@@ -694,10 +717,10 @@ public class ProjectInfoToolTest {
         // Call searchWithinPresentations()
         // ----------------------------------------
         LabelIdTypeListDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
-                searchWithinPresentations,
-                tool,
-                inputDTO,
-                LabelIdTypeListDTO.class);
+            searchWithinPresentations,
+            tool,
+            inputDTO,
+            LabelIdTypeListDTO.class);
 
         // Check output DTO
         assertNotNull(outputDTO);
@@ -731,10 +754,10 @@ public class ProjectInfoToolTest {
         IPackage package_ = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "package0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(package_.getId());
-        
+
         // ----------------------------------------
         // Call retrieveClassifiersWithinPackage()
         // ----------------------------------------
@@ -743,7 +766,7 @@ public class ProjectInfoToolTest {
             tool,
             inputDTO,
             NameIdTypeNamespaceListDTO.class);
-        
+
         // Check output DTO
         assertNotNull(outputDTO);
         assertNotNull(outputDTO.value());
@@ -841,6 +864,37 @@ public class ProjectInfoToolTest {
     }
 
     // The direction of an association without a navigable end carries no meaning, so either orientation is correct
+    private AllNameIdTypeInfoDTO getInfoOfAllNamedElements() throws Exception {
+        return TestSupport.instance().invokeToolMethodReturningDto(
+            getAllNamedElements,
+            tool,
+            new NoInputDTO(),
+            AllNameIdTypeInfoDTO.class);
+    }
+
+    // Edit the model in a transaction of its own, as another agent would between two calls
+    private void inTransaction(ModelEdit edit) throws Exception {
+        ITransactionManager transactionManager = projectAccessor.getTransactionManager();
+        transactionManager.beginTransaction();
+        try {
+            edit.run();
+            transactionManager.endTransaction();
+        } catch (Exception e) {
+            transactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    @FunctionalInterface
+    private interface ModelEdit {
+        void run() throws Exception;
+    }
+
+    private static void assertListChangedError(Exception exception, String infoToolName) {
+        assertInstanceOf(IllegalStateException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("call '" + infoToolName + "' again"), exception.getCause().getMessage());
+    }
+
     private static void assertUndirectedAssociation(String plantumlCode, String fqn1, String fqn2) {
         assertTrue(
             plantumlCode.contains("\"" + fqn1 + "\" --- \"" + fqn2 + "\"")

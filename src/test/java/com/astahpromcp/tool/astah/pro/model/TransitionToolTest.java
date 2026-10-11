@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithActionDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithEventDTO;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class TransitionToolTest {
 
@@ -80,7 +80,7 @@ public class TransitionToolTest {
         ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(transition.getId());
 
@@ -103,7 +103,7 @@ public class TransitionToolTest {
         ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
-        
+
         // Create input DTO
         TransitionWithActionDTO inputDTO = new TransitionWithActionDTO(
             transition.getId(),
@@ -129,12 +129,75 @@ public class TransitionToolTest {
     }
 
     @Test
+    void setAction_ok_emptyActionRemovesAction() throws Exception {
+        // Get transition
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
+            ITransition.class,
+            "");
+
+        // The transition has no action yet, so its name is its label without an action
+        String nameWithoutAction = transition.getName();
+
+        TestSupport.instance().invokeToolMethodReturningDto(
+            setAction,
+            tool,
+            new TransitionWithActionDTO(transition.getId(), "Test Action"),
+            TransitionDTO.class);
+
+        // ----------------------------------------
+        // Call setAction()
+        // ----------------------------------------
+        TransitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setAction,
+            tool,
+            new TransitionWithActionDTO(transition.getId(), ""),
+            TransitionDTO.class);
+
+        // Check that the action was removed rather than left empty, which keeps the '/' before it in the label
+        assertEquals("", outputDTO.action());
+        assertEquals("", transition.getAction());
+        assertEquals(nameWithoutAction, transition.getName());
+    }
+
+    @Test
+    void setAction_ok_blankOrNullActionRemovesAction() throws Exception {
+        // Get transition
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
+            ITransition.class,
+            "");
+
+        // The transition has no action yet, so its name is its label without an action
+        String nameWithoutAction = transition.getName();
+
+        for (String noAction : new String[] {"   ", null}) {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setAction,
+                tool,
+                new TransitionWithActionDTO(transition.getId(), "Test Action"),
+                TransitionDTO.class);
+
+            // ----------------------------------------
+            // Call setAction()
+            // ----------------------------------------
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setAction,
+                tool,
+                new TransitionWithActionDTO(transition.getId(), noAction),
+                TransitionDTO.class);
+
+            // Check that the action was removed just as with an empty action
+            assertEquals("", transition.getAction());
+            assertEquals(nameWithoutAction, transition.getName());
+        }
+    }
+
+    @Test
     void setEvent_ok() throws Exception {
         // Get transition
         ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
-        
+
         // Create input DTO
         TransitionWithEventDTO inputDTO = new TransitionWithEventDTO(
             transition.getId(),
@@ -165,7 +228,7 @@ public class TransitionToolTest {
         ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
             ITransition.class,
             "");
-        
+
         // Create input DTO
         TransitionWithGuardDTO inputDTO = new TransitionWithGuardDTO(
             transition.getId(),
@@ -188,5 +251,38 @@ public class TransitionToolTest {
 
         // Check guard after setting
         assertEquals("Test Guard", transition.getGuard());
+    }
+
+    @Test
+    void setGuard_ok_emptyBlankOrNullGuardRemovesGuard() throws Exception {
+        // Get transition
+        ITransition transition = (ITransition) TestSupport.instance().getNamedElementByClassAndName(
+            ITransition.class,
+            "");
+
+        // The transition has no guard yet, so its name is its label without a guard
+        String nameWithoutGuard = transition.getName();
+
+        for (String noGuard : new String[] {"", "   ", null}) {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setGuard,
+                tool,
+                new TransitionWithGuardDTO(transition.getId(), "Test Guard"),
+                TransitionDTO.class);
+
+            // ----------------------------------------
+            // Call setGuard()
+            // ----------------------------------------
+            TransitionDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+                setGuard,
+                tool,
+                new TransitionWithGuardDTO(transition.getId(), noGuard),
+                TransitionDTO.class);
+
+            // Check that the guard was removed rather than refused by Astah or left blank in brackets in the label
+            assertEquals("", outputDTO.guard());
+            assertEquals("", transition.getGuard());
+            assertEquals(nameWithoutGuard, transition.getName());
+        }
     }
 }

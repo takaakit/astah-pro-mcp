@@ -7,12 +7,12 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.RealizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.RealizationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IRealization;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IRealization.html
@@ -42,8 +42,6 @@ public class RealizationTool extends AstahToolProvider {
     }
 
     private RealizationDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get realization information: {}", param);
-
         IRealization astahRealization = astahProToolSupport.getRealization(param.id());
 
         return RealizationDTOAssembler.toDTO(astahRealization);

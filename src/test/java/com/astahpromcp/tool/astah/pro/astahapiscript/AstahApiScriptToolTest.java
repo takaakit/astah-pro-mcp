@@ -1,14 +1,8 @@
 package com.astahpromcp.tool.astah.pro.astahapiscript;
 
-import com.astahpromcp.tool.JsonSupport;
-import com.astahpromcp.tool.SchemaSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.astahapiscript.inputdto.RunAstahApiScriptDTO;
 import com.astahpromcp.tool.common.outputdto.ScriptResultDTO;
-import com.networknt.schema.InputFormat;
-import com.networknt.schema.Schema;
-import com.networknt.schema.SchemaRegistry;
-import com.networknt.schema.SpecificationVersion;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.model.IClass;

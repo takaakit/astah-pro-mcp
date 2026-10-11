@@ -131,7 +131,7 @@ tools.create_create_msg({
 // ============================================================
 
 // A combined fragment is placed by rectangle, so it has to be given coordinates that span exactly
-// the lifelines taking part in it.
+// the lifelines taking part in it. Its height is that of all its operands together: 85 for each of the two here.
 var fragment = tools.create_combined_fragment({
   combinedFragmentKind: 'alt',
   newCombinedFragmentName: '',
@@ -158,14 +158,11 @@ tools.add_interaction_operand({
 
 // Fix the operand heights before putting any message inside, because changing a height moves whatever is already there.
 // An operand needs to hold the message plus the 25 high activation it starts, so 85 leaves a margin of 10 below it.
+// Only the first operand is set: the last one takes the rest of the fragment, 85 here as well. Setting the last
+// operand's height would make Astah forget which lifelines and messages the operands hold.
 tools.set_height_of_interaction_operand({
   targetCombinedFragmentNodePresentationId: fragmentNode,
   targetInteractionOperandIndex: 1,
-  height: 85
-});
-tools.set_height_of_interaction_operand({
-  targetCombinedFragmentNodePresentationId: fragmentNode,
-  targetInteractionOperandIndex: 2,
   height: 85
 });
 

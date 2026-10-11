@@ -10,10 +10,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -149,7 +148,7 @@ public class KnowledgeToolSupportTest {
 
     @Test
     void splitTextWithOverlap_ok_usesWholePreviousChunkWhenItHasFewerLinesThanOverlap() {
-        String text = "0123456789abcdefghij"; // no newlines, chunk size 10 -> 2 chunks
+        String text = "0123456789abcdefghij"; // No newlines, chunk size 10 -> 2 chunks
 
         List<String> chunks = KnowledgeToolSupport.splitTextWithOverlap(text, 10, 3);
 
@@ -202,7 +201,7 @@ public class KnowledgeToolSupportTest {
     void chunkAndCache_ok_splitsTextAndReplacesContentCache() {
         KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
         KnowledgeToolSupport.chunkAndCache("stale chunk", contentCache);
-        String text = "a".repeat(60000); // larger than the default chunk size, so it splits into two chunks
+        String text = "a".repeat(60000); // Larger than the default chunk size, so it splits into two chunks
 
         DocumentDTO result = KnowledgeToolSupport.chunkAndCache(text, contentCache);
 

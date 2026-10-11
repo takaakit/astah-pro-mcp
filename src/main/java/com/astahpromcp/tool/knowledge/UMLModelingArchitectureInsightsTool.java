@@ -10,8 +10,10 @@ import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.InsightsDTO;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 @Slf4j
@@ -58,8 +60,6 @@ public class UMLModelingArchitectureInsightsTool implements ToolProvider {
     }
 
     private GuideDTO recallInsights(NoInputDTO param) throws Exception {
-        log.debug("Recall UML, modeling, and architecture insights: {}", param);
-
         Path insightsFile = workspaceDir.resolve(INSIGHTS_FILE_NAME);
         String absolutePath = insightsFile.toAbsolutePath().toString();
 
@@ -96,24 +96,24 @@ Follow these steps to recall insights on UML, modeling, and architecture:
     }
 
     private AbsoluteFilePathDTO storeInsights(TextContentsDTO param) throws Exception {
-        log.debug("Store UML, modeling, and architecture insights: {}", param);
-
         Path insightsFile = workspaceDir.resolve(INSIGHTS_FILE_NAME);
         String absolutePath = insightsFile.toAbsolutePath().toString();
 
-        if (Files.exists(insightsFile)) {
-            throw new IllegalStateException("The file storing insights on UML, modeling, and architecture already exists: " + absolutePath);
+        if (param.contents().isBlank()) {
+            throw new IllegalArgumentException("The insights on UML, modeling, and architecture to store must not be blank.");
         }
 
-        Files.writeString(insightsFile, param.contents());
+        try {
+            Files.writeString(insightsFile, param.contents(), StandardOpenOption.CREATE_NEW);
+        } catch (FileAlreadyExistsException e) {
+            throw new IllegalStateException("The file storing insights on UML, modeling, and architecture already exists: " + absolutePath);
+        }
         log.info("Stored insights file: {}", absolutePath);
 
         return new AbsoluteFilePathDTO(absolutePath);
     }
 
     private InsightsDTO readInsights(NoInputDTO param) throws Exception {
-        log.debug("Read UML, modeling, and architecture insights: {}", param);
-
         Path insightsFile = workspaceDir.resolve(INSIGHTS_FILE_NAME);
         String absolutePath = insightsFile.toAbsolutePath().toString();
 

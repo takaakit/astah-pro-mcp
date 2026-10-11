@@ -6,6 +6,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +37,7 @@ public class NoThumbnailImageCaptureSupportTest {
             support.createThumbnailContent("diagram-" + i);
         }
 
-        try (var entries = Files.list(outputDir)) {
+        try (Stream<Path> entries = Files.list(outputDir)) {
             assertEquals(0, entries.count(), "Skipping the capture must not leave files behind");
         }
     }
@@ -64,7 +66,7 @@ public class NoThumbnailImageCaptureSupportTest {
 
         for (String inherited : new String[]{"createLargeImageContent", "createCroppedImageContent",
                 "createWindowImageContent"}) {
-            boolean overridden = java.util.Arrays.stream(NoThumbnailImageCaptureSupport.class.getDeclaredMethods())
+            boolean overridden = Arrays.stream(NoThumbnailImageCaptureSupport.class.getDeclaredMethods())
                     .anyMatch(method -> method.getName().equals(inherited));
             assertFalse(overridden, "'" + inherited + "' is a capture the caller asked for and must not be skipped");
         }

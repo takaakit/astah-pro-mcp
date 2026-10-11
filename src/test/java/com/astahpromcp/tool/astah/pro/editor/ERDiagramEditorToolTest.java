@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewLinkPresentationOnERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.NewNodePresentationOnERDiagramDTO;
@@ -12,13 +13,11 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ERDiagramEditor;
-import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IERDiagram;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.model.IERPackage;
 import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
-import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -34,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ERDiagramEditorToolTest {
 
@@ -212,11 +210,11 @@ public class ERDiagramEditorToolTest {
         ILinkPresentation subtypeRelationshipPresentation1 = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Subtype",
             "Subtype1");
-        
+
         List<String> subtypeRelationshipIds = new ArrayList<>();
         subtypeRelationshipIds.add(subtypeRelationshipPresentation0.getID());
         subtypeRelationshipIds.add(subtypeRelationshipPresentation1.getID());
-    
+
         // Create input DTO
         NewSubtypeRelationshipGroupOnERDiagramDTO inputDTO = new NewSubtypeRelationshipGroupOnERDiagramDTO(
             erDiagram.getId(),

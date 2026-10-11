@@ -1,12 +1,11 @@
 package com.astahpromcp.tool;
 
 import io.modelcontextprotocol.spec.McpSchema;
-import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.exc.InvalidDefinitionException;
 
 import java.util.Map;
 
 // Binds raw MCP request arguments into a typed DTO.
-@Slf4j
 public final class DtoBinder {
 
     private DtoBinder() {
@@ -21,7 +20,11 @@ public final class DtoBinder {
             return new BindResult<>(dto, null);
 
         } catch (Exception e) {
-            log.error("Failed to convert arguments into {}", type.getName(), e);
+            // A DTO class that cannot be bound at all is a fault of this server; any other failure is an argument the caller got wrong.
+            ToolSupport.logFailure(
+                "Failed to convert arguments into " + type.getName() + ": " + e.getMessage(),
+                e,
+                !(e instanceof InvalidDefinitionException));
             McpSchema.CallToolResult error = ResponseSupport.error("Invalid arguments: " + e.getMessage());
 
             return new BindResult<>(null, error);

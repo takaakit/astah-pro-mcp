@@ -2,28 +2,45 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.VisibilityKind;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
+import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementTypeListDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
+import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
+import com.change_vision.jude.api.inf.editor.IDiagramEditorFactory;
+import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
+import com.change_vision.jude.api.inf.editor.StateMachineDiagramEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
+import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.IClassDiagram;
+import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.model.ILifeline;
+import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
+import com.change_vision.jude.api.inf.model.IPackage;
+import com.change_vision.jude.api.inf.model.ISequenceDiagram;
+import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.geom.Point2D;
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class NamedElementToolTest {
 
     private ProjectAccessor projectAccessor;
+    private TransactionSupport transactionSupport;
     private NamedElementTool tool;
     private Method getInfo;
     private Method getAllTypes;
@@ -37,7 +54,7 @@ public class NamedElementToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+        transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/NamedElementToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -103,7 +120,7 @@ public class NamedElementToolTest {
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(namedElement.getId());
 
@@ -123,6 +140,169 @@ public class NamedElementToolTest {
         assertEquals(".\\data\\sample1.xlsx", outputDTO.filePathHyperlinks().get(0).filePath());
         assertEquals("C:\\data\\sample2.xlsx", outputDTO.filePathHyperlinks().get(1).filePath());
         assertFalse(outputDTO.namedElementHyperlinks().get(0).namedElementId().isEmpty());
+    }
+
+    @Test
+    void getInfo_ok_ownedDiagramsAndRenderedInDiagrams() throws Exception {
+        IModel project = projectAccessor.getProject();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
+        ClassDiagramEditor classDiagramEditor = projectAccessor.getDiagramEditorFactory().getClassDiagramEditor();
+        StateMachineDiagramEditor stateMachineDiagramEditor = projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor();
+
+        // A class drawn twice on a class diagram owned by the root package, and owning a state machine diagram
+        IClass clazz = transactionSupport.call(() -> basicModelEditor.createClass(project, "DiagramOwner"));
+        IClassDiagram classDiagram = transactionSupport.call(() -> {
+            IClassDiagram diagram = classDiagramEditor.createClassDiagram(project, "RootClassDiagram");
+            classDiagramEditor.setDiagram(diagram);
+            classDiagramEditor.createNodePresentation(clazz, new Point2D.Double(0, 0));
+            classDiagramEditor.createNodePresentation(clazz, new Point2D.Double(300, 0));
+            return diagram;
+        });
+        IStateMachineDiagram stateMachineDiagram = transactionSupport.call(() ->
+            stateMachineDiagramEditor.createStatemachineDiagram(clazz, "OwnedStateMachineDiagram"));
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        NamedElementDTO classDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(clazz.getId()),
+            NamedElementDTO.class);
+        NamedElementDTO classDiagramDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(classDiagram.getId()),
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertEquals(List.of(stateMachineDiagram.getId()), idsOf(classDTO.ownedDiagrams()));
+        assertEquals(List.of(classDiagram.getId()), idsOf(classDTO.renderedInDiagrams()));
+        assertTrue(classDiagramDTO.renderedInDiagrams().isEmpty());
+    }
+
+    @Test
+    void getInfo_ok_ownedDiagramsIncludeBehaviorDiagramsButNotNestedOnes() throws Exception {
+        IModel project = projectAccessor.getProject();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
+        IDiagramEditorFactory diagramEditorFactory = projectAccessor.getDiagramEditorFactory();
+
+        IPackage pkg = transactionSupport.call(() -> basicModelEditor.createPackage(project, "DiagramOwnerPackage"));
+        IClass clazz = transactionSupport.call(() -> basicModelEditor.createClass(pkg, "DiagramOwnerClass"));
+        IDiagram packageDiagram = transactionSupport.call(() ->
+            diagramEditorFactory.getClassDiagramEditor().createClassDiagram(pkg, "PackageClassDiagram"));
+        List<IDiagram> classDiagrams = transactionSupport.call(() -> List.of(
+            diagramEditorFactory.getClassDiagramEditor().createClassDiagram(clazz, "ClassClassDiagram"),
+            diagramEditorFactory.getCompositeStructureDiagramEditor().createCompositeStructureDiagram(clazz, "ClassCompositeStructureDiagram"),
+            diagramEditorFactory.getStateMachineDiagramEditor().createStatemachineDiagram(clazz, "ClassStateMachineDiagram"),
+            diagramEditorFactory.getActivityDiagramEditor().createActivityDiagram(clazz, "ClassActivityDiagram"),
+            diagramEditorFactory.getSequenceDiagramEditor().createSequenceDiagram(clazz, "ClassSequenceDiagram")));
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        NamedElementDTO packageDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(pkg.getId()),
+            NamedElementDTO.class);
+        NamedElementDTO classDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(clazz.getId()),
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertEquals(List.of(packageDiagram.getId()), idsOf(packageDTO.ownedDiagrams()));
+        assertEquals(classDiagrams.stream().map(IDiagram::getId).sorted().toList(), idsOf(classDTO.ownedDiagrams()).stream().sorted().toList());
+        assertTrue(packageDTO.renderedInDiagrams().isEmpty());
+        assertTrue(classDTO.renderedInDiagrams().isEmpty());
+    }
+
+    @Test
+    void getInfo_ok_lifelineOwnsNoDiagramsAndIsRenderedInItsSequenceDiagram() throws Exception {
+        IModel project = projectAccessor.getProject();
+        SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+
+        ISequenceDiagram sequenceDiagram = transactionSupport.call(() ->
+            sequenceDiagramEditor.createSequenceDiagram(project, "LifelineSequenceDiagram"));
+        ILifeline lifeline = transactionSupport.call(() -> {
+            sequenceDiagramEditor.setDiagram(sequenceDiagram);
+            return (ILifeline) sequenceDiagramEditor.createLifeline("lifeline", 0).getModel();
+        });
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        NamedElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(lifeline.getId()),
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertTrue(outputDTO.ownedDiagrams().isEmpty());
+        assertEquals(List.of(sequenceDiagram.getId()), idsOf(outputDTO.renderedInDiagrams()));
+    }
+
+    @Test
+    void getInfo_ok_clientListsHoldRelationshipsWhoseClientIsThisElement() throws Exception {
+        IModel project = projectAccessor.getProject();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
+
+        // A client class that uses one class, depends on another and realizes an interface
+        IClass client = transactionSupport.call(() -> basicModelEditor.createClass(project, "RelationshipClient"));
+        IClass usedClass = transactionSupport.call(() -> basicModelEditor.createClass(project, "UsedClass"));
+        IClass dependedClass = transactionSupport.call(() -> basicModelEditor.createClass(project, "DependedClass"));
+        IClass realizedInterface = transactionSupport.call(() -> basicModelEditor.createInterface(project, "RealizedInterface"));
+        transactionSupport.call(() -> basicModelEditor.createUsage(client, usedClass, ""));
+        // Unlike createUsage and createRealization, createDependency takes the supplier first
+        transactionSupport.call(() -> basicModelEditor.createDependency(dependedClass, client, ""));
+        transactionSupport.call(() -> basicModelEditor.createRealization(client, realizedInterface, ""));
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        NamedElementDTO clientDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(client.getId()),
+            NamedElementDTO.class);
+        NamedElementDTO usedClassDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(usedClass.getId()),
+            NamedElementDTO.class);
+        NamedElementDTO dependedClassDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(dependedClass.getId()),
+            NamedElementDTO.class);
+        NamedElementDTO realizedInterfaceDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(realizedInterface.getId()),
+            NamedElementDTO.class);
+
+        // Check output DTO
+        assertEquals(List.of(usedClass.getId()), clientDTO.clientUsages().stream().map(usage -> usage.supplier().id()).toList());
+        assertEquals(List.of(dependedClass.getId()), clientDTO.clientDependencies().stream().map(dependency -> dependency.supplier().id()).toList());
+        assertEquals(List.of(realizedInterface.getId()), clientDTO.clientRealizations().stream().map(realization -> realization.supplier().id()).toList());
+        assertTrue(clientDTO.supplierUsages().isEmpty());
+        assertTrue(clientDTO.supplierDependencies().isEmpty());
+        assertTrue(clientDTO.supplierRealizations().isEmpty());
+
+        assertEquals(List.of(client.getId()), usedClassDTO.supplierUsages().stream().map(usage -> usage.client().id()).toList());
+        assertEquals(List.of(client.getId()), dependedClassDTO.supplierDependencies().stream().map(dependency -> dependency.client().id()).toList());
+        assertEquals(List.of(client.getId()), realizedInterfaceDTO.supplierRealizations().stream().map(realization -> realization.client().id()).toList());
+        assertTrue(usedClassDTO.clientUsages().isEmpty());
+
+        assertTrue(usedClassDTO.supplierDependencies().isEmpty());
+        assertTrue(realizedInterfaceDTO.supplierDependencies().isEmpty());
+    }
+
+    private static List<String> idsOf(List<NameIdTypeDTO> diagrams) {
+        return diagrams.stream().map(NameIdTypeDTO::id).toList();
     }
 
     @Test
@@ -151,7 +331,7 @@ public class NamedElementToolTest {
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
-        
+
         // Create input DTO
         NamedElementWithNameDTO inputDTO = new NamedElementWithNameDTO(
             namedElement.getId(),
@@ -177,12 +357,42 @@ public class NamedElementToolTest {
     }
 
     @Test
+    void setName_ng_lineBreakInClassName() throws Exception {
+        IModel project = projectAccessor.getProject();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
+
+        // A class rejects a line break in its name
+        IClass clazz = transactionSupport.call(() -> basicModelEditor.createClass(project, "LineBreakTarget"));
+
+        // Create input DTO
+        NamedElementWithNameDTO inputDTO = new NamedElementWithNameDTO(
+            clazz.getId(),
+            "Line\nBreak");
+
+        // ----------------------------------------
+        // Call setName()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setName,
+                tool,
+                inputDTO,
+                NamedElementDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(InvalidEditingException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("line breaks"));
+        assertEquals("LineBreakTarget", clazz.getName());
+    }
+
+    @Test
     void setAlias1_ok() throws Exception {
         // Get named element
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
-        
+
         // Create input DTO
         NamedElementWithAlias1DTO inputDTO = new NamedElementWithAlias1DTO(
             namedElement.getId(),
@@ -213,7 +423,7 @@ public class NamedElementToolTest {
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
-        
+
         // Create input DTO
         NamedElementWithAlias2DTO inputDTO = new NamedElementWithAlias2DTO(
             namedElement.getId(),
@@ -244,7 +454,7 @@ public class NamedElementToolTest {
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
-        
+
         // Create input DTO
         NamedElementWithDefinitionDTO inputDTO = new NamedElementWithDefinitionDTO(
             namedElement.getId(),
@@ -275,7 +485,7 @@ public class NamedElementToolTest {
         INamedElement namedElement = (INamedElement) TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
-        
+
         // Create input DTO
         NamedElementWithVisibilityDTO inputDTO = new NamedElementWithVisibilityDTO(
             namedElement.getId(),

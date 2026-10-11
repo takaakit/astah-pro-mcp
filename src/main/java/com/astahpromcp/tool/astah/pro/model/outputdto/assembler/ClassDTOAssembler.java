@@ -2,14 +2,14 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
-import com.change_vision.jude.api.inf.model.*;
-import lombok.NonNull;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.GeneralizationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.OperationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.PortDTO;
+import com.change_vision.jude.api.inf.model.*;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,11 +57,6 @@ public class ClassDTOAssembler {
             templateParameterDTOs.add(NameIdTypeDTOAssembler.toDTO(astahTemplateParameter));
         }
 
-        List<NameIdTypeDTO> ownedDiagramDTOs = new ArrayList<>();
-        for (IDiagram astahDiagram : astahClass.getOwnedDiagrams()) {
-            ownedDiagramDTOs.add(NameIdTypeDTOAssembler.toDTO(astahDiagram));
-        }
-
         return new ClassDTO(
             NamedElementDTOAssembler.toDTO(astahClass),
             attributeDTOs,
@@ -72,7 +67,6 @@ public class ClassDTOAssembler {
             portDTOs,
             nestedClassDTOs,
             templateParameterDTOs,
-            ownedDiagramDTOs,
             astahClass.isAbstract(),
             astahClass.isActive(),
             astahClass.isLeaf());

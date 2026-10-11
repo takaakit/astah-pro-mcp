@@ -2,10 +2,12 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.AttributeDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -16,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class AttributeToolTest {
 
@@ -24,12 +25,10 @@ public class AttributeToolTest {
     private AttributeTool tool;
     private Method getInfo;
     private Method setInitialValue;
-    private Method setLower;
     private Method setMultiplicity;
     private Method setStatic;
     private Method setType;
     private Method setTypeExpression;
-    private Method setUpper;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -95,7 +94,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(attribute.getId());
 
@@ -120,7 +119,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithInitialValueDTO inputDTO = new AttributeWithInitialValueDTO(
             attribute.getId(),
@@ -151,7 +150,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithStaticDTO inputDTO = new AttributeWithStaticDTO(
             attribute.getId(),
@@ -182,12 +181,12 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Get class
         IClass clazz = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "String");
-        
+
         // Create input DTO
         AttributeWithTypeDTO inputDTO = new AttributeWithTypeDTO(
             attribute.getId(),
@@ -213,12 +212,57 @@ public class AttributeToolTest {
     }
 
     @Test
+    void setType_ng_withAssociationEnd() throws Exception {
+        // Create an association between the owner of "sum" and "String"
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
+            IAttribute.class,
+            "sum");
+        IClass classA = (IClass) attribute.getOwner();
+        IClass classB = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "String");
+        IAssociation association = new TransactionSupport(projectAccessor.getTransactionManager()).call(() -> {
+            return projectAccessor.getModelEditorFactory().getBasicModelEditor().createAssociation(classA, classB, "", "", "");
+        });
+
+        // Get association ends
+        IAttribute associationEndA = association.getMemberEnds()[0];
+        IAttribute associationEndB = association.getMemberEnds()[1];
+        String endBTypeIdBefore = associationEndB.getType().getId();
+        String endAOwnerIdBefore = associationEndA.getOwner().getId();
+
+        // Create input DTO
+        AttributeWithTypeDTO inputDTO = new AttributeWithTypeDTO(
+            associationEndB.getId(),
+            classA.getId());
+
+        // ----------------------------------------
+        // Call setType()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setType,
+                tool,
+                inputDTO,
+                AttributeDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("because it is an end of an association"));
+
+        // Check that neither the type of end B nor the owner of end A moved
+        assertEquals(endBTypeIdBefore, associationEndB.getType().getId());
+        assertEquals(endAOwnerIdBefore, associationEndA.getOwner().getId());
+    }
+
+    @Test
     void setTypeExpression_ok() throws Exception {
         // Get attribute
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithTypeExpressionDTO inputDTO = new AttributeWithTypeExpressionDTO(
             attribute.getId(),
@@ -244,12 +288,57 @@ public class AttributeToolTest {
     }
 
     @Test
+    void setTypeExpression_ng_withAssociationEnd() throws Exception {
+        // Create an association between the owner of "sum" and "String"
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
+            IAttribute.class,
+            "sum");
+        IClass classA = (IClass) attribute.getOwner();
+        IClass classB = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "String");
+        IAssociation association = new TransactionSupport(projectAccessor.getTransactionManager()).call(() -> {
+            return projectAccessor.getModelEditorFactory().getBasicModelEditor().createAssociation(classA, classB, "", "", "");
+        });
+
+        // Get association ends
+        IAttribute associationEndA = association.getMemberEnds()[0];
+        IAttribute associationEndB = association.getMemberEnds()[1];
+        String endBTypeIdBefore = associationEndB.getType().getId();
+        String endAOwnerIdBefore = associationEndA.getOwner().getId();
+
+        // Create input DTO
+        AttributeWithTypeExpressionDTO inputDTO = new AttributeWithTypeExpressionDTO(
+            associationEndB.getId(),
+            "int");
+
+        // ----------------------------------------
+        // Call setTypeExpression()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setTypeExpression,
+                tool,
+                inputDTO,
+                AttributeDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("because it is an end of an association"));
+
+        // Check that neither the type of end B nor the owner of end A moved
+        assertEquals(endBTypeIdBefore, associationEndB.getType().getId());
+        assertEquals(endAOwnerIdBefore, associationEndA.getOwner().getId());
+    }
+
+    @Test
     void setMultiplicity_ok_byInt_1() throws Exception {
         // Get attribute
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -281,15 +370,15 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
-            "-10",
+            "10",
             "*");
 
         // Check multiplicity before setting
-        assertNotEquals("-10..*", attribute.getMultiplicityRangeString());
+        assertNotEquals("10..*", attribute.getMultiplicityRangeString());
 
         // ----------------------------------------
         // Call setMultiplicity()
@@ -304,7 +393,7 @@ public class AttributeToolTest {
         assertNotNull(outputDTO);
 
         // Check multiplicity after setting
-        assertEquals("-10..*", attribute.getMultiplicityRangeString());
+        assertEquals("10..*", attribute.getMultiplicityRangeString());
     }
 
     @Test
@@ -313,7 +402,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -345,7 +434,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -377,7 +466,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -409,7 +498,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -441,7 +530,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -473,7 +562,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -505,7 +594,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -537,7 +626,7 @@ public class AttributeToolTest {
         IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
             IAttribute.class,
             "sum");
-        
+
         // Create input DTO
         AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
             attribute.getId(),
@@ -561,5 +650,40 @@ public class AttributeToolTest {
 
         // Check multiplicity after setting
         assertEquals("5", attribute.getMultiplicityRangeString());
+    }
+
+    @Test
+    void setMultiplicity_ng_withRange() throws Exception {
+        // Get attribute
+        IAttribute attribute = (IAttribute) TestSupport.instance().getNamedElementByClassAndName(
+            IAttribute.class,
+            "sum");
+
+        // Create input DTO (Astah would store '5..2' as '0..*')
+        AttributeWithMultiplicityDTO inputDTO = new AttributeWithMultiplicityDTO(
+            attribute.getId(),
+            "5..2",
+            "");
+
+        // Keep multiplicity before setting
+        String multiplicityBefore = attribute.getMultiplicityRangeString();
+
+        // ----------------------------------------
+        // Call setMultiplicity()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                setMultiplicity,
+                tool,
+                inputDTO,
+                AttributeDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Invalid multiplicity bound '5..2'"));
+
+        // Check that the multiplicity is not changed
+        assertEquals(multiplicityBefore, attribute.getMultiplicityRangeString());
     }
 }

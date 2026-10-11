@@ -9,6 +9,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.ElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ElementDTOAssembler;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ElementListDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IEntity;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/view/IProjectViewManager.html
@@ -63,8 +63,6 @@ public class ProjectViewManagerTool extends AstahToolProvider {
     }
 
     private ElementListDTO getSelectedElements(NoInputDTO param) throws Exception {
-        log.debug("Get selected elements: {}", param);
-
         List<ElementDTO> elementDTOs = new ArrayList<>();
         for (IEntity astahEntity : projectViewManager.getSelectedEntities()) {
             IElement astahElement;
@@ -82,28 +80,24 @@ public class ProjectViewManagerTool extends AstahToolProvider {
     }
 
     private ElementDTO showInPropertyView(IdDTO param) throws Exception {
-        log.debug("Show in property view: {}", param);
-
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         try {
             projectViewManager.showInPropertyView(astahElement);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to show in property view.");
+            throw new RuntimeException("Failed to show in property view.", e);
         }
 
         return ElementDTOAssembler.toDTO(astahElement);
     }
 
     private ElementDTO showInStructureTree(IdDTO param) throws Exception {
-        log.debug("Show in structure tree: {}", param);
-
         IElement astahElement = astahProToolSupport.getElement(param.id());
 
         try {
             projectViewManager.showInStructureTree(astahElement);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to show in structure tree.");
+            throw new RuntimeException("Failed to show in structure tree.", e);
         }
 
         return ElementDTOAssembler.toDTO(astahElement);

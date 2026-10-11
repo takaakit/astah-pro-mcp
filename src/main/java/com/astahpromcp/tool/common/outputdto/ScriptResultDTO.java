@@ -9,10 +9,10 @@ public record ScriptResultDTO(
     @JsonPropertyDescription("String form of the script's last expression value; empty when none or failed")
     String result,
 
-    @JsonPropertyDescription("Text written by print()")
+    @JsonPropertyDescription("Text written by print(). Output past the size limit is dropped, and 'stderr' then says so.")
     String stdout,
 
-    @JsonPropertyDescription("Error output, including a note when a transaction left open by the script was aborted")
+    @JsonPropertyDescription("Error output, including a note when 'stdout' was truncated or when a transaction left open by the script was aborted")
     String stderr,
 
     @JsonPropertyDescription("Error message when 'ok' is false; empty otherwise")

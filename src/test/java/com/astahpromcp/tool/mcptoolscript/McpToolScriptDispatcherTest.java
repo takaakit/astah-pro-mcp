@@ -5,12 +5,11 @@ import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.ResponseSupport;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
-import com.astahpromcp.tool.ToolProvider;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
 import tools.jackson.core.type.TypeReference;
 
-import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import javax.swing.SwingUtilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +32,7 @@ public class McpToolScriptDispatcherTest {
 
     private static ToolDefinition definition(
             String name,
-            BiFunction<io.modelcontextprotocol.server.McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler) {
+            BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler) {
         return new ToolDefinition(schema(name), ToolDefinition.ResultKind.DTO, handler);
     }
 
@@ -148,7 +148,7 @@ public class McpToolScriptDispatcherTest {
     @Test
     void invoke_ng_countsEveryAttemptedCall() {
         McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryExcluding(
-                "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT,
+                "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT,
                 echoing("get_class_info"), echoing("capture_dgm_img")));
 
         dispatcher.invoke("get_class_info", "{}");
@@ -246,8 +246,8 @@ public class McpToolScriptDispatcherTest {
         List<String> excluded = List.of("capture_dgm_img", "run_astah_api_script", "get_info_of_ocl_spec");
         List<ToolDefinition> definitions = new ArrayList<>();
         definitions.add(echoing("get_class_info"));
-        Map<String, NotMcpToolScriptCallableReason> reasons = new java.util.LinkedHashMap<>();
-        reasons.put("capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT);
+        Map<String, NotMcpToolScriptCallableReason> reasons = new LinkedHashMap<>();
+        reasons.put("capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT);
         reasons.put("run_astah_api_script", NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT);
         reasons.put("get_info_of_ocl_spec", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO);
         for (String name : excluded) {
@@ -275,8 +275,16 @@ public class McpToolScriptDispatcherTest {
         ToolDefinition definition = definition("set_name_of_named_element", (exchange, request) -> {
             AtomicBoolean done = new AtomicBoolean(false);
             queuedWorkDone.set(done);
-            // Stands in for the work Astah queues on the EDT while applying an edit
-            SwingUtilities.invokeLater(() -> done.set(true));
+            // Stands in for the work Astah queues on the EDT while applying an edit. Slow on purpose: without the drain
+            // the call returns long before this finishes, so dropping the drain fails every run instead of most of them.
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                done.set(true);
+            });
             return ResponseSupport.success(Map.of("ok", true));
         });
         McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
@@ -376,7 +384,7 @@ public class McpToolScriptDispatcherTest {
 
         assertThrows(IllegalArgumentException.class, () -> dispatcher.invoke("no_such_tool", "{}"));
 
-        assertFalse(dispatcher.callCount() == 0, "The refused call is still counted");
+        assertNotEquals(0, dispatcher.callCount(), "The refused call is still counted");
         assertTrue(dispatcher.failed(), "A refused call is a failed call");
     }
 

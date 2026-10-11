@@ -18,7 +18,7 @@ import java.util.List;
 
 // Tool that fetches Plantuml guide content and returns it in chunks
 @Slf4j
-public class PlantumlGuideTool implements ToolProvider, RemoteDocumentTool {
+public class PlantumlGuideTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
     private final Path outputDirectory;
@@ -59,8 +59,6 @@ public class PlantumlGuideTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentDTO getPlantumlGuideInfo(NoInputDTO param) throws IOException {
-        log.debug("Get PlantUML guide: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("PlantUML guide already loaded, returning from cache.");
@@ -84,8 +82,6 @@ public class PlantumlGuideTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentChunkDTO getPlantumlGuideChunk(ChunkDTO param) {
-        log.debug("Get PlantUML guide chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

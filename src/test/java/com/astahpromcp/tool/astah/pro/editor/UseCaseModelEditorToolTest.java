@@ -2,12 +2,13 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
-import com.change_vision.jude.api.inf.model.IInclude;
 import com.change_vision.jude.api.inf.model.IExtend;
+import com.change_vision.jude.api.inf.model.IInclude;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IUseCase;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -17,9 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UseCaseModelEditorToolTest {
 
@@ -91,7 +90,7 @@ public class UseCaseModelEditorToolTest {
         IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
-        
+
         // Create input DTO
         NewActorDTO inputDTO = new NewActorDTO(
             astahPackage.getId(),
@@ -117,7 +116,7 @@ public class UseCaseModelEditorToolTest {
         IPackage astahPackage = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
-        
+
         // Create input DTO
         NewUseCaseDTO inputDTO = new NewUseCaseDTO(
             astahPackage.getId(),
@@ -146,7 +145,7 @@ public class UseCaseModelEditorToolTest {
         IUseCase astahIncludedUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase1");
-        
+
         // Create input DTO
         NewIncludeDTO inputDTO = new NewIncludeDTO(
             astahUseCase.getId(),
@@ -168,7 +167,7 @@ public class UseCaseModelEditorToolTest {
         // Get created include
         IInclude createdInclude = (IInclude) TestSupport.instance().getNamedElementById(
             outputDTO.namedElement().element().id());
-        
+
         // Check with the created include
         assertEquals(astahUseCase.getId(), createdInclude.getIncludingCase().getId());
         assertEquals(astahIncludedUseCase.getId(), createdInclude.getAddition().getId());
@@ -183,7 +182,7 @@ public class UseCaseModelEditorToolTest {
         IUseCase astahExtendedUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase1");
-        
+
         // Create input DTO
         NewExtendDTO inputDTO = new NewExtendDTO(
             astahUseCase.getId(),
@@ -205,7 +204,7 @@ public class UseCaseModelEditorToolTest {
         // Get created extend
         IExtend createdExtend = (IExtend) TestSupport.instance().getNamedElementById(
             outputDTO.namedElement().element().id());
-        
+
         // Check with the created extend
         assertEquals(astahUseCase.getId(), createdExtend.getExtension().getId());
         assertEquals(astahExtendedUseCase.getId(), createdExtend.getExtendedCase().getId());
@@ -217,7 +216,7 @@ public class UseCaseModelEditorToolTest {
         IUseCase astahUseCase = (IUseCase) TestSupport.instance().getNamedElementByClassAndName(
             IUseCase.class,
             "UseCase0");
-        
+
         // Create input DTO
         NewExtensionPointDTO inputDTO = new NewExtensionPointDTO(
             astahUseCase.getId(),

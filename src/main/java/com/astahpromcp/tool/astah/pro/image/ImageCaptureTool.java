@@ -49,8 +49,6 @@ public class ImageCaptureTool implements ToolProvider {
     }
 
     private List<McpSchema.Content> captureDiagramImage(DiagramWithImageRegionDTO param) throws Exception {
-        log.debug("Capture diagram image: {}", param);
-
         McpSchema.ImageContent content = imageCaptureSupport.createLargeImageContent(param.targetDiagramId(), param.region());
         List<McpSchema.Content> contents = new ArrayList<>();
         contents.add(content);
@@ -59,8 +57,6 @@ public class ImageCaptureTool implements ToolProvider {
     }
 
     private List<McpSchema.Content> cropDiagramImage(DiagramWithCropAreaDTO param) throws Exception {
-        log.debug("Crop diagram image: {}", param);
-
         McpSchema.ImageContent content = imageCaptureSupport.createCroppedImageContent(
                 param.targetDiagramId(), param.x(), param.y(), param.width(), param.height());
         List<McpSchema.Content> contents = new ArrayList<>();
@@ -70,8 +66,6 @@ public class ImageCaptureTool implements ToolProvider {
     }
 
     private List<McpSchema.Content> captureAstahWindowImage(NoInputDTO param) throws Exception {
-        log.debug("Capture Astah window image");
-
         JFrame mainFrame = projectAccessor.getViewManager().getMainFrame();
         McpSchema.ImageContent content = imageCaptureSupport.createWindowImageContent(mainFrame);
         List<McpSchema.Content> contents = new ArrayList<>();

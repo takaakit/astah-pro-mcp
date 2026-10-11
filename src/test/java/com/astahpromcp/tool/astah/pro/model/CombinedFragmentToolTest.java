@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.CombinedFragmentKind;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.CombinedFragmentWithKindDTO;
@@ -11,23 +12,27 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.CombinedFragmentDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
+import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyUtil;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class CombinedFragmentToolTest {
 
     private ProjectAccessor projectAccessor;
+    private TransactionSupport transactionSupport;
     private CombinedFragmentTool tool;
     private Method getInfo;
     private Method addInteractionOperand;
@@ -39,7 +44,7 @@ public class CombinedFragmentToolTest {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
         BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
-        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+        transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         projectAccessor.open("src/test/resources/modelfile/model/CombinedFragmentToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
@@ -134,7 +139,7 @@ public class CombinedFragmentToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(initialOperandCount + 1, outputDTO.interactionOperands().size());
-        
+
         // Check that the operand was added
         assertEquals(initialOperandCount + 1, combinedFragment.getInteractionOperands().length);
 
@@ -271,6 +276,9 @@ public class CombinedFragmentToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Check height of the interaction operand after setting
+        assertEquals(120, operandHeight(combinedFragment, 1));
     }
 
     @Test
@@ -297,6 +305,70 @@ public class CombinedFragmentToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Check height of the interaction operand after setting
+        assertEquals(120, operandHeight(combinedFragment, 3));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ok_minimumHeight() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getPresentations()[0].getID(),
+            1,
+            10);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check height of the interaction operand after setting
+        assertEquals(10, operandHeight(combinedFragment, 1));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ok_heightKeepsMessageInside() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Draw a message in the first interaction operand, 50 below its top
+        drawMessageInFirstOperand(combinedFragment, 50);
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getPresentations()[0].getID(),
+            1,
+            51);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check height of the interaction operand after setting
+        assertEquals(51, operandHeight(combinedFragment, 1));
     }
 
     @Test
@@ -343,6 +415,122 @@ public class CombinedFragmentToolTest {
             tool,
             inputDTO,
             NodePresentationDTO.class));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_zeroHeight() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getPresentations()[0].getID(),
+            1,
+            0);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_negativeHeight() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragment.getPresentations()[0].getID(),
+            1,
+            -50);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_belowMinimumHeight() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+        INodePresentation combinedFragmentPresentation = (INodePresentation) combinedFragment.getPresentations()[0];
+        double operandHeightBefore = operandHeight(combinedFragment, 1);
+        double combinedFragmentHeightBefore = combinedFragmentPresentation.getHeight();
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragmentPresentation.getID(),
+            1,
+            9);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+
+        // Check that the combined fragment is left as it was
+        assertEquals(operandHeightBefore, operandHeight(combinedFragment, 1));
+        assertEquals(combinedFragmentHeightBefore, combinedFragmentPresentation.getHeight());
+    }
+
+    @Test
+    void setHeightOfInteractionOperand_ng_heightLeavesMessageOutside() throws Exception {
+        // Get combined fragment
+        ICombinedFragment combinedFragment = (ICombinedFragment) TestSupport.instance().getNamedElementByClassAndName(
+            ICombinedFragment.class,
+            "");
+        INodePresentation combinedFragmentPresentation = (INodePresentation) combinedFragment.getPresentations()[0];
+
+        // Draw a message in the first interaction operand, 50 below its top
+        ILinkPresentation message = drawMessageInFirstOperand(combinedFragment, 50);
+        double firstOperandHeightBefore = operandHeight(combinedFragment, 1);
+        double secondOperandHeightBefore = operandHeight(combinedFragment, 2);
+        double combinedFragmentHeightBefore = combinedFragmentPresentation.getHeight();
+        double messageYBefore = message.getPoints()[0].getY();
+
+        // Create input DTO
+        InteractionOperandIndexWithHeightDTO inputDTO = new InteractionOperandIndexWithHeightDTO(
+            combinedFragmentPresentation.getID(),
+            1,
+            50);
+
+        // ----------------------------------------
+        // Call setHeightOfInteractionOperand()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+            setHeightOfInteractionOperand,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+
+        // Check that the exception tells that Astah did not apply the height
+        assertTrue(exception.getCause().getMessage().contains("did not apply"));
+
+        // Check that what Astah changed although it did not apply the height is rolled back
+        assertEquals(firstOperandHeightBefore, operandHeight(combinedFragment, 1));
+        assertEquals(secondOperandHeightBefore, operandHeight(combinedFragment, 2));
+        assertEquals(combinedFragmentHeightBefore, combinedFragmentPresentation.getHeight());
+        assertEquals(messageYBefore, message.getPoints()[0].getY());
     }
 
     @Test
@@ -400,5 +588,25 @@ public class CombinedFragmentToolTest {
             tool,
             inputDTO,
             NodePresentationDTO.class));
+    }
+
+    // The height the presentation of the combined fragment keeps for the given interaction operand (1-based index)
+    private static double operandHeight(ICombinedFragment combinedFragment, int index) throws Exception {
+        return Double.parseDouble(combinedFragment.getPresentations()[0].getProperty(PresentationPropertyUtil.createOperandLengthKey(index)));
+    }
+
+    // Draw a message between the two lifelines of the diagram, the given distance below the top of the first interaction operand
+    private ILinkPresentation drawMessageInFirstOperand(ICombinedFragment combinedFragment, double distanceFromTop) throws Exception {
+        INodePresentation combinedFragmentPresentation = (INodePresentation) combinedFragment.getPresentations()[0];
+        INodePresentation[] lifelines = Arrays.stream(combinedFragmentPresentation.getDiagram().getPresentations())
+            .filter(presentation -> "Lifeline".equals(presentation.getType()))
+            .toArray(INodePresentation[]::new);
+        assertEquals(2, lifelines.length);
+
+        SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+        return transactionSupport.call( () -> {
+            sequenceDiagramEditor.setDiagram(combinedFragmentPresentation.getDiagram());
+            return sequenceDiagramEditor.createMessage("message", lifelines[0], lifelines[1], combinedFragmentPresentation.getLocation().getY() + distanceFromTop);
+        });
     }
 }

@@ -5,12 +5,9 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
-import com.astahpromcp.tool.astah.pro.view.DiagramViewManagerTool;
-import com.astahpromcp.tool.astah.pro.view.ProjectViewManagerTool;
 import com.astahpromcp.tool.config.ConfigToolFactory;
 import com.astahpromcp.tool.info.InfoToolFactory;
 import com.astahpromcp.tool.knowledge.KnowledgeToolFactory;
-import com.astahpromcp.tool.knowledge.RemoteDocumentTool;
 import com.astahpromcp.tool.log.LogToolFactory;
 import com.astahpromcp.tool.mcptoolscript.FilteredToolProvider;
 import com.astahpromcp.tool.visualization.VisualizationToolFactory;
@@ -29,14 +26,10 @@ import java.util.Set;
 @Slf4j
 public final class ToolCatalog {
 
-    // The name of the tool that runs an astah api script.
-    private static final String ASTAH_API_SCRIPT_TOOL = "run_astah_api_script";
-
     private final List<ToolProvider> astahProviders;
     private final List<ToolProvider> otherProviders;
     private final Map<String, ToolDefinition> definitionsByName;
     private final Set<String> astahLockedNames;
-    private final Map<String, NotMcpToolScriptCallableReason> notMcpToolScriptCallableReasons;
 
     private ToolCatalog(List<ToolProvider> astahProviders, List<ToolProvider> otherProviders) {
         this.astahProviders = List.copyOf(astahProviders);
@@ -44,27 +37,19 @@ public final class ToolCatalog {
 
         Map<String, ToolDefinition> definitions = new LinkedHashMap<>();
         Set<String> locked = new LinkedHashSet<>();
-        Map<String, NotMcpToolScriptCallableReason> reasons = new LinkedHashMap<>();
 
-        index(this.astahProviders, definitions, reasons, locked);
-        index(this.otherProviders, definitions, reasons, null);
+        index(this.astahProviders, definitions, locked);
+        index(this.otherProviders, definitions, null);
 
         this.definitionsByName = Map.copyOf(definitions);
         this.astahLockedNames = Set.copyOf(locked);
-        this.notMcpToolScriptCallableReasons = Map.copyOf(reasons);
     }
 
     private static void index(List<ToolProvider> providers,
                               Map<String, ToolDefinition> definitions,
-                              Map<String, NotMcpToolScriptCallableReason> reasons,
                               Set<String> lockedNames) {
 
         for (ToolProvider provider : providers) {
-            // A provider that fetches over HTTP or converts a PDF holds the Astah API lock for the whole run if an mcp tool script calls it, so none of its tools may be called from one.
-            boolean remote = provider instanceof RemoteDocumentTool;
-            // A provider that drives the Astah view acts outside the Astah transaction, so a rollback could not undo what its tools did.
-            boolean view = provider instanceof DiagramViewManagerTool || provider instanceof ProjectViewManagerTool;
-
             for (ToolDefinition definition : provider.createToolDefinitions()) {
                 String name = definition.toolSchema().name();
 
@@ -75,30 +60,8 @@ public final class ToolCatalog {
                 if (lockedNames != null) {
                     lockedNames.add(name);
                 }
-
-                NotMcpToolScriptCallableReason reason = notMcpToolScriptCallableReasonOf(name, definition, remote, view);
-                if (reason != null) {
-                    reasons.put(name, reason);
-                }
             }
         }
-    }
-
-    // Derived, never declared: a tool that answers without structured content has nothing an mcp tool script could receive, a nested astah api script run is refused outright, a remote fetch would block the other profiles, and a change to the view would survive the rollback of the run.
-    private static NotMcpToolScriptCallableReason notMcpToolScriptCallableReasonOf(String name, ToolDefinition definition, boolean remote, boolean view) {
-        if (!definition.resultKind().carriesStructuredContent()) {
-            return NotMcpToolScriptCallableReason.RETURNS_BINARY_CONTENT;
-        }
-        if (name.equals(ASTAH_API_SCRIPT_TOOL)) {
-            return NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT;
-        }
-        if (remote) {
-            return NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO;
-        }
-        if (view) {
-            return NotMcpToolScriptCallableReason.DRIVES_THE_VIEW;
-        }
-        return null;
     }
 
     // Build a catalog from the given providers, for tests.
@@ -158,16 +121,6 @@ public final class ToolCatalog {
     // The tools that reach the Astah API, and therefore need the process-wide lock
     public Set<String> astahLockedNames() {
         return astahLockedNames;
-    }
-
-    // The tools no profile could ever let an mcp tool script call.
-    public Set<String> notMcpToolScriptCallableNames() {
-        return notMcpToolScriptCallableReasons.keySet();
-    }
-
-    // Why the shape of the given tool keeps an mcp tool script from calling it, or null when nothing about its shape does.
-    public NotMcpToolScriptCallableReason notMcpToolScriptCallableReason(String name) {
-        return notMcpToolScriptCallableReasons.get(name);
     }
 
     // Narrow the catalog to the named tools.

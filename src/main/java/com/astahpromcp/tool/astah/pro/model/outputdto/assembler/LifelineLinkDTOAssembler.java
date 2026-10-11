@@ -2,10 +2,10 @@ package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.NameIdTypeDTOAssembler;
+import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineLinkDTO;
 import com.change_vision.jude.api.inf.model.ILifelineLink;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.NonNull;
-import com.astahpromcp.tool.astah.pro.model.outputdto.LifelineLinkDTO;
 
 import java.util.ArrayList;
 import java.util.List;

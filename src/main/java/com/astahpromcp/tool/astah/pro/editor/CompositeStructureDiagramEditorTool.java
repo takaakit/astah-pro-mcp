@@ -22,6 +22,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.PresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.CompositeStructureDiagramEditor;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
@@ -42,7 +43,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/CompositeStructureDiagramEditor.html
@@ -118,8 +118,6 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private DiagramDTO createCompositeStructureDiagram(NewDiagramInPackageDTO param) throws Exception {
-        log.debug("Create composite structure diagram: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
 
         ICompositeStructureDiagram createdAstahCompositeStructureDiagram = txnAstah.call( () -> {
@@ -130,8 +128,6 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPortPresentation(NewPortPresentationDTO param) throws Exception {
-        log.debug("Create port presentation: {}", param);
-
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
         INodePresentation astahTargetNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
         IPort astahPort = astahProToolSupport.getPort(param.targetPortId());
@@ -155,11 +151,20 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createProvidedInterfacePresentation(NewProvidedInterfacePresentationDTO param) throws Exception {
-        log.debug("Create provided interface presentation: {}", param);
-
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
+
         INodePresentation astahTargetNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
-        IClass astahInterface = astahProToolSupport.getClass(param.targetInterfaceId());
+        if (!Type.PORT.matches(astahTargetNodePresentation.getType()) && !Type.PART.matches(astahTargetNodePresentation.getType())) {
+            throw new IllegalArgumentException(String.format(
+                "Target node for provided interface presentation must be one of the following node presentation types: Port, or Part (actual type: %s).",
+                astahTargetNodePresentation.getType()));
+        }
+
+        if (!astahCompositeStructureDiagram.equals(astahTargetNodePresentation.getDiagram())) {
+            throw new IllegalArgumentException("The target node presentation is not on the target composite structure diagram: " + param.targetNodePresentationId());
+        }
+
+        IClass astahInterface = astahProToolSupport.getInterface(param.targetInterfaceId());
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
@@ -180,11 +185,20 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createRequiredInterfacePresentation(NewRequiredInterfacePresentationDTO param) throws Exception {
-        log.debug("Create required interface presentation: {}", param);
-
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
+
         INodePresentation astahTargetNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
-        IClass astahInterface = astahProToolSupport.getClass(param.targetInterfaceId());
+        if (!Type.PORT.matches(astahTargetNodePresentation.getType()) && !Type.PART.matches(astahTargetNodePresentation.getType())) {
+            throw new IllegalArgumentException(String.format(
+                "Target node for required interface presentation must be one of the following node presentation types: Port, or Part (actual type: %s).",
+                astahTargetNodePresentation.getType()));
+        }
+
+        if (!astahCompositeStructureDiagram.equals(astahTargetNodePresentation.getDiagram())) {
+            throw new IllegalArgumentException("The target node presentation is not on the target composite structure diagram: " + param.targetNodePresentationId());
+        }
+
+        IClass astahInterface = astahProToolSupport.getInterface(param.targetInterfaceId());
 
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
@@ -205,8 +219,6 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createStructuredClassPresentation(NewStructuredClassPresentationDTO param) throws Exception {
-        log.debug("Create structured class presentation: {}", param);
-
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
         IClass astahClass = astahProToolSupport.getClass(param.targetClassId());
 
@@ -228,8 +240,6 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createPartPresentation(NewPartPresentationDTO param) throws Exception {
-        log.debug("Create part presentation: {}", param);
-
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
 
         // IPort extends IAttribute, so a port is accepted here and drawn as a part box instead of a port.
@@ -282,8 +292,6 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<PresentationListDTO, List<McpSchema.Content>> showInterfacePresentationsOfPort(ShowInterfacePresentationsOfPortDTO param) throws Exception {
-        log.debug("Show interface presentations of port: {}", param);
-
         ICompositeStructureDiagram astahCompositeStructureDiagram = astahProToolSupport.getCompositeStructureDiagram(param.targetCompositeStructureDiagramId());
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
@@ -294,7 +302,7 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
         compositeStructureDiagramEditor.setDiagram(astahCompositeStructureDiagram);
 
         Set<String> beforePresentationIds = new HashSet<>();
-        for (IPresentation astahPresentation : astahCompositeStructureDiagram.getPresentations()) {
+        for (IPresentation astahPresentation : AstahProToolSupport.getPresentationsOnDiagram(astahCompositeStructureDiagram)) {
             beforePresentationIds.add(astahPresentation.getID());
         }
 
@@ -308,7 +316,7 @@ public class CompositeStructureDiagramEditorTool extends AstahToolProvider {
 
         // The newly created presentations
         List<PresentationDTO> presentationDTOs = new ArrayList<>();
-        for (IPresentation astahPresentation : astahCompositeStructureDiagram.getPresentations()) {
+        for (IPresentation astahPresentation : AstahProToolSupport.getPresentationsOnDiagram(astahCompositeStructureDiagram)) {
             if (!beforePresentationIds.contains(astahPresentation.getID())) {
                 presentationDTOs.add(PresentationDTOAssembler.toDTO(astahPresentation));
             }

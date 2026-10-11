@@ -3,6 +3,7 @@ package com.astahpromcp.tool;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DtoBinderTest {
 
     private static String errorText(DtoBinder.BindResult<?> result) {
-        return ((io.modelcontextprotocol.spec.McpSchema.TextContent) result.error().content().get(0)).text();
+        return ((McpSchema.TextContent) result.error().content().get(0)).text();
     }
 
     @Test

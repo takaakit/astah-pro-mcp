@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionUseWithArgumentDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionUseWithSequenceDiagramDTO;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class InteractionUseToolTest {
 
@@ -69,11 +69,11 @@ public class InteractionUseToolTest {
 
     @Test
     void getInfo_ok() throws Exception {
-        // Get interaction use - assuming there's an interaction use in the test model
+        // Get interaction use
         IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionUse.class,
             "");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(interactionUse.getId());
 
@@ -127,7 +127,7 @@ public class InteractionUseToolTest {
         IInteractionUse interactionUse = (IInteractionUse) TestSupport.instance().getNamedElementByClassAndName(
             IInteractionUse.class,
             "");
-        
+
         // Get sequence diagram
         ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
             ISequenceDiagram.class,

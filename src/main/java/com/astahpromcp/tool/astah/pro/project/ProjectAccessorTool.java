@@ -14,6 +14,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.NamedElementDTOAssembler;
 import com.astahpromcp.tool.astah.pro.project.outputdto.ProjectPathDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
+import com.change_vision.jude.api.inf.exception.ProjectLockedException;
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IModel;
@@ -23,7 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html
@@ -121,33 +126,30 @@ public class ProjectAccessorTool extends AstahToolProvider {
     }
 
     private NamedElementDTO createProject(NoInputDTO param) throws Exception {
-        log.debug("Create project (root package): {}", param);
-
         ensureNoUnsavedChanges();
 
         try {
             projectAccessor.create();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create project (root package).");
+            throw new RuntimeException("Failed to create project (root package).", e);
         }
 
         IModel astahProject;
         try {
             astahProject = projectAccessor.getProject();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current project.");
+            throw new RuntimeException("Failed to get the current project.", e);
         }
 
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
     private NamedElementDTO openProject(FilePathDTO param) throws Exception {
-        log.debug("Open project: {}", param);
-
         ensureNoUnsavedChanges();
+        requireAbsolutePath(param.filePath());
 
         if (!new File(param.filePath()).isFile()) {
-            throw new RuntimeException("The specified project file does not exist: " + param.filePath());
+            throw new IllegalArgumentException("The specified project file does not exist: " + param.filePath());
         }
 
         try {
@@ -157,14 +159,18 @@ public class ProjectAccessorTool extends AstahToolProvider {
                 false,  // lockMode
                 true);  // allowReadOnly
         } catch (Exception e) {
-            throw new RuntimeException("Failed to open project: " + param.filePath());
+            throw new RuntimeException("Failed to open project: " + param.filePath() + ". " + e, e);
+        }
+
+        if (!isOpenAt(param.filePath())) {
+            throw new RuntimeException("Failed to open project: " + param.filePath() + ". Astah opened no project from it, and its log ('get_info_of_astah_log') has the reason.");
         }
 
         IModel astahProject;
         try {
             astahProject = projectAccessor.getProject();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current project.");
+            throw new RuntimeException("Failed to get the current project.", e);
         }
 
         return NamedElementDTOAssembler.toDTO(astahProject);
@@ -181,33 +187,25 @@ public class ProjectAccessorTool extends AstahToolProvider {
     }
 
     private NamedElementDTO getProject(NoInputDTO param) throws Exception {
-        log.debug("Get project (root package): {}", param);
-
         IModel astahProject;
         try {
             astahProject = projectAccessor.getProject();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get project (root package).");
+            throw new RuntimeException("Failed to get project (root package).", e);
         }
 
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
     private BooleanDTO isProjectOpen(NoInputDTO param) throws Exception {
-        log.debug("Is project opened: {}", param);
-
         return new BooleanDTO(projectAccessor.hasProject());
     }
 
     private BooleanDTO isProjectModified(NoInputDTO param) throws Exception {
-        log.debug("Is project modified: {}", param);
-
         return new BooleanDTO(projectAccessor.isProjectModified());
     }
 
     private NameIdTypeListDTO findNamedElementsByName(NameDTO param) throws Exception {
-        log.debug("Find named elements by name: {}", param);
-
         INamedElement[] astahNamedElements = projectAccessor.findElements(INamedElement.class);
 
         List<NameIdTypeDTO> namedIdTypeDTOs = new ArrayList<>();
@@ -228,8 +226,6 @@ public class ProjectAccessorTool extends AstahToolProvider {
     }
 
     private ProjectPathDTO saveProject(NoInputDTO param) throws Exception {
-        log.debug("Save project: {}", param);
-
         // Check if the current project is created
         if (!projectAccessor.hasProject()) {
             throw new RuntimeException("The current project is not created.");
@@ -246,41 +242,74 @@ public class ProjectAccessorTool extends AstahToolProvider {
             throw new RuntimeException("The current project has not been saved yet, so specify a file path when saving it.");
         }
 
+        if (!Files.isWritable(Path.of(projectPath))) {
+            throw new RuntimeException("Failed to save the current project because its file is not writable: " + projectPath + ". The file may be read-only, or you may have no permission to write to it (e.g., a file under Program Files). Save it to a writable folder with 'save_proj_as' instead.");
+        }
+
         try {
             projectAccessor.save();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save the current project.");
+            throw new RuntimeException("Failed to save the current project: " + projectPath + ". " + describeWriteFailure(e), e);
+        }
+
+        if (projectAccessor.isProjectModified()) {
+            throw new RuntimeException("Failed to save the current project. It still has unsaved changes, so the file was not written. The file may be read-only or locked.");
         }
 
         return new ProjectPathDTO(projectAccessor.getProjectPath());
     }
 
     private ProjectPathDTO saveProjectAs(FilePathDTO param) throws Exception {
-        log.debug("Save project as: {}", param);
+        String filePath = param.filePath();
+        requireAbsolutePath(filePath);
 
-        // Check that the parent directory of the file path exists
-        File folder = new File(param.filePath()).getParentFile();
-        if (folder == null || !folder.exists()) {
-            throw new RuntimeException("The parent folder of the specified file path does not exist: " + param.filePath());
+        if (!filePath.toLowerCase(Locale.ROOT).endsWith(".asta")) {
+            throw new IllegalArgumentException("The specified file path is not a valid Astah project file (*.asta): " + filePath);
         }
 
-        // Check that the file path has the .asta extension
-        if (!param.filePath().endsWith(".asta")) {
-            throw new RuntimeException("The specified file path is not a valid Astah project file (*.asta): " + param.filePath());
+        File folder = new File(filePath).getParentFile();
+        if (folder == null || !folder.isDirectory()) {
+            throw new IllegalArgumentException("The parent folder of the specified file path does not exist: " + filePath);
         }
 
-        // Check that the target file does not already exist
-        if (new File(param.filePath()).exists()) {
-            throw new RuntimeException("The specified file path already exists: " + param.filePath() + ". If you want to save the current project, use other tool function to overwrite it.");
+        if (new File(filePath).exists()) {
+            throw new IllegalArgumentException("The specified file path already exists: " + filePath + ". This tool does not overwrite an existing file. To save the current project to its own file, use 'save_proj' instead.");
+        }
+
+        if (!Files.isWritable(folder.toPath())) {
+            throw new IllegalArgumentException("The parent folder of the specified file path is not writable: " + filePath + ". Specify a file path in a folder you have permission to write to.");
         }
 
         try {
-            projectAccessor.saveAs(param.filePath());
+            projectAccessor.saveAs(filePath);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save the current project as: " + param.filePath());
+            throw new RuntimeException("Failed to save the current project as: " + filePath + ". " + describeWriteFailure(e), e);
+        }
+
+        if (!new File(filePath).isFile() || !isOpenAt(filePath)) {
+            throw new RuntimeException("Failed to save the current project as: " + filePath + ". Astah did not write the file.");
         }
 
         return new ProjectPathDTO(projectAccessor.getProjectPath());
+    }
+
+    private static void requireAbsolutePath(String filePath) {
+        if (!Path.of(filePath).isAbsolute()) {
+            throw new IllegalArgumentException("The specified file path is not an absolute path: " + filePath + ". Specify the absolute path, e.g., C:\\work\\model.asta.");
+        }
+    }
+
+    private static String describeWriteFailure(Exception e) {
+        if (e instanceof IOException || e instanceof ProjectLockedException) {
+            return e + ". Astah could not write the file: another program (or another Astah) may have it open, its folder may not be writable, or the disk may be full.";
+        }
+        return String.valueOf(e);
+    }
+
+    // Whether the project open in Astah is the file at the path
+    private boolean isOpenAt(String path) throws Exception {
+        return projectAccessor.hasProject()
+            && new File(projectAccessor.getProjectPath()).getCanonicalFile().equals(new File(path).getCanonicalFile());
     }
 
     private NamedElementDTO closeProject(NoInputDTO param) throws Exception {
@@ -290,21 +319,19 @@ public class ProjectAccessorTool extends AstahToolProvider {
         try {
             astahProject = projectAccessor.getProject();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get the current project.");
+            throw new RuntimeException("Failed to get the current project.", e);
         }
 
         try {
             projectAccessor.close();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to close the current project.");
+            throw new RuntimeException("Failed to close the current project.", e);
         }
 
         return NamedElementDTOAssembler.toDTO(astahProject);
     }
 
     private ProjectPathDTO getProjectPath(NoInputDTO param) throws Exception {
-        log.debug("Get project path: {}", param);
-
         try {
             String projectPath = projectAccessor.getProjectPath();
             if (projectPath == null

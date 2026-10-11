@@ -7,12 +7,12 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.GateDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.GateDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IGate;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IGate.html
@@ -42,8 +42,6 @@ public class GateTool extends AstahToolProvider {
     }
 
     private GateDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get gate information: {}", param);
-
         IGate astahGate = astahProToolSupport.getGate(param.id());
 
         return GateDTOAssembler.toDTO(astahGate);

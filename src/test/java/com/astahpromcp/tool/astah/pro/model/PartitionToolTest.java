@@ -2,24 +2,21 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.PartitionWithRepresentsDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.PartitionDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
-import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IPartition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class PartitionToolTest {
 
@@ -75,7 +72,7 @@ public class PartitionToolTest {
         IPartition partition = (IPartition) TestSupport.instance().getNamedElementByClassAndName(
             IPartition.class,
             "Partition0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(partition.getId());
 

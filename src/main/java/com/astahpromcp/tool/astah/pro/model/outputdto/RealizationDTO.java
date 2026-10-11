@@ -7,10 +7,10 @@ public record RealizationDTO(
     @JsonPropertyDescription("Named element info")
     NamedElementDTO namedElement,
 
-    @JsonPropertyDescription("Client")
+    @JsonPropertyDescription("Client: The element that realizes the supplier.")
     NameIdTypeDTO client,
 
-    @JsonPropertyDescription("Supplier")
+    @JsonPropertyDescription("Supplier: The element that the client realizes.")
     NameIdTypeDTO supplier
 ) {
 }

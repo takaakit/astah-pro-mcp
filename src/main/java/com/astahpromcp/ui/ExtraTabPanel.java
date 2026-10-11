@@ -7,6 +7,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.Document;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,12 +35,12 @@ public class ExtraTabPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
 
         JLabel logFileLinkLabel = new JLabel("<html><a href='#'>Open log file</a></html>");
-        logFileLinkLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        logFileLinkLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        logFileLinkLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        logFileLinkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        logFileLinkLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+        logFileLinkLabel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 openLogFile();
             }
         });

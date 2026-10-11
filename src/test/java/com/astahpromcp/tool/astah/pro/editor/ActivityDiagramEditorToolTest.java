@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActivityDiagramDTO;
@@ -9,14 +10,16 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ActivityDiagramEditor;
-import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IAction;
+import com.change_vision.jude.api.inf.model.IActivityDiagram;
 import com.change_vision.jude.api.inf.model.IClass;
-import com.change_vision.jude.api.inf.model.IPackage;
-import com.change_vision.jude.api.inf.model.IFlow;
 import com.change_vision.jude.api.inf.model.IDependency;
+import com.change_vision.jude.api.inf.model.IFlow;
+import com.change_vision.jude.api.inf.model.IPackage;
+import com.change_vision.jude.api.inf.model.IPartition;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
@@ -24,18 +27,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.awt.geom.Point2D;
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class ActivityDiagramEditorToolTest {
 
     private ProjectAccessor projectAccessor;
+    private TransactionSupport transactionSupport;
     private ActivityDiagramEditorTool tool;
     private Method createAcceptEventAction;
     private Method createAcceptTimeEventAction;
@@ -62,7 +65,7 @@ public class ActivityDiagramEditorToolTest {
     void setUp() throws Exception {
         AstahAPI astahApi = AstahAPI.getAstahAPI();
         projectAccessor = astahApi.getProjectAccessor();
-        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+        transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         ActivityDiagramEditor activityDiagramEditor = projectAccessor.getDiagramEditorFactory().getActivityDiagramEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ActivityDiagramEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
@@ -212,7 +215,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewAcceptEventActionDTO inputDTO = new NewAcceptEventActionDTO(
             activityDiagram.getId(),
@@ -239,7 +242,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewAcceptTimeEventActionDTO inputDTO = new NewAcceptTimeEventActionDTO(
             activityDiagram.getId(),
@@ -266,7 +269,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewActionDTO inputDTO = new NewActionDTO(
             activityDiagram.getId(),
@@ -293,7 +296,7 @@ public class ActivityDiagramEditorToolTest {
         IPackage package_ = (IPackage) TestSupport.instance().getNamedElementByClassAndName(
             IPackage.class,
             "subPackage");
-        
+
         // Create input DTO
         NewActivityDiagramDTO inputDTO = new NewActivityDiagramDTO(
             package_.getId(),
@@ -318,12 +321,12 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get class
         IClass class_ = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Create input DTO
         NewActivityParameterNodeDTO inputDTO = new NewActivityParameterNodeDTO(
             activityDiagram.getId(),
@@ -351,12 +354,12 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get reference activity diagram
         IActivityDiagram referenceActivityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram1");
-        
+
         // Create input DTO
         NewCallBehaviorActionDTO inputDTO = new NewCallBehaviorActionDTO(
             activityDiagram.getId(),
@@ -384,7 +387,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewConnectorDTO inputDTO = new NewConnectorDTO(
             activityDiagram.getId(),
@@ -411,7 +414,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewDecisionMergeNodeDTO inputDTO = new NewDecisionMergeNodeDTO(
             activityDiagram.getId(),
@@ -437,17 +440,17 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get client node presentation
         INodePresentation clientNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action0");
-        
+
         // Get supplier node presentation
         INodePresentation supplierNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action1");
-        
+
         // Create input DTO
         NewDependencyDTO inputDTO = new NewDependencyDTO(
             activityDiagram.getId(),
@@ -470,7 +473,7 @@ public class ActivityDiagramEditorToolTest {
         // Get created link presentation
         ILinkPresentation createdLinkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationById(
             outputDTO.presentation().id());
-        
+
         // Check with the created link presentation
         assertEquals(((IAction) clientNodePresentation.getModel()).getId(), ((IDependency) createdLinkPresentation.getModel()).getClient().getId());
         assertEquals(((IAction) supplierNodePresentation.getModel()).getId(), ((IDependency) createdLinkPresentation.getModel()).getSupplier().getId());
@@ -482,7 +485,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewFinalNodeDTO inputDTO = new NewFinalNodeDTO(
             activityDiagram.getId(),
@@ -509,17 +512,17 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get source node presentation
         INodePresentation sourceNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action0");
-        
+
         // Get target node presentation
         INodePresentation targetNodePresentation = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action1");
-        
+
         // Create input DTO
         NewFlowDTO inputDTO = new NewFlowDTO(
             activityDiagram.getId(),
@@ -541,7 +544,7 @@ public class ActivityDiagramEditorToolTest {
         // Get created link presentation
         ILinkPresentation createdLinkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationById(
             outputDTO.presentation().id());
-        
+
         // Check with the created link presentation
         assertEquals(((IAction) sourceNodePresentation.getModel()).getId(), ((IFlow) createdLinkPresentation.getModel()).getSource().getId());
         assertEquals(((IAction) targetNodePresentation.getModel()).getId(), ((IFlow) createdLinkPresentation.getModel()).getTarget().getId());
@@ -553,7 +556,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewFlowFinalNodeDTO inputDTO = new NewFlowFinalNodeDTO(
             activityDiagram.getId(),
@@ -580,7 +583,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewForkNodeDTO inputDTO = new NewForkNodeDTO(
             activityDiagram.getId(),
@@ -606,7 +609,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewInitialNodeDTO inputDTO = new NewInitialNodeDTO(
             activityDiagram.getId(),
@@ -633,7 +636,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewJoinNodeDTO inputDTO = new NewJoinNodeDTO(
             activityDiagram.getId(),
@@ -659,12 +662,12 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get class
         IClass class_ = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Create input DTO
         NewObjectNodeDTO inputDTO = new NewObjectNodeDTO(
             activityDiagram.getId(),
@@ -731,17 +734,17 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get super partition
         INodePresentation superPartition = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Partition",
             "Partition0");
-        
+
         // Get previous partition
         INodePresentation previousPartition = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Partition",
-            "Partition3");    
-    
+            "Partition3");
+
         // Create input DTO
         NewPartitionDTO inputDTO = new NewPartitionDTO(
             activityDiagram.getId(),
@@ -764,22 +767,312 @@ public class ActivityDiagramEditorToolTest {
     }
 
     @Test
+    void createPartition_ok_nullTreatedAsEmpty() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createPartition,
+            tool,
+            new NewPartitionDTO(fixture.diagram().getId(), null, null, "Test Partition", false),
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check that the new partition is appended after the last top-level partition
+        IPartition newPartition = (IPartition) TestSupport.instance().getPresentationById(outputDTO.presentation().id()).getModel();
+        assertEquals(fixture.p2().getModel().getId(), newPartition.getPreviousPartition().getId());
+        assertNull(newPartition.getSuperPartition().getSuperPartition());
+    }
+
+    @Test
+    void createPartition_ok_emptySuperWithNestedPrevious() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createPartition,
+            tool,
+            new NewPartitionDTO(fixture.diagram().getId(), "", fixture.s1().getID(), "Test Partition", false),
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check that the new partition is placed in the super partition of the previous partition
+        IPartition newPartition = (IPartition) TestSupport.instance().getPresentationById(outputDTO.presentation().id()).getModel();
+        assertEquals(fixture.p2().getModel().getId(), newPartition.getSuperPartition().getId());
+        assertEquals(fixture.s1().getModel().getId(), newPartition.getPreviousPartition().getId());
+    }
+
+    @Test
+    void createPartition_ng_superNotPartition() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), fixture.action().getID(), "", "Test Partition", false),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The super partition (ID: " + fixture.action().getID() + ", type: Action) is not a partition."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_previousNotPartition() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), "", fixture.action().getID(), "Test Partition", false),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The previous partition (ID: " + fixture.action().getID() + ", type: Action) is not a partition."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_superNotOnTargetDiagram() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        // Another activity diagram, whose partition an agent may pass by mistake
+        PartitionFixture anotherFixture = createPartitionFixture("Another Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+        int anotherPresentationCountBefore = anotherFixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), anotherFixture.p1().getID(), "", "Test Partition", false),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The super partition (ID: " + anotherFixture.p1().getID() + ") is not on the target activity diagram 'Partition Fixture'"));
+        assertTrue(exception.getCause().getMessage().contains("but on 'Another Partition Fixture'"));
+
+        // Check that nothing was drawn on either diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+        assertEquals(anotherPresentationCountBefore, anotherFixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_previousNotOnTargetDiagram() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        // Another activity diagram, whose partition an agent may pass by mistake
+        PartitionFixture anotherFixture = createPartitionFixture("Another Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+        int anotherPresentationCountBefore = anotherFixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), "", anotherFixture.p1().getID(), "Test Partition", false),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The previous partition (ID: " + anotherFixture.p1().getID() + ") is not on the target activity diagram 'Partition Fixture'"));
+        assertTrue(exception.getCause().getMessage().contains("but on 'Another Partition Fixture'"));
+
+        // Check that nothing was drawn on either diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+        assertEquals(anotherPresentationCountBefore, anotherFixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_superOrientationMismatch() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), fixture.p2().getID(), "", "Test Partition", true),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The super partition 'P2' (ID: " + fixture.p2().getID() + ") is vertical, but isHorizontal specifies a horizontal partition."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_previousOrientationMismatch() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), "", fixture.p1().getID(), "Test Partition", true),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The previous partition 'P1' (ID: " + fixture.p1().getID() + ") is vertical, but isHorizontal specifies a horizontal partition."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_previousNotSubPartitionOfSuper() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), fixture.p2().getID(), fixture.p1().getID(), "Test Partition", false),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The previous partition 'P1' (ID: " + fixture.p1().getID() + ") is not a sub partition of the super partition 'P2' (ID: " + fixture.p2().getID() + ")."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+    }
+
+    @Test
+    void createPartition_ng_previousIsDimension() throws Exception {
+        PartitionFixture fixture = createPartitionFixture("Partition Fixture");
+        INodePresentation dimension = fixture.dimension();
+
+        int presentationCountBefore = fixture.diagram().getPresentations().length;
+
+        // ----------------------------------------
+        // Call createPartition()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createPartition,
+                tool,
+                new NewPartitionDTO(fixture.diagram().getId(), "", dimension.getID(), "Test Partition", false),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("The previous partition (ID: " + dimension.getID() + ") is the dimension that Astah creates to hold the partitions of one orientation."));
+
+        // Check that nothing was drawn on the diagram
+        assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
+    }
+
+    // Creates an activity diagram with the vertical partitions P1 and P2, the partition S1 in P2, and an action
+    private PartitionFixture createPartitionFixture(String diagramName) throws Exception {
+        ActivityDiagramEditor activityDiagramEditor = projectAccessor.getDiagramEditorFactory().getActivityDiagramEditor();
+
+        return transactionSupport.call(() -> {
+            IActivityDiagram diagram = activityDiagramEditor.createActivityDiagram(projectAccessor.getProject(), diagramName);
+            activityDiagramEditor.setDiagram(diagram);
+            INodePresentation p1 = activityDiagramEditor.createPartition(null, null, "P1", false);
+            INodePresentation p2 = activityDiagramEditor.createPartition(null, p1, "P2", false);
+            INodePresentation s1 = activityDiagramEditor.createPartition(p2, null, "S1", false);
+            INodePresentation action = activityDiagramEditor.createAction("Fixture Action", new Point2D.Double(800, 300));
+            return new PartitionFixture(diagram, p1, p2, s1, action);
+        });
+    }
+
+    private record PartitionFixture(
+        IActivityDiagram diagram,
+        INodePresentation p1,
+        INodePresentation p2,
+        INodePresentation s1,
+        INodePresentation action) {
+
+        // The dimension that Astah creates to hold the top-level partitions
+        INodePresentation dimension() throws Exception {
+            for (IPresentation presentation : diagram.getPresentations()) {
+                if (presentation.getModel() instanceof IPartition partition && partition.getSuperPartition() == null) {
+                    return (INodePresentation) presentation;
+                }
+            }
+            throw new IllegalStateException("No dimension is drawn on the diagram: " + diagram.getName());
+        }
+    }
+
+    @Test
     void createPin_ok() throws Exception {
         // Get activity diagram
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Get class
         IClass class_ = (IClass) TestSupport.instance().getNamedElementByClassAndName(
             IClass.class,
             "Foo");
-        
+
         // Get parent action
         INodePresentation parentAction = (INodePresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Action",
             "Action0");
-        
+
         // Create input DTO
         NewPinWithBaseClassAndParentActionDTO inputDTO = new NewPinWithBaseClassAndParentActionDTO(
             activityDiagram.getId(),
@@ -809,7 +1102,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewProcessDTO inputDTO = new NewProcessDTO(
             activityDiagram.getId(),
@@ -836,7 +1129,7 @@ public class ActivityDiagramEditorToolTest {
         IActivityDiagram activityDiagram = (IActivityDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IActivityDiagram.class,
             "Activity Diagram0");
-        
+
         // Create input DTO
         NewSendSignalActionDTO inputDTO = new NewSendSignalActionDTO(
             activityDiagram.getId(),

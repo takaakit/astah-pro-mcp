@@ -11,12 +11,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ERDiagramWithModelTypeDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ERDiagramWithNotationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ERDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ERDiagramDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IERDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IERDiagram.html
@@ -75,16 +75,12 @@ public class ERDiagramTool extends AstahToolProvider {
     }
 
     private ERDiagramDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get ER diagram information: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.id());
 
         return ERDiagramDTOAssembler.toDTO(astahERDiagram);
     }
 
     private ERDiagramDTO setAlignAttributeItems(ERDiagramWithAlignAttributeItemsDTO param) throws Exception {
-        log.debug("Set align attribute items of ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
 
         txnAstah.run( () -> {
@@ -95,8 +91,6 @@ public class ERDiagramTool extends AstahToolProvider {
     }
 
     private ERDiagramDTO setInitialDisplayLevel(ERDiagramWithInitialDisplayLevelDTO param) throws Exception {
-        log.debug("Set initial display level of ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
 
         txnAstah.run( () -> {
@@ -107,8 +101,6 @@ public class ERDiagramTool extends AstahToolProvider {
     }
 
     private ERDiagramDTO setModelType(ERDiagramWithModelTypeDTO param) throws Exception {
-        log.debug("Set model type of ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
 
         txnAstah.run( () -> {
@@ -119,8 +111,6 @@ public class ERDiagramTool extends AstahToolProvider {
     }
 
     private ERDiagramDTO setNotation(ERDiagramWithNotationDTO param) throws Exception {
-        log.debug("Set notation of ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
 
         txnAstah.run( () -> {

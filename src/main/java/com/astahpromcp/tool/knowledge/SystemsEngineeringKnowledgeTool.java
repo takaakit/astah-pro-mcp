@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
-public class SystemsEngineeringKnowledgeTool implements ToolProvider, RemoteDocumentTool {
+public class SystemsEngineeringKnowledgeTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
 
@@ -53,8 +53,6 @@ public class SystemsEngineeringKnowledgeTool implements ToolProvider, RemoteDocu
     }
 
     private DocumentDTO getSystemsEngineeringKnowledge(NoInputDTO param) throws IOException {
-        log.debug("Get Systems Engineering knowledge: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("NASA Systems Engineering Handbook already loaded, returning from cache.");
@@ -79,8 +77,6 @@ public class SystemsEngineeringKnowledgeTool implements ToolProvider, RemoteDocu
     }
 
     private DocumentChunkDTO getSystemsEngineeringKnowledgeChunk(ChunkDTO param) {
-        log.debug("Get Systems Engineering knowledge chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

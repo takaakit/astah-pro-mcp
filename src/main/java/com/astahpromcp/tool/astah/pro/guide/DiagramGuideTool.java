@@ -34,8 +34,6 @@ public class DiagramGuideTool implements ToolProvider {
     }
 
     private GuideDTO getGuide(DiagramTypeDTO param) throws Exception {
-        log.debug("Get diagram guide: {}", param);
-
         String contents = switch (param.diagramType()) {
             case CLASS -> ClassDiagramGuide.contents();
             case SEQUENCE -> SequenceDiagramGuide.contents();

@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.PortWithBehaviorDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.PortWithServiceDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class PortToolTest {
 
@@ -72,7 +72,7 @@ public class PortToolTest {
         IPort port = (IPort) TestSupport.instance().getNamedElementByClassAndName(
             IPort.class,
             "port0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(port.getId());
 
@@ -96,7 +96,7 @@ public class PortToolTest {
         IPort port = (IPort) TestSupport.instance().getNamedElementByClassAndName(
             IPort.class,
             "port0");
-        
+
         // Create input DTO
         PortWithBehaviorDTO inputDTO = new PortWithBehaviorDTO(
             port.getId(),
@@ -128,7 +128,7 @@ public class PortToolTest {
         IPort port = (IPort) TestSupport.instance().getNamedElementByClassAndName(
             IPort.class,
             "port0");
-        
+
         // Create input DTO
         PortWithServiceDTO inputDTO = new PortWithServiceDTO(
             port.getId(),

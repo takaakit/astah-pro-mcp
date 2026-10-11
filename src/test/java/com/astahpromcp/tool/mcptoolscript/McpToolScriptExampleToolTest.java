@@ -22,7 +22,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import javax.script.Compilable;
 import javax.script.ScriptEngine;
 
@@ -83,10 +82,7 @@ public class McpToolScriptExampleToolTest {
         ToolManifest manifest = ToolManifest.load();
         ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
 
-        return AstahToolRegistry.from(
-                catalog,
-                manifest.namesFor(ToolManifest.Profile.DIRECT),
-                manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC));
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
     }
 
     private static Set<String> toolNamesCalledBy(String source) {

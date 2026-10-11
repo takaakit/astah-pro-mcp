@@ -9,13 +9,13 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionUseWithArgumentD
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionUseWithSequenceDiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionUseDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionUseDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IInteractionUse;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInteractionUse.html
@@ -60,16 +60,12 @@ public class InteractionUseTool extends AstahToolProvider {
     }
 
     private InteractionUseDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get interaction use information: {}", param);
-
         IInteractionUse astahInteractionUse = astahProToolSupport.getInteractionUse(param.id());
 
         return InteractionUseDTOAssembler.toDTO(astahInteractionUse);
     }
 
     private InteractionUseDTO setArgument(InteractionUseWithArgumentDTO param) throws Exception {
-        log.debug("Set argument of interaction use: {}", param);
-
         IInteractionUse astahInteractionUse = astahProToolSupport.getInteractionUse(param.targetInteractionUseId());
 
         txnAstah.run( () -> {
@@ -80,8 +76,6 @@ public class InteractionUseTool extends AstahToolProvider {
     }
 
     private InteractionUseDTO setSequenceDiagram(InteractionUseWithSequenceDiagramDTO param) throws Exception {
-        log.debug("Set sequence diagram to interaction use: {}", param);
-
         IInteractionUse astahInteractionUse = astahProToolSupport.getInteractionUse(param.targetInteractionUseId());
         ISequenceDiagram astahSequenceDiagram = astahProToolSupport.getSequenceDiagram(param.targetSequenceDiagramId());
 

@@ -59,8 +59,8 @@ public final class ToolSupport {
         String inputSchema = SchemaSupport.generateSchema(inputDtoType);
         String outputSchema = SchemaSupport.generateSchema(outputDtoType);
 
-        log.debug("inputSchema: {}", inputSchema);
-        log.debug("outputSchema: {}", outputSchema);
+        log.trace("inputSchema: {}", inputSchema);
+        log.trace("outputSchema: {}", outputSchema);
 
         return McpSchema.Tool.builder(toolName, JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .description(toolDescription)
@@ -82,11 +82,7 @@ public final class ToolSupport {
 
         try {
             INPUT_DTO inputDto = parsed.dto();
-            log.atDebug()
-                    .setMessage("Tool input of {}: \n{}")
-                    .addArgument(toolName)
-                    .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
-                    .log();
+            logInput(toolName, inputDto);
             OUTPUT_DTO outputDto = function.apply(inputDto);
             log.atDebug()
                     .setMessage("Tool output of {}: \n{}")
@@ -103,7 +99,7 @@ public final class ToolSupport {
             
         } catch (Throwable t) {
             String msg = String.format("Exception @tool=%s: %s", toolName, describeThrowable(t));
-            log.error(msg, t);
+            logFailure(msg, t);
             return ResponseSupport.error(msg);
         }
     }
@@ -147,7 +143,7 @@ public final class ToolSupport {
 
         String inputSchema = SchemaSupport.generateSchema(inputDtoType);
 
-        log.debug("inputSchema: {}", inputSchema);
+        log.trace("inputSchema: {}", inputSchema);
 
         return McpSchema.Tool.builder(toolName, JsonSupport.MCP_JSON_MAPPER, inputSchema)
                 .description(toolDescription)
@@ -168,11 +164,7 @@ public final class ToolSupport {
 
         try {
             INPUT_DTO inputDto = parsed.dto();
-            log.atDebug()
-                    .setMessage("Tool input of {}: \n{}")
-                    .addArgument(toolName)
-                    .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
-                    .log();
+            logInput(toolName, inputDto);
             List<McpSchema.Content> contents = function.apply(inputDto);
             log.atDebug()
                     .setMessage("Tool output of {}: \n{}")
@@ -189,9 +181,18 @@ public final class ToolSupport {
             
         } catch (Throwable t) {
             String msg = String.format("Exception @tool=%s: %s", toolName, describeThrowable(t));
-            log.error(msg, t);
+            logFailure(msg, t);
             return ResponseSupport.error(msg);
         }
+    }
+
+    // Log the input of a tool call
+    private static void logInput(String toolName, Object inputDto) {
+        log.atDebug()
+                .setMessage("Tool input of {}: {}")
+                .addArgument(toolName)
+                .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.SHORT_PREFIX_STYLE))
+                .log();
     }
 
     // Summarize contents for debug logging
@@ -223,10 +224,11 @@ public final class ToolSupport {
             Class<OUTPUT_DTO> outputDtoType) {
 
         // Create a tool schema
-        McpSchema.Tool schema = toolSchemaReturningDtoAndContents(
+        McpSchema.Tool schema = toolSchemaReturningDto(
             name,
             description,
-            inputDtoType);
+            inputDtoType,
+            outputDtoType);
 
         // Create a tool handler
         BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> handler = (ignoredExchange, request) -> toolHandlerReturningDtoAndContents(
@@ -236,21 +238,6 @@ public final class ToolSupport {
             inputDtoType);
 
         return new ToolDefinition(schema, ToolDefinition.ResultKind.DTO_AND_CONTENTS, handler);
-    }
-
-    // Create a tool schema for tools returning DTO and contents
-    public static <INPUT_DTO> McpSchema.Tool toolSchemaReturningDtoAndContents(
-            String toolName,
-            String toolDescription,
-            Class<INPUT_DTO> inputDtoType) {
-
-        String inputSchema = SchemaSupport.generateSchema(inputDtoType);
-
-        log.debug("inputSchema: {}", inputSchema);
-
-        return McpSchema.Tool.builder(toolName, JsonSupport.MCP_JSON_MAPPER, inputSchema)
-                .description(toolDescription)
-                .build();
     }
 
     // Create a tool handler for tools returning DTO and contents
@@ -267,11 +254,7 @@ public final class ToolSupport {
 
         try {
             INPUT_DTO inputDto = parsed.dto();
-            log.atDebug()
-                    .setMessage("Tool input of {}: \n{}")
-                    .addArgument(toolName)
-                    .addArgument(() -> ReflectionToStringBuilder.toString(inputDto, ToStringStyle.MULTI_LINE_STYLE))
-                    .log();
+            logInput(toolName, inputDto);
             Pair<OUTPUT_DTO, List<McpSchema.Content>> result = function.apply(inputDto);
             if (result == null || result.getLeft() == null) {
                 String msg = String.format("Failure @tool=%s", toolName);
@@ -296,7 +279,7 @@ public final class ToolSupport {
 
         } catch (Throwable t) {
             String msg = String.format("Exception @tool=%s: %s", toolName, describeThrowable(t));
-            log.error(msg, t);
+            logFailure(msg, t);
             return ResponseSupport.error(msg);
         }
     }
@@ -308,5 +291,21 @@ public final class ToolSupport {
         }
 
         return message;
+    }
+
+    // Log a failed tool call
+    static void logFailure(String msg, Throwable t) {
+        logFailure(msg, t, t instanceof IllegalArgumentException);
+    }
+
+    // An invalid input stays out of ERROR, which is kept for faults of this server
+    static void logFailure(String msg, Throwable t, boolean invalidInput) {
+        if (invalidInput) {
+            log.warn(msg);
+            log.debug("Stack trace of the rejected input above", t);
+            return;
+        }
+
+        log.error(msg, t);
     }
 }

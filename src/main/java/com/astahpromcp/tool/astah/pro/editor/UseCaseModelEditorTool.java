@@ -7,13 +7,13 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/UseCaseModelEditor.html
@@ -73,8 +73,6 @@ public class UseCaseModelEditorTool extends AstahToolProvider {
     }
 
     private ClassDTO createActor(NewActorDTO param) throws Exception {
-        log.debug("Create actor: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IClass astahActor = txnAstah.call( () -> {
@@ -87,8 +85,6 @@ public class UseCaseModelEditorTool extends AstahToolProvider {
     }
 
     private IncludeDTO createInclude(NewIncludeDTO param) throws Exception {
-        log.debug("Create include: {}", param);
-
         IUseCase astahUsecase = astahProToolSupport.getUseCase(param.includingUsecaseId());
         IUseCase astahIncludedUsecase = astahProToolSupport.getUseCase(param.includedUsecaseId());
 
@@ -103,8 +99,6 @@ public class UseCaseModelEditorTool extends AstahToolProvider {
     }
 
     private ExtendDTO createExtend(NewExtendDTO param) throws Exception {
-        log.debug("Create extend: {}", param);
-
         IUseCase astahUsecase = astahProToolSupport.getUseCase(param.extendingUsecaseId());
         IUseCase astahExtendedUsecase = astahProToolSupport.getUseCase(param.extendedUsecaseId());
 
@@ -119,8 +113,6 @@ public class UseCaseModelEditorTool extends AstahToolProvider {
     }
 
     private NamedElementDTO createExtensionPoint(NewExtensionPointDTO param) throws Exception {
-        log.debug("Create extension point: {}", param);
-
         IUseCase astahUsecase = astahProToolSupport.getUseCase(param.targetUsecaseId());
 
         IExtentionPoint astahExtensionPoint = txnAstah.call( () -> {
@@ -133,8 +125,6 @@ public class UseCaseModelEditorTool extends AstahToolProvider {
     }
 
     private UseCaseDTO createUseCase(NewUseCaseDTO param) throws Exception {
-        log.debug("Create usecase: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.parentPackageId());
 
         IUseCase astahUseCase = txnAstah.call( () -> {

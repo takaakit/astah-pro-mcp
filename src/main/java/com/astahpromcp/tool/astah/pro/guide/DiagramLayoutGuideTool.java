@@ -1,16 +1,16 @@
 package com.astahpromcp.tool.astah.pro.guide;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 @Slf4j
 public class DiagramLayoutGuideTool implements ToolProvider {
@@ -47,8 +47,6 @@ public class DiagramLayoutGuideTool implements ToolProvider {
     }
 
     private List<McpSchema.Content> getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get diagram layout guide: {}", param);
-
         String content = """
 Common Layout Rules:
 * Adjust the layout of any newly placed node/link presentations so that they always conform to the rules below. Also adjust already placed node/link presentations affected by your edits (e.g., resized by renaming, or overlapping newly placed ones), with minimal changes and without changing the line style of link presentations. For other already placed node/link presentations, adjust the layout only when the user has explicitly instructed you to make layout adjustments.
@@ -106,7 +104,7 @@ Requirement Diagram Layout Rules:
 
 
 Required adjustments after layout:
-* Detect overlaps involving any newly placed or affected node or link presentation using the tool, and adjust either the positions of the node presentations or the paths of the link presentations to eliminate the detected overlaps. On a diagram that already existed, run the tool before editing as well, and leave the overlaps already reported then. However, the readability of the diagram is also important. Therefore, do not place node presentations too far apart merely to avoid overlaps, and do not excessively increase the number of vertices in the paths of link presentations, especially to four or more vertices. In addition, if a particular overlap issue is not resolved after three consecutive layout adjustment attempts, give up on resolving that overlap and move on to resolving a different overlap issue.
+* Detect overlaps involving any newly placed or affected node or link presentation using the tool, and adjust either the positions of the node presentations or the paths of the link presentations to eliminate the detected overlaps. On a diagram that existed before your edits, leave an overlap as it is if the tool also reported an overlap between the same two presentations, identified by their IDs, before your first edit. However, the readability of the diagram is also important. Therefore, do not place node presentations too far apart merely to avoid overlaps, and do not excessively increase the number of vertices in the paths of link presentations, especially to four or more vertices. In addition, if a particular overlap issue is not resolved after three consecutive layout adjustment attempts, give up on resolving that overlap and move on to resolving a different overlap issue.
         """;
 
         List<McpSchema.Content> contents = new ArrayList<>();
@@ -121,8 +119,6 @@ Required adjustments after layout:
     }
 
     private List<McpSchema.Content> getAntiPatterns(NoInputDTO param) throws Exception {
-        log.debug("Get diagram layout anti-patterns: {}", param);
-
         List<McpSchema.Content> contents = new ArrayList<>();
         contents.add(loadImageContent(CLASS_ANTI_PATTERNS_IMAGE_RESOURCE));
         contents.add(loadImageContent(SEQUENCE_ANTI_PATTERNS_IMAGE_RESOURCE));

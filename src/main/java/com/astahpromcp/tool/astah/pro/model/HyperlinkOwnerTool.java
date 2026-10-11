@@ -15,6 +15,7 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWithUrlHyperlinkDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IHyperlink;
 import com.change_vision.jude.api.inf.model.IHyperlinkOwner;
@@ -25,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IHyperlinkOwner.html
@@ -98,7 +99,7 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "add_file_path_hyperlink_to_node_prst",
-                "Add a file path hyperlink (absolute path or relative path) to the specified node presentation (specified by ID), and return the node presentation after it is edited.",
+                "Add a file path hyperlink (absolute path or relative path) to the specified node presentation (specified by ID), and return the node presentation after it is edited. If the node presentation draws a model element, the hyperlink is added to that model element and is shown on all of its presentations.",
                 this::addFilePathHyperlinkToNodePresentation,
                 NodePresentationWithFilePathHyperlinkDTO.class,
                 NodePresentationDTO.class),
@@ -112,21 +113,21 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "remove_all_url_hyperlinks_from_node_prst",
-                "Remove all URL hyperlinks from the specified node presentation (specified by ID), and return the node presentation after it is edited.",
+                "Remove all URL hyperlinks from the specified node presentation (specified by ID), and return the node presentation after it is edited. If the node presentation draws a model element, the hyperlinks are removed from that model element and disappear from all of its presentations.",
                 this::removeAllUrlHyperlinksFromNodePresentation,
                 IdDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "remove_all_file_path_hyperlinks_from_node_prst",
-                "Remove all file path hyperlinks from the specified node presentation (specified by ID), and return the node presentation after it is edited.",
+                "Remove all file path hyperlinks from the specified node presentation (specified by ID), and return the node presentation after it is edited. If the node presentation draws a model element, the hyperlinks are removed from that model element and disappear from all of its presentations.",
                 this::removeAllFilePathHyperlinksFromNodePresentation,
                 IdDTO.class,
                 NodePresentationDTO.class),
 
             ToolSupport.toolDefinitionReturningDto(
                 "remove_all_named_elem_hyperlinks_from_node_prst",
-                "Remove all named element hyperlinks from the specified node presentation (specified by ID), and return the node presentation after it is edited.",
+                "Remove all named element hyperlinks from the specified node presentation (specified by ID), and return the node presentation after it is edited. If the node presentation draws a model element, the hyperlinks are removed from that model element and disappear from all of its presentations.",
                 this::removeAllNamedElementHyperlinksFromNodePresentation,
                 IdDTO.class,
                 NodePresentationDTO.class)
@@ -134,8 +135,6 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
     }
 
     private NamedElementDTO addUrlHyperlinkToNamedElement(NamedElementWithUrlHyperlinkDTO param) throws Exception {
-        log.debug("Add URL hyperlink to named element: {}", param);
-
         String url = param.url();
         if (url == null || !url.startsWith("https://")) {
             throw new IllegalArgumentException("URL must start with \"https://\", but was: " + url);
@@ -150,25 +149,33 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
+    // Return the normalized file path of a file hyperlink
+    private static Path requireFilePath(String filePath) {
+        Path p = filePath == null ? null : Paths.get(filePath).normalize();
+        // A path that names no file ("", ".", "C:\") is rejected here
+        if (p == null || p.getFileName() == null || p.getFileName().toString().isEmpty()) {
+            throw new IllegalArgumentException("filePath must be a path that ends with a file name, but was: "
+                + (filePath == null ? null : "\"" + filePath + "\""));
+        }
+        return p;
+    }
+
     private NamedElementDTO addFilePathHyperlinkToNamedElement(NamedElementWithFilePathHyperlinkDTO param) throws Exception {
-        log.debug("Add file path hyperlink to named element: {}", param);
+        Path p = requireFilePath(param.filePath());
 
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
-        Path p = Paths.get(param.filePath()).normalize();
-        
+
         txnAstah.run( () -> {
             astahNamedElement.createFileHyperlink(
-            p.getFileName() == null ? "" : p.getFileName().toString(),
-            p.getParent() == null ? "" : p.getParent().toString(),
-            param.hyperlinkComment());
+                p.getFileName().toString(),
+                p.getParent() == null ? "" : p.getParent().toString(),
+                param.hyperlinkComment());
         });
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO addNamedElementHyperlinkToNamedElement(NamedElementWithNamedElementHyperlinkDTO param) throws Exception {
-        log.debug("Add named element hyperlink to named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.targetNamedElementId());
         INamedElement astahNamedElementToLink = astahProToolSupport.getNamedElement(param.namedElementIdToLink());
 
@@ -182,51 +189,63 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
     }
 
     private NamedElementDTO removeAllUrlHyperlinksFromNamedElement(IdDTO param) throws Exception {
-        log.debug("Remove all URL hyperlinks from named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
 
+        List<IHyperlink> urlHyperlinks = new ArrayList<>();
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isURL()) {
-            txnAstah.run( () -> {
-                astahNamedElement.deleteHyperlink(hyperlink);
-            });
-
+                urlHyperlinks.add(hyperlink);
             }
+        }
+
+        if (!urlHyperlinks.isEmpty()) {
+            txnAstah.run( () -> {
+                for (IHyperlink hyperlink : urlHyperlinks) {
+                    astahNamedElement.deleteHyperlink(hyperlink);
+                }
+            });
         }
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO removeAllFilePathHyperlinksFromNamedElement(IdDTO param) throws Exception {
-        log.debug("Remove all file path hyperlinks from named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
 
+        List<IHyperlink> filePathHyperlinks = new ArrayList<>();
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isFile()) {
-            txnAstah.run( () -> {
-                astahNamedElement.deleteHyperlink(hyperlink);
-            });
-
+                filePathHyperlinks.add(hyperlink);
             }
+        }
+
+        if (!filePathHyperlinks.isEmpty()) {
+            txnAstah.run( () -> {
+                for (IHyperlink hyperlink : filePathHyperlinks) {
+                    astahNamedElement.deleteHyperlink(hyperlink);
+                }
+            });
         }
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
     }
 
     private NamedElementDTO removeAllNamedElementHyperlinksFromNamedElement(IdDTO param) throws Exception {
-        log.debug("Remove all named element hyperlinks from named element: {}", param);
-
         INamedElement astahNamedElement = astahProToolSupport.getNamedElement(param.id());
 
+        List<IHyperlink> namedElementHyperlinks = new ArrayList<>();
         for (IHyperlink hyperlink : astahNamedElement.getHyperlinks()) {
             if (hyperlink.isModel()) {
-            txnAstah.run( () -> {
-                astahNamedElement.deleteHyperlink(hyperlink);
-            });
-
+                namedElementHyperlinks.add(hyperlink);
             }
+        }
+
+        if (!namedElementHyperlinks.isEmpty()) {
+            txnAstah.run( () -> {
+                for (IHyperlink hyperlink : namedElementHyperlinks) {
+                    astahNamedElement.deleteHyperlink(hyperlink);
+                }
+            });
         }
 
         return NamedElementDTOAssembler.toDTO(astahNamedElement);
@@ -244,8 +263,6 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO addUrlHyperlinkToNodePresentation(NodePresentationWithUrlHyperlinkDTO param) throws Exception {
-        log.debug("Add URL hyperlink to node presentation: {}", param);
-
         String url = param.url();
         if (url == null || !url.startsWith("https://")) {
             throw new IllegalArgumentException("URL must start with \"https://\", but was: " + url);
@@ -262,16 +279,14 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO addFilePathHyperlinkToNodePresentation(NodePresentationWithFilePathHyperlinkDTO param) throws Exception {
-        log.debug("Add file path hyperlink to node presentation: {}", param);
+        Path p = requireFilePath(param.filePath());
 
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
         IHyperlinkOwner hyperlinkOwner = getHyperlinkOwnerForNodePresentation(astahNodePresentation);
 
-        Path p = Paths.get(param.filePath()).normalize();
-        
         txnAstah.run( () -> {
             hyperlinkOwner.createFileHyperlink(
-                p.getFileName() == null ? "" : p.getFileName().toString(),
+                p.getFileName().toString(),
                 p.getParent() == null ? "" : p.getParent().toString(),
                 param.hyperlinkComment());
         });
@@ -280,8 +295,6 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO addNamedElementHyperlinkToNodePresentation(NodePresentationWithNamedElementHyperlinkDTO param) throws Exception {
-        log.debug("Add named element hyperlink to node presentation: {}", param);
-
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.targetNodePresentationId());
         IHyperlinkOwner hyperlinkOwner = getHyperlinkOwnerForNodePresentation(astahNodePresentation);
 
@@ -297,54 +310,66 @@ public class HyperlinkOwnerTool extends AstahToolProvider {
     }
 
     private NodePresentationDTO removeAllUrlHyperlinksFromNodePresentation(IdDTO param) throws Exception {
-        log.debug("Remove all URL hyperlinks from node presentation: {}", param);
-
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
         IHyperlinkOwner hyperlinkOwner = getHyperlinkOwnerForNodePresentation(astahNodePresentation);
 
+        List<IHyperlink> urlHyperlinks = new ArrayList<>();
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isURL()) {
-            txnAstah.run( () -> {
-                hyperlinkOwner.deleteHyperlink(hyperlink);
-            });
-
+                urlHyperlinks.add(hyperlink);
             }
+        }
+
+        if (!urlHyperlinks.isEmpty()) {
+            txnAstah.run( () -> {
+                for (IHyperlink hyperlink : urlHyperlinks) {
+                    hyperlinkOwner.deleteHyperlink(hyperlink);
+                }
+            });
         }
 
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
     private NodePresentationDTO removeAllFilePathHyperlinksFromNodePresentation(IdDTO param) throws Exception {
-        log.debug("Remove all file path hyperlinks from node presentation: {}", param);
-
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
         IHyperlinkOwner hyperlinkOwner = getHyperlinkOwnerForNodePresentation(astahNodePresentation);
 
+        List<IHyperlink> filePathHyperlinks = new ArrayList<>();
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isFile()) {
-            txnAstah.run( () -> {
-                hyperlinkOwner.deleteHyperlink(hyperlink);
-            });
-
+                filePathHyperlinks.add(hyperlink);
             }
+        }
+
+        if (!filePathHyperlinks.isEmpty()) {
+            txnAstah.run( () -> {
+                for (IHyperlink hyperlink : filePathHyperlinks) {
+                    hyperlinkOwner.deleteHyperlink(hyperlink);
+                }
+            });
         }
 
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);
     }
 
     private NodePresentationDTO removeAllNamedElementHyperlinksFromNodePresentation(IdDTO param) throws Exception {
-        log.debug("Remove all named element hyperlinks from node presentation: {}", param);
-
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.id());
         IHyperlinkOwner hyperlinkOwner = getHyperlinkOwnerForNodePresentation(astahNodePresentation);
 
+        List<IHyperlink> namedElementHyperlinks = new ArrayList<>();
         for (IHyperlink hyperlink : hyperlinkOwner.getHyperlinks()) {
             if (hyperlink.isModel()) {
-            txnAstah.run( () -> {
-                hyperlinkOwner.deleteHyperlink(hyperlink);
-            });
-
+                namedElementHyperlinks.add(hyperlink);
             }
+        }
+
+        if (!namedElementHyperlinks.isEmpty()) {
+            txnAstah.run( () -> {
+                for (IHyperlink hyperlink : namedElementHyperlinks) {
+                    hyperlinkOwner.deleteHyperlink(hyperlink);
+                }
+            });
         }
 
         return NodePresentationDTOAssembler.toDTO(astahNodePresentation);

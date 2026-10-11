@@ -9,6 +9,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -230,5 +232,72 @@ public class ExclusiveToolProviderTest {
         assertSame(definition.toolSchema(), wrapped.get(0).toolSchema(), "Tool schema should be preserved as is");
         assertNotSame(definition.toolHandler(), wrapped.get(0).toolHandler(), "Tool handler should be wrapped");
         assertEquals(delegate.name(), provider.name(), "Provider name should be delegated for logging");
+    }
+
+    // The lock wrapper drains the EDT before it lets go of the lock, so that the next holder never sees an edit half applied.
+    @Test
+    void createToolDefinitions_ok_drainsTheEventDispatchThreadBeforeReleasingTheLock() {
+        AtomicBoolean queuedWorkDone = new AtomicBoolean();
+        AtomicBoolean lockHeldWhenItFinished = new AtomicBoolean();
+        ToolDefinition wrapped = wrap(definitionWith((exchange, request) -> {
+            // Stands in for the work Astah queues on the EDT while applying an edit. Slow on purpose: without the drain, or
+            // with the drain after the release, the call is over long before this finishes, so such a change fails every run.
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                lockHeldWhenItFinished.set(AstahApiLock.LOCK.isLocked());
+                queuedWorkDone.set(true);
+            });
+            return ResponseSupport.success(List.of(McpSchema.TextContent.builder("ok").build()));
+        }), 30);
+
+        wrapped.toolHandler().apply(null, null);
+
+        assertTrue(queuedWorkDone.get(), "Work queued on the EDT by the handler must have run before the call returns");
+        assertTrue(lockHeldWhenItFinished.get(), "The queued work must finish while the lock is still held");
+        assertFalse(AstahApiLock.LOCK.isLocked(), "Lock should be released after the call");
+    }
+
+    // A tool told to stop returns with its interrupt set, and the drain on the way out must neither wait nor swallow it.
+    @Test
+    void createToolDefinitions_ok_keepsTheInterruptOfAnInterruptedHandler() throws Exception {
+        ToolDefinition wrapped = wrap(definitionWith((exchange, request) -> {
+            Thread.currentThread().interrupt();
+            return ResponseSupport.success(List.of(McpSchema.TextContent.builder("ok").build()));
+        }), 30);
+
+        AtomicReference<McpSchema.CallToolResult> result = new AtomicReference<>();
+        AtomicBoolean interruptKept = new AtomicBoolean();
+        Thread caller = new Thread(() -> {
+            result.set(wrapped.toolHandler().apply(null, null));
+            interruptKept.set(Thread.currentThread().isInterrupted());
+        }, "interrupted-caller");
+        caller.start();
+        caller.join(10_000);
+
+        assertFalse(caller.isAlive(), "The call should have returned");
+        assertNotEquals(Boolean.TRUE, result.get().isError(), "The handler's result should be returned as is");
+        assertTrue(interruptKept.get(), "The caller's interrupt flag must survive the EDT drain");
+        assertFalse(AstahApiLock.LOCK.isLocked(), "Lock should be released after the call");
+    }
+
+    // Called on the EDT, the drain must not wait for a no-op that can only run after it returns.
+    @Test
+    void createToolDefinitions_ok_doesNotWaitForItselfWhenCalledOnTheEventDispatchThread() throws Exception {
+        ToolDefinition wrapped = wrap(definitionWith((exchange, request) ->
+                ResponseSupport.success(List.of(McpSchema.TextContent.builder("ok").build()))), 30);
+
+        AtomicReference<McpSchema.CallToolResult> result = new AtomicReference<>();
+        long started = System.nanoTime();
+        SwingUtilities.invokeAndWait(() -> result.set(wrapped.toolHandler().apply(null, null)));
+        long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
+
+        assertNotEquals(Boolean.TRUE, result.get().isError(), "The handler's result should be returned as is");
+        // Without the early return the drain would wait for its own no-op until EDT_FLUSH_TIMEOUT_SECONDS (20 s)
+        assertTrue(elapsedMillis < 5_000, "The call on the EDT should return at once: " + elapsedMillis + " ms");
+        assertFalse(AstahApiLock.LOCK.isLocked(), "Lock should be released after the call");
     }
 }

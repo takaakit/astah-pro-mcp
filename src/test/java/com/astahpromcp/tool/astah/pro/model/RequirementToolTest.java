@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.RequirementWithIdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.RequirementWithTextDTO;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class RequirementToolTest {
 
@@ -72,7 +72,7 @@ public class RequirementToolTest {
         IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElementByClassAndName(
             IRequirement.class,
             "Requirement0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(requirement.getId());
 
@@ -95,7 +95,7 @@ public class RequirementToolTest {
         IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElementByClassAndName(
             IRequirement.class,
             "Requirement0");
-        
+
         // Create input DTO
         RequirementWithIdDTO inputDTO = new RequirementWithIdDTO(
             requirement.getId(),
@@ -126,7 +126,7 @@ public class RequirementToolTest {
         IRequirement requirement = (IRequirement) TestSupport.instance().getNamedElementByClassAndName(
             IRequirement.class,
             "Requirement0");
-        
+
         // Create input DTO
         RequirementWithTextDTO inputDTO = new RequirementWithTextDTO(
             requirement.getId(),

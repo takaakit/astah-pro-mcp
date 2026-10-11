@@ -4,10 +4,12 @@ import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
+import com.astahpromcp.tool.astah.pro.ConditionTextSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.OperationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.OperationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IOperation;
@@ -15,7 +17,7 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import java.util.function.Function;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IOperation.html
@@ -123,16 +125,12 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get operation information: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.id());
 
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setAbstract(OperationWithAbstractDTO param) throws Exception {
-        log.debug("Set abstract of operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         txnAstah.run( () -> {
@@ -143,8 +141,6 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO setLeaf(OperationWithLeafDTO param) throws Exception {
-        log.debug("Set leaf of operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         txnAstah.run( () -> {
@@ -155,8 +151,6 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO setStatic(OperationWithStaticDTO param) throws Exception {
-        log.debug("Set static of operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         txnAstah.run( () -> {
@@ -167,8 +161,6 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO setReturnType(OperationWithReturnTypeDTO param) throws Exception {
-        log.debug("Set return type of operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
         IClass astahReturnType = astahProToolSupport.getClassOrPrimitiveType(param.returnTypeId());
 
@@ -180,8 +172,6 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO setReturnTypeExpression(OperationWithReturnTypeExpressionDTO param) throws Exception {
-        log.debug("Set return type expression of operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         try {
@@ -199,32 +189,40 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO addPrecondition(OperationWithPreconditionDTO param) throws Exception {
-        log.debug("Add precondition to operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
+        String precondition = ConditionTextSupport.normalize("precondition", param.precondition());
+        ConditionTextSupport.requireAbsent(
+            "precondition",
+            astahOperation.getId(),
+            precondition,
+            astahOperation.getPreConditions(),
+            Function.identity());
 
         txnAstah.run( () -> {
-            astahOperation.addPreCondition(param.precondition());
+            astahOperation.addPreCondition(precondition);
         });
 
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO addPostcondition(OperationWithPostconditionDTO param) throws Exception {
-        log.debug("Add postcondition to operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
+        String postcondition = ConditionTextSupport.normalize("postcondition", param.postcondition());
+        ConditionTextSupport.requireAbsent(
+            "postcondition",
+            astahOperation.getId(),
+            postcondition,
+            astahOperation.getPostConditions(),
+            Function.identity());
 
         txnAstah.run( () -> {
-            astahOperation.addPostCondition(param.postcondition());
+            astahOperation.addPostCondition(postcondition);
         });
 
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO setBodyCondition(OperationWithBodyConditionDTO param) throws Exception {
-        log.debug("Set body condition of operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
 
         txnAstah.run( () -> {
@@ -235,32 +233,44 @@ public class OperationTool extends AstahToolProvider {
     }
 
     private OperationDTO removePrecondition(OperationWithPreconditionDTO param) throws Exception {
-        log.debug("Remove precondition from operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
+        String precondition = ConditionTextSupport.normalize("precondition", param.precondition());
+        List<String> storedPreconditions = ConditionTextSupport.requirePresent(
+            "precondition",
+            astahOperation.getId(),
+            precondition,
+            astahOperation.getPreConditions(),
+            Function.identity());
 
         txnAstah.run( () -> {
-            astahOperation.removePreCondition(param.precondition());
+            for (String storedPrecondition : storedPreconditions) {
+                astahOperation.removePreCondition(storedPrecondition);
+            }
         });
 
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO removePostcondition(OperationWithPostconditionDTO param) throws Exception {
-        log.debug("Remove postcondition from operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.targetOperationId());
+        String postcondition = ConditionTextSupport.normalize("postcondition", param.postcondition());
+        List<String> storedPostconditions = ConditionTextSupport.requirePresent(
+            "postcondition",
+            astahOperation.getId(),
+            postcondition,
+            astahOperation.getPostConditions(),
+            Function.identity());
 
         txnAstah.run( () -> {
-            astahOperation.removePostCondition(param.postcondition());
+            for (String storedPostcondition : storedPostconditions) {
+                astahOperation.removePostCondition(storedPostcondition);
+            }
         });
 
         return OperationDTOAssembler.toDTO(astahOperation);
     }
 
     private OperationDTO removeBodyCondition(IdDTO param) throws Exception {
-        log.debug("Remove body condition from operation: {}", param);
-
         IOperation astahOperation = astahProToolSupport.getOperation(param.id());
 
         txnAstah.run( () -> {

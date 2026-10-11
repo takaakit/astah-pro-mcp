@@ -10,12 +10,12 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithEventDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.TransitionWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.TransitionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.TransitionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ITransition.html
@@ -67,28 +67,26 @@ public class TransitionTool extends AstahToolProvider {
     }
 
     private TransitionDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get transition information: {}", param);
-
         ITransition astahTransition = astahProToolSupport.getTransition(param.id());
 
         return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
     private TransitionDTO setAction(TransitionWithActionDTO param) throws Exception {
-        log.debug("Set action of transition: {}", param);
-
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
+        // A null or blank action means no action.
+        // Astah keeps an empty action, and with it the '/' before the action in the label, so remove the action with null instead.
+        String action = param.action() == null || param.action().isBlank() ? null : param.action();
+
         txnAstah.run( () -> {
-            astahTransition.setAction(param.action());
+            astahTransition.setAction(action);
         });
 
         return TransitionDTOAssembler.toDTO(astahTransition);
     }
 
     private TransitionDTO setEvent(TransitionWithEventDTO param) throws Exception {
-        log.debug("Set event of transition: {}", param);
-
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
         try {
@@ -104,12 +102,13 @@ public class TransitionTool extends AstahToolProvider {
     }
 
     private TransitionDTO setGuard(TransitionWithGuardDTO param) throws Exception {
-        log.debug("Set guard of transition: {}", param);
-
         ITransition astahTransition = astahProToolSupport.getTransition(param.targetTransitionId());
 
+        // A null or blank guard means no guard.
+        String guard = param.guard() == null || param.guard().isBlank() ? null : param.guard();
+
         txnAstah.run( () -> {
-            astahTransition.setGuard(param.guard());
+            astahTransition.setGuard(guard);
         });
 
         return TransitionDTOAssembler.toDTO(astahTransition);

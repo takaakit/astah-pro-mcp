@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
+import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import lombok.NonNull;
@@ -12,7 +13,7 @@ public class DiagramDTOAssembler {
     public static DiagramDTO toDTO(@NonNull IDiagram astahDiagram) throws Exception {
 
         List<String> containedPresentationIds = new ArrayList<>();
-        for (IPresentation presentation : astahDiagram.getPresentations()) {
+        for (IPresentation presentation : AstahProToolSupport.getPresentationsOnDiagram(astahDiagram)) {
             containedPresentationIds.add(presentation.getID());
         }
 

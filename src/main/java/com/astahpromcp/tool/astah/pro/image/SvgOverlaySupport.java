@@ -1,10 +1,12 @@
 package com.astahpromcp.tool.astah.pro.image;
 
+import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.astah.pro.SystemPropertySupport;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport.EncodedPng;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport.ExportedImage;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport.PngSizeTarget;
 import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport.ParsedSvg;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +23,7 @@ import java.util.List;
 public class SvgOverlaySupport {
 
     // Guards against an SVG viewBox placed so far from the diagram that the composed canvas exhausts memory.
-    private static final long MAX_COMPOSED_PIXELS = 4096L * 4096L;
+    private static final long MAX_COMPOSED_PIXELS = McpServerConfig.SVG_MAX_RASTER_PIXELS;
 
     // Keeps an absurd viewBox origin from overflowing the int pixel offsets before the canvas guard can reject it.
     private static final long MAX_PIXEL_OFFSET = 1_000_000L;
@@ -42,8 +44,11 @@ public class SvgOverlaySupport {
     public List<McpSchema.Content> createSvgOverlayContents(String diagramId, String imageSvgCode) throws Exception {
         log.debug("Compose SVG overlay on diagram image as PNG: {}", diagramId);
 
+        // Parsed and measured before the diagram is exported, and before any pixels are allocated for the SVG.
+        ParsedSvg svg = imageConvertSupport.parseSvg(imageSvgCode);
+
         if (diagramId == null || diagramId.isBlank()) {
-            return List.of(encodeAsPng(renderSvgOnly(imageSvgCode)));
+            return List.of(encodeAsPng(renderSvgOnly(svg)));
         }
 
         ExportedImage exported = imageCaptureSupport.exportDiagramImage(diagramId);
@@ -57,10 +62,10 @@ public class SvgOverlaySupport {
             return List.of(
                 McpSchema.TextContent.builder(
                     "The specified diagram has nothing drawn on it, so it covers no area and the SVG image is shown on its own. The image is still rendered at the resolution diagram images are exported at, so it appears at the same size it would over a diagram that does have content.").build(),
-                encodeAsPng(renderSvgOnly(imageSvgCode)));
+                encodeAsPng(renderSvgOnly(svg)));
         }
 
-        return List.of(encodeAsPng(composeOverDiagram(exported, imageSvgCode)));
+        return List.of(encodeAsPng(composeOverDiagram(exported, svg)));
     }
 
     private McpSchema.ImageContent encodeAsPng(BufferedImage composed) throws Exception {
@@ -80,17 +85,18 @@ public class SvgOverlaySupport {
     }
 
     // No diagram area to match, but render at the resolution diagram images are exported at, so that the SVG comes back the same size whether or not a diagram contributed to the image.
-    private BufferedImage renderSvgOnly(String imageSvgCode) {
+    private BufferedImage renderSvgOnly(ParsedSvg svg) {
         double scale = systemPropertySupport.imageExportDpi() / DIAGRAM_COORDINATE_DPI;
-        BufferedImage svgImage = imageConvertSupport.svgToRasterizedImage(imageSvgCode, scale).image();
+        Dimension svgPixelSize = imageConvertSupport.scaledSizeOf(svg, scale);
+        requireRenderableSvgLayer(svgPixelSize.width, svgPixelSize.height);
 
-        BufferedImage canvas = newOpaqueCanvas(svgImage.getWidth(), svgImage.getHeight());
-        drawOnto(canvas, svgImage, 0, 0);
+        BufferedImage canvas = newOpaqueCanvas(svgPixelSize.width, svgPixelSize.height);
+        drawOnto(canvas, imageConvertSupport.rasterize(svg, svgPixelSize.width, svgPixelSize.height), 0, 0);
 
         return canvas;
     }
 
-    private BufferedImage composeOverDiagram(ExportedImage exported, String imageSvgCode) throws Exception {
+    private BufferedImage composeOverDiagram(ExportedImage exported, ParsedSvg svg) throws Exception {
         BufferedImage diagramImage = exported.image();
         Rectangle2D boundRect = exported.boundRect();
 
@@ -100,14 +106,19 @@ public class SvgOverlaySupport {
         double pixelsPerUnitY = pixelsPerUnit(diagramImage.getHeight(), boundRect.getHeight());
 
         // The viewBox min-x/min-y are the diagram coordinates of the image's top-left corner, and the SVG's natural size is the size insert_svg_img_on_dgm would give the inserted image in diagram coordinates.
-        Point2D svgOrigin = imageConvertSupport.svgViewBoxOriginOf(imageSvgCode);
-        Dimension svgDisplaySize = imageConvertSupport.svgDisplaySizeOf(imageSvgCode);
+        Point2D svgOrigin = svg.viewBoxOrigin();
         Rectangle2D svgRect = new Rectangle2D.Double(
-                svgOrigin.getX(), svgOrigin.getY(), svgDisplaySize.width, svgDisplaySize.height);
+                svgOrigin.getX(), svgOrigin.getY(), svg.naturalWidth(), svg.naturalHeight());
 
         // Size the SVG raster so that it covers exactly the diagram rectangle it declares, on each axis separately.
-        int svgPixelWidth = Math.max(1, (int) Math.round(svgRect.getWidth() * pixelsPerUnitX));
-        int svgPixelHeight = Math.max(1, (int) Math.round(svgRect.getHeight() * pixelsPerUnitY));
+        // Kept as long until checked, since the natural size of an SVG that was never rasterized can be anything.
+        long svgPixelWidthLong = Math.max(1L, Math.round(svgRect.getWidth() * pixelsPerUnitX));
+        long svgPixelHeightLong = Math.max(1L, Math.round(svgRect.getHeight() * pixelsPerUnitY));
+
+        // Checked before the canvas, so that an SVG too large by itself is not blamed on its placement.
+        requireRenderableSvgLayer(svgPixelWidthLong, svgPixelHeightLong);
+        int svgPixelWidth = (int) svgPixelWidthLong;
+        int svgPixelHeight = (int) svgPixelHeightLong;
 
         ComposedLayout layout = layoutOf(
                 boundRect, diagramImage.getWidth(), diagramImage.getHeight(),
@@ -119,7 +130,7 @@ public class SvgOverlaySupport {
         // Allocated before the SVG is rasterized
         BufferedImage canvas = newOpaqueCanvas(layout.canvasWidth(), layout.canvasHeight());
 
-        BufferedImage svgImage = (BufferedImage) imageConvertSupport.svgToImage(imageSvgCode, svgPixelWidth, svgPixelHeight);
+        BufferedImage svgImage = imageConvertSupport.rasterize(svg, svgPixelWidth, svgPixelHeight);
 
         drawOnto(canvas, diagramImage, layout.diagramX(), layout.diagramY());
         drawOnto(canvas, svgImage, layout.svgX(), layout.svgY());
@@ -171,6 +182,15 @@ public class SvgOverlaySupport {
     // canvas size guard reject an absurd viewBox origin instead of the offset silently wrapping around.
     private static int toPixelOffset(double pixels) {
         return (int) Math.min(Math.max(Math.round(pixels), 0L), MAX_PIXEL_OFFSET);
+    }
+
+    // The canvas guard would blame an SVG that is too large by itself on its placement and advise moving it.
+    private static void requireRenderableSvgLayer(long width, long height) {
+        if ((double) width * height > McpServerConfig.SVG_MAX_RASTER_PIXELS) {
+            throw new IllegalArgumentException(String.format(
+                "The SVG would be rendered at %dx%d pixels at the resolution diagram images are exported at, above the limit of %d pixels. %s Shrinking does not move the image: the viewBox min-x and min-y still give the diagram coordinates of its top-left corner.",
+                width, height, McpServerConfig.SVG_MAX_RASTER_PIXELS, ImageConvertSupport.SHRINK_SVG_ADVICE));
+        }
     }
 
     // An opaque white canvas keeps the composed image readable and drops the alpha channel from the size budget;

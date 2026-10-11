@@ -11,6 +11,7 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithPointsDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
@@ -21,7 +22,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/ILinkPresentation.html
@@ -68,23 +68,19 @@ public class LinkPresentationTool extends AstahToolProvider {
     }
 
     private LinkPresentationDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get link presentation information: {}", param);
-
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.id());
 
         return LinkPresentationDTOAssembler.toDTO(linkPresentation);
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> setAllPoints(LinkPresentationWithPointsDTO param) throws Exception {
-        log.debug("Set points of link presentation: {}", param);
-
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());
 
-		Point2D.Double[] pointArray = new Point2D.Double[param.drawPoints().size()];
-		for (int i = 0; i < pointArray.length; i++) {
-			PointIntDTO point = param.drawPoints().get(i);
-			pointArray[i] = new Point2D.Double(point.x(), point.y());
-		}
+        Point2D.Double[] pointArray = new Point2D.Double[param.drawPoints().size()];
+        for (int i = 0; i < pointArray.length; i++) {
+            PointIntDTO point = param.drawPoints().get(i);
+            pointArray[i] = new Point2D.Double(point.x(), point.y());
+        }
 
         txnAstah.run( () -> {
             try {
@@ -124,12 +120,21 @@ public class LinkPresentationTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> setLineStyle(LinkPresentationWithLineStyleDTO param) throws Exception {
-        log.debug("Set line style of link presentation: {}", param);
-
         ILinkPresentation linkPresentation = astahProToolSupport.getLinkPresentation(param.targetLinkPresentationId());
+        String lineStyle = param.lineStyle().astahValue;
+        if (lineStyle == null) {
+            throw new IllegalArgumentException("Specify one of line, line_right_angle, curve or curve_right_angle. 'unknown' only reports a link that has no line style.");
+        }
 
         txnAstah.run( () -> {
-            linkPresentation.setProperty(Key.LINE_SHAPE, param.lineStyle().astahValue);
+            linkPresentation.setProperty(Key.LINE_SHAPE, lineStyle);
+
+            // Some links (a message on a sequence diagram, for one) silently keep their line style, so check the style took
+            if (!lineStyle.equals(linkPresentation.getProperty(Key.LINE_SHAPE))) {
+                throw new IllegalArgumentException(String.format(
+                        "Link presentation (ID: %s, type: %s) cannot take the line style '%s'.",
+                        linkPresentation.getID(), linkPresentation.getType(), lineStyle));
+            }
         });
 
         LinkPresentationDTO dto = LinkPresentationDTOAssembler.toDTO(linkPresentation);

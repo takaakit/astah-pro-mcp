@@ -1,10 +1,12 @@
 package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.config.McpServerConfig;
-import com.astahpromcp.tool.astah.pro.AstahApiLock;
 import com.astahpromcp.tool.astah.pro.TransactionBoundary;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.astahpromcp.tool.astah.pro.WatchedRunner;
+import com.astahpromcp.tool.common.BoundedWriter;
 import com.astahpromcp.tool.common.ScriptLine;
+import com.astahpromcp.tool.common.StopWhenInterruptedWriter;
 import com.astahpromcp.tool.mcptoolscript.outputdto.ModelChangesKind;
 import lombok.extern.slf4j.Slf4j;
 import org.openjdk.nashorn.api.scripting.ClassFilter;
@@ -15,10 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 // Runs an mcp tool script -- JavaScript that may call this server's tool functions, and nothing else.
 @Slf4j
@@ -133,16 +132,21 @@ public class McpToolScriptExecutor {
             });
             """;
 
-    private final AstahToolRegistry registry;
+    // Read on use rather than taken at construction: the registry may list the tool this executor runs for, so it can only be built after that tool is.
+    private final Supplier<AstahToolRegistry> registry;
     private final long timeoutSeconds;
     private final TransactionBoundary transaction;
 
-    public McpToolScriptExecutor(AstahToolRegistry registry) {
+    public McpToolScriptExecutor(Supplier<AstahToolRegistry> registry) {
         this(registry, McpServerConfig.MCP_TOOL_SCRIPT_TIMEOUT_SECONDS, TransactionBoundary.ASTAH);
     }
 
     // Package-private so that no profile can reach it, and taking the transaction so that a test can watch what this class does with it.
     McpToolScriptExecutor(AstahToolRegistry registry, long timeoutSeconds, TransactionBoundary transaction) {
+        this(() -> registry, timeoutSeconds, transaction);
+    }
+
+    private McpToolScriptExecutor(Supplier<AstahToolRegistry> registry, long timeoutSeconds, TransactionBoundary transaction) {
         this.registry = registry;
         this.timeoutSeconds = timeoutSeconds;
         this.transaction = transaction;
@@ -163,57 +167,47 @@ public class McpToolScriptExecutor {
                 -1, -1, -1, "", "", ModelChangesKind.NONE);
         }
 
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registry);
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registry.get());
 
-        FutureTask<Result> task = new FutureTask<>(() -> evaluate(script, dispatcher));
-        // One thread per run: a lingering stuck script must not poison later runs.
-        Thread runner = new Thread(task, "mcp-tool-script-runner");
-        runner.setDaemon(true);
-        runner.start();
+        WatchedRunner.Outcome<Result> outcome = WatchedRunner.run(
+                "mcp-tool-script-runner", "an mcp tool script", timeoutSeconds,
+                () -> evaluate(script, dispatcher),
+                dispatcher::abandon);
 
-        try {
-            return task.get(timeoutSeconds, TimeUnit.SECONDS);
+        return switch (outcome.kind()) {
+            case COMPLETED -> {
+                // At INFO because the calls themselves are logged at DEBUG only, which the log panel leaves out.
+                log.info("MCP tool script made {} tool function call(s)", dispatcher.callCount());
+                yield outcome.value();
+            }
+            case TIMED_OUT -> timeoutFailure();
+            case INTERRUPTED -> interruptionFailure();
+            case FAILED -> unexpectedFailure(outcome.failure());
+        };
+    }
 
-        } catch (TimeoutException e) {
-            // Best effort: a script blocked in an interruptible call stops here.
-            // A script stuck in a plain computation loop cannot be stopped at all: Java has no way to terminate a
-            // thread, and killing one mid-transaction would corrupt the model anyway.
-            dispatcher.abandon();
-            runner.interrupt();
+    // The runner was interrupted but may still be running, and WatchedRunner has suspended Astah API access until it stops.
+    private Result timeoutFailure() {
+        String message = String.format(
+            "MCP tool script execution timed out after %d seconds. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Every change the run made is rolled back when it stops, and restarting Astah discards them too. Wait and retry; restart Astah if it never stops. Keep scripts short and avoid blocking operations.",
+            timeoutSeconds);
+        log.warn(message);
 
-            String message = String.format(
-                "MCP tool script execution timed out after %d seconds. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Every change the run made is rolled back when it stops, and restarting Astah discards them too. Wait and retry; restart Astah if it never stops. Keep scripts short and avoid blocking operations.",
-                timeoutSeconds);
-            log.warn(message);
+        return Result.failure(message, -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
+    }
 
-            // The abandoned thread may still be calling the Astah API, so no tool may run until it terminates.
-            AstahApiLock.suspend(runner, String.format(
-                "an mcp tool script that timed out after %d seconds is still running", timeoutSeconds));
+    // The wait was cut short, not the script: the runner may still be running, and WatchedRunner has suspended Astah API access until it stops.
+    private Result interruptionFailure() {
+        String message = "Interrupted while waiting for mcp tool script execution. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Every change the run made is rolled back when it stops.";
+        // Logged because the caller that was waiting for this result is usually gone: what an agent sees is the next tool call being refused.
+        log.warn(message);
 
-            return Result.failure(message, -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
+        return Result.failure(message, -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
+    }
 
-        } catch (InterruptedException e) {
-            // The wait was cut short, not the script: this thread stopped waiting while the runner may still be calling the Astah API.
-            Thread.currentThread().interrupt();
-            dispatcher.abandon();
-            runner.interrupt();
-
-            String message = "Interrupted while waiting for mcp tool script execution. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Every change the run made is rolled back when it stops.";
-            // Logged because the caller that was waiting for this result is usually gone: what an agent sees is the next tool call being refused.
-            log.warn(message);
-
-            // The abandoned thread may still be calling the Astah API, so no tool may run until it terminates.
-            // Registered before returning, while this call still holds the Astah API lock, so that whoever acquires the lock next sees it.
-            AstahApiLock.suspend(runner, "an mcp tool script whose caller stopped waiting is still running");
-
-            return Result.failure(message, -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
-
-        } catch (ExecutionException e) {
-            // evaluate() reports its own failures through the Result; this is a safety net.
-            Throwable cause = e.getCause();
-
-            return Result.failure(String.valueOf(cause != null ? cause : e), -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
-        }
+    // evaluate() reports its own failures through the Result; this is a safety net.
+    private static Result unexpectedFailure(Throwable failure) {
+        return Result.failure(String.valueOf(failure), -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
     }
 
     // Evaluates the mcp tool script on the calling thread. Never throws: every failure mode is reported through the Result.
@@ -231,8 +225,8 @@ public class McpToolScriptExecutor {
         }
 
         // Capture print() and error output per run instead of hijacking System.out/err
-        engine.getContext().setWriter(new PrintWriter(output, true));
-        engine.getContext().setErrorWriter(new PrintWriter(errorOutput, true));
+        engine.getContext().setWriter(new PrintWriter(new StopWhenInterruptedWriter(output), true));
+        engine.getContext().setErrorWriter(new PrintWriter(new StopWhenInterruptedWriter(errorOutput), true));
 
         // Order matters. The hardening has to complete before anything else is put into the engine, because it
         // deletes global names, and before any script runs, because that is what it is protecting them from.

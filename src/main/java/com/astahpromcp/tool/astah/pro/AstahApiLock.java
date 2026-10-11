@@ -26,7 +26,7 @@ public final class AstahApiLock {
     }
 
     // Declare that a tool interrupted and then abandoned a thread that may still be using the Astah API. Holding the lock cannot protect the model from such a thread, so every tool call must be refused until it terminates.
-    public static void suspend(Thread cause, String reason) {
+    static void suspend(Thread cause, String reason) {
         SUSPENSION.set(new Suspension(cause, reason, System.nanoTime()));
         log.error("Astah API access suspended: {}", reason);
     }

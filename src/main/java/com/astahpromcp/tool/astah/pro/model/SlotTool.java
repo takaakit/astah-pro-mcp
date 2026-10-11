@@ -8,12 +8,12 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.SlotWithValueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.SlotDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.SlotDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.ISlot;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/ISlot.html
@@ -51,16 +51,12 @@ public class SlotTool extends AstahToolProvider {
     }
 
     private SlotDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get slot information: {}", param);
-
         ISlot astahSlot = astahProToolSupport.getSlot(param.id());
 
         return SlotDTOAssembler.toDTO(astahSlot);
     }
 
     private SlotDTO setValue(SlotWithValueDTO param) throws Exception {
-        log.debug("Set value of slot: {}", param);
-
         ISlot astahSlot = astahProToolSupport.getSlot(param.targetSlotId());
 
         txnAstah.run( () -> {

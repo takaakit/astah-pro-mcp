@@ -4,6 +4,7 @@ import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.common.ImageConvertSupport.ParsedSvg;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.ChangeToFloatingTopicDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.DeleteChildTopicsDTO;
@@ -22,8 +23,10 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.DiagramDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.MindmapEditor;
 import com.change_vision.jude.api.inf.model.IMindMapDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
@@ -37,7 +40,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/MindmapEditor.html
@@ -150,8 +152,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private DiagramDTO createMindmapDiagram(NewDiagramInPackageDTO param) throws Exception {
-        log.debug("Create mind map diagram: {}", param);
-
         IPackage astahPackage = astahProToolSupport.getPackage(param.targetPackageId());
 
         IMindMapDiagram createdAstahMindmapDiagram = txnAstah.call( () -> {
@@ -162,8 +162,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeToFloatingTopic(ChangeToFloatingTopicDTO param) throws Exception {
-        log.debug("Change to floating topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
 
@@ -181,8 +179,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createFloatingTopic(NewFloatingTopicDTO param) throws Exception {
-        log.debug("Create floating topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
@@ -203,10 +199,14 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createTopic(NewTopicDTO param) throws Exception {
-        log.debug("Create topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
+
         INodePresentation astahParentTopic = astahProToolSupport.getNodePresentation(param.parentTopicId());
+        if (!Type.TOPIC.matches(astahParentTopic.getType()) || !astahMindMapDiagram.equals(astahParentTopic.getDiagram())) {
+            throw new IllegalArgumentException(String.format(
+                "The parent topic must be a topic on the target mind map diagram (actual type: %s, actual diagram: %s).",
+                astahParentTopic.getType(), astahParentTopic.getDiagram().getName()));
+        }
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
@@ -222,8 +222,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createTopicLink(NewLinkBetweenTopicsDTO param) throws Exception {
-        log.debug("Create topic link: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahSourceTopic = astahProToolSupport.getNodePresentation(param.sourceTopicId());
         INodePresentation astahTargetTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
@@ -242,8 +240,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> changeParentOfTopic(ChangeParentOfTopicDTO param) throws Exception {
-        log.debug("Change parent of topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTargetTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
         INodePresentation astahNewParentTopic = astahProToolSupport.getNodePresentation(param.newParentTopicId());
@@ -262,8 +258,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> moveTopicWithinSiblingOrder(MoveTopicWithinSiblingOrderDTO param) throws Exception {
-        log.debug("Move topic within sibling order: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTargetTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
         INodePresentation astahParentTopic = astahTargetTopic.getParent();
@@ -285,14 +279,15 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertSvgImageIntoTopic(NewSvgImageIntoTopicDTO param) throws Exception {
-        log.debug("Insert SVG image into topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 
-        Image image = imageConvertSupport.svgToImage(param.imageSvgCode());
+        ParsedSvg svg = imageConvertSupport.parseSvg(param.imageSvgCode());
+        imageConvertSupport.requireInsertableSize(svg);
+
+        Image image = imageConvertSupport.rasterize(svg, svg.naturalWidth(), svg.naturalHeight());
 
         txnAstah.run( () -> {
             mindmapEditor.setImage(astahTopic, image);
@@ -306,8 +301,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> insertPngOrJpgImageIntoTopic(NewPngOrJpgImageIntoTopicDTO param) throws Exception {
-        log.debug("Insert PNG or JPG image into topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
 
@@ -327,8 +320,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteChildTopics(DeleteChildTopicsDTO param) throws Exception {
-        log.debug("Delete child topics: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTargetParentTopic = astahProToolSupport.getNodePresentation(param.targetParentTopicId());
 
@@ -346,8 +337,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> deleteImageFromTopic(DeleteImageFromTopicDTO param) throws Exception {
-        log.debug("Delete image from topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTargetTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
 
@@ -365,8 +354,6 @@ public class MindmapEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> setBoundaryOfTopic(TopicWithBoundaryVisibilityDTO param) throws Exception {
-        log.debug("Set boundary of topic: {}", param);
-
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTargetTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
 

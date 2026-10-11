@@ -1,10 +1,14 @@
 package com.astahpromcp.server;
 
 import com.astahpromcp.config.McpServerConfig;
+import com.astahpromcp.info.McpServerInfo;
 import com.astahpromcp.tool.JsonSupport;
+import com.astahpromcp.tool.ToolCallStatistics;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolRegistrar;
+import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
+import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
 import com.astahpromcp.tool.manifest.ToolManifestValidator;
@@ -23,13 +27,14 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
+import java.util.function.Supplier;
 
 // MCP server exposing tools over Streamable HTTP.
 @Slf4j
@@ -40,16 +45,15 @@ public final class McpServerApp {
         int port,
         String instructions,
         // Which column of the manifest selects this profile's tools
-        ToolManifest.Profile manifestColumn,
-        // Whether the editing tools an mcp tool script calls capture the diagram they change
-        DiagramThumbnails scriptThumbnails,
-        // Whether this profile also gets the tool-function lookup tools and run_mcp_tool_script
-        boolean mcpToolScriptSurface) {
+        ToolManifest.Profile manifestColumn) {
     }
+
+    // Where the programmatic profile's instructions list the kinds of tool function an mcp tool script cannot call.
+    static final String NOT_MCP_TOOL_SCRIPT_CALLABLE_PLACEHOLDER = "{notMcpToolScriptCallableTools}";
 
     private static final String DIRECT_PROFILE_INSTRUCTIONS ="This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah. Note that the MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project to understand how to use this MCP server, and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.";
 
-    private static final String PROGRAMMATIC_PROFILE_INSTRUCTIONS ="This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah; it is intended for trusted local automation and has full access to that project. This port exposes only a small part of its tool functions directly. Read every chunk of 'get_chunk_of_tools_callable_from_mcp_tool_script' to see the others (call it with 'chunkIndex' 0 first, then request every remaining index its 'totalChunks' names, all in parallel) and use 'get_info_of_tools_callable_from_mcp_tool_script' to learn the arguments of the ones you choose, then call them from 'run_mcp_tool_script' as tools.<name>({ ... }), which lets one script perform many operations in a single round trip. There are two kinds of script here. An mcp tool script, run by 'run_mcp_tool_script', calls this server's tool functions; an astah api script, run by 'run_astah_api_script', uses the raw Astah API. Prefer the mcp tool script, and use an astah api script only for operations that require the raw Astah API. One run of 'run_mcp_tool_script' is one Astah transaction: if any tool function call fails, every change the script made is rolled back. Tool functions that return an image, that fetch over the network or convert a PDF, that save the project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project or the logs, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. The MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project, MUST call the 'mcp_tool_script_guide' tool function before using 'run_mcp_tool_script', MUST call the 'astah_api_script_guide' tool function before using 'run_astah_api_script', and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.";
+    private static final String PROGRAMMATIC_PROFILE_INSTRUCTIONS ="This MCP server operates as a plugin for the modeling tool Astah. Using the tool functions it provides, the MCP client (you) can reference and edit the project currently open in Astah; it is intended for trusted local automation and has full access to that project. This port exposes only a small part of its tool functions directly. Read every chunk of 'get_chunk_of_tools_callable_from_mcp_tool_script' to see the others (call it with 'chunkIndex' 0 first, then request every remaining index its 'totalChunks' names, all in parallel) and use 'get_info_of_tools_callable_from_mcp_tool_script' to learn the arguments of the ones you choose, then call them from 'run_mcp_tool_script' as tools.<name>({ ... }), which lets one script perform many operations in a single round trip. There are two kinds of script here. An mcp tool script, run by 'run_mcp_tool_script', calls this server's tool functions; an astah api script, run by 'run_astah_api_script', uses the raw Astah API. Prefer the mcp tool script, and use an astah api script only for operations that require the raw Astah API. One run of 'run_mcp_tool_script' is one Astah transaction: if any tool function call fails, every change the script made is rolled back. " + NOT_MCP_TOOL_SCRIPT_CALLABLE_PLACEHOLDER + "The MCP client (you) MUST call the 'astah_pro_mcp_guide' tool function before referencing or editing the Astah project, MUST call the 'mcp_tool_script_guide' tool function before using 'run_mcp_tool_script', MUST call the 'astah_api_script_guide' tool function before using 'run_astah_api_script', and MUST call the 'uml_modeling_architecture_insights' and 'architectural_design_smells' tool functions before creating, editing, or reviewing a UML model in order to advance your modeling capabilities. Furthermore, if the MCP client (you) performs context compression, you MUST re-reference the contents of that guide, those insights, and those smells after the compression. You MUST also require any subagents you launch to reference the contents of that guide, those insights, and those smells immediately upon launch.";
 
     private static final class ServerInstance {
         private final ServerProfileConfig profile;
@@ -78,6 +82,9 @@ public final class McpServerApp {
     // One catalog per thumbnail setting, so that the providers the setting does not affect are built once
     private Map<DiagramThumbnails, ToolCatalog> catalogs;
 
+    // The tools that run mcp tool scripts, built once; the manifest decides which profiles publish them
+    private McpToolScriptProviderFactory.McpToolScriptTools mcpToolScriptTools;
+
     public void start() throws Exception {
         log.info("=== MCP SERVER STARTING ===");
 
@@ -104,11 +111,12 @@ public final class McpServerApp {
         WorkspaceDirectories.prepare(McpServerConfig.WORKSPACE_DIR, WorkspaceDirectories::isProcessAlive);
     }
 
-    // Load the manifest and build the catalogs, then check the two against each other.
+    // Load the manifest and build every tool, then check the two against each other.
     private void loadManifestAndCatalogs() {
         manifest = ToolManifest.load();
         catalogs = ToolCatalog.buildAll(McpServerConfig.WORKSPACE_DIR.resolve("images"), McpServerConfig.WORKSPACE_DIR);
-        ToolManifestValidator.verify(manifest, catalogs.values());
+        mcpToolScriptTools = new McpToolScriptProviderFactory().createToolProviders(scriptCatalog(catalogs), manifest);
+        ToolManifestValidator.verify(manifest, catalogs.values(), mcpToolScriptTools.names(), AstahProToolFactory.isRunningInsideAstahGui());
     }
 
     // The profiles this server starts, in start order
@@ -118,16 +126,12 @@ public final class McpServerApp {
                     "direct",
                     McpServerConfig.PORT_FOR_DIRECT,
                     DIRECT_PROFILE_INSTRUCTIONS,
-                    ToolManifest.Profile.DIRECT,
-                    DiagramThumbnails.INCLUDE,
-                    false),
+                    ToolManifest.Profile.DIRECT),
                 new ServerProfileConfig(
                     "programmatic",
                     McpServerConfig.PORT_FOR_PROGRAMMATIC,
                     PROGRAMMATIC_PROFILE_INSTRUCTIONS,
-                    ToolManifest.Profile.PROGRAMMATIC,
-                    DiagramThumbnails.OMIT,
-                    true)
+                    ToolManifest.Profile.PROGRAMMATIC)
         );
     }
 
@@ -153,8 +157,7 @@ public final class McpServerApp {
     // holds on to the transport, so losing the local variable does not stop it.
     private ServerInstance startServerInstance(ServerProfileConfig profile) throws Exception {
 
-        log.info("Initialize MCP profile '{}' on port {} (manifest column={}, script thumbnails={})",
-                profile.name(), profile.port(), profile.manifestColumn(), profile.scriptThumbnails());
+        log.info("Initialize MCP profile '{}' on port {} (manifest column={})", profile.name(), profile.port(), profile.manifestColumn());
 
         HttpServletStreamableServerTransportProvider transport = null;
         McpSyncServer mcpSyncServer = null;
@@ -169,7 +172,7 @@ public final class McpServerApp {
             List<ToolProvider> providers = registerToolProviders(profile);
 
             // Build the MCP server
-            mcpSyncServer = buildMcpServer(transport, providers, profile.instructions());
+            mcpSyncServer = buildMcpServer(transport, providers, instructionsOf(profile, manifest));
 
             // Create the servlet
             McpClientApprovalServlet approvalServlet = new McpClientApprovalServlet(transport);
@@ -196,7 +199,7 @@ public final class McpServerApp {
 
     // Package-private so that a test can hold on to the transport a failed start creates: the failure path drops it,
     // and what has to be proven is that it was closed before that.
-    java.util.function.Supplier<HttpServletStreamableServerTransportProvider> transportFactory = McpServerApp::newTransport;
+    Supplier<HttpServletStreamableServerTransportProvider> transportFactory = McpServerApp::newTransport;
 
     private static HttpServletStreamableServerTransportProvider newTransport() {
         return HttpServletStreamableServerTransportProvider.builder()
@@ -264,7 +267,7 @@ public final class McpServerApp {
     private List<ToolProvider> registerToolProviders(ServerProfileConfig profile) {
         log.info("Registering tool providers for profile '{}'...", profile.name());
 
-        List<ToolProvider> toolProviders = toolProvidersOf(profile, catalogs, manifest);
+        List<ToolProvider> toolProviders = toolProvidersOf(profile, catalogs, mcpToolScriptTools, manifest);
 
         log.info("Total tool providers: {}", toolProviders.size());
         log.info("Tool providers:");
@@ -273,30 +276,29 @@ public final class McpServerApp {
         }
 
         // Check that the wiring registered what the manifest selects. This looks along the other axis than the startup checks: those read the manifest, this reads what came out of it.
-        Set<String> registered = new java.util.LinkedHashSet<>();
+        Set<String> registered = new LinkedHashSet<>();
         for (ToolProvider toolProvider : toolProviders) {
             toolProvider.createToolDefinitions().forEach(d -> registered.add(d.toolSchema().name()));
         }
-        Set<String> extras = profile.mcpToolScriptSurface() ? Set.of("get_chunk_of_tools_callable_from_mcp_tool_script", "get_info_of_tools_callable_from_mcp_tool_script", "run_mcp_tool_script", "mcp_tool_script_guide", "get_mcp_tool_script_example") : Set.of();
-        ToolManifestValidator.verifyRegistered(profile.name(), registered, manifest, profile.manifestColumn(), publishingCatalog(catalogs), extras);
+        Set<String> existing = new LinkedHashSet<>(publishingCatalog(catalogs).names());
+        existing.addAll(mcpToolScriptTools.names());
+        ToolManifestValidator.verifyRegistered(profile.name(), registered, manifest, profile.manifestColumn(), existing);
         log.info("Profile '{}' publishes {} tools", profile.name(), registered.size());
 
         return toolProviders;
     }
 
-    // The tools a profile publishes, drawn from the catalog each half of the profile is entitled to.
+    // The tools a profile publishes: whatever its manifest column selects, among the tools that run mcp tool scripts and the tools of the catalog.
     static List<ToolProvider> toolProvidersOf(ServerProfileConfig profile,
                                               Map<DiagramThumbnails, ToolCatalog> catalogs,
+                                              McpToolScriptProviderFactory.McpToolScriptTools mcpToolScriptTools,
                                               ToolManifest manifest) {
 
-        List<ToolProvider> toolProviders = new ArrayList<>();
-        if (profile.mcpToolScriptSurface()) {
-            // Only the tool functions an mcp tool script reaches are subject to the profile's thumbnail setting: the dispatcher keeps their structured content and drops everything else, so a capture made for them would be thrown away.
-            toolProviders.addAll(new McpToolScriptProviderFactory()
-                    .createToolProviders(catalogs.get(profile.scriptThumbnails()), manifest));
-        }
+        Set<String> names = manifest.namesFor(profile.manifestColumn());
+
+        List<ToolProvider> toolProviders = new ArrayList<>(mcpToolScriptTools.select(names));
         toolProviders.addAll(publishingCatalog(catalogs)
-                .select(manifest.namesFor(profile.manifestColumn()))
+                .select(names)
                 .withAstahLock());
 
         return toolProviders;
@@ -305,6 +307,46 @@ public final class McpServerApp {
     // The catalog every profile publishes from directly.
     static ToolCatalog publishingCatalog(Map<DiagramThumbnails, ToolCatalog> catalogs) {
         return catalogs.get(DiagramThumbnails.INCLUDE);
+    }
+
+    // The catalog an mcp tool script calls into, on whichever profile runs it: the dispatcher keeps only the structured content of a call, so a diagram thumbnail captured for it would be thrown away.
+    static ToolCatalog scriptCatalog(Map<DiagramThumbnails, ToolCatalog> catalogs) {
+        return catalogs.get(DiagramThumbnails.OMIT);
+    }
+
+    // The instructions a profile's server hands its clients
+    static String instructionsOf(ServerProfileConfig profile, ToolManifest manifest) {
+        return profile.instructions().replace(NOT_MCP_TOOL_SCRIPT_CALLABLE_PLACEHOLDER, notMcpToolScriptCallableSentence(manifest));
+    }
+
+    // The sentence that lists the kinds of tool function an mcp tool script cannot call, made from the reasons the manifest gives, in the order NotMcpToolScriptCallableReason declares them.
+    static String notMcpToolScriptCallableSentence(ToolManifest manifest) {
+        Map<NotMcpToolScriptCallableReason, List<String>> namesByReason = new EnumMap<>(NotMcpToolScriptCallableReason.class);
+        manifest.notMcpToolScriptCallableReasons().forEach((name, reason) ->
+                namesByReason.computeIfAbsent(reason, r -> new ArrayList<>()).add(name));
+
+        List<String> phrases = new ArrayList<>();
+        namesByReason.forEach((reason, names) -> {
+            String phrase = reason.instructionPhrase(names);
+            if (phrase != null) {
+                phrases.add(phrase);
+            }
+        });
+        if (phrases.isEmpty()) {
+            return "";
+        }
+        return "Tool functions " + joinedAsAList(phrases) + " cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ";
+    }
+
+    // "a", "a and b", "a, b, and c"
+    private static String joinedAsAList(List<String> items) {
+        if (items.size() == 1) {
+            return items.get(0);
+        }
+        if (items.size() == 2) {
+            return items.get(0) + " and " + items.get(1);
+        }
+        return String.join(", ", items.subList(0, items.size() - 1)) + ", and " + items.get(items.size() - 1);
     }
 
     // Build the MCP server capabilities
@@ -319,7 +361,7 @@ public final class McpServerApp {
                 .build();
 
         McpServer.SyncSpecification<?> serverBuilder = McpServer.sync(transport)
-                .serverInfo(McpSchema.Implementation.builder(getArtifactId(), getVersion())
+                .serverInfo(McpSchema.Implementation.builder(McpServerInfo.ARTIFACT_ID, McpServerInfo.VERSION)
                         .title("Astah Pro MCP")
                         .build())
                 .instructions(instructions)
@@ -390,86 +432,13 @@ public final class McpServerApp {
         return server;
     }
 
-    private String getArtifactId() {
-        return getProjectProperty("project.artifactId");
-    }
-
-    private String getVersion() {
-        return getProjectProperty("project.version");
-    }
-
-    private String getProjectProperty(String key) {
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("project.properties")) {
-            if (input != null) {
-                Properties props = new Properties();
-                props.load(input);
-                String value = props.getProperty(key);
-                return value != null ? value : "";
-            }
-        } catch (IOException e) {
-            log.warn("Failed to load project properties, returning empty string for key: {}", key, e);
-        }
-        return "";
-    }
-
-    // Send a shutdown notification to MCP clients when the MCP server stops.
-    private void sendShutdownNotification() {
-        for (ServerInstance instance : serverInstances) {
-            HttpServletStreamableServerTransportProvider transport = instance.transport;
-            if (transport == null) {
-                continue;
-            }
-
-            try {
-                log.info("Send shutdown notification to MCP clients (profile='{}')", instance.profile.name());
-
-                // Send the notification in the format expected by the MCP protocol
-                // Parameters for the notifications/cancelled event
-                java.util.Map<String, Object> params = new java.util.HashMap<>();
-                params.put("reason", "server_shutdown");
-                params.put("message", "MCP server is shutting down");
-
-                transport.notifyClients("notifications/cancelled", params)
-                        .timeout(java.time.Duration.ofSeconds(5))
-                        .doOnSuccess(v -> log.info("Shutdown notification sent successfully for profile '{}'", instance.profile.name()))
-                        .doOnError(e -> log.warn("Failed to send shutdown notification for profile '{}': {}", instance.profile.name(), e.getMessage()))
-                        .onErrorComplete()
-                        .block();
-
-            } catch (Exception e) {
-                log.warn("Error sending shutdown notification for profile '{}': {}", instance.profile.name(), e.getMessage(), e);
-            }
-        }
-    }
-
-    public void stop() throws Exception {
-        Exception failure = null;
-
+    public void stop() {
         try {
-            // Notify clients about the MCP server shutdown before stopping components
-            sendShutdownNotification();
+            stopProfiles();
 
-        } catch (Exception e) {
-            log.warn("Failed to send shutdown notification: {}", e.getMessage(), e);
-            failure = e;
-            
         } finally {
-            try {
-                stopProfiles();
-                
-            } catch (RuntimeException e) {
-                log.warn("Failed to stop MCP profiles cleanly: {}", e.getMessage(), e);
-                if (failure == null) {
-                    failure = e;
-                }
-                
-            } finally {
-                cleanupWorkspaceDirectory();
-            }
-        }
-
-        if (failure != null) {
-            throw failure;
+            ToolCallStatistics.logAndReset();
+            cleanupWorkspaceDirectory();
         }
     }
 

@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.InteractionOperandWithGuardDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.InteractionOperandDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.InteractionOperandDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.model.IInteractionOperand;
@@ -15,7 +16,6 @@ import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IInteractionOperand.html
@@ -39,7 +39,7 @@ public class InteractionOperandTool extends AstahToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "get_interaction_operand_info",
-                "Return model element information about the specified interaction operand (specified by ID).",
+                "Return model element information about the specified interaction operand (specified by ID). The lifelines and messages Astah's model records for the operand can differ from what the diagram draws inside it; drawnLifelines and drawnMessages report what the diagram shows, and matchesDiagram tells whether the two agree.",
                 this::getInfo,
                 IdDTO.class,
                 InteractionOperandDTO.class),
@@ -55,16 +55,14 @@ public class InteractionOperandTool extends AstahToolProvider {
     }
 
     private InteractionOperandDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get interaction operand information: {}", param);
-
         IInteractionOperand astahInteractionOperand = astahProToolSupport.getInteractionOperand(param.id());
 
-        return InteractionOperandDTOAssembler.toDTO(astahInteractionOperand);
+        return InteractionOperandDTOAssembler.toDTO(
+            astahInteractionOperand,
+            SequenceDiagramLayout.drawnContentsOf(projectAccessor, astahInteractionOperand));
     }
 
     private InteractionOperandDTO setGuard(InteractionOperandWithGuardDTO param) throws Exception {
-        log.debug("Set guard of interaction operand: {}", param);
-
         IInteractionOperand astahInteractionOperand = astahProToolSupport.getInteractionOperand(param.targetInteractionOperandId());
 
         // A null or blank guard means no guard. Surrounding whitespace is removed up front.
@@ -78,7 +76,7 @@ public class InteractionOperandTool extends AstahToolProvider {
             if (currentGuard != null && !currentGuard.isEmpty()) {
                 for (IConstraint constraint : astahInteractionOperand.getConstraints()) {
                     if (constraint.getSpecification().equals(currentGuard)) {
-                        currentGuardConstraint = constraint;  // the last match is the current guard, since setGuard() appends
+                        currentGuardConstraint = constraint;  // The last match is the current guard, since setGuard() appends
                     }
                 }
             }
@@ -95,6 +93,8 @@ public class InteractionOperandTool extends AstahToolProvider {
             }
         });
 
-        return InteractionOperandDTOAssembler.toDTO(astahInteractionOperand);
+        return InteractionOperandDTOAssembler.toDTO(
+            astahInteractionOperand,
+            SequenceDiagramLayout.drawnContentsOf(projectAccessor, astahInteractionOperand));
     }
 }

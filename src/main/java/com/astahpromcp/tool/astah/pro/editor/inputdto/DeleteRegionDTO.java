@@ -9,7 +9,7 @@ public record DeleteRegionDTO(
     @JsonPropertyDescription("Parent node presentation identifier")
     String parentNodePresentationId,
 
-    @JsonPropertyDescription("Region index to delete")
+    @JsonPropertyDescription("0-based index of the region to delete: from 0 to the number of regions of the parent state minus 1")
     int index
 ) {
 }

@@ -15,6 +15,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.ERDiagramEditor;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IERDiagram;
@@ -29,7 +30,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/ERDiagramEditor.html
@@ -84,8 +84,6 @@ public class ERDiagramEditorTool extends AstahToolProvider {
     }
 
     private ERDiagramDTO createERDiagram(NewERDiagramDTO param) throws Exception {
-        log.debug("Create ER diagram: {}", param);
-
         IERPackage astahERPackage = astahProToolSupport.getERPackage(param.targetERPackageId());
 
         IERDiagram createdAstahERDiagram = txnAstah.call( () -> {
@@ -98,8 +96,6 @@ public class ERDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createNodePresentation(NewNodePresentationOnERDiagramDTO param) throws Exception {
-        log.debug("Create node presentation on ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
 
@@ -121,8 +117,6 @@ public class ERDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<LinkPresentationDTO, List<McpSchema.Content>> createLinkPresentation(NewLinkPresentationOnERDiagramDTO param) throws Exception {
-        log.debug("Create link presentation on ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
         IElement astahElement = astahProToolSupport.getElement(param.targetElementId());
         INodePresentation astahSourceNodePresentation = astahProToolSupport.getNodePresentation(param.sourceNodePresentationId());
@@ -145,8 +139,6 @@ public class ERDiagramEditorTool extends AstahToolProvider {
     }
 
     private Pair<NodePresentationDTO, List<McpSchema.Content>> createSubtypeRelationshipGroup(NewSubtypeRelationshipGroupOnERDiagramDTO param) throws Exception {
-        log.debug("Create subtype relationship group on ER diagram: {}", param);
-
         IERDiagram astahERDiagram = astahProToolSupport.getERDiagram(param.targetERDiagramId());
 
         List<ILinkPresentation> subtypeRelationshipPresentations = new ArrayList<>();

@@ -33,8 +33,6 @@ public class McpToolScriptExampleTool implements ToolProvider {
             "Walks every chunk of the named elements in the project, printing a census of them by type and then the name of each element of one chosen type."),
         new Example("list-presentation-and-model-ids.js",
             "Lists the presentations on a class diagram together with the model elements behind them, by crossing between the presentation IDs and the model element IDs."),
-        new Example("export-all-diagrams-as-png.js",
-            "Exports every diagram in the project as a PNG image file."),
         new Example("create-two-classes.js",
             "Creates two classes and an enumeration with definitions, attributes, operations, parameters and enumeration literals, then places them on a class diagram."),
         new Example("create-association.js",
@@ -116,8 +114,6 @@ Assigning to one of them stops the run with a TypeError on the line that did it,
     }
 
     private List<McpSchema.Content> getGuide(NoInputDTO param) throws Exception {
-        log.debug("Get mcp tool script guide: {}", param);
-
         List<McpSchema.Content> contents = new ArrayList<>();
         contents.add(catalogue(CORE_EXAMPLES));
         contents.add(McpSchema.TextContent.builder(ENVIRONMENT_NOTE).build());
@@ -129,8 +125,6 @@ Assigning to one of them stops the run with a TypeError on the line that did it,
     }
 
     private List<McpSchema.Content> getExample(McpToolScriptExampleDTO param) throws Exception {
-        log.debug("Get mcp tool script example: {}", param);
-
         Example example = EXAMPLES.stream()
                 .filter(candidate -> candidate.file().equals(param.exampleName()))
                 .findFirst()

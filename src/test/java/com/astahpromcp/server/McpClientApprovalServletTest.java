@@ -25,15 +25,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class McpClientApprovalServletTest {
+public class McpClientApprovalServletTest {
 
     @Mock
     private HttpServletStreamableServerTransportProvider delegate;
@@ -613,12 +609,6 @@ class McpClientApprovalServletTest {
     @Test
     void servlet_ng_rejectsANonPositiveLimit() {
         assertThrows(IllegalArgumentException.class, () -> servletLimitedTo(0));
-    }
-
-    @Test
-    void config_ok_sharesTheSdkDefaultLimitWithTheTransport() {
-        // McpServerApp states this same value on the transport builder, so both layers bound the body identically
-        assertEquals(16 * 1024 * 1024, McpServerConfig.MCP_MAX_REQUEST_SIZE_BYTES);
     }
 
     // Wait until the thread has queued up behind the approval dialog

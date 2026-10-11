@@ -21,17 +21,15 @@ public class InfoTool implements ToolProvider {
     public List<ToolDefinition> createToolDefinitions() {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
-            "get_astah_pro_mcp_version",
-            "Return the version of the Astah Pro MCP server.",
-            this::getAstahProMcpVersion,
-            NoInputDTO.class,
-            AstahProMcpVersionDTO.class)
+                "get_astah_pro_mcp_version",
+                "Return the version of the Astah Pro MCP server.",
+                this::getAstahProMcpVersion,
+                NoInputDTO.class,
+                AstahProMcpVersionDTO.class)
         );
     }
 
     private AstahProMcpVersionDTO getAstahProMcpVersion(NoInputDTO param) throws Exception {
-        log.debug("Get Astah Pro MCP version: {}", param);
-
         return new AstahProMcpVersionDTO(McpServerInfo.VERSION);
     }
 }

@@ -7,25 +7,26 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-// Checks the manifest against the catalog at startup.
+// Checks the manifest against the tools that exist, at startup.
 @Slf4j
 public final class ToolManifestValidator {
 
     private ToolManifestValidator() {
     }
 
-    public static void verify(ToolManifest manifest, Collection<ToolCatalog> catalogs) {
-        Set<String> catalogNames = new LinkedHashSet<>();
+    // The tools that exist are the ones the catalogs hold and the ones that run mcp tool scripts, which no catalog holds.
+    public static void verify(ToolManifest manifest,
+                              Collection<ToolCatalog> catalogs,
+                              Set<String> mcpToolScriptToolNames,
+                              boolean missingToolsStopStartup) {
+        Set<String> existingNames = new LinkedHashSet<>(mcpToolScriptToolNames);
         for (ToolCatalog catalog : catalogs) {
-            catalogNames.addAll(catalog.names());
+            existingNames.addAll(catalog.names());
         }
-        ToolCatalog reference = catalogs.iterator().next();
 
-        verifyEveryToolIsDecidedAbout(manifest, catalogNames);
-        verifyEveryWithheldRowStillExists(manifest, catalogNames);
-        verifyEveryRowStillExists(manifest, catalogNames);
-        verifyToolsAnMcpToolScriptCannotCallArePublishedDirectly(manifest, reference);
-        verifyProgrammaticProfileIsASubsetOfTheDirectProfile(manifest, reference);
+        verifyEveryToolIsDecidedAbout(manifest, existingNames);
+        verifyEveryWithheldRowStillExists(manifest, existingNames);
+        verifyEveryPublishingRowNamesAnExistingTool(manifest, existingNames, missingToolsStopStartup);
 
         log.info("Tool manifest verified: {} rows, direct={} programmatic={} withheld={}",
                 manifest.size(),
@@ -35,9 +36,9 @@ public final class ToolManifestValidator {
     }
 
     // A tool nobody has decided about must not be published by default, so it has to have a row.
-    private static void verifyEveryToolIsDecidedAbout(ToolManifest manifest, Set<String> catalogNames) {
+    private static void verifyEveryToolIsDecidedAbout(ToolManifest manifest, Set<String> existingNames) {
         Set<String> undecided = new TreeSet<>();
-        for (String name : catalogNames) {
+        for (String name : existingNames) {
             if (manifest.find(name) == null) {
                 undecided.add(name);
             }
@@ -47,25 +48,30 @@ public final class ToolManifestValidator {
         }
     }
 
-    // A row naming a tool that no longer exists selects nothing.
-    private static void verifyEveryRowStillExists(ToolManifest manifest, Set<String> catalogNames) {
+    // A row that publishes a tool that does not exist publishes nothing.
+    private static void verifyEveryPublishingRowNamesAnExistingTool(ToolManifest manifest, Set<String> existingNames, boolean missingToolsStopStartup) {
         Set<String> unknown = new TreeSet<>();
         for (String name : manifest.allNames()) {
-            if (!catalogNames.contains(name) && manifest.find(name).publishesTo(ToolManifest.Profile.DIRECT)) {
+            ToolManifest.Entry entry = manifest.find(name);
+            if (!existingNames.contains(name) && (entry.direct() || entry.programmatic())) {
                 unknown.add(name);
             }
         }
-        if (!unknown.isEmpty()) {
-            log.warn("These manifest rows name tools the catalog does not hold, so they publish nothing. Outside the Astah GUI the view manager tools are expected here: {}", unknown);
+        if (unknown.isEmpty()) {
+            return;
         }
+        if (missingToolsStopStartup) {
+            throw new IllegalStateException("These manifest rows publish tools that do not exist, so the server would not publish what the manifest says. Look earlier in the log for a tool provider that failed to build them: " + unknown);
+        }
+        log.warn("These manifest rows publish tools that do not exist, so they publish nothing. Outside the Astah GUI the view manager tools are expected here: {}", unknown);
     }
 
     // (the part that needs the catalog): a withheld row for a tool that no longer exists is stale text.
     // It publishes nowhere and is not callable from an MCP tool script either, so it does no harm beyond being wrong.
-    private static void verifyEveryWithheldRowStillExists(ToolManifest manifest, Set<String> catalogNames) {
+    private static void verifyEveryWithheldRowStillExists(ToolManifest manifest, Set<String> existingNames) {
         Set<String> unknown = new TreeSet<>();
         for (String name : manifest.withheldNames()) {
-            if (!catalogNames.contains(name)) {
+            if (!existingNames.contains(name)) {
                 unknown.add(name);
             }
         }
@@ -74,44 +80,15 @@ public final class ToolManifestValidator {
         }
     }
 
-    // Whatever an MCP tool script cannot call has to be published directly, or the programmatic profile could not reach it at all
-    private static void verifyToolsAnMcpToolScriptCannotCallArePublishedDirectly(ToolManifest manifest, ToolCatalog catalog) {
-        Set<String> unreachable = new TreeSet<>();
-        for (String name : catalog.notMcpToolScriptCallableNames()) {
-            ToolManifest.Entry entry = manifest.find(name);
-            if (entry == null || !entry.programmatic()) {
-                unreachable.add(name);
-            }
-        }
-        if (!unreachable.isEmpty()) {
-            throw new IllegalStateException("These tools cannot be called from an MCP tool script and are not published on the programmatic profile either, so nothing on that profile could reach them. Set programmatic = x in "
-                    + ToolManifest.RESOURCE_PATH + ": " + unreachable);
-        }
-    }
-
-    // The programmatic profile is a subset of the direct profile, apart from its own two tools, which no catalog holds
-    private static void verifyProgrammaticProfileIsASubsetOfTheDirectProfile(ToolManifest manifest, ToolCatalog catalog) {
-        Set<String> missing = new TreeSet<>();
-        for (String name : manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC)) {
-            if (catalog.contains(name) && !manifest.find(name).direct()) {
-                missing.add(name);
-            }
-        }
-        if (!missing.isEmpty()) {
-            throw new IllegalStateException("These tools are published on the programmatic profile but not on the direct profile, and the programmatic profile must stay a subset of it: " + missing);
-        }
-    }
-
-    // What a profile actually registered is what the manifest selects from the catalog
+    // What a profile actually registered is what the manifest selects from the tools that exist
     public static void verifyRegistered(String profileName,
                                         Set<String> registeredNames,
                                         ToolManifest manifest,
                                         ToolManifest.Profile profile,
-                                        ToolCatalog catalog,
-                                        Set<String> extraNames) {
-        Set<String> expected = new TreeSet<>(extraNames);
+                                        Set<String> existingNames) {
+        Set<String> expected = new TreeSet<>();
         for (String name : manifest.namesFor(profile)) {
-            if (catalog.contains(name)) {
+            if (existingNames.contains(name)) {
                 expected.add(name);
             }
         }

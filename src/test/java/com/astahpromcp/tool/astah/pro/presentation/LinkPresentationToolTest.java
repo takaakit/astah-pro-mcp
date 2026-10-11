@@ -2,20 +2,28 @@ package com.astahpromcp.tool.astah.pro.presentation;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithLineStyleDTO;
 import com.astahpromcp.tool.astah.pro.presentation.inputdto.LinkPresentationWithPointsDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationGeometryDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.LinkPresentationGeometryDTOAssembler;
 import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
-import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
+import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
+import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
+import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IPackage;
+import com.change_vision.jude.api.inf.model.IUseCase;
+import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
+import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -25,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.beans.Transient;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class LinkPresentationToolTest {
 
@@ -99,7 +105,7 @@ public class LinkPresentationToolTest {
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Association",
             "");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(linkPresentation.getID());
 
@@ -123,7 +129,7 @@ public class LinkPresentationToolTest {
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
             "line style");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(linkPresentation.getID());
 
@@ -135,7 +141,7 @@ public class LinkPresentationToolTest {
             tool,
             inputDTO,
             LinkPresentationDTO.class);
-            
+
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(LineStyleKind.LINE, outputDTO.lineStyle());
@@ -150,7 +156,7 @@ public class LinkPresentationToolTest {
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
             "line right angle style");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(linkPresentation.getID());
 
@@ -162,7 +168,7 @@ public class LinkPresentationToolTest {
             tool,
             inputDTO,
             LinkPresentationDTO.class);
-            
+
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(LineStyleKind.LINE_RIGHT_ANGLE, outputDTO.lineStyle());
@@ -177,7 +183,7 @@ public class LinkPresentationToolTest {
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
             "curve style");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(linkPresentation.getID());
 
@@ -204,7 +210,7 @@ public class LinkPresentationToolTest {
         ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
             "Dependency",
             "curve right angle style");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(linkPresentation.getID());
 
@@ -216,7 +222,7 @@ public class LinkPresentationToolTest {
             tool,
             inputDTO,
             LinkPresentationDTO.class);
-            
+
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals(LineStyleKind.CURVE_RIGHT_ANGLE, outputDTO.lineStyle());
@@ -236,7 +242,7 @@ public class LinkPresentationToolTest {
         Point2D[] points = linkPresentation.getAllPoints();
         PointIntDTO startPoint = new PointIntDTO((int)points[0].getX(), (int)points[0].getY());
         PointIntDTO endPoint = new PointIntDTO((int)points[points.length - 1].getX(), (int)points[points.length - 1].getY());
-        
+
         // Create input DTO
         LinkPresentationWithPointsDTO inputDTO = new LinkPresentationWithPointsDTO(
             linkPresentation.getID(),
@@ -247,7 +253,7 @@ public class LinkPresentationToolTest {
                 new PointIntDTO(50, 60),
                 endPoint
             ));
-        
+
         // Check points before setting
         assertNotEquals(5, linkPresentation.getPoints().length);
 
@@ -393,6 +399,137 @@ public class LinkPresentationToolTest {
 
         // Check link presentation
         assertEquals(LineStyleKind.LINE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void setLineStyle_ng_unknown() throws Exception {
+        // Get link presentation
+        ILinkPresentation linkPresentation = (ILinkPresentation) TestSupport.instance().getPresentationByTypeAndLabel(
+            "Dependency",
+            "line style");
+
+        // ----------------------------------------
+        // Call setLineStyle()
+        // ----------------------------------------
+        Exception thrown = assertThrows(Exception.class, () ->
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setLineStyle,
+                tool,
+                new LinkPresentationWithLineStyleDTO(linkPresentation.getID(), LineStyleKind.UNKNOWN),
+                LinkPresentationDTO.class));
+
+        // Check it was rejected with the line styles that can be set
+        String message = rootCauseMessageOf(thrown);
+        assertTrue(message.contains("Specify one of line, line_right_angle, curve or curve_right_angle."), message);
+
+        // Check link presentation was left as it was
+        assertEquals(LineStyleKind.LINE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
+    }
+
+    @Test
+    void setLineStyle_ng_messageOnSequenceDiagram() throws Exception {
+        // Draw a message, which keeps its line style whatever is set to it
+        SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+        ILinkPresentation message = transactionSupport.call( () -> {
+            sequenceDiagramEditor.setDiagram(sequenceDiagramEditor.createSequenceDiagram(projectAccessor.getProject(), "Sequence Diagram for line style"));
+            INodePresentation sender = sequenceDiagramEditor.createLifeline("sender", 0);
+            INodePresentation receiver = sequenceDiagramEditor.createLifeline("receiver", 200);
+            return sequenceDiagramEditor.createMessage("request", sender, receiver, 150);
+        });
+
+        // A message drawn through the API has no line style (null) at all, so only check it is left as it was
+        String lineStyleBefore = message.getProperty(Key.LINE_SHAPE);
+
+        // ----------------------------------------
+        // Call setLineStyle()
+        // ----------------------------------------
+        Exception thrown = assertThrows(Exception.class, () ->
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setLineStyle,
+                tool,
+                new LinkPresentationWithLineStyleDTO(message.getID(), LineStyleKind.CURVE),
+                LinkPresentationDTO.class));
+
+        // Check it was rejected rather than reported as set
+        String errorMessage = rootCauseMessageOf(thrown);
+        assertTrue(errorMessage.contains("cannot take the line style 'curve'"), errorMessage);
+
+        // Check link presentation was left as it was
+        assertEquals(lineStyleBefore, message.getProperty(Key.LINE_SHAPE));
+    }
+
+    // A link and the node presentations it is drawn from and to, following the arrow.
+    private record DrawnLink(
+        String kind,
+        ILinkPresentation link,
+        INodePresentation from,
+        INodePresentation to
+    ) {
+    }
+
+    @Test
+    void getInfo_ok_sourceEndIsWhereTheArrowStarts() throws Exception {
+        UseCaseModelEditor useCaseModelEditor = projectAccessor.getModelEditorFactory().getUseCaseModelEditor();
+        UseCaseDiagramEditor useCaseDiagramEditor = projectAccessor.getDiagramEditorFactory().getUseCaseDiagramEditor();
+
+        List<DrawnLink> drawnLinks = transactionSupport.call( () -> {
+            IPackage rootPackage = projectAccessor.getProject();
+
+            IClassDiagram classDiagram = classDiagramEditor.createClassDiagram(rootPackage, "LinkEnds");
+            classDiagramEditor.setDiagram(classDiagram);
+            IClass client = basicModelEditor.createClass(rootPackage, "Client");
+            IClass usedClass = basicModelEditor.createClass(rootPackage, "UsedClass");
+            IClass dependedClass = basicModelEditor.createClass(rootPackage, "DependedClass");
+            IClass realizedInterface = basicModelEditor.createInterface(rootPackage, "RealizedInterface");
+            IClass subClass = basicModelEditor.createClass(rootPackage, "SubClass");
+            INodePresentation clientNode = classDiagramEditor.createNodePresentation(client, new Point2D.Double(300, 200));
+            INodePresentation usedNode = classDiagramEditor.createNodePresentation(usedClass, new Point2D.Double(600, 100));
+            INodePresentation dependedNode = classDiagramEditor.createNodePresentation(dependedClass, new Point2D.Double(600, 300));
+            INodePresentation realizedNode = classDiagramEditor.createNodePresentation(realizedInterface, new Point2D.Double(300, 0));
+            INodePresentation subNode = classDiagramEditor.createNodePresentation(subClass, new Point2D.Double(300, 400));
+
+            IUseCaseDiagram useCaseDiagram = useCaseDiagramEditor.createUseCaseDiagram(rootPackage, "LinkEndsUseCases");
+            useCaseDiagramEditor.setDiagram(useCaseDiagram);
+            IUseCase baseUseCase = useCaseModelEditor.createUseCase(rootPackage, "BaseUseCase");
+            IUseCase includedUseCase = useCaseModelEditor.createUseCase(rootPackage, "IncludedUseCase");
+            IUseCase extendingUseCase = useCaseModelEditor.createUseCase(rootPackage, "ExtendingUseCase");
+            INodePresentation baseNode = useCaseDiagramEditor.createNodePresentation(baseUseCase, new Point2D.Double(0, 100));
+            INodePresentation includedNode = useCaseDiagramEditor.createNodePresentation(includedUseCase, new Point2D.Double(400, 0));
+            INodePresentation extendingNode = useCaseDiagramEditor.createNodePresentation(extendingUseCase, new Point2D.Double(400, 200));
+
+            // Unlike createUsage and createRealization, createDependency takes the supplier first
+            return List.of(
+                new DrawnLink("Usage", classDiagramEditor.createLinkPresentation(
+                    basicModelEditor.createUsage(client, usedClass, ""), clientNode, usedNode), clientNode, usedNode),
+                new DrawnLink("Dependency", classDiagramEditor.createLinkPresentation(
+                    basicModelEditor.createDependency(dependedClass, client, ""), clientNode, dependedNode), clientNode, dependedNode),
+                new DrawnLink("Realization", classDiagramEditor.createLinkPresentation(
+                    basicModelEditor.createRealization(client, realizedInterface, ""), clientNode, realizedNode), clientNode, realizedNode),
+                new DrawnLink("Generalization", classDiagramEditor.createLinkPresentation(
+                    basicModelEditor.createGeneralization(subClass, client, ""), subNode, clientNode), subNode, clientNode),
+                new DrawnLink("Include", useCaseDiagramEditor.createLinkPresentation(
+                    useCaseModelEditor.createInclude(baseUseCase, includedUseCase, ""), baseNode, includedNode), baseNode, includedNode),
+                new DrawnLink("Extend", useCaseDiagramEditor.createLinkPresentation(
+                    useCaseModelEditor.createExtend(extendingUseCase, baseUseCase, ""), extendingNode, baseNode), extendingNode, baseNode));
+        });
+
+        for (DrawnLink drawnLink : drawnLinks) {
+            // ----------------------------------------
+            // Call getInfo()
+            // ----------------------------------------
+            LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+                getInfo,
+                tool,
+                new IdDTO(drawnLink.link().getID()),
+                LinkPresentationDTO.class);
+            LinkPresentationGeometryDTO geometryDTO = LinkPresentationGeometryDTOAssembler.toDTO(drawnLink.link());
+
+            // Check output DTO
+            assertEquals(drawnLink.from().getID(), outputDTO.sourceNodeEnd().id(), drawnLink.kind());
+            assertEquals(drawnLink.to().getID(), outputDTO.targetNodeEnd().id(), drawnLink.kind());
+            assertEquals(drawnLink.from().getID(), geometryDTO.sourceNodeEnd().id(), drawnLink.kind());
+            assertEquals(drawnLink.to().getID(), geometryDTO.targetNodeEnd().id(), drawnLink.kind());
+        }
     }
 
     // Two classes on a class diagram of their own, with a generalization and an association drawn between them.

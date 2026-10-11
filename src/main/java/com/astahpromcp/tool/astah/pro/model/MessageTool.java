@@ -8,13 +8,13 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.MessageDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IMessage.html
@@ -87,16 +87,12 @@ public class MessageTool extends AstahToolProvider {
     }
 
     private MessageDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get message information: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.id());
 
         return MessageDTOAssembler.toDTO(astahMessage);
     }
 
     private MessageDTO setArgument(MessageWithArgumentDTO param) throws Exception {
-        log.debug("Set argument of message: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
         txnAstah.run( () -> {
@@ -107,8 +103,6 @@ public class MessageTool extends AstahToolProvider {
     }
 
     private MessageDTO setGuard(MessageWithGuardDTO param) throws Exception {
-        log.debug("Set guard of message: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
         txnAstah.run( () -> {
@@ -119,8 +113,6 @@ public class MessageTool extends AstahToolProvider {
     }
 
     private MessageDTO setReturnValue(MessageWithReturnValueDTO param) throws Exception {
-        log.debug("Set return value of message: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
         txnAstah.run( () -> {
@@ -131,8 +123,6 @@ public class MessageTool extends AstahToolProvider {
     }
 
     private MessageDTO setReturnValueVariable(MessageWithReturnValueVariableDTO param) throws Exception {
-        log.debug("Set return value variable of message: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
         txnAstah.run( () -> {
@@ -143,8 +133,6 @@ public class MessageTool extends AstahToolProvider {
     }
 
     private MessageDTO setAsynchronous(MessageWithAsynchronousDTO param) throws Exception {
-        log.debug("Set asynchronous of message: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
 
         txnAstah.run( () -> {
@@ -155,8 +143,6 @@ public class MessageTool extends AstahToolProvider {
     }
 
     private MessageDTO setOperation(MessageWithOperationDTO param) throws Exception {
-        log.debug("Set operation of message: {}", param);
-
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
         IOperation astahOperation = astahProToolSupport.getOperation(param.operationId());
 

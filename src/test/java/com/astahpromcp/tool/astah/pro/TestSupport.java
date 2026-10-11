@@ -7,8 +7,6 @@ import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ModelFinder;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
-import org.junit.jupiter.api.Assertions;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Field;
@@ -16,9 +14,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestSupport {
+
     private static TestSupport instance;
     private final ProjectAccessor projectAccessor;
 
@@ -27,11 +26,11 @@ public class TestSupport {
         try {
             astahApi = AstahAPI.getAstahAPI();
         } catch (ClassNotFoundException e) {
-            Assertions.fail("Failed to AstahAPI.getAstahAPI()");
+            fail("Failed to obtain the Astah API", e);
         }
         projectAccessor = astahApi.getProjectAccessor();
     }
-    
+
     public static TestSupport instance() {
         if (instance == null) {
             instance = new TestSupport();
@@ -86,7 +85,7 @@ public class TestSupport {
 
             List<IPresentation> presentations = new ArrayList<>();
             for (INamedElement namedElement : namedElements) {
-                IDiagram diagram = (IDiagram)namedElement;
+                IDiagram diagram = (IDiagram) namedElement;
                 for (IPresentation presentation : diagram.getPresentations()) {
                     if (presentation.getType().equals(presentationType)
                         && presentation.getLabel().equals(label)) {
@@ -111,7 +110,7 @@ public class TestSupport {
 
             List<IPresentation> presentations = new ArrayList<>();
             for (INamedElement namedElement : namedElements) {
-                IDiagram diagram = (IDiagram)namedElement;
+                IDiagram diagram = (IDiagram) namedElement;
                 for (IPresentation presentation : diagram.getPresentations()) {
                     if (presentation.getID().equals(id)) {
                         presentations.add(presentation);
@@ -126,27 +125,6 @@ public class TestSupport {
 
         } catch (Exception e) {
             return null;
-        }
-    }
-
-    public List<IPresentation> getPresentationsByType(String type) {
-        try {
-            INamedElement[] namedElements = projectAccessor.findElements(IDiagram.class);
-
-            List<IPresentation> presentations = new ArrayList<>();
-            for (INamedElement namedElement : namedElements) {
-                IDiagram diagram = (IDiagram)namedElement;
-                for (IPresentation presentation : diagram.getPresentations()) {
-                    if (presentation.getType().equals(type)) {
-                        presentations.add(presentation);
-                    }
-                }
-            }
-            
-            return presentations;
-
-        } catch (Exception e) {
-            return List.of();
         }
     }
 
@@ -172,14 +150,14 @@ public class TestSupport {
         return pair.getLeft();
     }
 
-    public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) 
+    public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes)
             throws NoSuchMethodException {
         Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
         method.setAccessible(true);
         return method;
     }
 
-    public static Field getAccessibleField(Class<?> clazz, String fieldName) 
+    public static Field getAccessibleField(Class<?> clazz, String fieldName)
             throws NoSuchFieldException {
         Field field = clazz.getDeclaredField(fieldName);
         field.setAccessible(true);

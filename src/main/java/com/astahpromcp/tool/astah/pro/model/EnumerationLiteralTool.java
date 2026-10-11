@@ -7,12 +7,12 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.model.inputdto.EnumerationLiteralWithValueDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.EnumerationLiteralDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.EnumerationLiteralDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IEnumerationLiteral;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 @Slf4j
 public class EnumerationLiteralTool extends AstahToolProvider {
@@ -40,8 +40,6 @@ public class EnumerationLiteralTool extends AstahToolProvider {
     }
 
     private EnumerationLiteralDTO setValue(EnumerationLiteralWithValueDTO param) throws Exception {
-        log.debug("Set value of enumeration literal: {}", param);
-
         IEnumerationLiteral astahEnumerationLiteral = astahProToolSupport.getEnumerationLiteral(param.targetEnumerationLiteralId());
 
         txnAstah.run( () -> {

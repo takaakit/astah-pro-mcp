@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.model;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.StateMachineDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class StateMachineToolTest {
 
@@ -36,7 +36,7 @@ public class StateMachineToolTest {
             transactionSupport,
             astahProToolSupport);
 
-        // Methods
+        // getInfo() method
         getInfo = TestSupport.getAccessibleMethod(
             StateMachineTool.class,
             "getInfo",
@@ -56,7 +56,7 @@ public class StateMachineToolTest {
         IStateMachine stateMachine = (IStateMachine) TestSupport.instance().getNamedElementByClassAndName(
             IStateMachine.class,
             "StateMachine0");
-        
+
         // Create input DTO
         IdDTO inputDTO = new IdDTO(stateMachine.getId());
 

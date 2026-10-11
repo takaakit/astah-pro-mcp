@@ -7,6 +7,8 @@ import com.astahpromcp.tool.common.inputdto.ChunkDTO;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentChunkDTO;
 import com.astahpromcp.tool.knowledge.outputdto.DocumentDTO;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -14,11 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 // Tool that fetches Object-Relational Impedance Mismatch knowledge content and returns it in chunks
 @Slf4j
-public class ORImpedanceMismatchKnowledgeTool implements ToolProvider, RemoteDocumentTool {
+public class ORImpedanceMismatchKnowledgeTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
     private final Path outputDirectory;
@@ -59,8 +59,6 @@ public class ORImpedanceMismatchKnowledgeTool implements ToolProvider, RemoteDoc
     }
 
     private DocumentDTO getORImpedanceMismatchKnowledgeInfo(NoInputDTO param) throws IOException {
-        log.debug("Get Object-Relational Impedance Mismatch knowledge: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("Object-Relational Impedance Mismatch knowledge already loaded, returning from cache.");
@@ -84,8 +82,6 @@ public class ORImpedanceMismatchKnowledgeTool implements ToolProvider, RemoteDoc
     }
 
     private DocumentChunkDTO getORImpedanceMismatchKnowledgeChunk(ChunkDTO param) {
-        log.debug("Get Object-Relational Impedance Mismatch knowledge chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

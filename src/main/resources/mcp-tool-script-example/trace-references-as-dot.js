@@ -230,7 +230,7 @@ function walk(direction) {
     }
 
     for (var sortKind = 0; sortKind < queues.length; sortKind++) {
-      queues[sortKind].sort(function(left, right) {
+      queues[sortKind].sort(function (left, right) {
         var leftKey = candidates[left].sortKey;
         var rightKey = candidates[right].sortKey;
         return leftKey < rightKey ? -1 : (leftKey > rightKey ? 1 : 0);

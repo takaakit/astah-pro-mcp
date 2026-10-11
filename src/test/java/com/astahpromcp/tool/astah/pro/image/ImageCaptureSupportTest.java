@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.image;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
@@ -12,19 +13,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.zip.CRC32;
+import javax.imageio.ImageIO;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -273,6 +277,38 @@ public class ImageCaptureSupportTest {
         assertColorNear(Color.BLUE, thumbnail.getRGB(thumbnail.getWidth() - 1, thumbnail.getHeight() - 1), "bottom-right corner");
     }
 
+    @Test
+    void exportDiagramImageFile_ok_answersThePathAndSizeOfTheExportedFile(@TempDir Path outputDir) throws Exception {
+        ImageCaptureSupport support = supportFor(diagramExporting(uniformImage(400, 200, Color.WHITE)), outputDir);
+
+        ImageCaptureSupport.ExportedImageFile exported = support.exportDiagramImageFile(DIAGRAM_ID);
+
+        assertEquals(outputDir.resolve("Class Diagram.png"), exported.path());
+        assertEquals(400, exported.width());
+        assertEquals(200, exported.height());
+    }
+
+    @Test
+    void exportDiagramImageFile_ok_readsTheSizeWithoutDecodingThePixels(@TempDir Path outputDir) throws Exception {
+        // 900 million pixels, about 3.4 GB as one ARGB image, but the file ends after its header: decoding it would fail
+        // for want of pixels, so only a reader that stops at the header can answer the size.
+        ImageCaptureSupport support = supportFor(diagramExportingBytes(headerOnlyPng(30000, 30000)), outputDir);
+
+        ImageCaptureSupport.ExportedImageFile exported = support.exportDiagramImageFile(DIAGRAM_ID);
+
+        assertEquals(30000, exported.width());
+        assertEquals(30000, exported.height());
+    }
+
+    @Test
+    void exportDiagramImageFile_ng_failsWhenTheExportedFileIsNotAnImage(@TempDir Path outputDir) throws Exception {
+        ImageCaptureSupport support = supportFor(diagramExportingBytes("not an image".getBytes(StandardCharsets.US_ASCII)), outputDir);
+
+        Exception thrown = assertThrows(Exception.class, () -> support.exportDiagramImageFile(DIAGRAM_ID));
+        assertTrue(thrown.getMessage().contains("Failed to read image file"),
+                "The failure must say that the exported file could not be read: " + thrown);
+    }
+
     private static ImageCaptureSupport supportFor(IDiagram diagram, Path imageOutputDir) {
         AstahProToolSupport astahProToolSupport = mock(AstahProToolSupport.class);
         when(astahProToolSupport.getDiagram(DIAGRAM_ID)).thenReturn(diagram);
@@ -288,6 +324,36 @@ public class ImageCaptureSupportTest {
             return "Class Diagram.png";
         });
         return diagram;
+    }
+
+    // A diagram whose export writes the given bytes into the output directory and answers its path, as Astah does.
+    private static IDiagram diagramExportingBytes(byte[] fileBytes) throws Exception {
+        IDiagram diagram = mock(IDiagram.class);
+        when(diagram.exportImage(anyString(), anyString(), anyDouble())).thenAnswer(invocation -> {
+            String outputDir = invocation.getArgument(0);
+            Files.write(Path.of(outputDir).resolve("Class Diagram.png"), fileBytes);
+            return "Class Diagram.png";
+        });
+        return diagram;
+    }
+
+    // A PNG that ends after its IHDR chunk: the header gives the size, but no pixels follow.
+    private static byte[] headerOnlyPng(int width, int height) {
+        byte[] ihdr = ByteBuffer.allocate(17)
+                .put("IHDR".getBytes(StandardCharsets.US_ASCII))
+                .putInt(width)
+                .putInt(height)
+                .put(new byte[]{8, 6, 0, 0, 0})  // 8-bit RGBA, as Astah exports, not interlaced
+                .array();
+        CRC32 crc = new CRC32();
+        crc.update(ihdr);
+
+        return ByteBuffer.allocate(8 + 4 + ihdr.length + 4)
+                .put(new byte[]{(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'})
+                .putInt(ihdr.length - 4)
+                .put(ihdr)
+                .putInt((int) crc.getValue())
+                .array();
     }
 
     // Noise with a solid red block in the top-left corner and a solid blue one in the bottom-right corner.
@@ -320,8 +386,7 @@ public class ImageCaptureSupportTest {
     }
 
     private static ListAppender<ILoggingEvent> attachAppenderTo(Class<?> type) {
-        ch.qos.logback.classic.Logger logger =
-                (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(type);
+        Logger logger = (Logger) LoggerFactory.getLogger(type);
         ListAppender<ILoggingEvent> appender = new ListAppender<>();
         appender.start();
         logger.addAppender(appender);
@@ -329,8 +394,7 @@ public class ImageCaptureSupportTest {
     }
 
     private static void detachAppenderFrom(Class<?> type, ListAppender<ILoggingEvent> appender) {
-        ch.qos.logback.classic.Logger logger =
-                (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(type);
+        Logger logger = (Logger) LoggerFactory.getLogger(type);
         logger.detachAppender(appender);
         appender.stop();
     }
@@ -349,7 +413,7 @@ public class ImageCaptureSupportTest {
 
     private static BufferedImage noiseImage(int width, int height) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Random random = new Random(42);  // fixed seed for a deterministic test
+        Random random = new Random(42);  // Fixed seed for a deterministic test
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 image.setRGB(x, y, random.nextInt(0xFFFFFF + 1));

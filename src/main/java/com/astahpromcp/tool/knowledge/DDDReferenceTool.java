@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
-public class DDDReferenceTool implements ToolProvider, RemoteDocumentTool {
+public class DDDReferenceTool implements ToolProvider {
 
     private final KnowledgeToolSupport.ContentCache contentCache;
     
@@ -53,8 +53,6 @@ public class DDDReferenceTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentDTO getDDDReference(NoInputDTO param) throws IOException {
-        log.debug("Get DDD reference: {}", param);
-
         DocumentDTO cached = contentCache.describe();
         if (cached != null) {
             log.info("Domain-Driven Design Reference already loaded, returning from cache.");
@@ -79,8 +77,6 @@ public class DDDReferenceTool implements ToolProvider, RemoteDocumentTool {
     }
 
     private DocumentChunkDTO getDDDReferenceChunk(ChunkDTO param) {
-        log.debug("Get DDD reference chunk: {}", param);
-
         return new DocumentChunkDTO(contentCache.chunkAt(param.chunkIndex()));
     }
 }

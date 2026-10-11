@@ -2,6 +2,7 @@ package com.astahpromcp.tool.astah.pro.editor;
 
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 public class CompositeStructureModelEditorToolTest {
 
@@ -253,6 +253,74 @@ public class CompositeStructureModelEditorToolTest {
     }
 
     @Test
+    void createRealization_ng_notInterface() throws Exception {
+        // Get port
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class4");
+        IPort port = portOwner.getPorts()[0];
+
+        // Get class
+        IClass targetClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class0");
+
+        // ----------------------------------------
+        // Call createRealization()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                createRealization,
+                tool,
+                new NewProvidedInterfaceOfPortDTO(port.getId(), targetClass.getId()),
+                RealizationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("is not an interface"));
+
+        // Check that nothing was created
+        assertEquals(0, port.getClientRealizations().length);
+    }
+
+    @Test
+    void createRealization_ng_duplicate() throws Exception {
+        // Get port
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class3");
+        IPort port = portOwner.getPorts()[0];
+
+        // Get interface
+        IClass targetInterface = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Interface0");
+
+        // Check the provided interfaces before creating one
+        assertEquals(1, port.getClientRealizations().length);
+        assertEquals(targetInterface.getId(), port.getClientRealizations()[0].getSupplier().getId());
+
+        // ----------------------------------------
+        // Call createRealization()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                createRealization,
+                tool,
+                new NewProvidedInterfaceOfPortDTO(port.getId(), targetInterface.getId()),
+                RealizationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("is already a provided interface of the port"));
+
+        // Check that nothing was created
+        assertEquals(1, port.getClientRealizations().length);
+    }
+
+    @Test
     void createUsage_ok() throws Exception {
         // Get port
         IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
@@ -290,5 +358,73 @@ public class CompositeStructureModelEditorToolTest {
         // Check that the interface became a required interface of the port
         assertEquals(1, port.getClientUsages().length);
         assertEquals(targetInterface.getId(), port.getClientUsages()[0].getSupplier().getId());
+    }
+
+    @Test
+    void createUsage_ng_notInterface() throws Exception {
+        // Get port
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class3");
+        IPort port = portOwner.getPorts()[0];
+
+        // Get class
+        IClass targetClass = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class0");
+
+        // ----------------------------------------
+        // Call createUsage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                createUsage,
+                tool,
+                new NewRequiredInterfaceOfPortDTO(port.getId(), targetClass.getId()),
+                UsageDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("is not an interface"));
+
+        // Check that nothing was created
+        assertEquals(0, port.getClientUsages().length);
+    }
+
+    @Test
+    void createUsage_ng_duplicate() throws Exception {
+        // Get port
+        IClass portOwner = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Class4");
+        IPort port = portOwner.getPorts()[0];
+
+        // Get interface
+        IClass targetInterface = (IClass) TestSupport.instance().getNamedElementByClassAndName(
+            IClass.class,
+            "Interface1");
+
+        // Check the required interfaces before creating one
+        assertEquals(1, port.getClientUsages().length);
+        assertEquals(targetInterface.getId(), port.getClientUsages()[0].getSupplier().getId());
+
+        // ----------------------------------------
+        // Call createUsage()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                createUsage,
+                tool,
+                new NewRequiredInterfaceOfPortDTO(port.getId(), targetInterface.getId()),
+                UsageDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("is already a required interface of the port"));
+
+        // Check that nothing was created
+        assertEquals(1, port.getClientUsages().length);
     }
 }

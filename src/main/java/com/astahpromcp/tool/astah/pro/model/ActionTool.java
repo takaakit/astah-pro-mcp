@@ -8,13 +8,14 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ActionWithCallingActivityDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ActionDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.ActionDTOAssembler;
+import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.model.IAction;
 import com.change_vision.jude.api.inf.model.IActivity;
+import com.change_vision.jude.api.inf.model.IActivityNode;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/model/IAction.html
@@ -44,7 +45,7 @@ public class ActionTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_calling_activity_of_action",
-                "Set the calling activity (specified by ID) of the specified action (specified by ID), and return the model element of the action after it is set.",
+                "Set the calling activity (specified by ID) of the specified call behavior action (specified by ID), and return the model element of the action after it is set.",
                 this::setCallingActivity,
                 ActionWithCallingActivityDTO.class,
                 ActionDTO.class)
@@ -52,18 +53,28 @@ public class ActionTool extends AstahToolProvider {
     }
 
     private ActionDTO getInfo(IdDTO param) throws Exception {
-        log.debug("Get action information: {}", param);
-
         IAction astahAction = astahProToolSupport.getAction(param.id());
 
         return ActionDTOAssembler.toDTO(astahAction);
     }
 
     private ActionDTO setCallingActivity(ActionWithCallingActivityDTO param) throws Exception {
-        log.debug("Set calling activity of action: {}", param);
-
         IAction astahAction = astahProToolSupport.getAction(param.targetActionId());
         IActivity astahCallingActivity = astahProToolSupport.getActivity(param.callingActivityId());
+
+        if (!astahAction.isCallBehaviorAction()) {
+            throw new IllegalArgumentException(String.format(
+                "The action '%s' (ID: %s) is not a call behavior action. A calling activity can be set only on a call behavior action. To call an activity, create a call behavior action with create_call_behavior_act.",
+                astahAction.getName(), astahAction.getId()));
+        }
+
+        for (IActivityNode astahActivityNode : astahCallingActivity.getActivityNodes()) {
+            if (astahActivityNode.getId().equals(astahAction.getId())) {
+                throw new IllegalArgumentException(String.format(
+                    "The action '%s' (ID: %s) is in the activity '%s' (ID: %s), so it cannot call that activity itself. Specify another activity.",
+                    astahAction.getName(), astahAction.getId(), astahCallingActivity.getName(), astahCallingActivity.getId()));
+            }
+        }
 
         txnAstah.run( () -> {
             astahAction.setCallingActivity(astahCallingActivity);
