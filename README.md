@@ -11,15 +11,18 @@ This plugin experimentally implements a programmatic tool calling mode, inspired
 
 ## Demo
 
-Prompts:  
-**I.** *Design a simple library management system and draw a class diagram in Astah to illustrate its structure.*  
-**II.** *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of borrowing a book.*  
-**III.** *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of returning a book.*  
-**IV.** *Based on the contents of the Astah model, draw a state machine diagram to illustrate the state transitions of a book.*
+Topic: **ATM system**  
+Setup: Astah Pro **v12.0** / Astah Pro MCP **v0.3.3**
+
+Prompts:
+- **I.** *Design a simple ATM system and draw a class diagram in Astah to illustrate its structure. The system should support customer authentication, balance inquiry, cash withdrawal, and funds transfer.*
+- **II.** *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of withdrawing cash.*
+- **III.** *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of transferring funds between accounts.*
+- **IV.** *Based on the contents of the Astah model, draw a state machine diagram to illustrate the state transitions of an ATM session.*
 
 ### Claude Code
 
-Model: Opus 5.5 / Effort: Medium / Total time: approx. 15 min
+**Opus 5.5 (medium)** / Total time: approx. **13 min**
 
 <table width="100%">
   <tr>
@@ -29,16 +32,35 @@ Model: Opus 5.5 / Effort: Medium / Total time: approx. 15 min
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/claude-code/Library%20Management%20System.png"><img src="demo/claude-code/Library%20Management%20System.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/Borrow%20a%20Book.png"><img src="demo/claude-code/Borrow%20a%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/Return%20a%20Book.png"><img src="demo/claude-code/Return%20a%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/BookCopy%20States.png"><img src="demo/claude-code/BookCopy%20States.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/ATM%20System.png"><img src="demo/claude-code/ATM%20System.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/Withdraw%20Cash.png"><img src="demo/claude-code/Withdraw%20Cash.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/Transfer%20Funds.png"><img src="demo/claude-code/Transfer%20Funds.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/Session%20States.png"><img src="demo/claude-code/Session%20States.png" width="100%"></a></td>
+  </tr>
+</table>
+
+### Antigravity CLI
+
+**Gemini 4 Argon (medium)** / Total time: approx. **114 min**
+
+<table width="100%">
+  <tr>
+    <td width="25%" align="center"><b>I</b></td>
+    <td width="25%" align="center"><b>II</b></td>
+    <td width="25%" align="center"><b>III</b></td>
+    <td width="25%" align="center"><b>IV</b></td>
+  </tr>
+  <tr>
+    <td width="25%"><a href="demo/antigravity-cli/ATM%20System%20Class%20Diagram.png"><img src="demo/antigravity-cli/ATM%20System%20Class%20Diagram.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/Cash%20Withdrawal%20Sequence%20Diagram.png"><img src="demo/antigravity-cli/Cash%20Withdrawal%20Sequence%20Diagram.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/Funds%20Transfer%20Activity%20Diagram.png"><img src="demo/antigravity-cli/Funds%20Transfer%20Activity%20Diagram.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/ATM%20Session%20State%20Machine%20Diagram.png"><img src="demo/antigravity-cli/ATM%20Session%20State%20Machine%20Diagram.png" width="100%"></a></td>
   </tr>
 </table>
 
 ### Codex CLI
 
-Model: GPT-6 Astra / Effort: Medium / Total time: approx. 19 min
+**GPT 6 Astra (medium)** / Total time: approx. **19 min**
 
 <table width="100%">
   <tr>
@@ -48,16 +70,16 @@ Model: GPT-6 Astra / Effort: Medium / Total time: approx. 19 min
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/codex-cli/Library%20Management.png"><img src="demo/codex-cli/Library%20Management.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/codex-cli/Borrow%20a%20Book.png"><img src="demo/codex-cli/Borrow%20a%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/codex-cli/Return%20a%20Book.png"><img src="demo/codex-cli/Return%20a%20Book.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/codex-cli/BookCopy%20Lifecycle.png"><img src="demo/codex-cli/BookCopy%20Lifecycle.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/ATM%20System%20-%20Class%20Diagram.png"><img src="demo/codex-cli/ATM%20System%20-%20Class%20Diagram.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/Cash%20Withdrawal.png"><img src="demo/codex-cli/Cash%20Withdrawal.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/Funds%20Transfer.png"><img src="demo/codex-cli/Funds%20Transfer.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/ATM%20Session%20Lifecycle.png"><img src="demo/codex-cli/ATM%20Session%20Lifecycle.png" width="100%"></a></td>
   </tr>
 </table>
 
 ### Grok Build
 
-Model: Grok 4.7 / Effort: Medium / Total time: approx. 41 min
+**Grok 4.7 (medium)** / Total time: approx. **83 min**
 
 <table width="100%">
   <tr>
@@ -67,10 +89,10 @@ Model: Grok 4.7 / Effort: Medium / Total time: approx. 41 min
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/grok-build/Library%20structure.png"><img src="demo/grok-build/Library%20structure.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Borrow%20a%20copy.png"><img src="demo/grok-build/Borrow%20a%20copy.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Return%20a%20copy.png"><img src="demo/grok-build/Return%20a%20copy.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Book%20copy.png"><img src="demo/grok-build/Book%20copy.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/ATM%20structure.png"><img src="demo/grok-build/ATM%20structure.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/Cash%20withdrawal.png"><img src="demo/grok-build/Cash%20withdrawal.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/Transfer%20funds.png"><img src="demo/grok-build/Transfer%20funds.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/grok-build/ATM%20session.png"><img src="demo/grok-build/ATM%20session.png" width="100%"></a></td>
   </tr>
 </table>
 
@@ -78,12 +100,12 @@ Model: Grok 4.7 / Effort: Medium / Total time: approx. 41 min
 
 - **AI agent**
 
-  The AI agents below have been tested, but no guarantee is implied. From personal experience, **Claude Code** works well for UML modeling, followed by **Codex CLI**.
+  The AI agents below have been tested, but no guarantee is implied. From personal experience, **Claude Code** works well for UML modeling.
 
   - Claude Code
+  - Antigravity CLI
   - Codex CLI
   - Grok Build
-  - Antigravity CLI
   - Cursor IDE
   - Antigravity IDE
   - Kiro IDE
@@ -145,6 +167,26 @@ claude mcp add --transport http --scope user astah-pro-mcp http://127.0.0.1:8888
 
 
 <details>
+<summary><b>Antigravity CLI</b></summary>
+
+Create `.agents/mcp_config.json` under your project directory (workspace scope) or edit `~/.gemini/config/mcp_config.json` (global scope) with:
+
+```json
+{
+  "mcpServers": {
+    "apm": {
+      "serverUrl": "http://127.0.0.1:8888/mcp"
+    }
+  }
+}
+```
+
+> The server key is shortened to `apm` to keep tool names within Antigravity's 64-character limit.
+
+</details>
+
+
+<details>
 <summary><b>Codex CLI</b></summary>
 
 Create `.codex/config.toml` under your project directory or your user directory with:
@@ -169,24 +211,6 @@ grok mcp add --scope project --transport http astah-pro-mcp http://127.0.0.1:888
 Or run this command for user scope:
 ```bash
 grok mcp add --scope user --transport http astah-pro-mcp http://127.0.0.1:8888/mcp
-```
-
-</details>
-
-
-<details>
-<summary><b>Antigravity CLI</b></summary>
-
-Create `.agents/mcp_config.json` under your project directory (workspace scope) or edit `~/.gemini/config/mcp_config.json` (global scope) with:
-
-```json
-{
-  "mcpServers": {
-    "astah-pro-mcp": {
-      "serverUrl": "http://127.0.0.1:8888/mcp"
-    }
-  }
-}
 ```
 
 </details>
@@ -237,7 +261,7 @@ Create `.agents/mcp_config.json` under your project directory (workspace scope) 
 
 > Use [mcp-remote](https://github.com/geelen/mcp-remote) to bridge the HTTP connection. [Node.js](https://nodejs.org/) must be installed.
 
-> The server key is shortened to `apm` to keep tool names within Antigravity IDE's 64-character limit.
+> The server key is shortened to `apm` to keep tool names within Antigravity's 64-character limit.
 
 </details>
 
