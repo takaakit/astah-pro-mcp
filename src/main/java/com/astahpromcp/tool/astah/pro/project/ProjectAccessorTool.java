@@ -35,7 +35,7 @@ import java.nio.file.Path;
 @Slf4j
 public class ProjectAccessorTool extends AstahToolProvider {
 
-    private static final String UNSAVED_PROJECT_PATH = "no_title";
+    static final String UNSAVED_PROJECT_PATH = "no_title";
 
     private final ProjectAccessor projectAccessor;
     private final AstahProToolSupport astahProToolSupport;
@@ -163,7 +163,7 @@ public class ProjectAccessorTool extends AstahToolProvider {
         }
 
         if (!isOpenAt(param.filePath())) {
-            throw new RuntimeException("Failed to open project: " + param.filePath() + ". Astah opened no project from it, and its log ('get_info_of_astah_log') has the reason.");
+            throw new RuntimeException("Failed to open project: " + param.filePath() + ". Astah opened no project from it, and its log ('astahLog' of 'get_info_of_logs') has the reason.");
         }
 
         IModel astahProject;
@@ -293,7 +293,7 @@ public class ProjectAccessorTool extends AstahToolProvider {
         return new ProjectPathDTO(projectAccessor.getProjectPath());
     }
 
-    private static void requireAbsolutePath(String filePath) {
+    static void requireAbsolutePath(String filePath) {
         if (!Path.of(filePath).isAbsolute()) {
             throw new IllegalArgumentException("The specified file path is not an absolute path: " + filePath + ". Specify the absolute path, e.g., C:\\work\\model.asta.");
         }

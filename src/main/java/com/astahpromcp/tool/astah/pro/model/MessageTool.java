@@ -9,6 +9,7 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.MessageDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.MessageDTOAssembler;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IOperation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -79,7 +80,7 @@ public class MessageTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDto(
                 "set_ope_of_msg",
-                "Set the operation of the specified message (specified by ID), and return the model element of the message after it is set. Note that, in order to set an operation to a message, the base class of the receiver lifeline must be set.",
+                "Set the operation of the specified message (specified by ID), and return the model element of the message after it is set. Note that, in order to set an operation to a message, the receiver of the message must be a lifeline whose base class is set.",
                 this::setOperation,
                 MessageWithOperationDTO.class,
                 MessageDTO.class)
@@ -94,6 +95,7 @@ public class MessageTool extends AstahToolProvider {
 
     private MessageDTO setArgument(MessageWithArgumentDTO param) throws Exception {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
+        requireNotReturnMessage(astahMessage, "argument");
 
         txnAstah.run( () -> {
             astahMessage.setArgument(param.argument());
@@ -104,6 +106,7 @@ public class MessageTool extends AstahToolProvider {
 
     private MessageDTO setGuard(MessageWithGuardDTO param) throws Exception {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
+        requireNotReturnMessage(astahMessage, "guard");
 
         txnAstah.run( () -> {
             astahMessage.setGuard(param.guard());
@@ -114,6 +117,7 @@ public class MessageTool extends AstahToolProvider {
 
     private MessageDTO setReturnValue(MessageWithReturnValueDTO param) throws Exception {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
+        requireNotReturnMessage(astahMessage, "return value");
 
         txnAstah.run( () -> {
             astahMessage.setReturnValue(param.returnValue());
@@ -124,6 +128,7 @@ public class MessageTool extends AstahToolProvider {
 
     private MessageDTO setReturnValueVariable(MessageWithReturnValueVariableDTO param) throws Exception {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
+        requireNotReturnMessage(astahMessage, "return value variable");
 
         txnAstah.run( () -> {
             astahMessage.setReturnValueVariable(param.returnValueVariable());
@@ -134,6 +139,7 @@ public class MessageTool extends AstahToolProvider {
 
     private MessageDTO setAsynchronous(MessageWithAsynchronousDTO param) throws Exception {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
+        requireNotReturnMessage(astahMessage, "asynchrony");
 
         txnAstah.run( () -> {
             astahMessage.setAsynchronous(param.isAsynchronous());
@@ -145,11 +151,38 @@ public class MessageTool extends AstahToolProvider {
     private MessageDTO setOperation(MessageWithOperationDTO param) throws Exception {
         IMessage astahMessage = astahProToolSupport.getMessage(param.targetMessageId());
         IOperation astahOperation = astahProToolSupport.getOperation(param.operationId());
+        requireNotReturnMessage(astahMessage, "operation");
 
         txnAstah.run( () -> {
-            astahMessage.setOperation(astahOperation);
+            try {
+                astahMessage.setOperation(astahOperation);
+            } catch (InvalidEditingException e) {
+                if (!InvalidEditingException.ILLEGALMODELTYPE_ERROR_KEY.equals(e.getKey())) {
+                    throw e;
+                } else {
+                    throw new IllegalArgumentException(String.format(
+                        "Message '%s' (ID: %s) is not received by a lifeline (for example, it is a lost message), so no operation can be set on it. An operation can be set only on a message whose receiver is a lifeline.",
+                        astahMessage.getName(), astahMessage.getId()));
+                }
+            }
         });
 
         return MessageDTOAssembler.toDTO(astahMessage);
+    }
+
+    // Astah rejects every setter of a return message with "Please check the model type.", which tells neither the cause nor what to specify instead.
+    private static void requireNotReturnMessage(IMessage astahMessage, String property) {
+        if (!astahMessage.isReturnMessage()) {
+            return;
+        }
+
+        IMessage callMessage = astahMessage.getActivator();
+        String instead = (callMessage == null) ? "" : String.format(
+            " To set it on the call, specify the message it returns from instead: '%s' (ID: %s).",
+            callMessage.getName(), callMessage.getId());
+
+        throw new IllegalArgumentException(String.format(
+            "Message '%s' (ID: %s) is a return message, and Astah does not allow the %s of a return message to be set.%s To change the label shown on the return message, set its name with set_name.",
+            astahMessage.getName(), astahMessage.getId(), property, instead));
     }
 }

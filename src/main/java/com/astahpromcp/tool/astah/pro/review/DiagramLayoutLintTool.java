@@ -7,14 +7,9 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.ReportDTO;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
-import com.change_vision.jude.api.inf.model.IActivityDiagram;
-import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IDiagram;
-import com.change_vision.jude.api.inf.model.IRequirementDiagram;
-import com.change_vision.jude.api.inf.model.ISequenceDiagram;
-import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
-import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
@@ -31,12 +26,115 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DiagramLayoutLintTool extends AstahToolProvider {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+
+    // The node and link presentation types checked for overlaps on one diagram type.
+    private record OverlapTarget(
+        NamedElementDTO.Type diagramType,
+        Set<Type> nodeTypes,
+        Set<Type> linkTypes
+    ) {
+    }
+
+    // The diagram types supported by overlap detection
+    private static final List<OverlapTarget> OVERLAP_TARGETS = List.of(
+        new OverlapTarget(
+            NamedElementDTO.Type.CLASS_DIAGRAM,
+            EnumSet.of(
+                Type.CLASS,
+                Type.ASSOCIATION_CLASS,
+                Type.INSTANCE_SPECIFICATION,
+                Type.USE_CASE,
+                Type.NOTE),
+            EnumSet.of(
+                Type.ASSOCIATION,
+                Type.GENERALIZATION,
+                Type.REALIZATION,
+                Type.DEPENDENCY,
+                Type.USAGE,
+                Type.LINK)),
+
+        new OverlapTarget(
+            NamedElementDTO.Type.USE_CASE_DIAGRAM,
+            EnumSet.of(
+                Type.CLASS,
+                Type.USE_CASE,
+                Type.NOTE),
+            EnumSet.of(
+                Type.ASSOCIATION,
+                Type.GENERALIZATION,
+                Type.DEPENDENCY,
+                Type.EXTEND,
+                Type.INCLUDE)),
+
+        new OverlapTarget(
+            NamedElementDTO.Type.SEQUENCE_DIAGRAM,
+            EnumSet.of(
+                Type.LIFELINE,
+                Type.NOTE),
+            EnumSet.of(
+                Type.MESSAGE)),
+
+        new OverlapTarget(
+            NamedElementDTO.Type.ACTIVITY_DIAGRAM,
+            EnumSet.of(
+                Type.INITIAL_NODE,
+                Type.ACTION,
+                Type.FLOW_FINAL_NODE,
+                Type.SEND_SIGNAL_ACTION,
+                Type.ACCEPT_EVENT_ACTION,
+                Type.PROCESS,
+                Type.CALL_BEHAVIOR_ACTION,
+                Type.ACTIVITY_FINAL,
+                Type.DECISION_NODE_AND_MERGE_NODE,
+                Type.FORK_NODE,
+                Type.JOIN_NODE,
+                Type.OBJECT_NODE,
+                Type.NOTE),
+            EnumSet.of(
+                Type.CONTROL_FLOW_OR_OBJECT_FLOW)),
+
+        new OverlapTarget(
+            NamedElementDTO.Type.STATE_MACHINE_DIAGRAM,
+            EnumSet.of(
+                Type.INITIAL_PSEUDOSTATE,
+                Type.FINAL_STATE,
+                Type.JUNCTION_PSEUDOSTATE,
+                Type.CHOICE_PSEUDOSTATE,
+                Type.FORK_PSEUDOSTATE,
+                Type.JOIN_PSEUDOSTATE,
+                Type.NOTE),
+            EnumSet.of(
+                Type.TRANSITION)),
+
+        new OverlapTarget(
+            NamedElementDTO.Type.REQUIREMENT_DIAGRAM,
+            EnumSet.of(
+                Type.REQUIREMENT,
+                Type.TEST_CASE,
+                Type.CLASS,
+                Type.USE_CASE,
+                Type.NOTE),
+            EnumSet.of(
+                Type.NEST,
+                Type.DERIVE_REQT,
+                Type.COPY,
+                Type.SATISFY,
+                Type.VERIFY,
+                Type.REFINE,
+                Type.TRACE,
+                Type.DEPENDENCY)));
+
+    private static final String SUPPORTED_DIAGRAM_TYPE_NAMES = OVERLAP_TARGETS.stream()
+        .map(target -> target.diagramType().typeName)
+        .collect(Collectors.joining(", "));
 
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
@@ -53,7 +151,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
         return List.of(
             ToolSupport.toolDefinitionReturningDto(
                 "detect_overlap",
-                "Detect overlap of presentations in the specified diagram (specified by ID) and return the overlap information. An empty string is returned when no overlap is detected. Use this tool when you need to adjust the layout of a diagram.",
+                "Detect overlap of presentations in the specified diagram (specified by ID) and return the overlap information. Use this tool when you need to adjust the layout of a diagram. Supported diagram types: " + SUPPORTED_DIAGRAM_TYPE_NAMES + ".",
                 this::detectOverlap,
                 IdDTO.class,
                 ReportDTO.class));
@@ -64,105 +162,32 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
         StringBuilder sbContents = new StringBuilder();
 
         // Retrieve the node/link presentations to be checked for overlap detection
-        List<INodePresentation> targetNodePresentations;
-        List<ILinkPresentation> targetLinkPresentations;
-        if (diagram instanceof IClassDiagram) {
-            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
-                Type.CLASS,
-                Type.ASSOCIATION_CLASS,
-                Type.INSTANCE_SPECIFICATION,
-                Type.USE_CASE,
-                Type.NOTE));
-
-            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
-                Type.ASSOCIATION,
-                Type.GENERALIZATION,
-                Type.REALIZATION,
-                Type.DEPENDENCY,
-                Type.USAGE,
-                Type.LINK));
-
-        } else if (diagram instanceof IUseCaseDiagram) {
-            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
-                Type.CLASS,
-                Type.USE_CASE,
-                Type.NOTE));
-
-            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
-                Type.ASSOCIATION,
-                Type.GENERALIZATION,
-                Type.DEPENDENCY,
-                Type.EXTEND,
-                Type.INCLUDE));
-
-        } else if (diagram instanceof ISequenceDiagram) {
-            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
-                Type.LIFELINE,
-                Type.NOTE));
-
-            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
-                Type.MESSAGE));
-
-        } else if (diagram instanceof IActivityDiagram) {
-            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
-                Type.INITIAL_NODE,
-                Type.ACTION,
-                Type.FLOW_FINAL_NODE,
-                Type.SEND_SIGNAL_ACTION,
-                Type.ACCEPT_EVENT_ACTION,
-                Type.PROCESS,
-                Type.CALL_BEHAVIOR_ACTION,
-                Type.ACTIVITY_FINAL,
-                Type.DECISION_NODE_AND_MERGE_NODE,
-                Type.FORK_NODE,
-                Type.JOIN_NODE,
-                Type.OBJECT_NODE,
-                Type.NOTE));
-
-            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
-                Type.CONTROL_FLOW_OR_OBJECT_FLOW));
-
-        } else if (diagram instanceof IStateMachineDiagram) {
-            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
-                Type.INITIAL_PSEUDOSTATE,
-                Type.FINAL_STATE,
-                Type.JUNCTION_PSEUDOSTATE,
-                Type.CHOICE_PSEUDOSTATE,
-                Type.FORK_PSEUDOSTATE,
-                Type.JOIN_PSEUDOSTATE,
-                Type.NOTE));
-
-            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
-                Type.TRANSITION));
-
-        } else if (diagram instanceof IRequirementDiagram) {
-            targetNodePresentations = getNodePresentationsByTypes(diagram, EnumSet.of(
-                Type.REQUIREMENT,
-                Type.TEST_CASE,
-                Type.CLASS,
-                Type.USE_CASE,
-                Type.NOTE));
-
-            targetLinkPresentations = getLinkPresentationsByTypes(diagram, EnumSet.of(
-                Type.NEST,
-                Type.DERIVE_REQT,
-                Type.COPY,
-                Type.SATISFY,
-                Type.VERIFY,
-                Type.REFINE,
-                Type.TRACE,
-                Type.DEPENDENCY));
-
-        } else {
-            throw new IllegalArgumentException("The type of this diagram is excluded from overlap detection: " + diagram.getName() + "(" + diagram.getId() + ")");
-        }
+        OverlapTarget overlapTarget = findOverlapTarget(diagram).orElseThrow(() -> new IllegalArgumentException(String.format(
+            "The type of this diagram is excluded from overlap detection: %s(%s) is a diagram of type %s. Supported diagram types: %s.",
+            diagram.getName(),
+            diagram.getId(),
+            NamedElementDTO.Type.getCorrespondingType(diagram).typeName,
+            SUPPORTED_DIAGRAM_TYPE_NAMES)));
+        List<INodePresentation> targetNodePresentations = getNodePresentationsByTypes(diagram, overlapTarget.nodeTypes());
+        List<ILinkPresentation> targetLinkPresentations = getLinkPresentationsByTypes(diagram, overlapTarget.linkTypes());
 
         // Detect overlaps
         sbContents.append(detectOverlapsBetweenRectangles(targetNodePresentations));
         sbContents.append(detectOverlapsBetweenLines(targetLinkPresentations));
         sbContents.append(detectOverlapsBetweenRectangleAndLine(targetNodePresentations, targetLinkPresentations));
 
+        if (sbContents.isEmpty()) {
+            sbContents.append("No overlap was detected.");
+        }
+
         return new ReportDTO(sbContents.toString());
+    }
+
+    // Find the overlap target for the type of the diagram, if overlap detection supports it
+    private static Optional<OverlapTarget> findOverlapTarget(IDiagram diagram) {
+        return OVERLAP_TARGETS.stream()
+            .filter(target -> target.diagramType().typeClass.isInstance(diagram))
+            .findFirst();
     }
 
     // Retrieve node presentations of the specified types

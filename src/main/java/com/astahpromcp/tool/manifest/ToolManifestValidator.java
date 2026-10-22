@@ -25,14 +25,13 @@ public final class ToolManifestValidator {
         }
 
         verifyEveryToolIsDecidedAbout(manifest, existingNames);
-        verifyEveryWithheldRowStillExists(manifest, existingNames);
-        verifyEveryPublishingRowNamesAnExistingTool(manifest, existingNames, missingToolsStopStartup);
+        verifyEveryReachingRowNamesAnExistingTool(manifest, existingNames, missingToolsStopStartup);
 
-        log.info("Tool manifest verified: {} rows, direct={} programmatic={} withheld={}",
+        log.info("Tool manifest verified: {} rows, direct={} programmatic={} mcpToolScript={}",
                 manifest.size(),
                 manifest.namesFor(ToolManifest.Profile.DIRECT).size(),
                 manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size(),
-                manifest.withheldNames().size());
+                manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC, ToolManifest.Reach.MCP_TOOL_SCRIPT).size());
     }
 
     // A tool nobody has decided about must not be published by default, so it has to have a row.
@@ -48,12 +47,11 @@ public final class ToolManifestValidator {
         }
     }
 
-    // A row that publishes a tool that does not exist publishes nothing.
-    private static void verifyEveryPublishingRowNamesAnExistingTool(ToolManifest manifest, Set<String> existingNames, boolean missingToolsStopStartup) {
+    // A row that publishes a tool, or lets an mcp tool script call one, that does not exist provides nothing.
+    private static void verifyEveryReachingRowNamesAnExistingTool(ToolManifest manifest, Set<String> existingNames, boolean missingToolsStopStartup) {
         Set<String> unknown = new TreeSet<>();
         for (String name : manifest.allNames()) {
-            ToolManifest.Entry entry = manifest.find(name);
-            if (!existingNames.contains(name) && (entry.direct() || entry.programmatic())) {
+            if (!existingNames.contains(name) && manifest.find(name).reachable()) {
                 unknown.add(name);
             }
         }
@@ -61,23 +59,9 @@ public final class ToolManifestValidator {
             return;
         }
         if (missingToolsStopStartup) {
-            throw new IllegalStateException("These manifest rows publish tools that do not exist, so the server would not publish what the manifest says. Look earlier in the log for a tool provider that failed to build them: " + unknown);
+            throw new IllegalStateException("These manifest rows publish tools, or let an mcp tool script call tools, that do not exist, so the server would not provide what the manifest says. Look earlier in the log for a tool provider that failed to build them: " + unknown);
         }
-        log.warn("These manifest rows publish tools that do not exist, so they publish nothing. Outside the Astah GUI the view manager tools are expected here: {}", unknown);
-    }
-
-    // (the part that needs the catalog): a withheld row for a tool that no longer exists is stale text.
-    // It publishes nowhere and is not callable from an MCP tool script either, so it does no harm beyond being wrong.
-    private static void verifyEveryWithheldRowStillExists(ToolManifest manifest, Set<String> existingNames) {
-        Set<String> unknown = new TreeSet<>();
-        for (String name : manifest.withheldNames()) {
-            if (!existingNames.contains(name)) {
-                unknown.add(name);
-            }
-        }
-        if (!unknown.isEmpty()) {
-            log.error("These rows are withheld from every profile but the tools no longer exist: {}", unknown);
-        }
+        log.warn("These manifest rows publish tools, or let an mcp tool script call tools, that do not exist, so they provide nothing. Outside the Astah GUI the view manager tools are expected here: {}", unknown);
     }
 
     // What a profile actually registered is what the manifest selects from the tools that exist

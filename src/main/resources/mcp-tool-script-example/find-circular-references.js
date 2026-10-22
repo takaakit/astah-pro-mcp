@@ -1,5 +1,5 @@
 /*
- * Finds the classifiers that reference one another in a circle, along association, inheritance, realization and dependency lines, and prints the distinct shortest circles through them.
+ * Finds the classifiers that reference one another in a circle, along association, inheritance, realization and dependency lines, and prints the shortest circle through each of them.
  */
 
 // Every classifier under this package is examined, the whole project by default.

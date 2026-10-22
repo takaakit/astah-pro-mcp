@@ -31,7 +31,7 @@ public record MessageDTO(
     @JsonPropertyDescription("Index. Empty if none (e.g., a return message).")
     String index,
 
-    @JsonPropertyDescription("Activator")
+    @JsonPropertyDescription("Activator. For a return message, this is the message it returns from.")
     NameIdTypeDTO activator,
 
     @JsonPropertyDescription("Successor")

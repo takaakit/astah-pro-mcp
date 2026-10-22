@@ -16,8 +16,7 @@ public class LogToolFactory {
     public List<ToolProvider> createToolProviders() {
         try {
             return List.of(
-                    new AstahProLogFileTool(),
-                    new McpServerLogFileTool()
+                    new LogFileTool()
             );
             
         } catch (Exception e) {

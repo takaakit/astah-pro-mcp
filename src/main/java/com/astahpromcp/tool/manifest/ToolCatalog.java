@@ -10,6 +10,8 @@ import com.astahpromcp.tool.info.InfoToolFactory;
 import com.astahpromcp.tool.knowledge.KnowledgeToolFactory;
 import com.astahpromcp.tool.log.LogToolFactory;
 import com.astahpromcp.tool.mcptoolscript.FilteredToolProvider;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
+import com.astahpromcp.tool.projectdiff.ProjectDiffToolFactory;
 import com.astahpromcp.tool.visualization.VisualizationToolFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,35 +72,37 @@ public final class ToolCatalog {
     }
 
     // Build one catalog
-    public static ToolCatalog build(DiagramThumbnails thumbnails, Path imageOutputDir, Path workspaceDir) {
-        return new ToolCatalog(astahProviders(thumbnails, imageOutputDir), sharedProviders(workspaceDir));
+    public static ToolCatalog build(DiagramThumbnails thumbnails, Path imageOutputDir, Path workspaceDir, ProjectDiffJobs projectDiffJobs) {
+        return new ToolCatalog(astahProviders(thumbnails, imageOutputDir, projectDiffJobs), sharedProviders(workspaceDir, projectDiffJobs));
     }
 
     // Build both thumbnail variants, sharing the providers the setting does not affect.
-    public static Map<DiagramThumbnails, ToolCatalog> buildAll(Path imageOutputDir, Path workspaceDir) {
-        List<ToolProvider> shared = sharedProviders(workspaceDir);
+    // Every catalog gets the same comparisons, so that a comparison started from either one has its result found by the tool that fetches it.
+    public static Map<DiagramThumbnails, ToolCatalog> buildAll(Path imageOutputDir, Path workspaceDir, ProjectDiffJobs projectDiffJobs) {
+        List<ToolProvider> shared = sharedProviders(workspaceDir, projectDiffJobs);
 
         Map<DiagramThumbnails, ToolCatalog> catalogs = new EnumMap<>(DiagramThumbnails.class);
         for (DiagramThumbnails thumbnails : DiagramThumbnails.values()) {
-            catalogs.put(thumbnails, new ToolCatalog(astahProviders(thumbnails, imageOutputDir), shared));
+            catalogs.put(thumbnails, new ToolCatalog(astahProviders(thumbnails, imageOutputDir, projectDiffJobs), shared));
         }
         return catalogs;
     }
 
     // The providers every profile puts behind the Astah API lock
-    private static List<ToolProvider> astahProviders(DiagramThumbnails thumbnails, Path imageOutputDir) {
-        return new AstahProToolFactory(imageOutputDir)
+    private static List<ToolProvider> astahProviders(DiagramThumbnails thumbnails, Path imageOutputDir, ProjectDiffJobs projectDiffJobs) {
+        return new AstahProToolFactory(imageOutputDir, projectDiffJobs)
                 .createRawToolProviders(thumbnails);
     }
 
-    // The five factories that never touch the Astah API, so they are not wrapped for any profile
-    private static List<ToolProvider> sharedProviders(Path workspaceDir) {
+    // The six factories that never touch the Astah API, so they are not wrapped for any profile
+    private static List<ToolProvider> sharedProviders(Path workspaceDir, ProjectDiffJobs projectDiffJobs) {
         List<ToolProvider> providers = new ArrayList<>();
         providers.addAll(new LogToolFactory().createToolProviders());
         providers.addAll(new KnowledgeToolFactory(workspaceDir).createToolProviders());
         providers.addAll(new VisualizationToolFactory().createToolProviders());
         providers.addAll(new ConfigToolFactory().createToolProviders());
         providers.addAll(new InfoToolFactory().createToolProviders());
+        providers.addAll(new ProjectDiffToolFactory(projectDiffJobs).createToolProviders());
         return providers;
     }
 

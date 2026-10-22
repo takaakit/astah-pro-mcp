@@ -381,6 +381,7 @@ public class SequenceDiagramEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals("Test Return Message", outputDTO.presentation().label());
     }
 
     @Test

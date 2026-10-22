@@ -13,6 +13,7 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.editor.BasicDiagramEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IComment;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
@@ -36,7 +37,7 @@ public class BasicDiagramEditorTool extends AstahToolProvider {
     private final AstahProToolSupport astahProToolSupport;
     private final DiagramEditorSupport diagramEditorSupport;
     private final ImageCaptureSupport imageCaptureSupport;
-    private static final double NOTE_MAX_WIDTH = 800.0;
+    static final double NOTE_MAX_WIDTH = 800.0;
 
     public BasicDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, DiagramEditorSupport diagramEditorSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
@@ -88,11 +89,15 @@ public class BasicDiagramEditorTool extends AstahToolProvider {
             if (notePresentation.getWidth() > NOTE_MAX_WIDTH) {
                 try {
                     notePresentation.setWidth(NOTE_MAX_WIDTH);
-                    notePresentation.setLocation(new Point2D.Double(param.locationX(), param.locationY()));
-                } catch (Exception e) {
-                    // Some diagram types (e.g. sequence diagrams) do not support resizing note.
-                    throw new RuntimeException(String.format("The width of the note cannot be changed. Adjust the width of the note by inserting line breaks at appropriate positions in the content to be written in the note. The width of a note cannot be adjusted on this diagram, so create the note again with line breaks already inserted so that every line fits within %.1f points. This note is %.1f points wide.", NOTE_MAX_WIDTH, notePresentation.getWidth()), e);
+                } catch (InvalidEditingException e) {
+                    // Some diagram types (e.g. sequence diagrams) do not support resizing a note.
+                    if (!InvalidEditingException.UNSUPPORTED_ELEMENT_ERROR_KEY.equals(e.getKey())) {
+                        throw e;
+                    } else {
+                        throw new RuntimeException(String.format("The note cannot be created on this diagram as it is. The size of a note cannot be changed here, so a note wider than %.1f points cannot be narrowed to fit. This note would be %.1f points wide. Insert line breaks (\\n) into noteContent so that every line is at most %.1f points wide, and call create_note again.", NOTE_MAX_WIDTH, notePresentation.getWidth(), NOTE_MAX_WIDTH), e);
+                    }
                 }
+                notePresentation.setLocation(new Point2D.Double(param.locationX(), param.locationY()));
             }
             return notePresentation;
         });

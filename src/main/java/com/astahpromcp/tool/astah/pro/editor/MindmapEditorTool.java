@@ -39,6 +39,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 import java.util.List;
 
 // Tools definition for the following Astah API.
@@ -144,7 +145,7 @@ public class MindmapEditorTool extends AstahToolProvider {
 
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_boundary_of_topic",
-                "Set the boundary visibility of the specified topic (specified by presentation ID) on the specified mind map diagram (specified by ID), and return the node presentation of the root topic within the set boundary along with the updated diagram image in low resolution. A boundary is an outline that collectively encloses a specific topic and its subordinate topics. It is used to make a particular group of topics stand out or to emphasize it.",
+                "Set the boundary visibility of the specified topic (specified by presentation ID) on the specified mind map diagram (specified by ID), and return the node presentation of the root topic within the set boundary along with the updated diagram image in low resolution. A boundary is an outline that collectively encloses a specific topic and its subordinate topics. It is used to make a particular group of topics stand out or to emphasize it. A boundary cannot be shown on the root topic of the diagram or on a floating topic.",
                 this::setBoundaryOfTopic,
                 TopicWithBoundaryVisibilityDTO.class,
                 NodePresentationDTO.class)
@@ -356,6 +357,14 @@ public class MindmapEditorTool extends AstahToolProvider {
     private Pair<NodePresentationDTO, List<McpSchema.Content>> setBoundaryOfTopic(TopicWithBoundaryVisibilityDTO param) throws Exception {
         IMindMapDiagram astahMindMapDiagram = astahProToolSupport.getMindMapDiagram(param.targetDiagramId());
         INodePresentation astahTargetTopic = astahProToolSupport.getNodePresentation(param.targetTopicId());
+
+        boolean isRootTopic = astahTargetTopic.equals(astahMindMapDiagram.getRoot());
+        boolean isFloatingTopic = Arrays.asList(astahMindMapDiagram.getFloatingTopics()).contains(astahTargetTopic);
+        if (param.boundaryVisibility() && (isRootTopic || isFloatingTopic)) {
+            throw new IllegalArgumentException(String.format(
+                "A boundary cannot be shown on %s: %s(%s). Astah does not draw a boundary on the root topic or on a floating topic. Show it on a topic that has a parent topic instead.",
+                isRootTopic ? "the root topic" : "a floating topic", astahTargetTopic.getLabel(), astahTargetTopic.getID()));
+        }
 
         mindmapEditor.setDiagram(astahMindMapDiagram);
 

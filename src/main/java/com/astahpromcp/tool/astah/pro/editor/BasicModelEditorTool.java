@@ -579,9 +579,12 @@ public class BasicModelEditorTool extends AstahToolProvider {
 
         systemPropertySupport.deleteWithoutConfirmationDialog( () -> {
             txnAstah.run( () -> {
-                if (astahElement instanceof IERModel || astahElement instanceof IEREntity || astahElement instanceof IERAttribute
-                        || astahElement instanceof IERRelationship || astahElement instanceof IERSubtypeRelationship
-                        || astahElement instanceof IERDatatype || astahElement instanceof IERDomain) {
+                if (astahElement instanceof IERModel
+                        || astahElement instanceof IEREntity
+                        || astahElement instanceof IERAttribute
+                        || astahElement instanceof IERRelationship
+                        || astahElement instanceof IERSubtypeRelationship
+                        || astahElement instanceof IERDatatype) {
                     erModelEditor.delete(astahElement);
                 } else {
                     basicModelEditor.delete(astahElement);

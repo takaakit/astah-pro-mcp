@@ -4,9 +4,13 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
+import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
 import com.astahpromcp.tool.mcptoolscript.McpToolScriptProviderFactory;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -25,13 +29,26 @@ public class ProfileCatalogWiringTest {
     private static final String DIRECTLY_PUBLISHED_EDITING_TOOL = "insert_svg_img_on_dgm";
 
     // The sentence the programmatic profile's instructions held as written text before it was made from the manifest
-    private static final String NOT_MCP_TOOL_SCRIPT_CALLABLE_SENTENCE = "Tool functions that return an image or other content instead of structured content, that fetch over the network or convert a PDF, that create, open or save a project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project, the Astah view, the MCP server or the logs, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ";
+    private static final String NOT_MCP_TOOL_SCRIPT_CALLABLE_SENTENCE = "Tool functions that return an image or other content instead of structured content, that fetch over the network or convert a PDF, that create, open or save a project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project, the Astah view, the MCP server or the logs, that start a background job or wait for its result, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ";
 
     @TempDir
     Path workspaceDir;
 
+    // The project comparisons the tools of the catalog share
+    private ProjectDiffJobs projectDiffJobs;
+
+    @BeforeEach
+    void setUp() {
+        projectDiffJobs = new ProjectDiffJobs(workspaceDir.resolve("project-diff"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        projectDiffJobs.shutdown();
+    }
+
     private Map<DiagramThumbnails, ToolCatalog> catalogs() {
-        return ToolCatalog.buildAll(workspaceDir.resolve("images"), workspaceDir);
+        return ToolCatalog.buildAll(workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
     }
 
     private static McpToolScriptProviderFactory.McpToolScriptTools mcpToolScriptTools(Map<DiagramThumbnails, ToolCatalog> catalogs, ToolManifest manifest) {
@@ -110,8 +127,8 @@ public class ProfileCatalogWiringTest {
     void toolProvidersOf_ok_publishesTheToolsThatRunScriptsWhereverTheManifestSaysSo() {
         Map<DiagramThumbnails, ToolCatalog> catalogs = catalogs();
         ToolManifest manifest = ToolManifest.parse(List.of(
-                "Common\trun_mcp_tool_script\tx\t-",
-                "Common\tmcp_tool_script_guide\t-\tx"), "test");
+                "Common\trun_mcp_tool_script\tx\ts",
+                "Common\tmcp_tool_script_guide\t-\tx\tno_structured_content"), "test");
         McpToolScriptProviderFactory.McpToolScriptTools tools = mcpToolScriptTools(catalogs, manifest);
 
         List<ToolProvider> direct = McpServerApp.toolProvidersOf(profile("direct"), catalogs, tools, manifest);
@@ -129,13 +146,27 @@ public class ProfileCatalogWiringTest {
     void toolProvidersOf_ok_publishesACatalogToolOnlyOnTheProgrammaticProfileWhenTheManifestSaysSo() {
         Map<DiagramThumbnails, ToolCatalog> catalogs = catalogs();
         ToolManifest manifest = ToolManifest.parse(List.of(
-                "Common\tget_class_info\t-\tx"), "test");
+                "Common\tget_class_info\t-\tx\tdirect"), "test");
         McpToolScriptProviderFactory.McpToolScriptTools tools = mcpToolScriptTools(catalogs, manifest);
 
         assertEquals(Set.of(), publishedNames(McpServerApp.toolProvidersOf(profile("direct"), catalogs, tools, manifest)));
         assertEquals(Set.of("get_class_info"), publishedNames(McpServerApp.toolProvidersOf(profile("programmatic"), catalogs, tools, manifest)));
 
-        assertNull(tools.registry().find("get_class_info"));
+        // Held so that a script that calls it is told to call it directly, and never called from one
+        assertEquals(NotMcpToolScriptCallableReason.PUBLISHED_DIRECTLY, tools.registry().notMcpToolScriptCallableReason("get_class_info"));
+        assertFalse(tools.registry().mcpToolScriptCallableNames().contains("get_class_info"));
+    }
+
+    @Test
+    void toolProvidersOf_ok_publishesNothingForAToolOnlyAnMcpToolScriptReaches() {
+        Map<DiagramThumbnails, ToolCatalog> catalogs = catalogs();
+        ToolManifest manifest = ToolManifest.parse(List.of(
+                "Common\tget_class_info\t-\ts"), "test");
+        McpToolScriptProviderFactory.McpToolScriptTools tools = mcpToolScriptTools(catalogs, manifest);
+
+        assertEquals(Set.of(), publishedNames(McpServerApp.toolProvidersOf(profile("direct"), catalogs, tools, manifest)));
+        assertEquals(Set.of(), publishedNames(McpServerApp.toolProvidersOf(profile("programmatic"), catalogs, tools, manifest)));
+        assertEquals(Set.of("get_class_info"), tools.registry().mcpToolScriptCallableNames());
     }
 
     @Test

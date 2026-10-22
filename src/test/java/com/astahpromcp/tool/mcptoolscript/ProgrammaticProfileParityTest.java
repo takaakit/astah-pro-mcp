@@ -7,6 +7,9 @@ import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -18,21 +21,34 @@ import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// What the manifest cannot say, and the startup checks therefore cannot check.
+// What the manifest cannot say, and the startup checks therefore cannot check, and whether the profiles are wired as it does say.
 public class ProgrammaticProfileParityTest {
 
     @TempDir
     Path workspaceDir;
 
+    // The project comparisons the tools of the catalog share
+    private ProjectDiffJobs projectDiffJobs;
+
+    @BeforeEach
+    void setUp() {
+        projectDiffJobs = new ProjectDiffJobs(workspaceDir.resolve("project-diff"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        projectDiffJobs.shutdown();
+    }
+
     private ToolCatalog catalog(DiagramThumbnails thumbnails) {
-        return ToolCatalog.build(thumbnails, workspaceDir.resolve("images"), workspaceDir);
+        return ToolCatalog.build(thumbnails, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
     }
 
     private static ToolManifest manifest() {
         return ToolManifest.load();
     }
 
-    // The programmatic profile as McpServerApp assembles it: what the programmatic column selects among the tools that run
+    // The programmatic profile as McpServerApp assembles it: what the programmatic column publishes ('x') among the tools that run
     // mcp tool scripts and the tools of the catalog
     private List<ToolProvider> programmaticProfileProviders(ToolCatalog catalog, ToolManifest manifest) {
         Set<String> names = manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC);
@@ -51,7 +67,7 @@ public class ProgrammaticProfileParityTest {
         return names;
     }
 
-    // The programmatic profile as McpToolScriptProviderFactory builds it: the direct profile can be reached, the rows with a reason cannot
+    // The programmatic profile as McpToolScriptProviderFactory builds it: the rows marked 's' can be called, the rows marked 'x' are held with their reason
     private static AstahToolRegistry registryOf(ToolCatalog catalog, ToolManifest manifest) {
         return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
     }
@@ -69,9 +85,9 @@ public class ProgrammaticProfileParityTest {
         assertFalse(withheld.isEmpty(), "the comparison is only meaningful if some tools are actually withheld");
     }
 
-    // The half of the rule the manifest cannot state and the startup checks therefore cannot check.
-    // Publishing a tool directly and leaving it callable from a script would give the agent two ways to do one thing
-    // with nothing to choose between them, so the two sets have to be disjoint as well as cover the direct profile.
+    // One half of the rule. Publishing a tool directly and leaving it callable from a script would give the agent two ways
+    // to do one thing with nothing to choose between them, so the two sets have to be disjoint as well as cover the direct profile.
+    // The manifest states it, since a row is either 'x' or 's', so what this checks is that the wiring keeps to it.
     @Test
     void programmaticProfile_ok_reachesNoToolBothDirectlyAndFromAScript() {
         ToolCatalog catalog = catalog(DiagramThumbnails.OMIT);
@@ -84,7 +100,7 @@ public class ProgrammaticProfileParityTest {
         assertTrue(both.isEmpty(), "reachable both directly and from a script: " + both);
     }
 
-    // The reason for the test above, stated as the thing that would break it: every tool the programmatic column names is withheld from a script, and the ones the registry holds say why.
+    // The reason for the test above, stated as the thing that would break it: every tool the programmatic column marks 'x' is withheld from a script, and the ones the registry holds say why.
     @Test
     void mcpToolScriptCallableNames_ok_holdsNoToolTheProgrammaticColumnPublishes() {
         ToolCatalog catalog = catalog(DiagramThumbnails.OMIT);
@@ -102,6 +118,7 @@ public class ProgrammaticProfileParityTest {
     // The other half of the rule the test above states: the two sets cover the direct profile between them, so
     // nothing the direct profile publishes becomes unreachable on the programmatic profile. Disjoint and covering together
     // are what make it a partition -- exactly one way to reach every tool, and never none.
+    // The parser already refuses a row with direct = x and programmatic = -, so what this checks is that the wiring keeps to it.
     @Test
     void programmaticProfile_ok_leavesNoToolOfTheDirectProfileUnreachable() {
         ToolCatalog catalog = catalog(DiagramThumbnails.OMIT);
@@ -111,7 +128,7 @@ public class ProgrammaticProfileParityTest {
 
         Set<String> unreachable = new TreeSet<>();
         for (String name : manifest.namesFor(ToolManifest.Profile.DIRECT)) {
-            // The registry holds every tool of the direct column that exists, so a name it lacks names no tool here
+            // The registry holds every tool the programmatic column reaches that exists, which the parser makes a superset of the direct column, so a name it lacks names no tool here
             if (registry.find(name) == null) {
                 continue;
             }
@@ -180,7 +197,7 @@ public class ProgrammaticProfileParityTest {
     // never which tools exist or what they are called.
     @Test
     void createRawToolProviders_ok_omittingThumbnailsChangesNoToolAtAll() {
-        AstahProToolFactory factory = new AstahProToolFactory(workspaceDir.resolve("images"));
+        AstahProToolFactory factory = new AstahProToolFactory(workspaceDir.resolve("images"), projectDiffJobs);
 
         Set<String> withThumbnails = toolNamesOf(factory.createRawToolProviders(DiagramThumbnails.INCLUDE));
         Set<String> withoutThumbnails = toolNamesOf(factory.createRawToolProviders(DiagramThumbnails.OMIT));
@@ -193,7 +210,7 @@ public class ProgrammaticProfileParityTest {
     // thumbnails at all, and that one has to mean INCLUDE.
     @Test
     void createRawToolProviders_ok_capturesThumbnailsUnlessAskedNotTo() {
-        AstahProToolFactory factory = new AstahProToolFactory(workspaceDir.resolve("images"));
+        AstahProToolFactory factory = new AstahProToolFactory(workspaceDir.resolve("images"), projectDiffJobs);
 
         Set<String> byDefault = toolNamesOf(factory.createRawToolProviders());
         Set<String> explicitlyIncluded = toolNamesOf(factory.createRawToolProviders(DiagramThumbnails.INCLUDE));

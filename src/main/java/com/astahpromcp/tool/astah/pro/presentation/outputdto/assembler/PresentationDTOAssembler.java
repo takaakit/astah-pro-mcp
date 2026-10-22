@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler;
 
 import com.change_vision.jude.api.inf.model.IHyperlink;
+import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
 import lombok.NonNull;
@@ -43,8 +44,13 @@ public class PresentationDTOAssembler {
             fontColor = "";
         }
 
-        // If the presentation has a null label (such as an image, rectangle, or line), use an empty string.
-        String label = astahPresentation.getLabel() != null ? astahPresentation.getLabel() : "";
+        // For a return message, () is appended to the end, so return the model name.
+        String label;
+        if (astahPresentation.getModel() instanceof IMessage astahMessage && astahMessage.isReturnMessage()) {
+            label = astahMessage.getName() != null ? astahMessage.getName() : "";
+        } else {
+            label = astahPresentation.getLabel() != null ? astahPresentation.getLabel() : "";
+        }
 
         return  new PresentationDTO(
             astahPresentation.getID(),

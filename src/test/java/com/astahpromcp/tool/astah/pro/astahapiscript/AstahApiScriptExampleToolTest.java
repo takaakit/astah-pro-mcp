@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.script.Compilable;
 import javax.script.ScriptEngine;
@@ -132,6 +133,19 @@ public class AstahApiScriptExampleToolTest {
     void examples_ok_haveADescription() {
         for (AstahApiScriptExampleTool.Example example : AstahApiScriptExampleTool.EXAMPLES) {
             assertFalse(example.description().isBlank(), example.file() + " has no description");
+        }
+    }
+
+    @Test
+    void examples_ok_openWithTheDescriptionTheCatalogueGives() throws Exception {
+        // The tools hand back the description and the file together, so the comment the file opens with must not say otherwise
+        for (AstahApiScriptExampleTool.Example example : AstahApiScriptExampleTool.EXAMPLES) {
+            String opening = AstahApiScriptExampleTool.loadExample(example.file()).lines()
+                    .limit(3)
+                    .collect(Collectors.joining("\n"));
+
+            assertEquals("/*\n * " + example.description() + "\n */", opening,
+                    example.file() + " must open with its description from the catalogue, on one line of a comment of its own");
         }
     }
 

@@ -6,6 +6,7 @@ import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,16 +36,21 @@ public class McpToolScriptCallCostTest {
 
     private ProjectAccessor projectAccessor;
 
+    // The project comparisons the tools of the catalog share
+    private ProjectDiffJobs projectDiffJobs;
+
     @BeforeEach
     void setUp() throws Exception {
         // A project of this test's own, so the measurement never touches a project the user has open
         projectAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
         projectAccessor.create();
+        projectDiffJobs = new ProjectDiffJobs(workspaceDir.resolve("project-diff"));
     }
 
     @AfterEach
     void tearDown() throws Exception {
         AstahApiLock.clearSuspension();
+        projectDiffJobs.shutdown();
         if (projectAccessor != null) {
             projectAccessor.close();
         }
@@ -52,7 +58,7 @@ public class McpToolScriptCallCostTest {
 
     @Test
     void execute_ok_recordsTheCostOfManyToolCallsInOneRun() {
-        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
+        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
         // No reason from the manifest is passed, so every tool the direct profile has is script callable here.
         // The programmatic profile withholds 'get_astah_pro_mcp_version' from a script because calling it once is all
         // anyone ever does, but that is exactly what makes it the right handler to measure the dispatch path with:

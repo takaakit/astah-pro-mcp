@@ -30,10 +30,10 @@ public record ERRelationshipDTO(
     @JsonPropertyDescription("Physical name. An empty string in case there is none.")
     String physicalName,
 
-    @JsonPropertyDescription("Verb Phrase(Parent to Child). null in case there is none.")
+    @JsonPropertyDescription("Verb Phrase(Parent to Child). An empty string in case there is none.")
     String verbPhraseParentToChild,
 
-    @JsonPropertyDescription("Verb Phrase(Child to Parent). null in case there is none.")
+    @JsonPropertyDescription("Verb Phrase(Child to Parent). An empty string in case there is none.")
     String verbPhraseChildToParent,
 
     @JsonPropertyDescription("Check if the ER relationship is Identifying.")

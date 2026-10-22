@@ -5,7 +5,10 @@ import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import io.modelcontextprotocol.spec.McpSchema;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
@@ -21,6 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.script.Compilable;
 import javax.script.ScriptEngine;
@@ -31,6 +35,19 @@ public class McpToolScriptExampleToolTest {
 
     @TempDir
     Path workspaceDir;
+
+    // The project comparisons the tools of the catalog share
+    private ProjectDiffJobs projectDiffJobs;
+
+    @BeforeEach
+    void setUp() {
+        projectDiffJobs = new ProjectDiffJobs(workspaceDir.resolve("project-diff"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        projectDiffJobs.shutdown();
+    }
 
     // How an example calls a tool function
     private static final Pattern TOOL_CALL = Pattern.compile("tools\\.([a-zA-Z0-9_]+)\\s*\\(");
@@ -80,7 +97,7 @@ public class McpToolScriptExampleToolTest {
 
     private AstahToolRegistry registry() {
         ToolManifest manifest = ToolManifest.load();
-        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
+        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
 
         return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
     }
@@ -168,6 +185,19 @@ public class McpToolScriptExampleToolTest {
     void examples_ok_haveADescription() {
         for (McpToolScriptExampleTool.Example example : McpToolScriptExampleTool.EXAMPLES) {
             assertFalse(example.description().isBlank(), example.file() + " has no description");
+        }
+    }
+
+    @Test
+    void examples_ok_openWithTheDescriptionTheCatalogueGives() throws Exception {
+        // The tools hand back the description and the file together, so the comment the file opens with must not say otherwise
+        for (McpToolScriptExampleTool.Example example : McpToolScriptExampleTool.EXAMPLES) {
+            String opening = McpToolScriptExampleTool.loadExample(example.file()).lines()
+                    .limit(3)
+                    .collect(Collectors.joining("\n"));
+
+            assertEquals("/*\n * " + example.description() + "\n */", opening,
+                    example.file() + " must open with its description from the catalogue, on one line of a comment of its own");
         }
     }
 

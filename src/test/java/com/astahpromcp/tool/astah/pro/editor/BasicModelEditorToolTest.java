@@ -12,6 +12,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
@@ -933,11 +934,10 @@ public class BasicModelEditorToolTest {
         ERModelEditor erModelEditor = projectAccessor.getModelEditorFactory().getERModelEditor();
         TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
 
-        // One ER element of each kind. BasicModelEditor deletes some of them and ERModelEditor the others.
+        // One ER element of each kind except an ER domain, which deleteElement() fails to delete. BasicModelEditor deletes some of them and ERModelEditor the others.
         IERModel erModel = transactionSupport.call(() -> erModelEditor.createERModel(projectAccessor.getProject(), "ERModel"));
         IERSchema erSchema = erModel.getSchemata()[0];
         IERDatatype erDatatype = transactionSupport.call(() -> erModelEditor.createERDatatype(erModel, "Datatype"));
-        IERDomain erDomain = transactionSupport.call(() -> erModelEditor.createERDomain(erModel, null, "Domain", "domain", erDatatype));
         IERPackage erPackage = transactionSupport.call(() -> erModelEditor.createERPackage(erSchema, "ERPackage"));
         IEREntity parentEntity = transactionSupport.call(() -> erModelEditor.createEREntity(erSchema, "ParentEntity", "parent_entity"));
         IEREntity childEntity = transactionSupport.call(() -> erModelEditor.createEREntity(erSchema, "ChildEntity", "child_entity"));
@@ -952,7 +952,7 @@ public class BasicModelEditorToolTest {
         // Call deleteElement()
         // ----------------------------------------
         for (IElement element : new IElement[] {
-                erIndex, erAttribute, erRelationship, erSubtypeRelationship, erDomain, erDatatype,
+                erIndex, erAttribute, erRelationship, erSubtypeRelationship, erDatatype,
                 erPackage, childEntity, parentEntity, erSchema, erModel}) {
             String id = element.getId();
             ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
@@ -964,6 +964,38 @@ public class BasicModelEditorToolTest {
             // Check output DTO
             assertEquals(id, outputDTO.id(), element.getClass().getSimpleName());
         }
+    }
+
+    @Test
+    void deleteElement_ng_erDomain() throws Exception {
+        ERModelEditor erModelEditor = projectAccessor.getModelEditorFactory().getERModelEditor();
+        TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
+
+        // ER domain
+        IERModel erModel = transactionSupport.call(() -> erModelEditor.createERModel(projectAccessor.getProject(), "ERModel"));
+        IERDatatype erDatatype = transactionSupport.call(() -> erModelEditor.createERDatatype(erModel, "Datatype"));
+        IERDomain erDomain = transactionSupport.call(() -> erModelEditor.createERDomain(erModel, null, "Domain", "domain", erDatatype));
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(erDomain.getId());
+
+        // ----------------------------------------
+        // Call deleteElement()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDto(
+                deleteElement,
+                tool,
+                inputDTO,
+                ElementDTO.class);
+        });
+
+        // Check exception: BasicModelEditor.delete() rejects an ER domain
+        assertInstanceOf(InvalidEditingException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("Parameter should be set correctly."), exception.getCause().getMessage());
+
+        // Check that the ER domain was not deleted
+        assertNotNull(projectAccessor.getEntity(erDomain.getId()));
     }
 
     @Test

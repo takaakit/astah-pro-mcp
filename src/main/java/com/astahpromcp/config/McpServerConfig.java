@@ -175,6 +175,69 @@ public final class McpServerConfig {
     public static final String ENV_LOG_PANEL_LEVEL = "ASTAH_PRO_MCP_LOG_PANEL_LEVEL";
 
     // ----------
+    // Project comparison
+
+    // Maximum number of comparisons being prepared or running at once
+    public static final int PROJECT_DIFF_MAX_JOBS_IN_PROGRESS = 2;
+
+    // Maximum number of comparisons kept, including finished ones whose results are still kept
+    public static final int PROJECT_DIFF_MAX_STORED_JOBS = 100;
+
+    // Number of comparisons the background runs at the same time
+    public static final int PROJECT_DIFF_CONCURRENT_JOBS = 1;
+
+    // Maximum size of a project file to compare
+    public static final long PROJECT_DIFF_MAX_PROJECT_FILE_BYTES = 64L * 1024 * 1024;
+
+    // Maximum time to copy one project file
+    public static final long PROJECT_DIFF_COPY_TIMEOUT_SECONDS = 10;
+
+    // Maximum time to wait, after writing the open project's XMI, for the EDT to finish what was queued meanwhile
+    public static final long PROJECT_DIFF_CAPTURE_EDT_WAIT_SECONDS = 10;
+
+    // Maximum size of an XMI to compare
+    public static final long PROJECT_DIFF_MAX_XMI_BYTES = 128L * 1024 * 1024;
+
+    // Maximum time a separate process may take to write the XMI of a project file
+    public static final long PROJECT_DIFF_EXPORT_TIMEOUT_SECONDS = 180;
+
+    // Maximum heap of a separate process that writes an XMI
+    public static final String PROJECT_DIFF_CHILD_MAX_HEAP = "1024m";
+
+    // Maximum size of the log of a separate process
+    public static final long PROJECT_DIFF_CHILD_LOG_MAX_BYTES = 1024L * 1024;
+
+    // Maximum time get_proj_diff_result waits for a comparison to finish
+    public static final long PROJECT_DIFF_RESULT_WAIT_SECONDS = 20;
+
+    // Maximum size, as UTF-8 JSON, of one page of the result get_proj_diff_result answers with. A change too large for a page is split across pages by its properties.
+    public static final int PROJECT_DIFF_MAX_RESPONSE_BYTES = 32 * 1024;
+
+    // Maximum length of one value in the answer of get_proj_diff_result
+    public static final int PROJECT_DIFF_MAX_RESPONSE_VALUE_CHARS = 2_000;
+
+    // Maximum length of one value in a part of a change in a page of get_proj_diff_result when not even one of its properties fits in the page with its values cut to PROJECT_DIFF_MAX_RESPONSE_VALUE_CHARS
+    public static final int PROJECT_DIFF_LAST_RESORT_VALUE_CHARS = 100;
+
+    // Disk space one comparison may use
+    public static final long PROJECT_DIFF_MAX_JOB_BYTES = 512L * 1024 * 1024;
+
+    // Disk space all comparisons together may use
+    public static final long PROJECT_DIFF_MAX_TOTAL_BYTES = 2L * 1024 * 1024 * 1024;
+
+    // How long a result is kept at least after the comparison ends
+    public static final long PROJECT_DIFF_MINIMUM_RETENTION_MINUTES = 60;
+
+    // How long a result is kept at least after it was last returned, so that the file it names can still be read
+    public static final long PROJECT_DIFF_READ_GRACE_MINUTES = 10;
+
+    // Maximum time stopping the server waits for comparisons to stop
+    public static final long PROJECT_DIFF_STOP_WAIT_SECONDS = 15;
+
+    // The XMI versions ("exporterVersion/currentModelVersion") the normalization rules of the comparison were checked against
+    public static final Set<String> PROJECT_DIFF_VERIFIED_XMI_VERSIONS = Set.of("1.2.0.44/44");
+
+    // ----------
     // Output directories
 
     // Root directory where generated output is stored.

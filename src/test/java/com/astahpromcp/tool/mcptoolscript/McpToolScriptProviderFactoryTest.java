@@ -5,6 +5,9 @@ import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import tools.jackson.core.type.TypeReference;
@@ -25,8 +28,21 @@ public class McpToolScriptProviderFactoryTest {
     @TempDir
     Path workspaceDir;
 
+    // The project comparisons the tools of the catalog share
+    private ProjectDiffJobs projectDiffJobs;
+
+    @BeforeEach
+    void setUp() {
+        projectDiffJobs = new ProjectDiffJobs(workspaceDir.resolve("project-diff"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        projectDiffJobs.shutdown();
+    }
+
     private McpToolScriptProviderFactory.McpToolScriptTools tools(ToolManifest manifest) {
-        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
+        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
         return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest);
     }
 
@@ -42,23 +58,35 @@ public class McpToolScriptProviderFactoryTest {
         return names;
     }
 
-    // The shipped manifest publishes them on the programmatic profile only, so the registry holds none of them
+    // The shipped manifest publishes them directly on the programmatic profile, so the registry holds them only to tell a script why it cannot call them
     @Test
-    void createToolProviders_ok_leavesTheToolsThatRunScriptsOutOfTheRegistryUnderTheShippedManifest() {
+    void createToolProviders_ok_holdsTheToolsThatRunScriptsButLetsNoScriptCallThemUnderTheShippedManifest() {
         McpToolScriptProviderFactory.McpToolScriptTools tools = tools(ToolManifest.load());
 
-        Set<String> held = new TreeSet<>(tools.names());
-        held.retainAll(tools.registry().names());
-
-        assertEquals(Set.of(), held);
+        assertEquals(5, tools.names().size(), "the comparison is only meaningful if the tools were actually built");
+        for (String name : tools.names()) {
+            assertNotNull(tools.registry().find(name), name);
+            assertNotNull(tools.registry().notMcpToolScriptCallableReason(name), name);
+            assertFalse(tools.registry().mcpToolScriptCallableNames().contains(name), name);
+        }
     }
 
-    // direct = x and programmatic = - makes them callable from a script, and the list a script reads then names them too
+    // What a script can call is exactly the rows marked 's', in file order, all of which exist outside the Astah GUI too
+    @Test
+    void createToolProviders_ok_letsAScriptCallExactlyTheRowsMarkedS() {
+        ToolManifest manifest = ToolManifest.load();
+        McpToolScriptProviderFactory.McpToolScriptTools tools = tools(manifest);
+
+        assertEquals(List.copyOf(manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC, ToolManifest.Reach.MCP_TOOL_SCRIPT)), List.copyOf(tools.registry().mcpToolScriptCallableNames()));
+        assertTrue(manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC).containsAll(tools.registry().names()));
+    }
+
+    // programmatic = s makes them callable from a script, and the list a script reads then names them too
     @Test
     void createToolProviders_ok_letsAScriptCallTheToolsThatListTheCallableOnesWhenTheManifestSaysSo() {
         McpToolScriptProviderFactory.McpToolScriptTools tools = tools(ToolManifest.parse(List.of(
-                "Common\t" + CHUNK_TOOL + "\tx\t-",
-                "Common\t" + INFO_TOOL + "\tx\t-"), "test"));
+                "Common\t" + CHUNK_TOOL + "\t-\ts",
+                "Common\t" + INFO_TOOL + "\t-\ts"), "test"));
 
         assertEquals(Set.of(CHUNK_TOOL, INFO_TOOL), tools.registry().mcpToolScriptCallableNames());
 
@@ -72,11 +100,11 @@ public class McpToolScriptProviderFactoryTest {
         assertEquals(Set.of(CHUNK_TOOL), namesOf(info.get("tools")));
     }
 
-    // Published on both profiles, the tool is refused from a script for the reason the manifest gives, before it runs
+    // Published directly on the programmatic profile, as the shipped manifest publishes it, the tool is refused from a script for the reason the manifest gives, before it runs
     @Test
     void createToolProviders_ok_refusesAToolThatRunsScriptsForTheReasonTheManifestGives() {
         McpToolScriptProviderFactory.McpToolScriptTools tools = tools(ToolManifest.parse(List.of(
-                "Common\trun_mcp_tool_script\tx\tx\tdirect"), "test"));
+                "Common\trun_mcp_tool_script\t-\tx\tdirect"), "test"));
 
         assertEquals(NotMcpToolScriptCallableReason.PUBLISHED_DIRECTLY,
                 tools.registry().notMcpToolScriptCallableReason("run_mcp_tool_script"));
@@ -90,7 +118,7 @@ public class McpToolScriptProviderFactoryTest {
     @Test
     void createToolProviders_ok_turnsAwayAToolThatRunsScriptsAndAnswersWithTextLikeAnyOther() {
         McpToolScriptProviderFactory.McpToolScriptTools tools = tools(ToolManifest.parse(List.of(
-                "Common\tmcp_tool_script_guide\tx\t-"), "test"));
+                "Common\tmcp_tool_script_guide\t-\ts"), "test"));
 
         assertEquals(Set.of("mcp_tool_script_guide"), tools.registry().mcpToolScriptCallableNames());
 

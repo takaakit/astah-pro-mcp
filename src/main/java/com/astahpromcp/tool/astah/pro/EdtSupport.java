@@ -23,26 +23,41 @@ public final class EdtSupport {
     }
 
     static void drain(String toolName, String nextStep, long timeoutSeconds) {
+        switch (drainAndReport(timeoutSeconds)) {
+            case DRAINED -> {
+            }
+            case TIMED_OUT -> log.warn("EDT did not drain within {} seconds; {} anyway @tool={}", timeoutSeconds, nextStep, toolName);
+            case INTERRUPTED -> log.warn("Interrupted while draining the EDT; {} anyway @tool={}", nextStep, toolName);
+        }
+    }
+
+    // How a wait for the EDT ended
+    public enum DrainOutcome {
+        DRAINED,
+        TIMED_OUT,
+        INTERRUPTED
+    }
+
+    // Wait until everything Astah queued on the EDT before this call has run, and say whether it did.
+    public static DrainOutcome drainAndReport(long timeoutSeconds) {
+        // On the EDT nothing queued can run before the caller returns to the queue, so there is nothing to wait for
         if (SwingUtilities.isEventDispatchThread()) {
-            return;
+            return DrainOutcome.DRAINED;
         }
 
         // A thread told to stop does not wait, and keeps its interrupt. Posting to the EDT from it could also lose that interrupt: when AWT has to restart a stopped EDT, AWTAutoShutdown.activateBlockerThread() swallows it.
         if (Thread.currentThread().isInterrupted()) {
-            log.warn("Interrupted while draining the EDT; {} anyway @tool={}", nextStep, toolName);
-            return;
+            return DrainOutcome.INTERRUPTED;
         }
 
         // Wait with a bounded timeout instead of invokeAndWait: a blocked EDT must not hold the caller forever.
         CountDownLatch latch = new CountDownLatch(1);
         SwingUtilities.invokeLater(latch::countDown);
         try {
-            if (!latch.await(timeoutSeconds, TimeUnit.SECONDS)) {
-                log.warn("EDT did not drain within {} seconds; {} anyway @tool={}", timeoutSeconds, nextStep, toolName);
-            }
+            return latch.await(timeoutSeconds, TimeUnit.SECONDS) ? DrainOutcome.DRAINED : DrainOutcome.TIMED_OUT;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Interrupted while draining the EDT; {} anyway @tool={}", nextStep, toolName);
+            return DrainOutcome.INTERRUPTED;
         }
     }
 

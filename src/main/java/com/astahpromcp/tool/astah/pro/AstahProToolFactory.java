@@ -1,8 +1,8 @@
 package com.astahpromcp.tool.astah.pro;
 
-import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.common.ImageConvertSupport;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import com.astahpromcp.tool.astah.pro.editor.*;
 import com.astahpromcp.tool.astah.pro.guide.*;
 import com.astahpromcp.tool.astah.pro.image.*;
@@ -29,13 +29,11 @@ import java.util.List;
 public class AstahProToolFactory {
 
     private final Path imageOutputDir;
+    private final ProjectDiffJobs projectDiffJobs;
 
-    public AstahProToolFactory() {
-        this(McpServerConfig.WORKSPACE_DIR.resolve("images"));
-    }
-
-    public AstahProToolFactory(Path imageOutputDir) {
+    public AstahProToolFactory(Path imageOutputDir, ProjectDiffJobs projectDiffJobs) {
         this.imageOutputDir = imageOutputDir;
+        this.projectDiffJobs = projectDiffJobs;
     }
 
     // Whether this runs inside the Astah GUI (the plugin environment)
@@ -109,6 +107,7 @@ public class AstahProToolFactory {
             providers.add(new PresentationTool(projectAccessor, transactionSupport, astahProToolSupport, imageCaptureSupport));
             providers.add(new ProjectAccessorTool(projectAccessor, astahProToolSupport));
             providers.add(new ProjectInfoTool(projectAccessor, astahProToolSupport));
+            providers.add(new ProjectDiffStartTool(projectAccessor, projectDiffJobs));
             providers.add(new ImageCaptureTool(projectAccessor, imageCaptureSupport));
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new DiagramLayoutLintTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -203,7 +202,7 @@ public class AstahProToolFactory {
             providers.add(new PortTool(projectAccessor, transactionSupport, astahProToolSupport));
 
             // ER diagram tools
-            providers.add(new ERModelEditorTool(erModelEditor, projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport));
+            providers.add(new ERModelEditorTool(erModelEditor, basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport, systemPropertySupport));
             providers.add(new ERDiagramEditorTool(projectAccessor, transactionSupport, erDiagramEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new ERDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new ERDomainTool(projectAccessor, transactionSupport, astahProToolSupport));

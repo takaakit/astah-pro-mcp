@@ -13,6 +13,7 @@ import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
 import com.astahpromcp.tool.manifest.ToolManifestValidator;
 import com.astahpromcp.tool.mcptoolscript.McpToolScriptProviderFactory;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
@@ -85,6 +86,9 @@ public final class McpServerApp {
     // The tools that run mcp tool scripts, built once; the manifest decides which profiles publish them
     private McpToolScriptProviderFactory.McpToolScriptTools mcpToolScriptTools;
 
+    // The project comparisons, which both the tool that starts them and the tool that fetches their results share on every profile.
+    private ProjectDiffJobs projectDiffJobs;
+
     public void start() throws Exception {
         log.info("=== MCP SERVER STARTING ===");
 
@@ -102,6 +106,7 @@ public final class McpServerApp {
 
         } catch (Exception e) {
             log.error("=== MCP SERVER START FAILED ===", e);
+            stop();
             throw e;
         }
     }
@@ -114,7 +119,8 @@ public final class McpServerApp {
     // Load the manifest and build every tool, then check the two against each other.
     private void loadManifestAndCatalogs() {
         manifest = ToolManifest.load();
-        catalogs = ToolCatalog.buildAll(McpServerConfig.WORKSPACE_DIR.resolve("images"), McpServerConfig.WORKSPACE_DIR);
+        projectDiffJobs = new ProjectDiffJobs(McpServerConfig.WORKSPACE_DIR.resolve("project-diff"));
+        catalogs = ToolCatalog.buildAll(McpServerConfig.WORKSPACE_DIR.resolve("images"), McpServerConfig.WORKSPACE_DIR, projectDiffJobs);
         mcpToolScriptTools = new McpToolScriptProviderFactory().createToolProviders(scriptCatalog(catalogs), manifest);
         ToolManifestValidator.verify(manifest, catalogs.values(), mcpToolScriptTools.names(), AstahProToolFactory.isRunningInsideAstahGui());
     }
@@ -438,8 +444,20 @@ public final class McpServerApp {
 
         } finally {
             ToolCallStatistics.logAndReset();
-            cleanupWorkspaceDirectory();
+            // The comparisons write into the workspace, from threads and processes of their own, so the workspace is deleted only once they are known to have stopped.
+            if (stopProjectDiffs()) {
+                cleanupWorkspaceDirectory();
+            } else {
+                log.warn("Keep the workspace directory {}, because not every project comparison could be confirmed to have stopped", workspaceDir);
+            }
         }
+    }
+
+    // Stop the project comparisons
+    private boolean stopProjectDiffs() {
+        ProjectDiffJobs jobs = projectDiffJobs;
+        projectDiffJobs = null;
+        return jobs == null || jobs.shutdown();
     }
 
     private void cleanupWorkspaceDirectory() {

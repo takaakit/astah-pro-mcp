@@ -11,6 +11,7 @@ public enum NotMcpToolScriptCallableReason {
     MANAGES_A_PROJECT_FILE("project_file"),
     DRIVES_THE_VIEW("view"),
     ANSWERS_A_STANDALONE_QUESTION("standalone"),
+    STARTS_OR_AWAITS_A_BACKGROUND_JOB("background_job"),
     RUNS_AN_ASTAH_API_SCRIPT("astah_api_script"),
     PUBLISHED_DIRECTLY("direct");
 
@@ -50,6 +51,7 @@ public enum NotMcpToolScriptCallableReason {
             case MANAGES_A_PROJECT_FILE -> "'" + toolName + "' cannot be called from an mcp tool script because it creates, opens or saves a project, which the transaction of the run cannot roll back. Call '" + toolName + "' directly as an MCP tool instead.";
             case DRIVES_THE_VIEW -> "'" + toolName + "' cannot be called from an mcp tool script because it drives the Astah view (opening a diagram, selection, zoom), which the transaction of the run cannot roll back. Call '" + toolName + "' directly as an MCP tool instead.";
             case ANSWERS_A_STANDALONE_QUESTION -> "'" + toolName + "' cannot be called from an mcp tool script because it answers a standalone question about the project, the Astah view, the MCP server or the logs, which is why this server publishes it directly, and a tool function is never reachable both ways. Call '" + toolName + "' directly as an MCP tool instead.";
+            case STARTS_OR_AWAITS_A_BACKGROUND_JOB -> "'" + toolName + "' cannot be called from an mcp tool script because it starts work in a separate process that outlives the run, or waits for that work to finish, which the transaction of the run cannot roll back. Call '" + toolName + "' directly as an MCP tool instead.";
             case RUNS_AN_ASTAH_API_SCRIPT -> "'" + toolName + "' cannot be called from an mcp tool script. If you need the raw Astah API, call '" + toolName + "' directly as an MCP tool instead.";
             case PUBLISHED_DIRECTLY -> "'" + toolName + "' cannot be called from an mcp tool script because this server publishes it directly, and a tool function is never reachable both ways. Call '" + toolName + "' directly as an MCP tool instead.";
         };
@@ -63,6 +65,7 @@ public enum NotMcpToolScriptCallableReason {
             case MANAGES_A_PROJECT_FILE -> "that create, open or save a project";
             case DRIVES_THE_VIEW -> "that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order)";
             case ANSWERS_A_STANDALONE_QUESTION -> "that answer a standalone question about the project, the Astah view, the MCP server or the logs";
+            case STARTS_OR_AWAITS_A_BACKGROUND_JOB -> "that start a background job or wait for its result";
             case RUNS_AN_ASTAH_API_SCRIPT -> quoted(toolNames) + (toolNames.size() == 1 ? " itself" : " themselves");
             case PUBLISHED_DIRECTLY -> null;
         };

@@ -6,7 +6,7 @@ public record ERRelationshipWithChildVerbPhraseDTO(
     @JsonPropertyDescription("Target ER relationship identifier")
     String targetERRelationshipId,
 
-    @JsonPropertyDescription("Child verb phrase")
+    @JsonPropertyDescription("Verb phrase (Child to Parent)")
     String childVerbPhrase
 ) {
 }

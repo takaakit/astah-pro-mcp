@@ -8,6 +8,7 @@ import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -45,12 +46,14 @@ public class ERModelEditorToolTest {
         projectAccessor = astahApi.getProjectAccessor();
         TransactionSupport transactionSupport = new TransactionSupport(projectAccessor.getTransactionManager());
         ERModelEditor erModelEditor = projectAccessor.getModelEditorFactory().getERModelEditor();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
         projectAccessor.open("src/test/resources/modelfile/editor/ERModelEditorToolTest.asta");
         AstahProToolSupport astahProToolSupport = new AstahProToolSupport(projectAccessor);
 
         // Tool
         tool = new ERModelEditorTool(
             erModelEditor,
+            basicModelEditor,
             projectAccessor,
             transactionSupport,
             astahProToolSupport,
@@ -587,5 +590,71 @@ public class ERModelEditorToolTest {
         assertNull(TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package1"));
+    }
+
+    @Test
+    void delete_ok_erIndex() throws Exception {
+        // Get parent ER entity
+        IEREntity parentEREntity = (IEREntity) TestSupport.instance().getNamedElementByClassAndName(
+            IEREntity.class,
+            "Entity0");
+
+        // Get ER attribute
+        IERAttribute erAttribute = (IERAttribute) TestSupport.instance().getNamedElementByClassAndName(
+            IERAttribute.class,
+            "Attribute1");
+
+        // Create ER index
+        ERIndexDTO erIndexDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            createERIndex,
+            tool,
+            new NewERIndexDTO("TestERIndex", parentEREntity.getId(), false, false, List.of(erAttribute.getId())),
+            ERIndexDTO.class);
+        String erIndexId = erIndexDTO.namedElement().element().id();
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(erIndexId);
+
+        // ----------------------------------------
+        // Call delete()
+        // ----------------------------------------
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            delete,
+            tool,
+            inputDTO,
+            ElementDTO.class);
+
+        // Check output DTO
+        assertEquals(erIndexId, outputDTO.id());
+
+        // Check that the ER index was deleted
+        assertNull(projectAccessor.getEntity(erIndexId));
+    }
+
+    @Test
+    void delete_ok_erDomain() throws Exception {
+        // Get ER domain
+        IERDomain erDomain = (IERDomain) TestSupport.instance().getNamedElementByClassAndName(
+            IERDomain.class,
+            "Domain0");
+        String erDomainId = erDomain.getId();
+
+        // Create input DTO
+        IdDTO inputDTO = new IdDTO(erDomainId);
+
+        // ----------------------------------------
+        // Call delete()
+        // ----------------------------------------
+        ElementDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            delete,
+            tool,
+            inputDTO,
+            ElementDTO.class);
+
+        // Check output DTO
+        assertEquals(erDomainId, outputDTO.id());
+
+        // Check that the ER domain was deleted
+        assertNull(projectAccessor.getEntity(erDomainId));
     }
 }

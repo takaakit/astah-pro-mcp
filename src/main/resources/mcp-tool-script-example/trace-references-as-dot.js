@@ -1,6 +1,5 @@
 /*
- * Traces the classifier references around one focus classifier and prints a bounded Graphviz DOT network.
- * The walk covers association, dependency, inheritance and realization in both directions.
+ * Traces four kinds of classifier reference in both directions, fairly limits each breadth-first layer, disambiguates classifiers by ID and namespace, and prints a bounded Graphviz DOT network of the references around one classifier. Use this to get a single-picture overview of reference relationships around a specific classifier.
  */
 
 // An ID is unambiguous and takes precedence when supplied. Leave it empty to select by exact name.

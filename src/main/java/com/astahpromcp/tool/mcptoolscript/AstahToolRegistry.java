@@ -60,7 +60,7 @@ public final class AstahToolRegistry {
         return of(definitions.values(), reasons);
     }
 
-    // Build the registry from exactly the given definitions, with the reason each withheld one cannot be called from an mcp tool script.
+    // Build the registry from exactly the given definitions, with the reason each refused one cannot be called from an mcp tool script.
     public static AstahToolRegistry of(Collection<ToolDefinition> toolDefinitions,
                                        Map<String, NotMcpToolScriptCallableReason> notMcpToolScriptCallableReasons) {
         Map<String, ToolDefinition> definitions = new LinkedHashMap<>();

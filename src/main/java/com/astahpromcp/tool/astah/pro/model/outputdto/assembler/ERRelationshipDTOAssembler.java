@@ -39,18 +39,18 @@ public class ERRelationshipDTOAssembler {
             foreignKeysDTOs.add(NameIdTypeDTOAssembler.toDTO(astahERAttribute));
         }
 
-        String verbPhraseChild;
-        if (astahERRelationship.getVerbPhraseChild() != null) {
-            verbPhraseChild = astahERRelationship.getVerbPhraseChild();
+        String verbPhraseParentToChild;
+        if (astahERRelationship.getVerbPhraseParent() != null) {
+            verbPhraseParentToChild = astahERRelationship.getVerbPhraseParent();
         } else {
-            verbPhraseChild = "";
+            verbPhraseParentToChild = "";
         }
 
-        String verbPhraseParent;
-        if (astahERRelationship.getVerbPhraseParent() != null) {
-            verbPhraseParent = astahERRelationship.getVerbPhraseParent();
+        String verbPhraseChildToParent;
+        if (astahERRelationship.getVerbPhraseChild() != null) {
+            verbPhraseChildToParent = astahERRelationship.getVerbPhraseChild();
         } else {
-            verbPhraseParent = "";
+            verbPhraseChildToParent = "";
         }
         
         return new ERRelationshipDTO(
@@ -62,8 +62,8 @@ public class ERRelationshipDTOAssembler {
             astahERRelationship.getCardinality(),
             astahERRelationship.getLogicalName(),
             astahERRelationship.getPhysicalName(),
-            verbPhraseChild,
-            verbPhraseParent,
+            verbPhraseParentToChild,
+            verbPhraseChildToParent,
             astahERRelationship.isIdentifying(),
             astahERRelationship.isNonIdentifying(),
             astahERRelationship.isMultiToMulti(),

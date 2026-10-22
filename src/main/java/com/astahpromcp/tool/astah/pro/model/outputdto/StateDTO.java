@@ -22,7 +22,7 @@ public record StateDTO(
     @JsonPropertyDescription("Is SubmachineState")
     boolean isSubmachineState,
 
-    @JsonPropertyDescription("SubmachineState")
+    @JsonPropertyDescription("Submachine: The state machine that this state references as a submachine state. Empty if this state is not a submachine state or references no state machine.")
     NameIdTypeDTO submachineState,
 
     @JsonPropertyDescription("Number of regions")

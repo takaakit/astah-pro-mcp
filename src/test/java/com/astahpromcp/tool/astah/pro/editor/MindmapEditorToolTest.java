@@ -235,17 +235,17 @@ public class MindmapEditorToolTest {
 
     @Test
     void createTopic_ng_parentIsNotTopic() throws Exception {
-        // Get mind map diagram and root topic
+        // Get mind map diagram and a child topic of the root topic
         IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
-        INodePresentation rootTopic = mindMapDiagram.getRoot();
+        INodePresentation childTopic = createChildTopicOfRoot(mindMapDiagram, "Test Bounded Topic");
 
         // Show a boundary, which is a node on the same mind map diagram but not a topic
         TestSupport.instance().invokeToolMethodReturningDtoAndContents(
             setBoundaryOfTopic,
             tool,
-            new TopicWithBoundaryVisibilityDTO(mindMapDiagram.getId(), rootTopic.getID(), true),
+            new TopicWithBoundaryVisibilityDTO(mindMapDiagram.getId(), childTopic.getID(), true),
             NodePresentationDTO.class);
         IPresentation boundary = Arrays.stream(mindMapDiagram.getPresentations())
             .filter(presentation -> "MMBoundary".equals(presentation.getType()))
@@ -584,16 +584,16 @@ public class MindmapEditorToolTest {
 
     @Test
     void setBoundaryOfTopic_ok() throws Exception {
-        // Get mind map diagram and a topic
+        // Get mind map diagram and a child topic of the root topic
         IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IMindMapDiagram.class,
             "Mindmap0");
-        INodePresentation rootTopic = mindMapDiagram.getRoot();
+        INodePresentation childTopic = createChildTopicOfRoot(mindMapDiagram, "Test Bounded Topic");
 
         // Create input DTO
         TopicWithBoundaryVisibilityDTO inputDTO = new TopicWithBoundaryVisibilityDTO(
             mindMapDiagram.getId(),
-            rootTopic.getID(),
+            childTopic.getID(),
             true);
 
         // ----------------------------------------
@@ -607,5 +607,129 @@ public class MindmapEditorToolTest {
 
         // Check output DTO
         assertNotNull(outputDTO);
+
+        // Check that the boundary was set on the topic
+        assertEquals(1, countBoundariesOf(mindMapDiagram, childTopic));
+    }
+
+    @Test
+    void setBoundaryOfTopic_ng_rootTopic() throws Exception {
+        // Get mind map diagram and root topic
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IMindMapDiagram.class,
+            "Mindmap0");
+        INodePresentation rootTopic = mindMapDiagram.getRoot();
+
+        int presentationCountBefore = mindMapDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call setBoundaryOfTopic()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setBoundaryOfTopic,
+                tool,
+                new TopicWithBoundaryVisibilityDTO(mindMapDiagram.getId(), rootTopic.getID(), true),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("A boundary cannot be shown on the root topic: " + rootTopic.getLabel() + "(" + rootTopic.getID() + ")."), exception.getCause().getMessage());
+
+        // Check that no boundary was created
+        assertEquals(presentationCountBefore, mindMapDiagram.getPresentations().length);
+    }
+
+    @Test
+    void setBoundaryOfTopic_ng_floatingTopic() throws Exception {
+        // Get mind map diagram and create a floating topic
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IMindMapDiagram.class,
+            "Mindmap0");
+        NodePresentationDTO floatingTopicDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createFloatingTopic,
+            tool,
+            new NewFloatingTopicDTO(mindMapDiagram.getId(), "Test Floating Topic", 200, 150),
+            NodePresentationDTO.class);
+        INodePresentation floatingTopic = findNodePresentation(mindMapDiagram, floatingTopicDTO.presentation().id());
+
+        int presentationCountBefore = mindMapDiagram.getPresentations().length;
+
+        // ----------------------------------------
+        // Call setBoundaryOfTopic()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setBoundaryOfTopic,
+                tool,
+                new TopicWithBoundaryVisibilityDTO(mindMapDiagram.getId(), floatingTopic.getID(), true),
+                NodePresentationDTO.class);
+        });
+
+        // Check exception
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("A boundary cannot be shown on a floating topic: Test Floating Topic(" + floatingTopic.getID() + ")."), exception.getCause().getMessage());
+
+        // Check that no boundary was created
+        assertEquals(presentationCountBefore, mindMapDiagram.getPresentations().length);
+    }
+
+    @Test
+    void setBoundaryOfTopic_ok_hideOnRootTopic() throws Exception {
+        // Get mind map diagram and root topic
+        IMindMapDiagram mindMapDiagram = (IMindMapDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IMindMapDiagram.class,
+            "Mindmap0");
+        INodePresentation rootTopic = mindMapDiagram.getRoot();
+
+        // Create a boundary on the root topic through the Astah API directly, as the tool did before it rejected this.
+        // Astah does not draw this boundary, but it is in the project.
+        MindmapEditor mindmapEditor = projectAccessor.getDiagramEditorFactory().getMindmapEditor();
+        mindmapEditor.setDiagram(mindMapDiagram);
+        new TransactionSupport(projectAccessor.getTransactionManager()).run(() -> {
+            mindmapEditor.setBoundaryVisibility(rootTopic, true);
+        });
+        assertEquals(1, countBoundariesOf(mindMapDiagram, rootTopic));
+
+        // ----------------------------------------
+        // Call setBoundaryOfTopic()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            setBoundaryOfTopic,
+            tool,
+            new TopicWithBoundaryVisibilityDTO(mindMapDiagram.getId(), rootTopic.getID(), false),
+            NodePresentationDTO.class);
+
+        // Check output DTO
+        assertNotNull(outputDTO);
+
+        // Check that the boundary was removed
+        assertEquals(0, countBoundariesOf(mindMapDiagram, rootTopic));
+    }
+
+    // Create a child topic of the root topic with the tool, and return it
+    private INodePresentation createChildTopicOfRoot(IMindMapDiagram mindMapDiagram, String label) throws Exception {
+        NodePresentationDTO childTopicDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createTopic,
+            tool,
+            new NewTopicDTO(mindMapDiagram.getId(), mindMapDiagram.getRoot().getID(), label),
+            NodePresentationDTO.class);
+        return findNodePresentation(mindMapDiagram, childTopicDTO.presentation().id());
+    }
+
+    private static INodePresentation findNodePresentation(IMindMapDiagram mindMapDiagram, String id) throws Exception {
+        return (INodePresentation) Arrays.stream(mindMapDiagram.getPresentations())
+            .filter(presentation -> presentation.getID().equals(id))
+            .findFirst()
+            .orElseThrow();
+    }
+
+    // Count the boundaries set on the topic. The parent of a boundary is the topic it is set on.
+    private static long countBoundariesOf(IMindMapDiagram mindMapDiagram, INodePresentation topic) throws Exception {
+        return Arrays.stream(mindMapDiagram.getPresentations())
+            .filter(presentation -> "MMBoundary".equals(presentation.getType()))
+            .filter(presentation -> topic.equals(((INodePresentation) presentation).getParent()))
+            .count();
     }
 }

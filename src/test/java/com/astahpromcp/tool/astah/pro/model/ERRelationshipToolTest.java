@@ -292,6 +292,7 @@ public class ERRelationshipToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals("ParentVerb_777", erRelationship.getVerbPhraseParent());
+        assertEquals("ParentVerb_777", outputDTO.verbPhraseParentToChild());
     }
 
     @Test
@@ -318,5 +319,6 @@ public class ERRelationshipToolTest {
         // Check output DTO
         assertNotNull(outputDTO);
         assertEquals("ChildVerb_777", erRelationship.getVerbPhraseChild());
+        assertEquals("ChildVerb_777", outputDTO.verbPhraseChildToParent());
     }
 }

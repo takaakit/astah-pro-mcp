@@ -6,28 +6,79 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
-// The single record of which tools each profile publishes.
 public final class ToolManifest {
 
     public static final String RESOURCE_PATH = "/toolmanifest/tools.tsv";
-
-    // The directive that ends the body section and begins the withheld section
-    private static final String WITHHELD_DIRECTIVE = "#@withheld";
 
     // category, name, direct and programmatic, then the reason, which a row without one may leave out.
     private static final int COLUMN_COUNT_WITHOUT_REASON = 4;
     private static final int COLUMN_COUNT_WITH_REASON = 5;
 
+    // Each profile has a column of its own, which takes the values listed here
     public enum Profile {
-        DIRECT,
-        PROGRAMMATIC
+        DIRECT("direct", Reach.TOOL_LIST, Reach.NONE),
+        PROGRAMMATIC("programmatic", Reach.TOOL_LIST, Reach.MCP_TOOL_SCRIPT, Reach.NONE);
+
+        private final String columnName;
+        private final Set<Reach> reaches;
+
+        Profile(String columnName, Reach... reaches) {
+            this.columnName = columnName;
+            this.reaches = EnumSet.copyOf(Arrays.asList(reaches));
+        }
+
+        public String columnName() {
+            return columnName;
+        }
+
+        // Whether this profile's column takes the given value
+        boolean takes(Reach reach) {
+            return reaches.contains(reach);
+        }
+
+        // The codes this profile's column takes, in the order Reach declares them
+        List<String> codes() {
+            List<String> codes = new ArrayList<>();
+            for (Reach reach : reaches) {
+                codes.add(reach.code());
+            }
+            return codes;
+        }
+    }
+
+    // How a profile reaches a tool: what the manifest writes in that profile's column. A value means the same in every column.
+    public enum Reach {
+        TOOL_LIST("x"),
+        MCP_TOOL_SCRIPT("s"),
+        NONE("-");
+
+        private final String code;
+
+        Reach(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+
+        // The reach whose code is exactly the given text, or null when no reach has it
+        static Reach ofCode(String code) {
+            for (Reach reach : values()) {
+                if (reach.code.equals(code)) {
+                    return reach;
+                }
+            }
+            return null;
+        }
     }
 
     public enum Category {
@@ -68,18 +119,31 @@ public final class ToolManifest {
     public record Entry(
         Category category,
         String name,
-        boolean direct,
-        boolean programmatic,
-        boolean withheld,
+        Reach direct,
+        Reach programmatic,
         NotMcpToolScriptCallableReason reason
     ) {
 
-        // Whether this row publishes to the given profile
-        public boolean publishesTo(Profile profile) {
+        // The value of the given profile's column
+        public Reach reachOn(Profile profile) {
             return switch (profile) {
                 case DIRECT -> direct;
                 case PROGRAMMATIC -> programmatic;
             };
+        }
+
+        // Whether this row publishes to the given profile
+        public boolean publishesTo(Profile profile) {
+            return reachOn(profile) == Reach.TOOL_LIST;
+        }
+
+        public boolean reachable() {
+            for (Profile profile : Profile.values()) {
+                if (reachOn(profile) != Reach.NONE) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -112,24 +176,17 @@ public final class ToolManifest {
     // Parse the given lines. Exposed so that a test can feed a deliberately broken manifest.
     public static ToolManifest parse(List<String> lines, String source) {
         Map<String, Entry> entries = new LinkedHashMap<>();
-        Set<String> allDashInBody = new TreeSet<>();
-        Set<String> publishedInWithheld = new TreeSet<>();
-        boolean withheldSection = false;
 
         for (int i = 0; i < lines.size(); i++) {
             String raw = lines.get(i);
             int lineNumber = i + 1;
             String trimmed = raw.trim();
 
-            if (trimmed.equals(WITHHELD_DIRECTIVE)) {
-                withheldSection = true;
-                continue;
-            }
             if (trimmed.isEmpty() || trimmed.startsWith("#")) {
                 continue;
             }
 
-            Entry entry = parseRow(raw, lineNumber, source, withheldSection);
+            Entry entry = parseRow(raw, lineNumber, source);
 
             // A name may appear only once
             if (entries.containsKey(entry.name())) {
@@ -137,32 +194,14 @@ public final class ToolManifest {
                         source + ":" + lineNumber + ": tool '" + entry.name() + "' appears more than once");
             }
             entries.put(entry.name(), entry);
-
-            // An all-dash row belongs to the withheld section, and every withheld row is all-dash
-            boolean allDash = !entry.direct() && !entry.programmatic();
-            if (allDash && !withheldSection) {
-                allDashInBody.add(entry.name());
-            }
-            if (!allDash && withheldSection) {
-                publishedInWithheld.add(entry.name());
-            }
-        }
-
-        if (!allDashInBody.isEmpty()) {
-            throw new IllegalStateException(source + ": these rows publish to no profile but are outside the '"
-                    + WITHHELD_DIRECTIVE + "' section, so an intentional withholding cannot be told apart from a"
-                    + " forgotten 'x': " + allDashInBody);
-        }
-        if (!publishedInWithheld.isEmpty()) {
-            throw new IllegalStateException(source + ": these rows are in the '" + WITHHELD_DIRECTIVE
-                    + "' section but still publish to a profile: " + publishedInWithheld);
         }
 
         return new ToolManifest(entries);
     }
 
-    // Four or five columns, a known category, a non-empty name, every flag either 'x' or '-', and a known reason exactly when the row publishes to both profiles
-    private static Entry parseRow(String raw, int lineNumber, String source, boolean withheld) {
+    // Four or five columns, a known category, a non-empty name, in each profile's column a value that column takes,
+    // column 'programmatic' reaching whatever column 'direct' publishes, and a known reason exactly when column 'programmatic' is 'x'
+    private static Entry parseRow(String raw, int lineNumber, String source) {
         String[] columns = raw.split("\t", -1);
         if (columns.length != COLUMN_COUNT_WITHOUT_REASON && columns.length != COLUMN_COUNT_WITH_REASON) {
             throw new IllegalStateException(source + ":" + lineNumber + ": expected " + COLUMN_COUNT_WITHOUT_REASON
@@ -176,26 +215,33 @@ public final class ToolManifest {
             throw new IllegalStateException(source + ":" + lineNumber + ": the tool name is empty");
         }
 
-        boolean direct = parseFlag(columns[2], "direct", lineNumber, source);
-        boolean programmatic = parseFlag(columns[3], "programmatic", lineNumber, source);
+        Reach direct = parseReach(columns[2], Profile.DIRECT, lineNumber, source);
+        Reach programmatic = parseReach(columns[3], Profile.PROGRAMMATIC, lineNumber, source);
         NotMcpToolScriptCallableReason reason = columns.length == COLUMN_COUNT_WITH_REASON
                 ? parseReason(columns[4], lineNumber, source)
                 : null;
 
-        // A row that publishes to both profiles hands the tool to the agent directly on the programmatic profile, so an mcp tool script cannot call it and the row has to say why.
-        boolean publishedDirectlyOnTheProgrammaticProfile = direct && programmatic;
+        // Whatever the direct profile publishes, the programmatic profile reaches too, or an agent there could not use it at all.
+        if (direct == Reach.TOOL_LIST && programmatic == Reach.NONE) {
+            throw new IllegalStateException(source + ":" + lineNumber + ": tool '" + name
+                    + "' is published on the direct profile but the programmatic profile does not reach it. Set column 'programmatic' to '"
+                    + Reach.TOOL_LIST.code() + "' or '" + Reach.MCP_TOOL_SCRIPT.code() + "'");
+        }
+
+        // A row with programmatic = x hands the tool to the agent directly on the programmatic profile, so an mcp tool script cannot call it and the row has to say why.
+        boolean publishedDirectlyOnTheProgrammaticProfile = programmatic == Reach.TOOL_LIST;
         if (publishedDirectlyOnTheProgrammaticProfile && reason == null) {
             throw new IllegalStateException(source + ":" + lineNumber + ": tool '" + name
-                    + "' is published on both profiles, so column 'reason' has to say why an mcp tool script cannot call it: one of "
+                    + "' is published directly on the programmatic profile, so column 'reason' has to say why an mcp tool script cannot call it: one of "
                     + NotMcpToolScriptCallableReason.codes());
         }
         if (!publishedDirectlyOnTheProgrammaticProfile && reason != null) {
             throw new IllegalStateException(source + ":" + lineNumber + ": tool '" + name
-                    + "' is not published on both profiles, so nothing would ever show its reason '" + reason.code()
+                    + "' is not published directly on the programmatic profile, so nothing would ever show its reason '" + reason.code()
                     + "'. Leave column 'reason' empty");
         }
 
-        return new Entry(category, name, direct, programmatic, withheld, reason);
+        return new Entry(category, name, direct, programmatic, reason);
     }
 
     private static Category parseCategory(String column, int lineNumber, String source) {
@@ -212,16 +258,14 @@ public final class ToolManifest {
         return category;
     }
 
-    private static boolean parseFlag(String column, String columnName, int lineNumber, String source) {
+    private static Reach parseReach(String column, Profile profile, int lineNumber, String source) {
         String value = column.trim();
-        if (value.equals("x")) {
-            return true;
+        Reach reach = Reach.ofCode(value);
+        if (reach == null || !profile.takes(reach)) {
+            throw new IllegalStateException(source + ":" + lineNumber + ": column '" + profile.columnName()
+                    + "' must be one of " + profile.codes() + " but was '" + value + "'");
         }
-        if (value.equals("-")) {
-            return false;
-        }
-        throw new IllegalStateException(source + ":" + lineNumber + ": column '" + columnName
-                + "' must be 'x' or '-' but was '" + value + "'");
+        return reach;
     }
 
     // An empty column is no reason
@@ -240,20 +284,25 @@ public final class ToolManifest {
 
     // The tools the given profile publishes, in file order
     public Set<String> namesFor(Profile profile) {
+        return namesFor(profile, Reach.TOOL_LIST);
+    }
+
+    // The tools whose column of the given profile holds the given value, in file order
+    public Set<String> namesFor(Profile profile, Reach reach) {
         Set<String> names = new LinkedHashSet<>();
         for (Entry entry : entriesByName.values()) {
-            if (entry.publishesTo(profile)) {
+            if (entry.reachOn(profile) == reach) {
                 names.add(entry.name());
             }
         }
         return names;
     }
 
-    // The tools the withheld section holds, in file order
-    public Set<String> withheldNames() {
+    // The tools the given profile reaches in any way, in file order
+    public Set<String> namesReachedOn(Profile profile) {
         Set<String> names = new LinkedHashSet<>();
         for (Entry entry : entriesByName.values()) {
-            if (entry.withheld()) {
+            if (entry.reachOn(profile) != Reach.NONE) {
                 names.add(entry.name());
             }
         }

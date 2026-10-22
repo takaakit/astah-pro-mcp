@@ -49,10 +49,11 @@ public class McpToolScriptProviderFactory {
             candidates.addAll(provider.createToolDefinitions());
         }
 
-        // The two columns are the whole rule: the direct column is what the registry can reach, and the reason column covers exactly the tools the programmatic profile hands the agent directly, which is what an mcp tool script may not call, saying why for each.
+        // The programmatic column is the whole rule. The registry holds every tool that column reaches: the 's' ones are what an mcp tool script may call,
+        // and the 'x' ones, which the profile hands the agent directly, are held only so that a script that calls one is told why it cannot, in the words of the reason column.
         AstahToolRegistry built = AstahToolRegistry.from(
                 candidates,
-                manifest.namesFor(ToolManifest.Profile.DIRECT),
+                manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC),
                 manifest.notMcpToolScriptCallableReasons());
         registryHolder.set(built);
         log.info("MCP tool script registry holds {} tool functions, {} of them callable from an mcp tool script and the rest published directly",

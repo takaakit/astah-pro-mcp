@@ -55,6 +55,8 @@ public class McpToolScriptExampleTool implements ToolProvider {
             "Draws a requirement diagram with requirements and a test case, joined by nesting, deriveReqt, copy, satisfy, verify, refine and trace lines."),
         new Example("create-mind-map.js",
             "Draws a mind map with topics nested under the root topic, a multi-line topic label, a reordered sibling, a boundary around one branch, an icon inside a topic, a floating topic and a link between two topics."),
+        new Example("move-and-resize-frame.js",
+            "Moves and resizes the frame of a class diagram, shrinking it in the steps Astah accepts."),
         new Example("trace-references-as-dot.js",
             "Traces four kinds of classifier reference in both directions, fairly limits each breadth-first layer, disambiguates classifiers by ID and namespace, and prints a bounded Graphviz DOT network of the references around one classifier. Use this to get a single-picture overview of reference relationships around a specific classifier."),
         new Example("find-circular-references.js",

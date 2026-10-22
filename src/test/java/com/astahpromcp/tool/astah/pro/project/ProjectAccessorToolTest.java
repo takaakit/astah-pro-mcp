@@ -731,7 +731,7 @@ public class ProjectAccessorToolTest {
             NamedElementDTO.class));
 
         // Without the check, getProject() would have failed next with a message that does not say the open failed
-        assertEquals("Failed to open project: " + notAProject + ". Astah opened no project from it, and its log ('get_info_of_astah_log') has the reason.",
+        assertEquals("Failed to open project: " + notAProject + ". Astah opened no project from it, and its log ('astahLog' of 'get_info_of_logs') has the reason.",
             exception.getCause().getMessage());
     }
 
@@ -753,7 +753,7 @@ public class ProjectAccessorToolTest {
             NamedElementDTO.class));
 
         // Without the check, the project left open would have been returned as the one opened
-        assertEquals("Failed to open project: " + requested + ". Astah opened no project from it, and its log ('get_info_of_astah_log') has the reason.",
+        assertEquals("Failed to open project: " + requested + ". Astah opened no project from it, and its log ('astahLog' of 'get_info_of_logs') has the reason.",
             exception.getCause().getMessage());
     }
 

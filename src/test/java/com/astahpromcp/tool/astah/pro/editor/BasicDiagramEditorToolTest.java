@@ -12,9 +12,11 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
+import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
 import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -143,6 +145,72 @@ public class BasicDiagramEditorToolTest {
         assertEquals(800.0, createdNote.getWidth(), 0.1);
         assertEquals(100.0, createdNote.getLocation().getX(), 0.1);
         assertEquals(200.0, createdNote.getLocation().getY(), 0.1);
+    }
+
+    @Test
+    void createNote_ng_tooWideOnSequenceDiagram() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+        int notesBefore = countNotes(sequenceDiagram);
+
+        // Create input DTO
+        NewNoteDTO inputDTO = new NewNoteDTO(
+            sequenceDiagram.getId(),
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            100,
+            200);
+
+        // ----------------------------------------
+        // Call createNote()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createNote,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class));
+
+        // Check exception
+        String message = exception.getCause().getMessage();
+        assertTrue(message.startsWith("The note cannot be created on this diagram as it is."), message);
+        assertTrue(message.contains("Insert line breaks"), message);
+        assertTrue(message.contains(String.format("at most %.1f points wide", BasicDiagramEditorTool.NOTE_MAX_WIDTH)), message);
+        InvalidEditingException cause = assertInstanceOf(InvalidEditingException.class, exception.getCause().getCause());
+        assertEquals(InvalidEditingException.UNSUPPORTED_ELEMENT_ERROR_KEY, cause.getKey());
+
+        // Check no note is created
+        assertEquals(notesBefore, countNotes(sequenceDiagram));
+    }
+
+    @Test
+    void createNote_ok_wrappedOnSequenceDiagram() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+
+        // Create input DTO, with line breaks that keep every line within the limit
+        NewNoteDTO inputDTO = new NewNoteDTO(
+            sequenceDiagram.getId(),
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            100,
+            200);
+
+        // ----------------------------------------
+        // Call createNote()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createNote,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+
+        // Check with the created note
+        INodePresentation createdNote = (INodePresentation) TestSupport.instance().getPresentationById(outputDTO.presentation().id());
+        assertTrue(createdNote.getWidth() <= BasicDiagramEditorTool.NOTE_MAX_WIDTH, "width=" + createdNote.getWidth());
     }
 
     @Test

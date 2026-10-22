@@ -10,6 +10,7 @@ import com.astahpromcp.tool.astah.pro.editor.inputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.*;
 import com.astahpromcp.tool.astah.pro.model.outputdto.assembler.*;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -24,13 +25,15 @@ import java.util.List;
 public class ERModelEditorTool extends AstahToolProvider {
 
     private final ERModelEditor erModelEditor;
+    private final BasicModelEditor basicModelEditor;
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final AstahProToolSupport astahProToolSupport;
     private final SystemPropertySupport systemPropertySupport;
 
-    public ERModelEditorTool(ERModelEditor erModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport) {
+    public ERModelEditorTool(ERModelEditor erModelEditor, BasicModelEditor basicModelEditor, ProjectAccessor projectAccessor, TransactionSupport transactionSupport, AstahProToolSupport astahProToolSupport, SystemPropertySupport systemPropertySupport) {
         this.erModelEditor = erModelEditor;
+        this.basicModelEditor = basicModelEditor;
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.astahProToolSupport = astahProToolSupport;
@@ -316,7 +319,11 @@ public class ERModelEditorTool extends AstahToolProvider {
 
         systemPropertySupport.deleteWithoutConfirmationDialog( () -> {
             txnAstah.run( () -> {
-                erModelEditor.delete(astahElement);
+                if (astahElement instanceof IERIndex) {
+                    basicModelEditor.delete(astahElement);
+                } else {
+                    erModelEditor.delete(astahElement);
+                }
             });
         });
 

@@ -13,9 +13,12 @@ import com.astahpromcp.tool.mcptoolscript.outputdto.CallableToolChunkDTO;
 import com.astahpromcp.tool.mcptoolscript.outputdto.CallableToolInfoDTO;
 import com.astahpromcp.tool.mcptoolscript.outputdto.CallableToolInfoListDTO;
 import com.astahpromcp.tool.mcptoolscript.outputdto.CallableToolSummaryDTO;
+import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
 import io.modelcontextprotocol.json.schema.jackson3.DefaultJsonSchemaValidator;
 import io.modelcontextprotocol.spec.McpSchema;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import tools.jackson.databind.JsonNode;
@@ -39,6 +42,19 @@ public class CallableToolInfoToolTest {
 
     @TempDir
     Path workspaceDir;
+
+    // The project comparisons the tools of the catalog share
+    private ProjectDiffJobs projectDiffJobs;
+
+    @BeforeEach
+    void setUp() {
+        projectDiffJobs = new ProjectDiffJobs(workspaceDir.resolve("project-diff"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        projectDiffJobs.shutdown();
+    }
 
     private static ToolDefinition definition(String name, String description) {
         McpSchema.Tool schema = McpSchema.Tool.builder(name, JsonSupport.MCP_JSON_MAPPER,
@@ -193,7 +209,7 @@ public class CallableToolInfoToolTest {
     }
 
     private AstahToolRegistry realRegistry() {
-        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir);
+        ToolCatalog catalog = ToolCatalog.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
         ToolManifest manifest = ToolManifest.load();
 
         return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
