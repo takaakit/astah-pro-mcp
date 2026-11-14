@@ -1,6 +1,7 @@
 package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.tool.ToolProvider;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
 import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public final class ExitCanaryRunner {
         ToolProvider empty = List::of;
         AstahToolRegistry registry = AstahToolRegistry.of(empty.createToolDefinitions(), Map.of());
         
-        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry, 15, new FakeTransactionBoundary()).execute(script);
+        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry, 15, new AstahMcpToolScriptHost(new FakeTransactionBoundary())).execute(script);
         
         // Reaching this line at all is the result being tested
         System.out.println(SURVIVED_PREFIX + result.ok() + ":" + result.errorMessage().replace('\n', ' '));

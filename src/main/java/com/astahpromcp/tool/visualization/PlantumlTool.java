@@ -39,7 +39,7 @@ public class PlantumlTool implements ToolProvider {
             return List.of(
                 ToolSupport.toolDefinitionReturningContents(
                     "generate_dgm_img_from_puml",
-                    "Generate a diagram image based on the provided PlantUML code. Use this tool, for example, to visualize the structure and behavior of architectures and algorithms. Some diagram types require the DOT command for rendering.",
+                    "Generate a diagram image based on the provided PlantUML code. Use this tool, for example, to visualize the structure and behavior of architectures and algorithms. Some diagram types require the DOT command for rendering. To write the PlantUML code, consult the PlantUML guide.",
                     this::generateDiagramImageFromPlantuml,
                     PlantumlDTO.class)
             );

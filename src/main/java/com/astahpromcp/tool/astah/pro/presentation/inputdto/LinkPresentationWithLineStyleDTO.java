@@ -1,6 +1,6 @@
 package com.astahpromcp.tool.astah.pro.presentation.inputdto;
 
-import com.astahpromcp.tool.astah.pro.presentation.LineStyleKind;
+import com.astahpromcp.tool.astah.pro.common.LineStyleKind;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 public record LinkPresentationWithLineStyleDTO(

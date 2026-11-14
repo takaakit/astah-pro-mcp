@@ -113,8 +113,8 @@ final class ResultWriter implements ProjectDiffEngine.ChangeSink, AutoCloseable 
     // Everything of the answer of get_proj_diff_result but the changes of a page and expiresAt, which ResultPages fills in
     DiffResultDTO header() {
         SummaryDTO counts = new SummaryDTO(summary.total(), summary.added(), summary.removed(), summary.modified(), 0, 0);
-        return new DiffResultDTO(diffId, DiffStatus.DONE, "", DiffFailureDTO.empty(), base, target, normalization, allWarnings, notCompared,
-                counts, 0, 0, -1, 0, List.of(), false, false, resultFile.toString());
+        return DiffResultDTO.withoutPage(diffId, DiffStatus.DONE, "", DiffFailureDTO.empty(), base, target, normalization, allWarnings, notCompared,
+                counts, resultFile.toString());
     }
     
     @Override

@@ -2,6 +2,7 @@ package com.astahpromcp.server;
 
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
@@ -25,9 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 // Which tools each profile publishes, which catalog they come from, and the instructions the profile hands its clients.
 public class ProfileCatalogWiringTest {
     
-    // The one editing tool the programmatic profile publishes directly, and therefore the only one that can show this.
-    private static final String DIRECTLY_PUBLISHED_EDITING_TOOL = "insert_svg_img_on_dgm";
-    
     // The sentence the programmatic profile's instructions held as written text before it was made from the manifest
     private static final String NOT_MCP_TOOL_SCRIPT_CALLABLE_SENTENCE = "Tool functions that return an image or other content instead of structured content, that fetch over the network or convert a PDF, that create, open or save a project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project, the Astah view, the MCP server or the logs, that start a background job or wait for its result, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ";
     
@@ -48,11 +46,11 @@ public class ProfileCatalogWiringTest {
     }
     
     private Map<DiagramThumbnails, ToolCatalog> catalogs() {
-        return ToolCatalogAssembler.buildAll(workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        return ToolCatalogAssembler.buildAll(workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
     }
     
     private static McpToolScriptProviderFactory.McpToolScriptTools mcpToolScriptTools(Map<DiagramThumbnails, ToolCatalog> catalogs, ToolManifest manifest) {
-        return new McpToolScriptProviderFactory().createToolProviders(McpServerApp.scriptCatalog(catalogs), manifest);
+        return new McpToolScriptProviderFactory().createToolProviders(McpServerApp.scriptCatalog(catalogs), manifest, new AstahMcpToolScriptHost());
     }
     
     private static McpServerApp.ServerProfileConfig profile(String name) {
@@ -98,8 +96,8 @@ public class ProfileCatalogWiringTest {
                 () -> McpServerApp.toolProvidersOf(profile("programmatic"), capturingOnly, tools, manifest),
                 "the directly published tools must come from the capturing catalog alone");
         
-        assertTrue(publishedNames(providers).contains(DIRECTLY_PUBLISHED_EDITING_TOOL),
-                DIRECTLY_PUBLISHED_EDITING_TOOL + " is published directly, so it comes from the capturing catalog");
+        assertTrue(publishedNames(providers).contains("insert_svg_img_on_dgm"),
+                "insert_svg_img_on_dgm is published directly, so it comes from the capturing catalog");
     }
     
     @Test

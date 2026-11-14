@@ -1,6 +1,6 @@
 package com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler;
 
-import com.astahpromcp.tool.astah.pro.presentation.LineStyleKind;
+import com.astahpromcp.tool.astah.pro.common.LineStyleKind;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationGeometryDTO;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;

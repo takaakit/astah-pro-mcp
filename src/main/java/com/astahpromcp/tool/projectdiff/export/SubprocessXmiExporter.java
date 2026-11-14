@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
@@ -198,7 +199,7 @@ public final class SubprocessXmiExporter {
                     throw new IllegalStateException("The process that writes the XMI wrote more log than allowed.");
                 }
                 if (sizeOf(work.resolve(XMI_FILE_NAME + ".part")) > McpServerConfig.PROJECT_DIFF_MAX_XMI_BYTES) {
-                    throw new IllegalStateException(String.format("The XMI grew beyond %,d bytes, which is more than this server compares.", McpServerConfig.PROJECT_DIFF_MAX_XMI_BYTES));
+                    throw new IllegalStateException(String.format(Locale.ROOT, "The XMI grew beyond %,d bytes, which is more than this server compares.", McpServerConfig.PROJECT_DIFF_MAX_XMI_BYTES));
                 }
             }
             

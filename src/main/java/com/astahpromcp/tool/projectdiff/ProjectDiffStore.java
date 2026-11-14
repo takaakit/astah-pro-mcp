@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 // The files of the comparisons: one folder per comparison, holding the copies of the project files, the XMIs, the logs
 // of the separate processes and the result
 @Slf4j
-public final class ProjectDiffStore {
+final class ProjectDiffStore {
     
     static final String BASE = "base";
     static final String TARGET = "target";
@@ -55,7 +56,7 @@ public final class ProjectDiffStore {
         try {
             long size = Files.size(source);
             if (size > McpServerConfig.PROJECT_DIFF_MAX_PROJECT_FILE_BYTES) {
-                throw new IllegalStateException(String.format("The project file %s is %,d bytes, which is more than the %,d bytes this server compares.",
+                throw new IllegalStateException(String.format(Locale.ROOT, "The project file %s is %,d bytes, which is more than the %,d bytes this server compares.",
                         source, size, McpServerConfig.PROJECT_DIFF_MAX_PROJECT_FILE_BYTES));
             }
             

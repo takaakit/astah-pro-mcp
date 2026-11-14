@@ -147,8 +147,8 @@ This plugin experimentally implements a programmatic tool calling mode (port `88
 
 | Mode | Port | Exposed tools |
 | --- | --- | --- |
-| Programmatic tool calling | `8888` | 85 |
-| Direct tool calling | `18888` | 392 |
+| Programmatic tool calling | `8888` | 70 |
+| Direct tool calling | `18888` | 377 |
 
 <details>
 <summary><b>Claude Code</b></summary>

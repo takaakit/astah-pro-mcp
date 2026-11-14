@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +43,10 @@ public class PdfConversionTest {
         
         assertContent(markdown);
         assertEquals(markdown, Files.readString(output.resolve("guide.md")));
-        assertFalse(Files.exists(output.resolve("guide.pdf")));
+        try (Stream<Path> files = Files.list(output)) {
+            assertEquals(List.of("guide.md"), files.map(file -> file.getFileName().toString()).toList(),
+                    "Only the Markdown may be left: the temporary PDF and the file the converter named after it must be gone");
+        }
     }
     
     @Test
@@ -53,6 +58,28 @@ public class PdfConversionTest {
         assertTrue(markdown.contains(ocl), () -> "The OCL expression was altered: " + markdown);
         assertFalse(Stream.of("&lt;", "&gt;", "&amp;").anyMatch(markdown::contains), () -> "HTML entities left in: " + markdown);
         assertEquals(markdown, Files.readString(directory.resolve("ocl.md")));
+    }
+    
+    @Test
+    void convertPdfToMarkdown_ok_convertsOnlyTheSelectedPages() throws Exception {
+        byte[] pdf = documentBytes("Alpha page content", "Bravo page content", "Charlie page content");
+        
+        String markdown = KnowledgeToolSupport.convertPdfToMarkdown(pdf, directory, "excerpt", "1-1,3-3");
+        
+        int alpha = markdown.indexOf("Alpha page content");
+        int charlie = markdown.indexOf("Charlie page content");
+        assertTrue(alpha >= 0, () -> "Missing the first selected page: " + markdown);
+        assertTrue(charlie > alpha, () -> "Missing or reordered the second selected page: " + markdown);
+        assertFalse(markdown.contains("Bravo page content"), () -> "A page that was not selected was converted: " + markdown);
+        assertEquals(markdown, Files.readString(directory.resolve("excerpt.md")));
+    }
+    
+    @Test
+    void convertPdfToMarkdown_ng_rejectsPagesBeyondTheLastPage() throws Exception {
+        IOException e = assertThrows(IOException.class,
+                () -> KnowledgeToolSupport.convertPdfToMarkdown(documentBytes(), directory, "excerpt", "3-4"));
+        
+        assertTrue(e.getMessage().contains("3-4"), e.getMessage());
     }
     
     private static void assertContent(String markdown) {
@@ -67,7 +94,7 @@ public class PdfConversionTest {
     }
     
     // One page per text
-    private static byte[] documentBytes(String... pageTexts) throws Exception {
+    static byte[] documentBytes(String... pageTexts) throws Exception {
         try (PDDocument document = new PDDocument();
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             for (String text : pageTexts) {

@@ -189,27 +189,21 @@ final class ResponseLimiter {
         }
         
         // 1. Long values in the other fields
-        current = withHeader(current, shorten(current.base(), SHORT_VALUE_CHARS, Integer.MAX_VALUE), shorten(current.target(), SHORT_VALUE_CHARS, Integer.MAX_VALUE),
+        current = current.withShortenedHeader(shorten(current.base(), SHORT_VALUE_CHARS, Integer.MAX_VALUE), shorten(current.target(), SHORT_VALUE_CHARS, Integer.MAX_VALUE),
                 shortenEach(current.warnings(), SHORT_VALUE_CHARS), current.notCompared());
         if (sizeOf(current) <= maxBytes) {
             return current;
         }
         
         // 2. Only the first few warnings and referenced projects
-        current = withHeader(current, shorten(current.base(), SHORT_VALUE_CHARS, SHORT_LIST_SIZE), shorten(current.target(), SHORT_VALUE_CHARS, SHORT_LIST_SIZE),
+        current = current.withShortenedHeader(shorten(current.base(), SHORT_VALUE_CHARS, SHORT_LIST_SIZE), shorten(current.target(), SHORT_VALUE_CHARS, SHORT_LIST_SIZE),
                 firstOf(current.warnings(), SHORT_LIST_SIZE), current.notCompared());
         if (sizeOf(current) <= maxBytes) {
             return current;
         }
         
         // 3. Only what says where the result is
-        return withHeader(current, emptied(current.base()), emptied(current.target()), List.of(), List.of());
-    }
-    
-    private static DiffResultDTO withHeader(DiffResultDTO answer, ProjectSideDTO base, ProjectSideDTO target, List<String> warnings, List<String> notCompared) {
-        return new DiffResultDTO(answer.diffId(), answer.status(), answer.expiresAt(), answer.failure(), base, target,
-                answer.normalization(), warnings, notCompared, answer.summary(), answer.startIndex(), answer.startPropertyIndex(), answer.nextIndex(),
-                answer.nextPropertyIndex(), answer.changes(), answer.truncated(), true, answer.fullDiffPath());
+        return current.withShortenedHeader(emptied(current.base()), emptied(current.target()), List.of(), List.of());
     }
     
     private static ProjectSideDTO shorten(ProjectSideDTO side, int maxChars, int maxReferences) {

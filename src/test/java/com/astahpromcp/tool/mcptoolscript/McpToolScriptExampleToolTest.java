@@ -3,6 +3,7 @@ package com.astahpromcp.tool.mcptoolscript;
 import com.astahpromcp.server.ToolCatalogAssembler;
 import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.ToolDefinition;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.manifest.ToolManifest;
@@ -98,9 +99,9 @@ public class McpToolScriptExampleToolTest {
     
     private AstahToolRegistry registry() {
         ToolManifest manifest = ToolManifest.load();
-        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
         
-        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest, new AstahMcpToolScriptHost()).registry();
     }
     
     private static Set<String> toolNamesCalledBy(String source) {

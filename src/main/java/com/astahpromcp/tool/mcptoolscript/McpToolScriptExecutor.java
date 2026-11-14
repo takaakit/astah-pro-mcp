@@ -1,9 +1,6 @@
 package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.config.McpServerConfig;
-import com.astahpromcp.tool.astah.pro.TransactionBoundary;
-import com.astahpromcp.tool.astah.pro.TransactionSupport;
-import com.astahpromcp.tool.astah.pro.WatchedRunner;
 import com.astahpromcp.tool.common.BoundedWriter;
 import com.astahpromcp.tool.common.ScriptLine;
 import com.astahpromcp.tool.common.StopWhenInterruptedWriter;
@@ -17,6 +14,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 // Runs an mcp tool script -- JavaScript that may call this server's tool functions, and nothing else.
@@ -42,13 +40,6 @@ public class McpToolScriptExecutor {
         static Result failure(String errorMessage, int errorLine, int errorColumn, int errorToolCallIndex, String output, String errorOutput, ModelChangesKind modelChanges) {
             return new Result(false, "", output, errorOutput, errorMessage, errorLine, errorColumn, errorToolCallIndex, modelChanges);
         }
-    }
-    
-    // What closing the run's transaction did with the changes in it, and what went wrong while closing it, or null.
-    private record Closing(
-            ModelChangesKind modelChanges,
-            Throwable failure
-    ) {
     }
     
     // Removes the globals a script could otherwise escape through, before any script of ours or the user's runs.
@@ -135,21 +126,23 @@ public class McpToolScriptExecutor {
     // Read on use rather than taken at construction: the registry may list the tool this executor runs for, so it can only be built after that tool is.
     private final Supplier<AstahToolRegistry> registry;
     private final long timeoutSeconds;
-    private final TransactionBoundary transaction;
     
-    public McpToolScriptExecutor(Supplier<AstahToolRegistry> registry) {
-        this(registry, McpServerConfig.MCP_TOOL_SCRIPT_TIMEOUT_SECONDS, TransactionBoundary.ASTAH);
+    // Keeps a run safe while it calls the tool functions: its thread, its transaction, and what settles after each call.
+    private final McpToolScriptHost host;
+    
+    public McpToolScriptExecutor(Supplier<AstahToolRegistry> registry, McpToolScriptHost host) {
+        this(registry, McpServerConfig.MCP_TOOL_SCRIPT_TIMEOUT_SECONDS, host);
     }
     
-    // Package-private so that no profile can reach it, and taking the transaction so that a test can watch what this class does with it.
-    McpToolScriptExecutor(AstahToolRegistry registry, long timeoutSeconds, TransactionBoundary transaction) {
-        this(() -> registry, timeoutSeconds, transaction);
+    // Package-private so that no profile can reach it, and taking the timeout so that a test does not have to sit through the real one.
+    McpToolScriptExecutor(AstahToolRegistry registry, long timeoutSeconds, McpToolScriptHost host) {
+        this(() -> registry, timeoutSeconds, host);
     }
     
-    private McpToolScriptExecutor(Supplier<AstahToolRegistry> registry, long timeoutSeconds, TransactionBoundary transaction) {
+    private McpToolScriptExecutor(Supplier<AstahToolRegistry> registry, long timeoutSeconds, McpToolScriptHost host) {
         this.registry = registry;
         this.timeoutSeconds = timeoutSeconds;
-        this.transaction = transaction;
+        this.host = host;
     }
     
     // Evaluates the mcp tool script on a dedicated thread with a bounded timeout.
@@ -167,42 +160,49 @@ public class McpToolScriptExecutor {
                 -1, -1, -1, "", "", ModelChangesKind.NONE);
         }
         
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registry.get());
+        McpToolScriptRunCompletion completion = new McpToolScriptRunCompletion();
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registry.get(), host, completion);
         
-        WatchedRunner.Outcome<Result> outcome = WatchedRunner.run(
-                "mcp-tool-script-runner", "an mcp tool script", timeoutSeconds,
-                () -> evaluate(script, dispatcher),
-                dispatcher::abandon);
+        McpToolScriptHost.RunOutcome<Result> outcome = host.runWatched(
+                timeoutSeconds,
+                () -> evaluate(script, dispatcher, completion),
+                completion::abandon);
         
+        // The host runs onAbandon on this thread before runWatched returns, so the completion is already settled here.
         return switch (outcome.kind()) {
-            case COMPLETED -> {
-                // At INFO because the calls themselves are logged at DEBUG only, which the log panel leaves out.
-                log.info("MCP tool script made {} tool function call(s)", dispatcher.callCount());
-                yield outcome.value();
-            }
-            case TIMED_OUT -> timeoutFailure();
-            case INTERRUPTED -> interruptionFailure();
+            case COMPLETED -> outcome.value();
+            case TIMED_OUT -> timeoutFailure(completion.commitStarted());
+            case INTERRUPTED -> interruptionFailure(completion.commitStarted());
             case FAILED -> unexpectedFailure(outcome.failure());
         };
     }
     
-    // The runner was interrupted but may still be running, and WatchedRunner has suspended Astah API access until it stops.
-    private Result timeoutFailure() {
-        String message = String.format(
-            "MCP tool script execution timed out after %d seconds. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Every change the run made is rolled back when it stops, and restarting Astah discards them too. Wait and retry; restart Astah if it never stops. Keep scripts short and avoid blocking operations.",
-            timeoutSeconds);
+    // The runner was interrupted but may still be running, and the host has suspended Astah API access until it stops.
+    private Result timeoutFailure(boolean commitStarted) {
+        String message = String.format("MCP tool script execution timed out after %d seconds.", timeoutSeconds)
+                + abandonedRunNote(commitStarted)
+                + " Keep scripts short and avoid blocking operations.";
         log.warn(message);
         
         return Result.failure(message, -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
     }
     
-    // The wait was cut short, not the script: the runner may still be running, and WatchedRunner has suspended Astah API access until it stops.
-    private Result interruptionFailure() {
-        String message = "Interrupted while waiting for mcp tool script execution. The script thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Every change the run made is rolled back when it stops.";
+    // The wait was cut short, not the script: the runner may still be running, and the host has suspended Astah API access until it stops.
+    private static Result interruptionFailure(boolean commitStarted) {
+        String message = "Interrupted while waiting for mcp tool script execution." + abandonedRunNote(commitStarted);
         // Logged because the caller that was waiting for this result is usually gone: what an agent sees is the next tool call being refused.
         log.warn(message);
         
         return Result.failure(message, -1, -1, -1, "", "", ModelChangesKind.UNKNOWN);
+    }
+    
+    // modelChanges stays unknown while the run is still going; this says whether the run can still keep its changes.
+    private static String abandonedRunNote(boolean commitStarted) {
+        if (commitStarted) {
+            return " The script had already finished and the run was committing its changes, and the commit was not called off, so the changes may have been kept. Astah API access is blocked until the commit ends. Once access is restored, check the model before running the script again: running a script whose changes were kept would apply them twice. The server log records how the run ended.";
+        }
+        
+        return " The run was stopped before it could commit, so it will keep none of its changes: its thread discards them when it stops, and restarting Astah discards them too. The thread was interrupted but may still be running, so Astah API access is blocked until it stops, and the transaction the run opened stays open until then, so editing in Astah itself may fail meanwhile. Wait until access is restored, then retry; restart Astah if it never stops.";
     }
     
     // evaluate() reports its own failures through the Result; this is a safety net.
@@ -211,7 +211,7 @@ public class McpToolScriptExecutor {
     }
     
     // Evaluates the mcp tool script on the calling thread. Never throws: every failure mode is reported through the Result.
-    private Result evaluate(String script, McpToolScriptDispatcher dispatcher) {
+    private Result evaluate(String script, McpToolScriptDispatcher dispatcher, McpToolScriptRunCompletion completion) {
         BoundedWriter output = new BoundedWriter(McpServerConfig.MCP_TOOL_SCRIPT_MAX_STDOUT_BYTES);
         BoundedWriter errorOutput = new BoundedWriter(McpServerConfig.MCP_TOOL_SCRIPT_MAX_STDOUT_BYTES);
         
@@ -250,8 +250,8 @@ public class McpToolScriptExecutor {
                     output.toString(), errorOutput.toString(), ModelChangesKind.NONE);
         }
         
-        // The whole run shares one transaction, but TransactionSupport opens it lazily -- only the first time a tool function actually edits the model -- so a script that only reads never opens one at all.
-        TransactionSupport.shareOnThisThread(transaction);
+        // From here to the end of the script, everything the tool functions change is one unit, kept or undone as a whole.
+        McpToolScriptHost.RunScope scope = host.openRunScope();
         
         // Naming the source here, after the preludes and before the script itself, is what lets a failure be traced back to the line of the script that caused it rather than to the prelude line that passed the call on.
         engine.getContext().setAttribute(
@@ -264,8 +264,8 @@ public class McpToolScriptExecutor {
         } catch (Throwable throwable) {
             error = throwable;
         } finally {
-            // Unconditional, and harmless when it was never turned on: from here on the tool functions manage their own transactions again. A run that times out never reaches this, which is why sharing is thread-scoped.
-            TransactionSupport.stopSharingOnThisThread();
+            // Unconditional: from here on the tool functions manage their own changes again.
+            scope.stopSharing();
         }
         
         // A tool function whose failure the script caught has still left a half-applied edit in this transaction, so
@@ -282,25 +282,22 @@ public class McpToolScriptExecutor {
             error = new IllegalStateException(dispatcher.firstFailure());
         }
         
-        // A run the request thread abandoned has already been answered with a timeout failure. Reaching this line
-        // means it outlived that answer -- a computation loop ignores its interrupt and then finishes on its own --
-        // and committing now would leave the project holding changes the caller was told it did not get.
-        // Read after eval rather than before: the timeout may land at any point during the run.
-        if (error == null && dispatcher.abandoned()) {
+        // Settled once, against a caller that may be giving up right now; reading a flag and then committing would miss that.
+        // A run that loses was told it keeps nothing, so it rolls back; one that wins commits even if the caller gives up.
+        if (error == null && !completion.beginCommit()) {
             error = new IllegalStateException("The mcp tool script run was stopped.");
         }
         
-        Closing closing = closeTransaction(error == null, errorOutput);
+        // Closed before the result is built, so that what closing it had to say is included.
+        McpToolScriptHost.Closing closing = scope.close(error == null);
+        for (String note : closing.notes()) {
+            errorOutput.write(note + "\n");
+        }
         if (error == null) {
             error = closing.failure();
         }
         ModelChangesKind modelChanges = closing.modelChanges();
-        
-        // Abort a dangling transaction before building the result, so that the note it appends is included.
-        // Whatever that transaction held is gone once it is aborted, which settles what closeTransaction could not.
-        if (abortDanglingTransaction(errorOutput) && modelChanges != ModelChangesKind.COMMITTED) {
-            modelChanges = ModelChangesKind.ROLLED_BACK;
-        }
+        logOutcome(dispatcher.callCount(), modelChanges, completion.abandonRequested());
         
         appendTruncationNotes(output, errorOutput);
         
@@ -333,6 +330,18 @@ public class McpToolScriptExecutor {
                 output.toString(),
                 errorOutput.toString(),
                 modelChanges);
+        }
+    }
+    
+    // Logged on the runner, because a run whose caller stopped waiting has nobody else to report how it ended to.
+    private static void logOutcome(int callCount, ModelChangesKind modelChanges, boolean callerStoppedWaiting) {
+        // Spelled as the result spells it
+        String changes = modelChanges.name().toLowerCase(Locale.ROOT);
+        if (callerStoppedWaiting) {
+            log.warn("An mcp tool script whose caller had stopped waiting has ended after {} tool function call(s); model changes: {}",
+                    callCount, changes);
+        } else {
+            log.info("MCP tool script made {} tool function call(s); model changes: {}", callCount, changes);
         }
     }
     
@@ -370,63 +379,6 @@ public class McpToolScriptExecutor {
         }
         
         return message;
-    }
-    
-    // Commits the transaction the run opened, or rolls the whole run back. Returns what became of the run's changes, and what went wrong, or null.
-    private Closing closeTransaction(boolean commit, BoundedWriter errorOutput) {
-        boolean opened = false;
-        try {
-            // A script that never edited anything never opened the shared transaction, and there is nothing to keep.
-            opened = transaction.isInTransaction();
-            if (!opened) {
-                return new Closing(ModelChangesKind.NONE, null);
-            }
-            
-            if (commit) {
-                transaction.commit();
-                return new Closing(ModelChangesKind.COMMITTED, null);
-            }
-            
-            transaction.abort();
-            return new Closing(ModelChangesKind.ROLLED_BACK, null);
-            
-        } catch (Throwable t) {
-            log.error("Failed to close the transaction of an mcp tool script", t);
-            errorOutput.write("Failed to close the transaction of the mcp tool script: " + t + "\n");
-            
-            // A commit that failed leaves the transaction open, and changes nobody could confirm must not survive it.
-            // Only an abort seen to succeed counts as a rollback: a transaction that is gone without one may have been
-            // committed after all, and one whose state could not even be read tells nothing either way.
-            boolean rolledBack = false;
-            if (opened) {
-                try {
-                    if (transaction.isInTransaction()) {
-                        transaction.abort();
-                        rolledBack = true;
-                    }
-                } catch (Throwable abortFailure) {
-                    log.warn("Failed to abort after the commit of an mcp tool script failed", abortFailure);
-                }
-            }
-            return new Closing(rolledBack ? ModelChangesKind.ROLLED_BACK : ModelChangesKind.UNKNOWN, t);
-        }
-    }
-    
-    // The net under closeTransaction. Returns whether it had to abort a transaction.
-    private boolean abortDanglingTransaction(BoundedWriter errorOutput) {
-        try {
-            if (transaction.isInTransaction()) {
-                log.error("An mcp tool script left a transaction open. This should be impossible: the run closes the transaction it opens, and an mcp tool script cannot reach TransactionManager itself.");
-                transaction.abort();
-                errorOutput.write("A transaction left open by the mcp tool script was aborted.\n");
-                return true;
-            }
-            
-        } catch (Throwable t) {
-            log.warn("Failed to abort a transaction left open by the mcp tool script", t);
-            errorOutput.write("Failed to abort a transaction left open by the mcp tool script: " + t + "\n");
-        }
-        return false;
     }
     
     private static void appendTruncationNotes(BoundedWriter output, BoundedWriter errorOutput) {

@@ -6,6 +6,7 @@ import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.ResponseSupport;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.manifest.ToolCatalog;
@@ -34,9 +35,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CallableToolInfoToolTest {
-    
-    private static final String CHUNK_TOOL = "get_chunk_of_tools_callable_from_mcp_tool_script";
-    private static final String INFO_TOOL = "get_info_of_tools_callable_from_mcp_tool_script";
     
     // Smaller than any entry, so that every tool function gets a chunk of its own.
     private static final int ONE_TOOL_PER_CHUNK = 1;
@@ -104,7 +102,7 @@ public class CallableToolInfoToolTest {
         Map<String, Object> arguments = new LinkedHashMap<>();
         arguments.put("chunkIndex", chunkIndex);
         
-        return call(tool, CHUNK_TOOL, arguments);
+        return call(tool, "get_chunk_of_tools_callable_from_mcp_tool_script", arguments);
     }
     
     private static CallableToolChunkDTO chunk(CallableToolInfoTool tool, int chunkIndex) {
@@ -144,13 +142,13 @@ public class CallableToolInfoToolTest {
         Map<String, Object> arguments = new LinkedHashMap<>();
         arguments.put("toolNames", toolNames);
         
-        return call(tool, INFO_TOOL, arguments);
+        return call(tool, "get_info_of_tools_callable_from_mcp_tool_script", arguments);
     }
     
     // The schema of the answer this tool function publishes, which is what the MCP SDK checks every answer against
     private static Map<String, Object> publishedInfoOutputSchema(CallableToolInfoTool tool) {
         return tool.createToolDefinitions().stream()
-                .filter(candidate -> candidate.toolSchema().name().equals(INFO_TOOL))
+                .filter(candidate -> candidate.toolSchema().name().equals("get_info_of_tools_callable_from_mcp_tool_script"))
                 .findFirst()
                 .orElseThrow()
                 .toolSchema()
@@ -201,19 +199,19 @@ public class CallableToolInfoToolTest {
                 definition("create_class", "Create a class in the project."),
                 definitionWithoutOutputSchema("create_note", "Create a note on the specified diagram."),
                 definition("capture_dgm_img", "Capture a PNG image of the specified diagram."),
-                definition("get_info_of_ocl_spec", "Return the OCL specification document."));
+                definition("get_info_of_document", "Return a reference document."));
         
         // The reasons the manifest gives these two, stated here because this registry has no manifest behind it
         return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of(
                 "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT,
-                "get_info_of_ocl_spec", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
+                "get_info_of_document", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
     }
     
     private AstahToolRegistry realRegistry() {
-        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
         ToolManifest manifest = ToolManifest.load();
         
-        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest, new AstahMcpToolScriptHost()).registry();
     }
     
     @Test
@@ -229,7 +227,7 @@ public class CallableToolInfoToolTest {
         List<String> names = namesOf(allChunks(new CallableToolInfoTool(sampleRegistry(), ONE_TOOL_PER_CHUNK)));
         
         assertFalse(names.contains("capture_dgm_img"), "it returns binary content");
-        assertFalse(names.contains("get_info_of_ocl_spec"), "it performs blocking IO");
+        assertFalse(names.contains("get_info_of_document"), "it performs blocking IO");
     }
     
     @Test
@@ -287,7 +285,7 @@ public class CallableToolInfoToolTest {
     void getChunkOfToolsCallable_ok_answersWithinItsPublishedSchemaOverTheRealCatalog() {
         CallableToolInfoTool tool = new CallableToolInfoTool(realRegistry());
         Map<String, Object> schema = tool.createToolDefinitions().stream()
-                .filter(candidate -> candidate.toolSchema().name().equals(CHUNK_TOOL))
+                .filter(candidate -> candidate.toolSchema().name().equals("get_chunk_of_tools_callable_from_mcp_tool_script"))
                 .findFirst()
                 .orElseThrow()
                 .toolSchema()
@@ -309,10 +307,10 @@ public class CallableToolInfoToolTest {
         CallableToolInfoTool tool = new CallableToolInfoTool(sampleRegistry());
         McpSchema.Tool schema = tool.createToolDefinitions().get(0).toolSchema();
         
-        assertEquals(CHUNK_TOOL, schema.name());
+        assertEquals("get_chunk_of_tools_callable_from_mcp_tool_script", schema.name());
         assertEquals(List.of("chunkIndex"), schema.inputSchema().get("required"));
         
-        String message = errorOf(call(tool, CHUNK_TOOL, Map.of()));
+        String message = errorOf(call(tool, "get_chunk_of_tools_callable_from_mcp_tool_script", Map.of()));
         assertTrue(message.contains("chunkIndex"), message);
     }
     
@@ -514,7 +512,7 @@ public class CallableToolInfoToolTest {
                 "One wrong name must not cost the caller the schemas it did ask for");
         assertEquals(1, result.problems().size());
         assertTrue(result.problems().get(0).contains("zzzznotatool"), result.problems().get(0));
-        assertTrue(result.problems().get(0).contains(CHUNK_TOOL), result.problems().get(0));
+        assertTrue(result.problems().get(0).contains("get_chunk_of_tools_callable_from_mcp_tool_script"), result.problems().get(0));
     }
     
     @Test

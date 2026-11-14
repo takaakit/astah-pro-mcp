@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.model.outputdto.assembler;
 
+import com.astahpromcp.tool.astah.pro.AstahElementType;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.VisibilityKind;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
@@ -121,7 +122,7 @@ public class NamedElementDTOAssembler {
         
         return new NamedElementDTO(
             ElementDTOAssembler.toDTO(astahNamedElement),
-            NamedElementDTO.Type.getCorrespondingType(astahNamedElement).typeName,
+            AstahElementType.getCorrespondingType(astahNamedElement).typeName,
             astahNamedElement.getName(),
             astahNamedElement.getFullNamespace("."),
             visibility,

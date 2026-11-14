@@ -3,7 +3,8 @@ package com.astahpromcp.tool.mcptoolscript;
 import com.astahpromcp.server.ToolCatalogAssembler;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
+import com.astahpromcp.tool.astah.pro.assembly.AstahProToolFactory;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
@@ -42,7 +43,7 @@ public class ProgrammaticProfileParityTest {
     }
     
     private ToolCatalog catalog(DiagramThumbnails thumbnails) {
-        return ToolCatalogAssembler.build(thumbnails, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        return ToolCatalogAssembler.build(thumbnails, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
     }
     
     private static ToolManifest manifest() {
@@ -53,8 +54,8 @@ public class ProgrammaticProfileParityTest {
     // mcp tool scripts and the tools of the catalog
     private List<ToolProvider> programmaticProfileProviders(ToolCatalog catalog, ToolManifest manifest) {
         Set<String> names = manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC);
-        List<ToolProvider> providers = new ArrayList<>(new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).select(names));
-        providers.addAll(catalog.select(names).withAstahLock());
+        List<ToolProvider> providers = new ArrayList<>(new McpToolScriptProviderFactory().createToolProviders(catalog, manifest, new AstahMcpToolScriptHost()).select(names, ExclusiveToolProvider::new));
+        providers.addAll(catalog.select(names).withAstahLock(ExclusiveToolProvider::new));
         return providers;
     }
     
@@ -70,7 +71,7 @@ public class ProgrammaticProfileParityTest {
     
     // The programmatic profile as McpToolScriptProviderFactory builds it: the rows marked 's' can be called, the rows marked 'x' are held with their reason
     private static AstahToolRegistry registryOf(ToolCatalog catalog, ToolManifest manifest) {
-        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).registry();
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest, new AstahMcpToolScriptHost()).registry();
     }
     
     @Test
@@ -227,7 +228,7 @@ public class ProgrammaticProfileParityTest {
         
         ToolCatalog.Selection selection = catalog.select(manifest.namesFor(ToolManifest.Profile.DIRECT));
         
-        for (ToolProvider provider : selection.withAstahLock()) {
+        for (ToolProvider provider : selection.withAstahLock(ExclusiveToolProvider::new)) {
             Set<String> names = toolNamesOf(List.of(provider));
             boolean reachesAstah = catalog.astahLockedNames().containsAll(names);
             if (reachesAstah) {

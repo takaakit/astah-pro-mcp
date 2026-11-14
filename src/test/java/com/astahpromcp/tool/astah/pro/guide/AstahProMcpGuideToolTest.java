@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.guide;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.common.outputdto.GuideDTO;
+import com.astahpromcp.tool.knowledge.document.DocumentType;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AstahProMcpGuideToolTest {
     
@@ -58,5 +60,20 @@ public class AstahProMcpGuideToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+    
+    @Test
+    void getGuide_ok_tellsWhenToReadEveryReferenceDocument() throws Exception {
+        GuideDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getGuide,
+            tool,
+            new NoInputDTO(),
+            GuideDTO.class);
+        
+        assertTrue(outputDTO.contents().contains("Reference Documents:\nRead a reference document with the 'get_info_of_document' tool function, naming it in 'documentType', and read the rest of it with 'get_chunk_of_document'."), outputDTO.contents());
+        for (DocumentType type : DocumentType.values()) {
+            assertTrue(outputDTO.contents().contains("* '" + type.value() + "': " + type.title() + ". " + type.usage()),
+                "the guide does not tell when to read " + type.value());
+        }
     }
 }

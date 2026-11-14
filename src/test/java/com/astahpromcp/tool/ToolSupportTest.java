@@ -269,7 +269,82 @@ public class ToolSupportTest {
         assertEquals(errorText(result), errors.get(0).getFormattedMessage());
         assertNotNull(errors.get(0).getThrowableProxy());
     }
-    
+
+    // A tool function that answers with no result is a fault of this server, so the client gets a failure and the log keeps it at ERROR
+    private void assertNoResultReported(McpSchema.CallToolResult result, String toolName) {
+        assertTrue(result.isError());
+        assertEquals("Failure @tool=" + toolName, errorText(result));
+
+        assertTrue(eventsAt(Level.WARN).isEmpty());
+        List<ILoggingEvent> errors = eventsAt(Level.ERROR);
+        assertEquals(1, errors.size());
+        assertEquals(errorText(result), errors.get(0).getFormattedMessage());
+    }
+
+    @Test
+    void toolDefinitionReturningDto_ng_nullOutputIsReportedAsFailure() {
+        ToolDefinition definition = ToolSupport.toolDefinitionReturningDto(
+                "test_dto",
+                "test",
+                input -> null,
+                NoInputDTO.class,
+                TestOutputDTO.class);
+
+        McpSchema.CallToolResult result = definition.toolHandler().apply(
+                null,
+                new McpSchema.CallToolRequest("test_dto", Map.of(), null));
+
+        assertNoResultReported(result, "test_dto");
+    }
+
+    @Test
+    void toolDefinitionReturningContents_ng_nullContentsIsReportedAsFailure() {
+        ToolDefinition definition = ToolSupport.toolDefinitionReturningContents(
+                "test_contents",
+                "test",
+                input -> null,
+                NoInputDTO.class);
+
+        McpSchema.CallToolResult result = definition.toolHandler().apply(
+                null,
+                new McpSchema.CallToolRequest("test_contents", Map.of(), null));
+
+        assertNoResultReported(result, "test_contents");
+    }
+
+    @Test
+    void toolDefinitionReturningDtoAndContents_ng_nullResultIsReportedAsFailure() {
+        ToolDefinition definition = ToolSupport.toolDefinitionReturningDtoAndContents(
+                "test_dto_and_contents",
+                "test",
+                input -> null,
+                NoInputDTO.class,
+                TestOutputDTO.class);
+
+        McpSchema.CallToolResult result = definition.toolHandler().apply(
+                null,
+                new McpSchema.CallToolRequest("test_dto_and_contents", Map.of(), null));
+
+        assertNoResultReported(result, "test_dto_and_contents");
+    }
+
+    @Test
+    void toolDefinitionReturningDtoAndContents_ng_nullDtoIsReportedAsFailureEvenWithContents() {
+        // The DTO is what the declared output schema describes, so contents alone do not make a result
+        ToolDefinition definition = ToolSupport.toolDefinitionReturningDtoAndContents(
+                "test_dto_and_contents",
+                "test",
+                input -> Pair.of(null, List.of(McpSchema.TextContent.builder("contents").build())),
+                NoInputDTO.class,
+                TestOutputDTO.class);
+
+        McpSchema.CallToolResult result = definition.toolHandler().apply(
+                null,
+                new McpSchema.CallToolRequest("test_dto_and_contents", Map.of(), null));
+
+        assertNoResultReported(result, "test_dto_and_contents");
+    }
+
     @Test
     void toolDefinitionReturningDto_ng_unbindableArgumentsAreLoggedAsWarning() {
         ToolDefinition definition = ToolSupport.toolDefinitionReturningDto(

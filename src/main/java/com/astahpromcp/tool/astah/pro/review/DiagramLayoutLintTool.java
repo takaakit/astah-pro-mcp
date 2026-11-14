@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.review;
 
+import com.astahpromcp.tool.astah.pro.AstahElementType;
 import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
@@ -7,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.ReportDTO;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
-import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
@@ -40,7 +40,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
     
     // The node and link presentation types checked for overlaps on one diagram type.
     private record OverlapTarget(
-        NamedElementDTO.Type diagramType,
+        AstahElementType diagramType,
         Set<Type> nodeTypes,
         Set<Type> linkTypes
     ) {
@@ -49,7 +49,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
     // The diagram types supported by overlap detection
     private static final List<OverlapTarget> OVERLAP_TARGETS = List.of(
         new OverlapTarget(
-            NamedElementDTO.Type.CLASS_DIAGRAM,
+            AstahElementType.CLASS_DIAGRAM,
             EnumSet.of(
                 Type.CLASS,
                 Type.ASSOCIATION_CLASS,
@@ -65,7 +65,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
                 Type.LINK)),
         
         new OverlapTarget(
-            NamedElementDTO.Type.USE_CASE_DIAGRAM,
+            AstahElementType.USE_CASE_DIAGRAM,
             EnumSet.of(
                 Type.CLASS,
                 Type.USE_CASE,
@@ -78,7 +78,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
                 Type.INCLUDE)),
         
         new OverlapTarget(
-            NamedElementDTO.Type.SEQUENCE_DIAGRAM,
+            AstahElementType.SEQUENCE_DIAGRAM,
             EnumSet.of(
                 Type.LIFELINE,
                 Type.NOTE),
@@ -86,7 +86,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
                 Type.MESSAGE)),
         
         new OverlapTarget(
-            NamedElementDTO.Type.ACTIVITY_DIAGRAM,
+            AstahElementType.ACTIVITY_DIAGRAM,
             EnumSet.of(
                 Type.INITIAL_NODE,
                 Type.ACTION,
@@ -105,7 +105,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
                 Type.CONTROL_FLOW_OR_OBJECT_FLOW)),
         
         new OverlapTarget(
-            NamedElementDTO.Type.STATE_MACHINE_DIAGRAM,
+            AstahElementType.STATE_MACHINE_DIAGRAM,
             EnumSet.of(
                 Type.INITIAL_PSEUDOSTATE,
                 Type.FINAL_STATE,
@@ -118,7 +118,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
                 Type.TRANSITION)),
         
         new OverlapTarget(
-            NamedElementDTO.Type.REQUIREMENT_DIAGRAM,
+            AstahElementType.REQUIREMENT_DIAGRAM,
             EnumSet.of(
                 Type.REQUIREMENT,
                 Type.TEST_CASE,
@@ -169,7 +169,7 @@ public class DiagramLayoutLintTool extends AstahToolProvider {
             "The type of this diagram is excluded from overlap detection: %s(%s) is a diagram of type %s. Supported diagram types: %s.",
             diagram.getName(),
             diagram.getId(),
-            NamedElementDTO.Type.getCorrespondingType(diagram).typeName,
+            AstahElementType.getCorrespondingType(diagram).typeName,
             SUPPORTED_DIAGRAM_TYPE_NAMES)));
         List<INodePresentation> targetNodePresentations = getNodePresentationsByTypes(diagram, overlapTarget.nodeTypes());
         List<ILinkPresentation> targetLinkPresentations = getLinkPresentationsByTypes(diagram, overlapTarget.linkTypes());

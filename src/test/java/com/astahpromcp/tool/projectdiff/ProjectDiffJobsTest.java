@@ -533,7 +533,28 @@ public class ProjectDiffJobsTest {
     void start_ng_refusesToStartAProcessAfterShutdown() {
         ProjectDiffJobs jobs = jobs(1, 10, 100, 1_000);
         assertTrue(jobs.shutdown());
-        
+
         assertThrows(IOException.class, () -> jobs.start(new ProcessBuilder("java", "-version")));
+    }
+
+    @Test
+    void keyOf_ok_makesOneKeyOfSpellingsOfAWindowsPathThatDifferOnlyInCase() {
+        String key = ProjectDiffJobs.keyOf(Path.of("C:\\dev\\Model\\Project.asta"), true);
+
+        assertEquals(key, ProjectDiffJobs.keyOf(Path.of("c:\\DEV\\model\\project.ASTA"), true));
+        assertNotEquals(key, ProjectDiffJobs.keyOf(Path.of("C:\\dev\\Model\\Other.asta"), true));
+    }
+
+    @Test
+    void keyOf_ok_keepsTheCaseWhereFileNamesTellCaseApart() {
+        assertNotEquals(ProjectDiffJobs.keyOf(Path.of("/work/Model.asta"), false), ProjectDiffJobs.keyOf(Path.of("/work/model.asta"), false));
+    }
+
+    @Test
+    void inputKeyOf_ok_tellsTheOpenProjectFromAFile() {
+        Path base = Path.of("/work/Base.asta");
+
+        assertNotEquals(ProjectDiffJobs.inputKeyOf(base, null), ProjectDiffJobs.inputKeyOf(base, Path.of("/work/Target.asta")));
+        assertEquals(ProjectDiffJobs.inputKeyOf(base, null), ProjectDiffJobs.inputKeyOf(base, null));
     }
 }

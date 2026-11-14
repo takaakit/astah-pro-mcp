@@ -1,7 +1,7 @@
 package com.astahpromcp.tool.astah.pro.project.outputdto.assembler;
 
+import com.astahpromcp.tool.astah.pro.AstahElementType;
 import com.astahpromcp.tool.astah.pro.project.outputdto.NameIdTypeDefinitionDTO;
-import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.NonNull;
 
@@ -10,7 +10,7 @@ public class NameIdTypeDefinitionDTOAssembler {
         return new NameIdTypeDefinitionDTO(
             namedElement.getName(),
             namedElement.getId(),
-            NamedElementDTO.Type.getCorrespondingType(namedElement).typeName,
+            AstahElementType.getCorrespondingType(namedElement).typeName,
             namedElement.getDefinition());
     }
 }

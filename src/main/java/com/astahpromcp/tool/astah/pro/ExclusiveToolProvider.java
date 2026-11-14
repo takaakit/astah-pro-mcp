@@ -91,6 +91,12 @@ public final class ExclusiveToolProvider implements ToolProvider {
                 return ResponseSupport.error(msg);
             }
             
+            // The abandoned thread has since closed its run outside the lock (a rollback, or a commit it had begun), so what that queued on the EDT is drained here, once, before this tool reads anything.
+            // On this thread rather than on the abandoned one: that thread was interrupted, and a drain on an interrupted thread returns without waiting.
+            if (AstahApiLock.clearLiftedSuspension()) {
+                EdtSupport.drain(toolName, "running the tool after an abandoned thread terminated");
+            }
+            
             McpSchema.CallToolResult result = definition.toolHandler().apply(exchange, request);
             EdtSupport.drain(toolName, "releasing the Astah API lock");  // Before the lock is released, so that the next holder never sees an edit half applied
             return result;

@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.presentation.outputdto;
 import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.NameIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.PointDoubleDTO;
-import com.astahpromcp.tool.astah.pro.presentation.LineStyleKind;
+import com.astahpromcp.tool.astah.pro.common.LineStyleKind;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import java.util.List;

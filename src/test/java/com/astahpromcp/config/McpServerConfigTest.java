@@ -2,8 +2,10 @@ package com.astahpromcp.config;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.time.Duration;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Check relationships, not individual default values.
@@ -52,6 +54,17 @@ public class McpServerConfigTest {
         assertTrue(imageFetchTimeout.compareTo(lockWaitTimeout) < 0,
                 () -> "IMAGE_URL_FETCH_TIMEOUT_SECONDS (%d s) must be shorter than ASTAH_API_LOCK_TIMEOUT_SECONDS (%d s) to limit the impact of image fetching on callers waiting for the Astah API lock."
                         .formatted(McpServerConfig.IMAGE_URL_FETCH_TIMEOUT_SECONDS, McpServerConfig.ASTAH_API_LOCK_TIMEOUT_SECONDS));
+    }
+    
+    @Test
+    void documentCacheDir_ok_outsideEveryWorkspaceDirectory() {
+        Path cacheDir = McpServerConfig.DOCUMENT_CACHE_DIR;
+        
+        // The workspace directories are deleted when their session ends and at startup, so a cache inside one would last only a session
+        assertTrue(cacheDir.startsWith(McpServerConfig.ROOT_OUTPUT_DIR), () -> "DOCUMENT_CACHE_DIR (%s) must be under ROOT_OUTPUT_DIR".formatted(cacheDir));
+        String topName = McpServerConfig.ROOT_OUTPUT_DIR.relativize(cacheDir).getName(0).toString();
+        assertFalse(topName.startsWith(McpServerConfig.WORKSPACE_DIR_NAME_PREFIX),
+                () -> "DOCUMENT_CACHE_DIR (%s) must not be inside a directory named like a workspace directory".formatted(cacheDir));
     }
     
     @Test

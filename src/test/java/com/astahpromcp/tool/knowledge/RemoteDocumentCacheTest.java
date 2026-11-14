@@ -25,7 +25,8 @@ import static org.mockito.Mockito.mock;
 // on the next call, so that a transient network failure does not outlive it.
 public class RemoteDocumentCacheTest {
     
-    private static final String INFO_TOOL = "get_info_of_puml_guide";
+    // A document read from web pages
+    private static final Map<String, Object> PUML_GUIDE = Map.of("documentType", "puml_guide");
     
     // An HttpClient whose status code can be switched between calls, counting the requests it was asked to make.
     private static final class SwitchableHttpClient {
@@ -59,13 +60,13 @@ public class RemoteDocumentCacheTest {
         }
     }
     
-    private static McpSchema.CallToolResult callInfoTool(PlantumlGuideTool tool) {
+    private static McpSchema.CallToolResult callInfoTool(DocumentTool tool) {
         ToolDefinition definition = tool.createToolDefinitions().stream()
-                .filter(candidate -> candidate.toolSchema().name().equals(INFO_TOOL))
+                .filter(candidate -> candidate.toolSchema().name().equals("get_info_of_document"))
                 .findFirst()
-                .orElseThrow(() -> new AssertionError("this provider registers no tool function named " + INFO_TOOL));
+                .orElseThrow(() -> new AssertionError("this provider registers no tool function named get_info_of_document"));
         
-        return definition.toolHandler().apply(null, new McpSchema.CallToolRequest(INFO_TOOL, Map.of(), null));
+        return definition.toolHandler().apply(null, new McpSchema.CallToolRequest("get_info_of_document", PUML_GUIDE, null));
     }
     
     private static List<Path> filesIn(Path directory) throws Exception {
@@ -77,7 +78,7 @@ public class RemoteDocumentCacheTest {
     @Test
     void getInfo_ng_fetchesAgainAfterEveryPageFailed(@TempDir Path outputDirectory) throws Exception {
         SwitchableHttpClient client = new SwitchableHttpClient(503);
-        PlantumlGuideTool tool = new PlantumlGuideTool(outputDirectory, client.httpClient);
+        DocumentTool tool = new DocumentTool(outputDirectory, client.httpClient);
         
         McpSchema.CallToolResult firstResult = callInfoTool(tool);
         int requestsOfFirstCall = client.requests.get();
@@ -101,7 +102,7 @@ public class RemoteDocumentCacheTest {
     @Test
     void getInfo_ok_doesNotFetchAgainOnceLoaded(@TempDir Path outputDirectory) throws Exception {
         SwitchableHttpClient client = new SwitchableHttpClient(200);
-        PlantumlGuideTool tool = new PlantumlGuideTool(outputDirectory, client.httpClient);
+        DocumentTool tool = new DocumentTool(outputDirectory, client.httpClient);
         
         McpSchema.CallToolResult firstResult = callInfoTool(tool);
         int requestsOfFirstCall = client.requests.get();
@@ -118,7 +119,7 @@ public class RemoteDocumentCacheTest {
     @Test
     void getInfo_ng_fetchesAgainAfterASinglePageFailed(@TempDir Path outputDirectory) throws Exception {
         SwitchableHttpClient client = new SwitchableHttpClient(200);
-        PlantumlGuideTool tool = new PlantumlGuideTool(outputDirectory, client.httpClient);
+        DocumentTool tool = new DocumentTool(outputDirectory, client.httpClient);
         
         // One page failing is enough to fail the whole load: half a guide must not be cached as the guide.
         AtomicInteger pageNumber = new AtomicInteger();

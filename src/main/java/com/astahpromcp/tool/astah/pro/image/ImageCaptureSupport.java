@@ -279,7 +279,7 @@ public class ImageCaptureSupport {
         if (x < boundX || y < boundY
                 || x + (double) width > boundX + boundWidth
                 || y + (double) height > boundY + boundHeight) {
-            throw new Exception(String.format(
+            throw new Exception(String.format(Locale.ROOT,
                 "The specified crop area extends outside the diagram bounds. The diagram bound rectangle is x=%.1f, y=%.1f, width=%.1f, height=%.1f, but the requested crop area (x=%d, y=%d, width=%d, height=%d) does not fit within it. Specify a crop area that lies inside the diagram bound rectangle (obtainable via the get_dgm_rectangle tool).",
                 boundX, boundY, boundWidth, boundHeight, x, y, width, height));
         }

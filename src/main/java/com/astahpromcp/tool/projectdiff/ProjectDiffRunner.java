@@ -20,11 +20,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 
 // The background part of one comparison, which never touches the Astah API: write the XMI of each project file in a
 // separate process, compare the XMIs, and write the result
 @Slf4j
-public final class ProjectDiffRunner implements Runnable {
+final class ProjectDiffRunner implements Runnable {
     
     // Data that is never compared, or left out under a condition, which every result lists
     static final List<String> NOT_COMPARED = List.of(
@@ -118,10 +121,11 @@ public final class ProjectDiffRunner implements Runnable {
             checkJobSize();
             
             enter(DiffStage.COMPARE, false);
+            StopCheck checkStop = new StopCheck(job::stopRequested, McpServerConfig.PROJECT_DIFF_COMPARE_TIMEOUT_SECONDS, McpServerConfig.PROJECT_DIFF_STOP_CHECK_INTERVAL);
             Path baseXmi = base.directory().resolve(SubprocessXmiExporter.XMI_FILE_NAME);
             Path targetXmi = target.directory().resolve(SubprocessXmiExporter.XMI_FILE_NAME);
-            XmiIndex baseIndex = read(baseXmi);
-            XmiIndex targetIndex = read(targetXmi);
+            XmiIndex baseIndex = read(baseXmi, checkStop);
+            XmiIndex targetIndex = read(targetXmi, checkStop);
             
             List<String> warnings = formatWarnings(baseSide, baseInformation, targetSide, targetInformation);
             
@@ -129,7 +133,7 @@ public final class ProjectDiffRunner implements Runnable {
                 ProjectDiffEngine.compare(
                         new ProjectDiffEngine.Input(baseXmi, baseIndex, baseSide.projectName(), baseSide.astahVersion()),
                         new ProjectDiffEngine.Input(targetXmi, targetIndex, targetSide.projectName(), targetSide.astahVersion()),
-                        McpServerConfig.PROJECT_DIFF_VERIFIED_XMI_VERSIONS, writer);
+                        McpServerConfig.PROJECT_DIFF_VERIFIED_XMI_VERSIONS, writer, checkStop);
                 writer.finish();
                 
                 enter(DiffStage.RESULT, false);
@@ -217,12 +221,45 @@ public final class ProjectDiffRunner implements Runnable {
         return Instant.now().plus(McpServerConfig.PROJECT_DIFF_MINIMUM_RETENTION_MINUTES, ChronoUnit.MINUTES);
     }
     
-    private static XmiIndex read(Path xmi) {
+    private static XmiIndex read(Path xmi, Runnable checkStop) {
         try {
-            return XmiIndex.read(xmi, McpServerConfig.PROJECT_DIFF_MAX_XMI_BYTES);
+            return XmiIndex.read(xmi, McpServerConfig.PROJECT_DIFF_MAX_XMI_BYTES, checkStop);
             
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read the XMI " + xmi + ": " + e.getMessage(), e);
+        }
+    }
+    
+    // Run over and over while the XMIs are read and compared
+    static final class StopCheck implements Runnable {
+        
+        private final BooleanSupplier stopRequested;
+        private final long timeoutSeconds;
+        private final long deadlineNanos;
+        private final int interval;
+        private int runs;
+        
+        StopCheck(BooleanSupplier stopRequested, long timeoutSeconds, int interval) {
+            this.stopRequested = stopRequested;
+            this.timeoutSeconds = timeoutSeconds;
+            this.deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(timeoutSeconds);
+            this.interval = interval;
+        }
+        
+        @Override
+        public void run() {
+            if (++runs < interval) {
+                return;
+            }
+            runs = 0;
+            
+            // An interrupt stops it too, as it stops the wait for the processes that write the XMIs
+            if (stopRequested.getAsBoolean() || Thread.currentThread().isInterrupted()) {
+                throw new IllegalStateException("The comparison was stopped.");
+            }
+            if (System.nanoTime() - deadlineNanos >= 0) {
+                throw new IllegalStateException("Reading and comparing the XMIs took longer than " + timeoutSeconds + " seconds.");
+            }
         }
     }
     
@@ -230,7 +267,7 @@ public final class ProjectDiffRunner implements Runnable {
     private void checkJobSize() {
         long size = ProjectDiffStore.sizeOf(job.directory());
         if (size > McpServerConfig.PROJECT_DIFF_MAX_JOB_BYTES) {
-            throw new IllegalStateException(String.format("The comparison's files take %,d bytes, more than the %,d bytes set aside for one comparison.",
+            throw new IllegalStateException(String.format(Locale.ROOT, "The comparison's files take %,d bytes, more than the %,d bytes set aside for one comparison.",
                     size, McpServerConfig.PROJECT_DIFF_MAX_JOB_BYTES));
         }
     }

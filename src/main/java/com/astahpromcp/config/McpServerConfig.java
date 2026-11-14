@@ -210,6 +210,12 @@ public final class McpServerConfig {
     // Maximum size of the log of a separate process
     public static final long PROJECT_DIFF_CHILD_LOG_MAX_BYTES = 1024L * 1024;
     
+    // Maximum time a comparison may take to index the two XMIs, compare them and write the result.
+    public static final long PROJECT_DIFF_COMPARE_TIMEOUT_SECONDS = 90;
+    
+    // Number of XMI elements, or of elements compared, between two looks at whether a comparison is to stop or has run out of time.
+    public static final int PROJECT_DIFF_STOP_CHECK_INTERVAL = 1_000;
+    
     // Maximum time get_proj_diff_result waits for a comparison to finish
     public static final long PROJECT_DIFF_RESULT_WAIT_SECONDS = 20;
     
@@ -250,4 +256,7 @@ public final class McpServerConfig {
     
     // Temporary workspace directory
     public static final Path WORKSPACE_DIR = ROOT_OUTPUT_DIR.resolve(WORKSPACE_DIR_NAME_PREFIX + ProcessHandle.current().pid());
+    
+    // Reference documents converted from PDF
+    public static final Path DOCUMENT_CACHE_DIR = ROOT_OUTPUT_DIR.resolve("cache").resolve("documents");
 }

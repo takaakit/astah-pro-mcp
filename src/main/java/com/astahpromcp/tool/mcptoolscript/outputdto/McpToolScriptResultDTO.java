@@ -27,7 +27,7 @@ public record McpToolScriptResultDTO(
     @JsonPropertyDescription("1-based ordinal of the tool function call that failed, counting every call the run made, or -1 when the failure was not in one. Read it together with 'errorLine': the line says which call in the script failed, and this says which time it was called, which is what identifies the pass of a loop that a repeated call failed on.")
     int errorToolCallIndex,
     
-    @JsonPropertyDescription("What became of the changes the run made to the model: 'none' when it made none (a run that only reads, or one that failed before it changed anything), so a failed run lost nothing and what it printed still holds; 'committed' when they were kept; 'rolled_back' when they were all discarded because the run failed; 'unknown' when the run timed out or its caller stopped waiting before it ended, in which case whatever it changed is rolled back once it stops.")
+    @JsonPropertyDescription("What became of the changes the run made to the model: 'none' when it made none (a run that only reads, or one that failed before it changed anything), so a failed run lost nothing and what it printed still holds; 'committed' when they were kept; 'rolled_back' when they were all discarded because the run failed; 'unknown' when the outcome was not settled, or could not be confirmed, when the run was answered: it timed out, its caller stopped waiting, or closing its transaction failed. 'errorMessage' then says whether the changes can still have been kept; unless it rules that out, check the model before running the script again.")
     ModelChangesKind modelChanges
 ) {
 }

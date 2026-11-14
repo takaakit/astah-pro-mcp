@@ -9,8 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ListSnapshotTest {
     
-    private static final String INFO_TOOL = "get_info_of_all_named_elements";
-    
     // Stands in for a DTO of the list, whose JSON is what the snapshot ID is computed from
     record Entry(String name, String id) {
     }
@@ -38,7 +36,7 @@ public class ListSnapshotTest {
         ListSnapshot<Entry> snapshot = ListSnapshot.of(List.of(), 400);
         
         assertEquals(List.of(List.of()), snapshot.chunks());
-        assertEquals(List.of(), snapshot.chunk(snapshot.id(), 0, INFO_TOOL));
+        assertEquals(List.of(), snapshot.chunk(snapshot.id(), 0, "get_info_of_all_named_elements"));
     }
     
     @Test
@@ -67,7 +65,7 @@ public class ListSnapshotTest {
         String snapshotId = ListSnapshot.of(entries(5), 2).id();
         
         // A later build of the unchanged list accepts the ID it issued earlier
-        assertEquals(entries(5).subList(2, 4), ListSnapshot.of(entries(5), 2).chunk(snapshotId, 1, INFO_TOOL));
+        assertEquals(entries(5).subList(2, 4), ListSnapshot.of(entries(5), 2).chunk(snapshotId, 1, "get_info_of_all_named_elements"));
     }
     
     @Test
@@ -75,17 +73,17 @@ public class ListSnapshotTest {
         String snapshotId = ListSnapshot.of(entries(5), 2).id();
         ListSnapshot<Entry> changed = ListSnapshot.of(entries(6), 2);
         
-        IllegalStateException e = assertThrows(IllegalStateException.class, () -> changed.chunk(snapshotId, 1, INFO_TOOL));
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> changed.chunk(snapshotId, 1, "get_info_of_all_named_elements"));
         assertTrue(e.getMessage().contains(snapshotId), e.getMessage());
-        assertTrue(e.getMessage().contains("call '" + INFO_TOOL + "' again"), e.getMessage());
+        assertTrue(e.getMessage().contains("call 'get_info_of_all_named_elements' again"), e.getMessage());
     }
     
     @Test
     void chunk_ng_rejectsAnIndexOutsideTheList() {
         ListSnapshot<Entry> snapshot = ListSnapshot.of(entries(5), 2);
         
-        IllegalArgumentException below = assertThrows(IllegalArgumentException.class, () -> snapshot.chunk(snapshot.id(), -1, INFO_TOOL));
-        IllegalArgumentException above = assertThrows(IllegalArgumentException.class, () -> snapshot.chunk(snapshot.id(), 3, INFO_TOOL));
+        IllegalArgumentException below = assertThrows(IllegalArgumentException.class, () -> snapshot.chunk(snapshot.id(), -1, "get_info_of_all_named_elements"));
+        IllegalArgumentException above = assertThrows(IllegalArgumentException.class, () -> snapshot.chunk(snapshot.id(), 3, "get_info_of_all_named_elements"));
         
         assertTrue(below.getMessage().contains("from 0 to 2"), below.getMessage());
         assertTrue(above.getMessage().contains("from 0 to 2"), above.getMessage());

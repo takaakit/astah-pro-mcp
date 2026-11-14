@@ -17,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LogFileToolTest {
     
-    private static final String TOOL_NAME = "get_info_of_logs";
-    
     @TempDir
     Path dir;
     
@@ -26,9 +24,9 @@ public class LogFileToolTest {
         List<ToolDefinition> definitions = new LogFileTool(() -> astahLog, () -> mcpServerLog).createToolDefinitions();
         assertEquals(1, definitions.size());
         ToolDefinition definition = definitions.get(0);
-        assertEquals(TOOL_NAME, definition.toolSchema().name());
+        assertEquals("get_info_of_logs", definition.toolSchema().name());
         
-        McpSchema.CallToolResult result = definition.toolHandler().apply(null, new McpSchema.CallToolRequest(TOOL_NAME, Map.of(), null));
+        McpSchema.CallToolResult result = definition.toolHandler().apply(null, new McpSchema.CallToolRequest("get_info_of_logs", Map.of(), null));
         assertNotEquals(Boolean.TRUE, result.isError(), "a log that cannot be read must not fail the tool");
         return JsonSupport.OBJ_MAPPER.convertValue(result.structuredContent(), LogFilesDTO.class);
     }

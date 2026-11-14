@@ -68,12 +68,20 @@ public class KnowledgeToolSupport {
     }
     
     // Converts a PDF file to Markdown using OpenDataLoader PDF and saves it as <outputBaseName>.md in the output directory.
-    public static synchronized String convertPdfToMarkdown(Path pdfFile, Path outputDirectory, String outputBaseName) throws IOException {
+    public static String convertPdfToMarkdown(Path pdfFile, Path outputDirectory, String outputBaseName) throws IOException {
+        return convertPdfToMarkdown(pdfFile, outputDirectory, outputBaseName, "");
+    }
+    
+    // As above, but converts only the pages in pageSelection, such as "145-226,307-354" (physical pages counted from 1).
+    public static synchronized String convertPdfToMarkdown(Path pdfFile, Path outputDirectory, String outputBaseName, String pageSelection) throws IOException {
         Config config = new Config();
         config.setOutputFolder(outputDirectory.toString());
         config.setGenerateMarkdown(true);
         config.setGenerateJSON(false);
         config.setImageOutput(Config.IMAGE_OUTPUT_OFF);
+        if (!pageSelection.isEmpty()) {
+            config.setPages(pageSelection);
+        }
         OpenDataLoaderPDF.processFile(pdfFile.toString(), config);
         
         // OpenDataLoader PDF names the output <pdfBaseName>.md; rename it to <outputBaseName>.md
@@ -87,6 +95,11 @@ public class KnowledgeToolSupport {
         
         // Written back so that the saved file holds the same text this method returns
         String markdown = unescapeHtmlSpecialChars(Files.readString(outputPath, StandardCharsets.UTF_8));
+        
+        // OpenDataLoader PDF skips selected pages that the PDF does not have without telling, so an empty result is the only sign of a wrong selection
+        if (!pageSelection.isEmpty() && markdown.isBlank()) {
+            throw new IOException("No text was extracted from pages " + pageSelection + " of " + pdfFileName + ". The pages may be beyond the last page of the PDF.");
+        }
         Files.writeString(outputPath, markdown, StandardCharsets.UTF_8);
         log.info("Markdown saved to file: {}", outputPath.toAbsolutePath());
         
@@ -100,13 +113,19 @@ public class KnowledgeToolSupport {
         return markdown.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&");
     }
     
-    // Converts PDF bytes to Markdown via a temporary <outputBaseName>.pdf file in the output directory
+    // Converts PDF bytes to Markdown via a temporary PDF file in the output directory
     public static String convertPdfToMarkdown(byte[] pdfBytes, Path outputDirectory, String outputBaseName) throws IOException {
+        return convertPdfToMarkdown(pdfBytes, outputDirectory, outputBaseName, "");
+    }
+    
+    // As above, but converts only the pages in pageSelection; an empty pageSelection converts the whole document
+    public static String convertPdfToMarkdown(byte[] pdfBytes, Path outputDirectory, String outputBaseName, String pageSelection) throws IOException {
         Files.createDirectories(outputDirectory);
-        Path pdfPath = outputDirectory.resolve(outputBaseName + ".pdf");
+        // A name of its own, so that two conversions into the same directory never overwrite or delete each other's PDF
+        Path pdfPath = Files.createTempFile(outputDirectory, outputBaseName + "-", ".pdf");
         Files.write(pdfPath, pdfBytes);
         try {
-            return convertPdfToMarkdown(pdfPath, outputDirectory, outputBaseName);
+            return convertPdfToMarkdown(pdfPath, outputDirectory, outputBaseName, pageSelection);
         } finally {
             Files.deleteIfExists(pdfPath);
         }
@@ -188,7 +207,7 @@ public class KnowledgeToolSupport {
         public String chunkAt(int index) {
             List<String> snapshot = chunks;
             if (snapshot.isEmpty()) {
-                throw new IllegalStateException("The document has not been loaded yet. Call the corresponding get_info_of_... tool function first.");
+                throw new IllegalStateException("The document has not been loaded yet.");
             }
             if (index < 0 || index >= snapshot.size()) {
                 throw new IllegalArgumentException("Invalid chunk index: " + index + ". The valid range is 0 to " + (snapshot.size() - 1) + " (totalChunks=" + snapshot.size() + ").");

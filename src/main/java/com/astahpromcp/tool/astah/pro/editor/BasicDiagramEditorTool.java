@@ -26,6 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.Locale;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicDiagramEditor.html
@@ -94,7 +95,7 @@ public class BasicDiagramEditorTool extends AstahToolProvider {
                     if (!InvalidEditingException.UNSUPPORTED_ELEMENT_ERROR_KEY.equals(e.getKey())) {
                         throw e;
                     } else {
-                        throw new RuntimeException(String.format("The note cannot be created on this diagram as it is. The size of a note cannot be changed here, so a note wider than %.1f points cannot be narrowed to fit. This note would be %.1f points wide. Insert line breaks (\\n) into noteContent so that every line is at most %.1f points wide, and call create_note again.", NOTE_MAX_WIDTH, notePresentation.getWidth(), NOTE_MAX_WIDTH), e);
+                        throw new RuntimeException(String.format(Locale.ROOT, "The note cannot be created on this diagram as it is. The size of a note cannot be changed here, so a note wider than %.1f points cannot be narrowed to fit. This note would be %.1f points wide. Insert line breaks (\\n) into noteContent so that every line is at most %.1f points wide, and call create_note again.", NOTE_MAX_WIDTH, notePresentation.getWidth(), NOTE_MAX_WIDTH), e);
                     }
                 }
                 notePresentation.setLocation(new Point2D.Double(param.locationX(), param.locationY()));

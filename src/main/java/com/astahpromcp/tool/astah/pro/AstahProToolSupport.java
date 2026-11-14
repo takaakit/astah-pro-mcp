@@ -1,6 +1,5 @@
 package com.astahpromcp.tool.astah.pro;
 
-import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.change_vision.jude.api.inf.exception.InvalidUsingException;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.ILinkPresentation;
@@ -52,8 +51,8 @@ public class AstahProToolSupport {
             if (astahEntity instanceof IPresentation astahPresentation) {
                 actualType = String.format(" (actual type: %s presentation)", astahPresentation.getType());
             } else {
-                NamedElementDTO.Type type = NamedElementDTO.Type.getCorrespondingType(astahEntity);
-                if (type != NamedElementDTO.Type.UNKNOWN && type != NamedElementDTO.Type.ENTITY) {
+                AstahElementType type = AstahElementType.getCorrespondingType(astahEntity);
+                if (type != AstahElementType.UNKNOWN && type != AstahElementType.ENTITY) {
                     actualType = String.format(" (actual type: %s)", type.typeName);
                 }
             }

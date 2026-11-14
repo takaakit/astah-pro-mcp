@@ -2,6 +2,9 @@ package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.server.ToolCatalogAssembler;
 import com.astahpromcp.tool.JsonSupport;
+import com.astahpromcp.tool.ToolDefinition;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
+import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import com.astahpromcp.tool.manifest.ToolCatalog;
@@ -23,9 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class McpToolScriptProviderFactoryTest {
     
-    private static final String CHUNK_TOOL = "get_chunk_of_tools_callable_from_mcp_tool_script";
-    private static final String INFO_TOOL = "get_info_of_tools_callable_from_mcp_tool_script";
-    
     @TempDir
     Path workspaceDir;
     
@@ -43,8 +43,8 @@ public class McpToolScriptProviderFactoryTest {
     }
     
     private McpToolScriptProviderFactory.McpToolScriptTools tools(ToolManifest manifest) {
-        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
-        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest);
+        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest, new AstahMcpToolScriptHost());
     }
     
     private static Map<String, Object> parse(String json) {
@@ -81,24 +81,43 @@ public class McpToolScriptProviderFactoryTest {
         assertEquals(List.copyOf(manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC, ToolManifest.Reach.MCP_TOOL_SCRIPT)), List.copyOf(tools.registry().mcpToolScriptCallableNames()));
         assertTrue(manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC).containsAll(tools.registry().names()));
     }
-    
+
+    // A script receives structured content only, so a row marked 's' for a tool that answers without it would list the tool as callable and refuse it only when a script calls it
+    @Test
+    void createToolProviders_ok_letsAScriptCallOnlyToolsThatAnswerWithStructuredContentUnderTheShippedManifest() {
+        AstahToolRegistry registry = tools(ToolManifest.load()).registry();
+
+        // Without such a tool in the registry the check below would pass whatever the manifest said
+        assertTrue(registry.all().stream().anyMatch(d -> !d.resultKind().carriesStructuredContent()),
+                "the check is only meaningful if the registry holds tools that answer without structured content");
+
+        Set<String> withoutStructuredContent = new TreeSet<>();
+        for (ToolDefinition definition : registry.mcpToolScriptCallableDefinitions()) {
+            if (!definition.resultKind().carriesStructuredContent()) {
+                withoutStructuredContent.add(definition.toolSchema().name());
+            }
+        }
+        assertEquals(Set.of(), withoutStructuredContent,
+                "Set column 'programmatic' to 'x' with reason 'no_structured_content' for these tools in " + ToolManifest.RESOURCE_PATH);
+    }
+
     // programmatic = s makes them callable from a script, and the list a script reads then names them too
     @Test
     void createToolProviders_ok_letsAScriptCallTheToolsThatListTheCallableOnesWhenTheManifestSaysSo() {
         McpToolScriptProviderFactory.McpToolScriptTools tools = tools(ToolManifest.parse(List.of(
-                "Common\t" + CHUNK_TOOL + "\t-\ts",
-                "Common\t" + INFO_TOOL + "\t-\ts"), "test"));
+                "Common\tget_chunk_of_tools_callable_from_mcp_tool_script\t-\ts",
+                "Common\tget_info_of_tools_callable_from_mcp_tool_script\t-\ts"), "test"));
         
-        assertEquals(Set.of(CHUNK_TOOL, INFO_TOOL), tools.registry().mcpToolScriptCallableNames());
+        assertEquals(Set.of("get_chunk_of_tools_callable_from_mcp_tool_script", "get_info_of_tools_callable_from_mcp_tool_script"), tools.registry().mcpToolScriptCallableNames());
         
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(tools.registry());
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(tools.registry(), new AstahMcpToolScriptHost(new FakeTransactionBoundary()), new McpToolScriptRunCompletion());
         
-        Map<String, Object> chunk = parse(dispatcher.invoke(CHUNK_TOOL, "{\"chunkIndex\":0}"));
+        Map<String, Object> chunk = parse(dispatcher.invoke("get_chunk_of_tools_callable_from_mcp_tool_script", "{\"chunkIndex\":0}"));
         assertEquals(2, chunk.get("totalTools"));
-        assertEquals(Set.of(CHUNK_TOOL, INFO_TOOL), namesOf(chunk.get("tools")));
+        assertEquals(Set.of("get_chunk_of_tools_callable_from_mcp_tool_script", "get_info_of_tools_callable_from_mcp_tool_script"), namesOf(chunk.get("tools")));
         
-        Map<String, Object> info = parse(dispatcher.invoke(INFO_TOOL, "{\"toolNames\":[\"" + CHUNK_TOOL + "\"]}"));
-        assertEquals(Set.of(CHUNK_TOOL), namesOf(info.get("tools")));
+        Map<String, Object> info = parse(dispatcher.invoke("get_info_of_tools_callable_from_mcp_tool_script", "{\"toolNames\":[\"get_chunk_of_tools_callable_from_mcp_tool_script\"]}"));
+        assertEquals(Set.of("get_chunk_of_tools_callable_from_mcp_tool_script"), namesOf(info.get("tools")));
     }
     
     // Published directly on the programmatic profile, as the shipped manifest publishes it, the tool is refused from a script for the reason the manifest gives, before it runs
@@ -111,7 +130,7 @@ public class McpToolScriptProviderFactoryTest {
                 tools.registry().notMcpToolScriptCallableReason("run_mcp_tool_script"));
         
         IllegalStateException e = assertThrows(IllegalStateException.class,
-                () -> new McpToolScriptDispatcher(tools.registry()).invoke("run_mcp_tool_script", "{\"script\":\"1;\"}"));
+                () -> new McpToolScriptDispatcher(tools.registry(), new AstahMcpToolScriptHost(new FakeTransactionBoundary()), new McpToolScriptRunCompletion()).invoke("run_mcp_tool_script", "{\"script\":\"1;\"}"));
         assertEquals(NotMcpToolScriptCallableReason.PUBLISHED_DIRECTLY.message("run_mcp_tool_script"), e.getMessage());
     }
     
@@ -124,7 +143,7 @@ public class McpToolScriptProviderFactoryTest {
         assertEquals(Set.of("mcp_tool_script_guide"), tools.registry().mcpToolScriptCallableNames());
         
         IllegalStateException e = assertThrows(IllegalStateException.class,
-                () -> new McpToolScriptDispatcher(tools.registry()).invoke("mcp_tool_script_guide", "{}"));
+                () -> new McpToolScriptDispatcher(tools.registry(), new AstahMcpToolScriptHost(new FakeTransactionBoundary()), new McpToolScriptRunCompletion()).invoke("mcp_tool_script_guide", "{}"));
         assertEquals("'mcp_tool_script_guide' returned no structured content, so it cannot be called from an mcp tool script. Call 'mcp_tool_script_guide' directly as an MCP tool instead.", e.getMessage());
     }
 }

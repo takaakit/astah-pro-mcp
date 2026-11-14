@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,17 +70,18 @@ public final class XmiIndex {
     }
     
     // Read an XMI. An XMI larger than maxBytes is refused before it is read.
-    public static XmiIndex read(Path xmi, long maxBytes) throws IOException {
+    // checkStop is run at every element, and stops the reading by throwing when the comparison is to stop.
+    public static XmiIndex read(Path xmi, long maxBytes, Runnable checkStop) throws IOException {
         long size = Files.size(xmi);
         if (size > maxBytes) {
-            throw new IllegalStateException(String.format("The XMI is %,d bytes, which is more than the %,d bytes this server compares.", size, maxBytes));
+            throw new IllegalStateException(String.format(Locale.ROOT, "The XMI is %,d bytes, which is more than the %,d bytes this server compares.", size, maxBytes));
         }
         
         MessageDigest digest = sha256();
         Map<String, String> interned = new HashMap<>();
         List<Pending> pendingElements = new ArrayList<>();
         
-        XmiScanner.Header header = XmiScanner.scan(xmi, scanned -> pendingElements.add(summarize(scanned, digest, interned)));
+        XmiScanner.Header header = XmiScanner.scan(xmi, scanned -> pendingElements.add(summarize(scanned, digest, interned)), checkStop);
         
         // Elements arrive as they end, children before parents; put them in document order
         pendingElements.sort(Comparator.comparingInt(Pending::order));
@@ -103,8 +105,9 @@ public final class XmiIndex {
         return new XmiIndex(Collections.unmodifiableList(elements), indexById, header.exporterVersion(), header.currentModelVersion());
     }
     
-    // Read the values of the elements with the given xmi.ids again, in full
-    public static Map<String, List<XmiProperty>> readProperties(Path xmi, Set<String> ids) throws IOException {
+    // Read the values of the elements with the given xmi.ids again, in full.
+    // checkStop is run at every element, and stops the reading by throwing when the comparison is to stop.
+    public static Map<String, List<XmiProperty>> readProperties(Path xmi, Set<String> ids, Runnable checkStop) throws IOException {
         Map<String, List<XmiProperty>> properties = new HashMap<>();
         if (ids.isEmpty()) {
             return properties;
@@ -114,7 +117,7 @@ public final class XmiIndex {
             if (wanted.contains(scanned.id())) {
                 properties.put(scanned.id(), scanned.properties());
             }
-        });
+        }, checkStop);
         return properties;
     }
     

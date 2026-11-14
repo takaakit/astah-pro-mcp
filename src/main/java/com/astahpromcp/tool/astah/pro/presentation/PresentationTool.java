@@ -78,7 +78,7 @@ public class PresentationTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "change_line_color",
-                "Change the line color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image in low resolution.",
+                "Change the line color of the specified presentation (specified by ID), and return the presentation after it is changed along with the updated diagram image in low resolution. Note that the line color of some presentation types, such as notes and classes, cannot be changed.",
                 this::changeLineColor,
                 PresentationWithColorDTO.class,
                 PresentationDTO.class),

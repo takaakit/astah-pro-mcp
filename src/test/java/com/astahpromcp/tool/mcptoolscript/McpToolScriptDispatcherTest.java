@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
-import javax.swing.SwingUtilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,9 +55,34 @@ public class McpToolScriptDispatcherTest {
         return JsonSupport.OBJ_MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
     }
     
+    // A host that only notes what the dispatcher asks of it after each call. The dispatcher never starts a run or opens a scope itself.
+    private static final class RecordingHost implements McpToolScriptHost {
+        
+        final List<String> settledCalls = new ArrayList<>();
+        
+        @Override
+        public <T> RunOutcome<T> runWatched(long timeoutSeconds, Callable<T> work, Runnable onAbandon) {
+            throw new UnsupportedOperationException("The dispatcher does not start runs");
+        }
+        
+        @Override
+        public RunScope openRunScope() {
+            throw new UnsupportedOperationException("The dispatcher does not open scopes");
+        }
+        
+        @Override
+        public void afterToolCall(String toolName) {
+            settledCalls.add(toolName);
+        }
+    }
+    
+    private static McpToolScriptDispatcher dispatcherOf(AstahToolRegistry registry) {
+        return new McpToolScriptDispatcher(registry, new RecordingHost(), new McpToolScriptRunCompletion());
+    }
+    
     @Test
     void invoke_ok_returnsTheStructuredContentAsJson() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         String json = dispatcher.invoke("get_class_info", "{\"id\":\"abc\"}");
         
@@ -67,7 +92,7 @@ public class McpToolScriptDispatcherTest {
     // The reason JSON is the boundary: handing Nashorn objects to Jackson turns an array into {"0":...,"1":...}.
     @Test
     void invoke_ok_preservesNestedObjectsAndArrays() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("set_points_of_link_prst")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("set_points_of_link_prst")));
         
         String json = dispatcher.invoke("set_points_of_link_prst",
                 "{\"targetLinkPresentationId\":\"id-1\",\"drawPoints\":[{\"x\":100,\"y\":100},{\"x\":200,\"y\":200}]}");
@@ -83,7 +108,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_rejectsAnUnknownToolName() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> dispatcher.invoke("no_such_tool", "{}"));
@@ -101,7 +126,7 @@ public class McpToolScriptDispatcherTest {
                 return ResponseSupport.success(Map.of("ok", true));
             });
             
-            McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryExcluding(name, reason, definition));
+            McpToolScriptDispatcher dispatcher = dispatcherOf(registryExcluding(name, reason, definition));
             
             IllegalStateException e = assertThrows(IllegalStateException.class,
                     () -> dispatcher.invoke(name, "{}"), name);
@@ -114,7 +139,7 @@ public class McpToolScriptDispatcherTest {
     void invoke_ng_reportsAHandlerErrorAsAnException() {
         ToolDefinition definition = definition("get_class_info",
                 (exchange, request) -> ResponseSupport.error("Exception @tool=get_class_info: no such element"));
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(definition));
         
         RuntimeException e = assertThrows(RuntimeException.class, () -> dispatcher.invoke("get_class_info", "{}"));
         assertTrue(e.getMessage().contains("no such element"), e.getMessage());
@@ -125,7 +150,7 @@ public class McpToolScriptDispatcherTest {
     void invoke_ng_refusesAHandlerThatReturnsNoStructuredContent() {
         ToolDefinition definition = definition("some_new_image_tool",
                 (exchange, request) -> ResponseSupport.success(List.of(McpSchema.TextContent.builder("image").build())));
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(definition));
         
         IllegalStateException e = assertThrows(IllegalStateException.class,
                 () -> dispatcher.invoke("some_new_image_tool", "{}"));
@@ -135,7 +160,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_rejectsArgumentsAboveTheSizeLimit() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         String oversized = "{\"id\":\"" + "x".repeat(McpServerConfig.MCP_TOOL_SCRIPT_MAX_ARG_BYTES) + "\"}";
         
@@ -147,7 +172,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_countsEveryAttemptedCall() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryExcluding(
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryExcluding(
                 "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT,
                 echoing("get_class_info"), echoing("capture_dgm_img")));
         
@@ -164,7 +189,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_leadsWithTheReasonRatherThanTheOrdinal() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(
                 echoing("get_class_info"),
                 definition("delete_elem", (exchange, request) -> ResponseSupport.error("boom"))));
         
@@ -182,7 +207,7 @@ public class McpToolScriptDispatcherTest {
     // than leave it thinking the tool is broken, because the tool is right there and works.
     @Test
     void invoke_ng_sendsAToolPublishedDirectlyBackToTheToolList() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryExcluding(
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryExcluding(
                 "zoom", NotMcpToolScriptCallableReason.PUBLISHED_DIRECTLY, echoing("zoom")));
         
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> dispatcher.invoke("zoom", "{}"));
@@ -193,7 +218,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_stopsAfterTheCallLimit() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         for (int i = 0; i < McpServerConfig.MCP_TOOL_SCRIPT_MAX_CALLS; i++) {
             dispatcher.invoke("get_class_info", "{}");
@@ -206,7 +231,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_rejectsArgumentsNestedTooDeeply() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         int depth = McpServerConfig.MCP_TOOL_SCRIPT_MAX_JSON_DEPTH + 10;
         String json = "{\"a\":".repeat(depth) + "1" + "}".repeat(depth);
@@ -218,7 +243,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void invoke_ng_rejectsMalformedArguments() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         assertThrows(IllegalArgumentException.class, () -> dispatcher.invoke("get_class_info", "{not json"));
     }
@@ -231,30 +256,43 @@ public class McpToolScriptDispatcherTest {
             calls.incrementAndGet();
             return ResponseSupport.success(Map.of("ok", true));
         });
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+        McpToolScriptRunCompletion completion = new McpToolScriptRunCompletion();
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition), new RecordingHost(), completion);
         
         dispatcher.invoke("get_class_info", "{}");
-        dispatcher.abandon();
+        completion.abandon();
         
         assertThrows(IllegalStateException.class, () -> dispatcher.invoke("get_class_info", "{}"));
         assertEquals(1, calls.get(), "No handler may run once the run was abandoned");
     }
     
+    // Being abandoned is not a failed call, so it leaves no first failure behind.
+    @Test
+    void invoke_ng_recordsNoFailureForTheRunBeingAbandoned() {
+        McpToolScriptRunCompletion completion = new McpToolScriptRunCompletion();
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")), new RecordingHost(), completion);
+        
+        dispatcher.invoke("get_class_info", "{}");
+        completion.abandon();
+        
+        assertFalse(dispatcher.failed(), "Nothing failed: the run was simply given up on");
+    }
+    
     // Every name is bound, including the ones a script may not call. Leaving those out would make calling one fail with "tools.capture_dgm_img is not a function", which reads as "no such tool" instead of "call it directly".
     @Test
     void toolNamesJson_ok_bindsEveryToolIncludingTheOnesAScriptCannotCall() {
-        List<String> excluded = List.of("capture_dgm_img", "run_astah_api_script", "get_info_of_ocl_spec");
+        List<String> excluded = List.of("capture_dgm_img", "run_astah_api_script", "get_info_of_document");
         List<ToolDefinition> definitions = new ArrayList<>();
         definitions.add(echoing("get_class_info"));
         Map<String, NotMcpToolScriptCallableReason> reasons = new LinkedHashMap<>();
         reasons.put("capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT);
         reasons.put("run_astah_api_script", NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT);
-        reasons.put("get_info_of_ocl_spec", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO);
+        reasons.put("get_info_of_document", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO);
         for (String name : excluded) {
             definitions.add(echoing(name));
         }
         McpToolScriptDispatcher dispatcher =
-                new McpToolScriptDispatcher(AstahToolRegistry.of(definitions, reasons));
+                dispatcherOf(AstahToolRegistry.of(definitions, reasons));
         
         List<?> names = JsonSupport.OBJ_MAPPER.readValue(dispatcher.toolNamesJson(), List.class);
         
@@ -265,61 +303,38 @@ public class McpToolScriptDispatcherTest {
         }
     }
     
-    // On the direct profile the lock wrapper drains the EDT after every single tool call. Calling the unwrapped
-    // handler skips that, so the dispatcher has to do it, or a script could read back a value before Astah had
-    // finished applying the edit that produced it.
+    // The registry's handlers are unwrapped, so the host settles every call, a failed one too, before it returns.
     @Test
-    void invoke_ok_drainsTheEventDispatchThreadAfterEveryCall() {
-        AtomicReference<AtomicBoolean> queuedWorkDone = new AtomicReference<>();
-        
-        ToolDefinition definition = definition("set_name_of_named_element", (exchange, request) -> {
-            AtomicBoolean done = new AtomicBoolean(false);
-            queuedWorkDone.set(done);
-            // Stands in for the work Astah queues on the EDT while applying an edit. Slow on purpose: without the drain
-            // the call returns long before this finishes, so dropping the drain fails every run instead of most of them.
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                done.set(true);
-            });
-            return ResponseSupport.success(Map.of("ok", true));
-        });
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+    void invoke_ok_letsTheHostSettleEveryCallBeforeItReturns() {
+        RecordingHost host = new RecordingHost();
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(
+                echoing("set_name_of_named_element"),
+                definition("delete_elem", (exchange, request) -> ResponseSupport.error("boom"))), host, new McpToolScriptRunCompletion());
         
         for (int i = 0; i < 3; i++) {
             dispatcher.invoke("set_name_of_named_element", "{}");
-            assertTrue(queuedWorkDone.get().get(),
-                    "Work queued on the EDT by call " + (i + 1) + " must have run before the call returns");
+            assertEquals(i + 1, host.settledCalls.size(), "Call " + (i + 1) + " must be settled before it returns");
         }
+        assertThrows(RuntimeException.class, () -> dispatcher.invoke("delete_elem", "{}"));
+        
+        assertEquals(List.of("set_name_of_named_element", "set_name_of_named_element", "set_name_of_named_element", "delete_elem"),
+                host.settledCalls);
     }
     
-    // A run that timed out interrupts the runner thread, and the drain after its tool call must not swallow that interrupt.
+    // A call the dispatcher refuses never reaches a handler, so there is nothing for the host to settle.
     @Test
-    void invoke_ok_keepsTheInterruptOfAnInterruptedCaller() throws Exception {
-        ToolDefinition definition = definition("set_name_of_named_element", (exchange, request) -> {
-            Thread.currentThread().interrupt();
-            return ResponseSupport.success(Map.of("ok", true));
-        });
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+    void invoke_ng_leavesNothingToSettleForARefusedCall() {
+        RecordingHost host = new RecordingHost();
+        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")), host, new McpToolScriptRunCompletion());
         
-        AtomicBoolean interruptKept = new AtomicBoolean();
-        Thread caller = new Thread(() -> {
-            dispatcher.invoke("set_name_of_named_element", "{}");
-            interruptKept.set(Thread.currentThread().isInterrupted());
-        }, "interrupted-caller");
-        caller.start();
-        caller.join(10_000);
+        assertThrows(IllegalArgumentException.class, () -> dispatcher.invoke("no_such_tool", "{}"));
         
-        assertFalse(caller.isAlive(), "The call should have returned");
-        assertTrue(interruptKept.get(), "The caller's interrupt flag must survive the EDT drain");
+        assertEquals(List.of(), host.settledCalls);
     }
     
     @Test
     void invoke_ok_treatsMissingArgumentsAsAnEmptyObject() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_project_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_project_info")));
         
         assertEquals(Map.of(), parse(dispatcher.invoke("get_project_info", null)));
         assertEquals(Map.of(), parse(dispatcher.invoke("get_project_info", "{}")));
@@ -332,7 +347,7 @@ public class McpToolScriptDispatcherTest {
             huge.put("text", "x".repeat(McpServerConfig.MCP_TOOL_SCRIPT_MAX_RESULT_BYTES + 1));
             return ResponseSupport.success(huge);
         });
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(definition));
         
         IllegalStateException e = assertThrows(IllegalStateException.class,
                 () -> dispatcher.invoke("get_chunk_of_all_definitions", "{}"));
@@ -347,7 +362,7 @@ public class McpToolScriptDispatcherTest {
             seenExchange.set(exchange);
             return ResponseSupport.success(Map.of("ok", true));
         });
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(definition));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(definition));
         
         dispatcher.invoke("get_class_info", "{}");
         
@@ -356,7 +371,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void failed_ok_staysUnsetWhenEveryCallSucceeds() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         dispatcher.invoke("get_class_info", "{}");
         
@@ -365,7 +380,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void failed_ng_staysSetOnceAToolFunctionHasFailed() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(
                 echoing("get_class_info"),
                 definition("delete_elem", (exchange, request) -> ResponseSupport.error("boom"))));
         
@@ -380,7 +395,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void failed_ng_isSetWhenTheDispatcherItselfRefusesTheCall() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         assertThrows(IllegalArgumentException.class, () -> dispatcher.invoke("no_such_tool", "{}"));
         
@@ -390,7 +405,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void firstFailure_ok_staysNullWhenEveryCallSucceeds() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         dispatcher.invoke("get_class_info", "{}");
         
@@ -399,7 +414,7 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void firstFailure_ng_keepsTheFirstOneWithItsOrdinal() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(
                 echoing("get_class_info"),
                 definition("delete_elem", (exchange, request) -> ResponseSupport.error("boom")),
                 definition("delete_prst", (exchange, request) -> ResponseSupport.error("later failure"))));
@@ -422,34 +437,10 @@ public class McpToolScriptDispatcherTest {
     
     @Test
     void firstFailureCallIndex_ok_staysUnsetWhenEveryCallSucceeds() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
+        McpToolScriptDispatcher dispatcher = dispatcherOf(registryOf(echoing("get_class_info")));
         
         dispatcher.invoke("get_class_info", "{}");
         
         assertEquals(-1, dispatcher.firstFailureCallIndex(), "A run in which nothing failed has no ordinal to give");
-    }
-    
-    // What the executor reads to decide that a run which outlived its timeout must not commit.
-    @Test
-    void abandoned_ok_reportsWhetherTheRequestThreadGaveUpOnTheRun() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
-        
-        assertFalse(dispatcher.abandoned(), "A run nobody has given up on is not abandoned");
-        
-        dispatcher.abandon();
-        
-        assertTrue(dispatcher.abandoned(), "The run was abandoned, and it stays abandoned");
-    }
-    
-    // A timed-out run whose script never calls a tool function again reaches its end with nothing failed. The flag below is then the only thing left that says the caller was already answered with a failure.
-    @Test
-    void abandoned_ng_isSetEvenWhenNoToolFunctionCallFailed() {
-        McpToolScriptDispatcher dispatcher = new McpToolScriptDispatcher(registryOf(echoing("get_class_info")));
-        
-        dispatcher.invoke("get_class_info", "{}");
-        dispatcher.abandon();
-        
-        assertFalse(dispatcher.failed(), "Nothing failed: the run was simply given up on");
-        assertTrue(dispatcher.abandoned(), "Which is exactly why abandonment has to be readable on its own");
     }
 }

@@ -85,6 +85,7 @@ Follow these steps to recall insights on UML, modeling, and architecture:
    - Craig Larman. Applying UML and Patterns: An Introduction to Object-Oriented Analysis and Design and Iterative Development, the 3rd edition. Pearson Education, 2004.
    - Eric Evans. Domain-driven design: tackling complexity in the heart of software. Addison-Wesley Professional, 2004.
    - Robert C. Martin. Clean architecture: a craftsman's guide to software structure and design. Prentice Hall Press, 2017.
+   - Len Bass, Paul Clements, and Rick Kazman. Software Architecture in Practice, the 4th edition. Addison-Wesley Professional, 2021.
    **Note:** Retrieve ONLY insights that are actually presented in those books. Do NOT include any critique, commentary, explanation, interpretation, review, or personal impressions about the books.
 2. Verbalize those insights explicitly for each book, and call the `store_uml_modeling_architecture_insights` tool function to store them.
 3. Call the `read_uml_modeling_architecture_insights` tool function to load the insights into your working context.

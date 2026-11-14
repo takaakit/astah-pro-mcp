@@ -3,7 +3,6 @@ package com.astahpromcp.tool.manifest;
 import com.astahpromcp.tool.FilteredToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 @Slf4j
 public final class ToolCatalog {
@@ -109,11 +109,11 @@ public final class ToolCatalog {
             return List.copyOf(providers);
         }
         
-        // The providers as a profile registers them: the ones that reach the Astah API hold the lock while they run
-        public List<ToolProvider> withAstahLock() {
+        // The providers as a profile registers them, with astahApiLock putting the ones that reach the Astah API behind the lock
+        public List<ToolProvider> withAstahLock(UnaryOperator<ToolProvider> astahApiLock) {
             List<ToolProvider> providers = new ArrayList<>();
             for (ToolProvider provider : astahProviders) {
-                providers.add(new ExclusiveToolProvider(provider));
+                providers.add(astahApiLock.apply(provider));
             }
             providers.addAll(otherProviders);
             return List.copyOf(providers);

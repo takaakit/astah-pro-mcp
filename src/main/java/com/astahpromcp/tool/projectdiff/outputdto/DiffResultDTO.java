@@ -61,4 +61,144 @@ public record DiffResultDTO(
     @JsonPropertyDescription("Path of the JSON file with the full result; empty unless done")
     String fullDiffPath
 ) {
+    
+    // An answer that holds no page of changes
+    public static DiffResultDTO withoutPage(
+            String diffId,
+            DiffStatus status,
+            String expiresAt,
+            DiffFailureDTO failure,
+            ProjectSideDTO base,
+            ProjectSideDTO target,
+            NormalizationDTO normalization,
+            List<String> warnings,
+            List<String> notCompared,
+            SummaryDTO summary,
+            String fullDiffPath) {
+        return emptyPage(
+                diffId,
+                status,
+                expiresAt,
+                failure,
+                base,
+                target,
+                normalization,
+                warnings,
+                notCompared,
+                summary,
+                0,
+                0,
+                fullDiffPath);
+    }
+    
+    // This answer as the frame of the page that starts at startIndex and startPropertyIndex, kept until expiresAt.
+    public DiffResultDTO startingAt(
+            String expiresAt,
+            int startIndex,
+            int startPropertyIndex) {
+        return emptyPage(
+                diffId,
+                status,
+                expiresAt,
+                failure,
+                base,
+                target,
+                normalization,
+                warnings,
+                notCompared,
+                summary,
+                startIndex,
+                startPropertyIndex,
+                fullDiffPath);
+    }
+    
+    // This page with its changes
+    public DiffResultDTO withPage(
+            SummaryDTO summary,
+            int nextIndex,
+            int nextPropertyIndex,
+            List<ChangeDTO> changes) {
+        return new DiffResultDTO(
+                diffId,
+                status,
+                expiresAt,
+                failure,
+                base,
+                target,
+                normalization,
+                warnings,
+                notCompared,
+                summary,
+                startIndex,
+                startPropertyIndex,
+                nextIndex,
+                nextPropertyIndex,
+                changes,
+                nextIndex != -1,
+                shortened,
+                fullDiffPath);
+    }
+    
+    // This answer with the fields other than the changes replaced by shortened ones (ResponseLimiter)
+    public DiffResultDTO withShortenedHeader(
+            ProjectSideDTO base,
+            ProjectSideDTO target,
+            List<String> warnings,
+            List<String> notCompared) {
+        return new DiffResultDTO(
+                diffId,
+                status,
+                expiresAt,
+                failure,
+                base,
+                target,
+                normalization,
+                warnings,
+                notCompared,
+                summary,
+                startIndex,
+                startPropertyIndex,
+                nextIndex,
+                nextPropertyIndex,
+                changes,
+                truncated,
+                true,
+                fullDiffPath);
+    }
+    
+    // The one place that says what a page without changes holds
+    private static DiffResultDTO emptyPage(
+            String diffId,
+            DiffStatus status,
+            String expiresAt,
+            DiffFailureDTO failure,
+            ProjectSideDTO base,
+            ProjectSideDTO target,
+            NormalizationDTO normalization,
+            List<String> warnings,
+            List<String> notCompared,
+            SummaryDTO summary,
+            int startIndex,
+            int startPropertyIndex,
+            String fullDiffPath) {
+        return new DiffResultDTO(
+                diffId,
+                status,
+                expiresAt,
+                failure,
+                base,
+                target,
+                normalization,
+                warnings,
+                notCompared,
+                summary,
+                startIndex,
+                startPropertyIndex,
+                -1,
+                0,
+                List.of(),
+                false,
+                false,
+                fullDiffPath);
+    }
 }

@@ -3,6 +3,8 @@ package com.astahpromcp.tool.manifest;
 import com.astahpromcp.server.ToolCatalogAssembler;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
+import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.mcptoolscript.McpToolScriptProviderFactory;
 import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
@@ -43,12 +45,12 @@ public class ToolManifestConsistencyTest {
     }
     
     private ToolCatalog catalog() {
-        return ToolCatalogAssembler.build(DiagramThumbnails.INCLUDE, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        return ToolCatalogAssembler.build(DiagramThumbnails.INCLUDE, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
     }
     
     // The names of the tools that run mcp tool scripts, which no catalog holds
     private static Set<String> mcpToolScriptToolNames(ToolCatalog catalog, ToolManifest manifest) {
-        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest).names();
+        return new McpToolScriptProviderFactory().createToolProviders(catalog, manifest, new AstahMcpToolScriptHost()).names();
     }
     
     // A row the parser accepts: a row the programmatic profile publishes directly gets the generic reason
@@ -103,7 +105,7 @@ public class ToolManifestConsistencyTest {
                 }
             }
             
-            Set<String> registered = namesOf(catalog.select(manifest.namesFor(profile)).withAstahLock());
+            Set<String> registered = namesOf(catalog.select(manifest.namesFor(profile)).withAstahLock(ExclusiveToolProvider::new));
             
             assertEquals(expected, registered, "profile " + profile);
         }
@@ -114,13 +116,13 @@ public class ToolManifestConsistencyTest {
         ToolManifest manifest = ToolManifest.load();
         ToolCatalog catalog = catalog();
         
-        // 391 = rows with direct = x, 19 = the view manager tools the catalog lacks outside the GUI.
-        assertEquals(391 - 19,
+        // 377 = rows with direct = x, 19 = the view manager tools the catalog lacks outside the GUI.
+        assertEquals(377 - 19,
                 catalog.select(manifest.namesFor(ToolManifest.Profile.DIRECT)).unlocked().stream()
                         .mapToLong(p -> p.createToolDefinitions().size()).sum());
-        // 84 = rows with programmatic = x, 19 = the view manager tools the catalog lacks outside the GUI,
+        // 70 = rows with programmatic = x, 19 = the view manager tools the catalog lacks outside the GUI,
         // 5 = get_chunk_of_tools_callable_from_mcp_tool_script, get_info_of_tools_callable_from_mcp_tool_script, run_mcp_tool_script, mcp_tool_script_guide and get_mcp_tool_script_example, which McpToolScriptProviderFactory builds rather than the catalog.
-        assertEquals(84 - 19 - 5,
+        assertEquals(70 - 19 - 5,
                 catalog.select(manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC)).unlocked().stream()
                         .mapToLong(p -> p.createToolDefinitions().size()).sum());
     }

@@ -4,7 +4,6 @@ import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.ToolCallStatistics;
 import com.astahpromcp.tool.ToolDefinition;
-import com.astahpromcp.tool.astah.pro.EdtSupport;
 import com.astahpromcp.tool.common.ScriptLine;
 import com.astahpromcp.tool.manifest.NotMcpToolScriptCallableReason;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -14,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 // The only Java entry point an mcp tool script can reach, and therefore the only place the limits of one run are enforced.
 //
@@ -22,18 +20,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 // misconvert nested values -- a JavaScript array arrives as {"0":...,"1":...} -- and the failure would surface deep
 // inside a DTO rather than at the call. Stringifying on the JavaScript side and parsing here removes that class of bug.
 //
-// One instance serves one mcp tool script run: the call counter, the first failure and the abandoned flag are per-run state.
+// One instance serves one mcp tool script run: the call counter, the first failure and the run's completion are per-run state.
 public final class McpToolScriptDispatcher {
-    
+
     private final AstahToolRegistry registry;
-    private final AtomicBoolean abandoned = new AtomicBoolean(false);
+    private final McpToolScriptHost host;
+    private final McpToolScriptRunCompletion completion;
     private int callCount;
     private String firstFailure;
     private int firstFailureLine = -1;
     private int firstFailureCallIndex = -1;
     
-    public McpToolScriptDispatcher(AstahToolRegistry registry) {
+    McpToolScriptDispatcher(AstahToolRegistry registry, McpToolScriptHost host, McpToolScriptRunCompletion completion) {
         this.registry = registry;
+        this.host = host;
+        this.completion = completion;
     }
     
     // Called from JavaScript. Both the arguments and the return value are JSON strings.
@@ -65,7 +66,7 @@ public final class McpToolScriptDispatcher {
     private String doInvoke(String toolName, String argsJson) {
         // A run that has already timed out must not start further work: the request thread has given up on this
         // script, so anything begun now would edit the model with nobody waiting for the answer.
-        if (abandoned.get()) {
+        if (completion.abandoned()) {
             throw new IllegalStateException("The mcp tool script run was stopped, so '" + toolName + "' was not called.");
         }
         
@@ -104,11 +105,8 @@ public final class McpToolScriptDispatcher {
         McpSchema.CallToolResult result = definition.toolHandler().apply(null, request);
         ToolCallStatistics.record(ToolCallStatistics.Route.MCP_TOOL_SCRIPT, toolName, result);
         
-        // The lock wrapper drains the EDT after every single tool call before it releases the lock, so on the direct
-        // profile one call means one drain. Calling the unwrapped handler skips that, which would let a script read
-        // back a value before Astah had finished applying the edit that produced it. Draining here keeps a tool
-        // function behaving the same whether it is called directly or from an mcp tool script.
-        EdtSupport.drain(toolName, "continuing the mcp tool script");
+        // Failed or not, before the script reads anything back: the handlers here are unwrapped, so the host settles the call.
+        host.afterToolCall(toolName);
         
         if (result == null) {
             throw new IllegalStateException("'" + toolName + "' returned no result.");
@@ -157,16 +155,6 @@ public final class McpToolScriptDispatcher {
     // Every tool function name, as a JSON array, for the prelude to build the tools object from.
     public String toolNamesJson() {
         return JsonSupport.OBJ_MAPPER.writeValueAsString(List.copyOf(registry.names()));
-    }
-    
-    // Stop accepting calls. Called when the run times out and its thread is abandoned.
-    public void abandon() {
-        abandoned.set(true);
-    }
-    
-    // Whether the request thread gave up on this run. Set before the timeout is reported to the caller, so a run that reads it as true has already been answered with a failure and must not commit anything.
-    public boolean abandoned() {
-        return abandoned.get();
     }
     
     public int callCount() {

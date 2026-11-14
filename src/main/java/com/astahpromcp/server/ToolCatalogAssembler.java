@@ -1,7 +1,7 @@
 package com.astahpromcp.server;
 
 import com.astahpromcp.tool.ToolProvider;
-import com.astahpromcp.tool.astah.pro.AstahProToolFactory;
+import com.astahpromcp.tool.astah.pro.assembly.AstahProToolFactory;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.config.ConfigToolFactory;
 import com.astahpromcp.tool.info.InfoToolFactory;
@@ -25,14 +25,14 @@ public final class ToolCatalogAssembler {
     }
     
     // Build one catalog
-    public static ToolCatalog build(DiagramThumbnails thumbnails, Path imageOutputDir, Path workspaceDir, ProjectDiffJobs projectDiffJobs) {
-        return ToolCatalog.of(astahProviders(thumbnails, imageOutputDir, projectDiffJobs), sharedProviders(workspaceDir, projectDiffJobs));
+    public static ToolCatalog build(DiagramThumbnails thumbnails, Path imageOutputDir, Path workspaceDir, Path documentCacheDir, ProjectDiffJobs projectDiffJobs) {
+        return ToolCatalog.of(astahProviders(thumbnails, imageOutputDir, projectDiffJobs), sharedProviders(workspaceDir, documentCacheDir, projectDiffJobs));
     }
     
     // Build both thumbnail variants, sharing the providers the setting does not affect.
     // Every catalog gets the same comparisons, so that a comparison started from either one has its result found by the tool that fetches it.
-    public static Map<DiagramThumbnails, ToolCatalog> buildAll(Path imageOutputDir, Path workspaceDir, ProjectDiffJobs projectDiffJobs) {
-        List<ToolProvider> shared = sharedProviders(workspaceDir, projectDiffJobs);
+    public static Map<DiagramThumbnails, ToolCatalog> buildAll(Path imageOutputDir, Path workspaceDir, Path documentCacheDir, ProjectDiffJobs projectDiffJobs) {
+        List<ToolProvider> shared = sharedProviders(workspaceDir, documentCacheDir, projectDiffJobs);
         
         Map<DiagramThumbnails, ToolCatalog> catalogs = new EnumMap<>(DiagramThumbnails.class);
         for (DiagramThumbnails thumbnails : DiagramThumbnails.values()) {
@@ -47,10 +47,10 @@ public final class ToolCatalogAssembler {
                 .createRawToolProviders(thumbnails);
     }
     
-    private static List<ToolProvider> sharedProviders(Path workspaceDir, ProjectDiffJobs projectDiffJobs) {
+    private static List<ToolProvider> sharedProviders(Path workspaceDir, Path documentCacheDir, ProjectDiffJobs projectDiffJobs) {
         List<ToolProvider> providers = new ArrayList<>();
         providers.addAll(new LogToolFactory().createToolProviders());
-        providers.addAll(new KnowledgeToolFactory(workspaceDir).createToolProviders());
+        providers.addAll(new KnowledgeToolFactory(workspaceDir, documentCacheDir).createToolProviders());
         providers.addAll(new VisualizationToolFactory().createToolProviders());
         providers.addAll(new ConfigToolFactory().createToolProviders());
         providers.addAll(new InfoToolFactory().createToolProviders());

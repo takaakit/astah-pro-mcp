@@ -216,6 +216,47 @@ public class ExclusiveToolProviderTest {
         assertFalse(AstahApiLock.LOCK.isLocked(), "Lock should be released after the call");
     }
     
+    // The abandoned thread rolls its run back on its own after the call that gave up on it has drained the EDT and released the lock, so what Astah queued on the EDT for that rollback must have run before the next tool reads anything.
+    @Test
+    void createToolDefinitions_ok_drainsTheEventDispatchThreadBeforeTheFirstCallAfterTheAbandonedThreadTerminates() throws Exception {
+        AtomicBoolean queuedWorkDone = new AtomicBoolean();
+        CountDownLatch rollBack = new CountDownLatch(1);
+        Thread abandoned = new Thread(() -> {
+            try {
+                rollBack.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            // Stands in for the work Astah queues on the EDT while rolling back. Slow on purpose: without the drain the handler
+            // runs long before this finishes, so such a change fails every run.
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                queuedWorkDone.set(true);
+            });
+        }, "abandoned-thread");
+        abandoned.start();
+        AstahApiLock.suspend(abandoned, "a timed-out script that has since rolled back and stopped");
+        rollBack.countDown();
+        abandoned.join();
+        
+        AtomicBoolean queuedWorkDoneWhenHandlerRan = new AtomicBoolean();
+        ToolDefinition wrapped = wrap(definitionWith((exchange, request) -> {
+            queuedWorkDoneWhenHandlerRan.set(queuedWorkDone.get());
+            return ResponseSupport.success(List.of(McpSchema.TextContent.builder("ok").build()));
+        }), 30);
+        
+        McpSchema.CallToolResult result = wrapped.toolHandler().apply(null, null);
+        
+        assertFalse(result.isError(), "Tool calls should resume once the abandoned thread has terminated");
+        assertTrue(queuedWorkDoneWhenHandlerRan.get(), "Work the abandoned thread queued on the EDT must have run before the next tool's handler");
+        assertFalse(AstahApiLock.clearLiftedSuspension(), "The settled suspension should be forgotten, so that later calls do not drain for it again");
+        assertFalse(AstahApiLock.LOCK.isLocked(), "Lock should be released after the call");
+    }
+    
     @Test
     void createToolDefinitions_ok_preservesToolSchemaAndDelegateName() {
         ToolDefinition definition = definitionWith((exchange, request) -> ResponseSupport.error("dummy"));

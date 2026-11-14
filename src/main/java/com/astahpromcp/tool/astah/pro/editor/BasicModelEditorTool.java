@@ -283,7 +283,7 @@ public class BasicModelEditorTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDto(
                 "create_constraint",
-                "Create a constraint to the specified named element (specified by ID), and return the newly created model element of the constraint.",
+                "Create a constraint to the specified named element (specified by ID), and return the newly created model element of the constraint. To write the constraint in OCL, consult the OCL (Object Constraint Language) Specification.",
                 this::createConstraint,
                 NewConstraintDTO.class,
                 ConstraintDTO.class)

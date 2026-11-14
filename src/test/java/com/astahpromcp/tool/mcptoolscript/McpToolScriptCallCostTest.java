@@ -3,6 +3,7 @@ package com.astahpromcp.tool.mcptoolscript;
 import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.server.ToolCatalogAssembler;
 import com.astahpromcp.tool.astah.pro.AstahApiLock;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
 import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.image.DiagramThumbnails;
 import com.astahpromcp.tool.manifest.ToolCatalog;
@@ -59,7 +60,7 @@ public class McpToolScriptCallCostTest {
     
     @Test
     void execute_ok_recordsTheCostOfManyToolCallsInOneRun() {
-        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        ToolCatalog catalog = ToolCatalogAssembler.build(DiagramThumbnails.OMIT, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
         // No reason from the manifest is passed, so every tool the direct profile has is script callable here.
         // The programmatic profile withholds 'get_astah_pro_mcp_version' from a script because calling it once is all
         // anyone ever does, but that is exactly what makes it the right handler to measure the dispatch path with:
@@ -67,7 +68,7 @@ public class McpToolScriptCallCostTest {
         AstahToolRegistry registry = AstahToolRegistry.from(
                 catalog.all(), ToolManifest.load().namesFor(ToolManifest.Profile.DIRECT), Map.of());
         
-        McpToolScriptExecutor executor = new McpToolScriptExecutor(registry, 60, new FakeTransactionBoundary());
+        McpToolScriptExecutor executor = new McpToolScriptExecutor(registry, 60, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         assertNotNull(registry.find("get_astah_pro_mcp_version"),
                 "The benchmark needs a tool function that works outside the Astah GUI");

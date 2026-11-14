@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.model;
 
+import com.astahpromcp.tool.astah.pro.AstahElementType;
 import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
@@ -95,8 +96,8 @@ public class NamedElementTool extends AstahToolProvider {
     }
     
     private NamedElementTypeListDTO getAllTypes(NoInputDTO param) throws Exception {
-        List<String> typeNames = Arrays.stream(NamedElementDTO.Type.values())
-                .filter(type -> type != NamedElementDTO.Type.UNKNOWN)
+        List<String> typeNames = Arrays.stream(AstahElementType.values())
+                .filter(type -> type != AstahElementType.UNKNOWN)
                 .map(type -> type.typeName)
                 .toList();
         

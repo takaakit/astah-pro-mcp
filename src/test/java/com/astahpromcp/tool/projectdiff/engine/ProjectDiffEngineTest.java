@@ -5,7 +5,6 @@ import com.astahpromcp.tool.projectdiff.outputdto.ChangeKind;
 import com.astahpromcp.tool.projectdiff.outputdto.PropertyChangeDTO;
 import com.astahpromcp.tool.projectdiff.outputdto.PropertyChangeKind;
 import com.astahpromcp.tool.projectdiff.outputdto.ValueEncoding;
-import com.astahpromcp.tool.projectdiff.outputdto.assembler.ChangeDTOAssembler;
 import com.astahpromcp.tool.projectdiff.xmi.XmiIndex;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -24,6 +23,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProjectDiffEngineTest {
     
     private static final Set<String> VERIFIED = Set.of("1.2.0.44/44");
+    
+    // A stop check for a comparison that is never to stop
+    private static final Runnable NEVER_STOP = () -> {
+    };
+    
+    // A stop check that stops the comparison at once, with a message no other failure has
+    private static final Runnable STOP_AT_ONCE = () -> {
+        throw new IllegalStateException("Stopped by the test.");
+    };
     
     @TempDir
     Path dir;
@@ -122,9 +130,9 @@ public class ProjectDiffEngineTest {
         Path targetPath = write("target.xmi", targetXmi);
         List<ChangeDTO> changes = new ArrayList<>();
         ProjectDiffEngine.Outcome outcome = ProjectDiffEngine.compare(
-                new ProjectDiffEngine.Input(basePath, XmiIndex.read(basePath, Long.MAX_VALUE), "Base", astahVersion),
-                new ProjectDiffEngine.Input(targetPath, XmiIndex.read(targetPath, Long.MAX_VALUE), "Target", astahVersion),
-                verified, changes::add);
+                new ProjectDiffEngine.Input(basePath, XmiIndex.read(basePath, Long.MAX_VALUE, NEVER_STOP), "Base", astahVersion),
+                new ProjectDiffEngine.Input(targetPath, XmiIndex.read(targetPath, Long.MAX_VALUE, NEVER_STOP), "Target", astahVersion),
+                verified, changes::add, NEVER_STOP);
         return new Run(outcome, changes);
     }
     
@@ -637,7 +645,7 @@ public class ProjectDiffEngineTest {
     void read_ng_refusesTwoElementsWithTheSameId() throws Exception {
         Path path = write("dup.xmi", xmi(BASE.replace("\"c3\"", "\"c2\""), "1.2.0.44"));
         
-        IllegalStateException e = assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, Long.MAX_VALUE));
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, Long.MAX_VALUE, NEVER_STOP));
         assertTrue(e.getMessage().contains("c2"), e.getMessage());
     }
     
@@ -645,7 +653,7 @@ public class ProjectDiffEngineTest {
     void read_ng_refusesAnXmiLargerThanTheLimit() throws Exception {
         Path path = write("big.xmi", xmi(BASE, "1.2.0.44"));
         
-        assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, 100));
+        assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, 100, NEVER_STOP));
     }
     
     @Test
@@ -656,6 +664,46 @@ public class ProjectDiffEngineTest {
         Path path = write("entity.xmi", withEntity);
         
         // The parser refuses the DTD rather than read the file it names
-        assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, Long.MAX_VALUE));
+        assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, Long.MAX_VALUE, NEVER_STOP));
+    }
+    
+    @Test
+    void read_ok_runsTheStopCheckAtEveryElement() throws Exception {
+        Path path = write("base.xmi", xmi(BASE, "1.2.0.44"));
+        int[] runs = {0};
+        
+        XmiIndex index = XmiIndex.read(path, Long.MAX_VALUE, () -> runs[0]++);
+        
+        assertTrue(runs[0] >= index.elements().size(), runs[0] + " runs for " + index.elements().size() + " elements");
+    }
+    
+    @Test
+    void read_ng_stopsWithWhatTheStopCheckThrows() throws Exception {
+        Path path = write("base.xmi", xmi(BASE, "1.2.0.44"));
+        
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> XmiIndex.read(path, Long.MAX_VALUE, STOP_AT_ONCE));
+        assertEquals("Stopped by the test.", e.getMessage());
+    }
+    
+    @Test
+    void readProperties_ng_stopsWithWhatTheStopCheckThrows() throws Exception {
+        Path path = write("base.xmi", xmi(BASE, "1.2.0.44"));
+        
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> XmiIndex.readProperties(path, Set.of("c1"), STOP_AT_ONCE));
+        assertEquals("Stopped by the test.", e.getMessage());
+    }
+    
+    @Test
+    void compare_ng_stopsBeforeHandingOverAnyChange() throws Exception {
+        Path basePath = write("base.xmi", xmi(BASE, "1.2.0.44"));
+        Path targetPath = write("target.xmi", xmi(BASE.replace("name=\"Order\"", "name=\"Purchase\""), "1.2.0.44"));
+        ProjectDiffEngine.Input base = new ProjectDiffEngine.Input(basePath, XmiIndex.read(basePath, Long.MAX_VALUE, NEVER_STOP), "Base", ASTAH_VERSION);
+        ProjectDiffEngine.Input target = new ProjectDiffEngine.Input(targetPath, XmiIndex.read(targetPath, Long.MAX_VALUE, NEVER_STOP), "Target", ASTAH_VERSION);
+        List<ChangeDTO> changes = new ArrayList<>();
+        
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> ProjectDiffEngine.compare(base, target, VERIFIED, changes::add, STOP_AT_ONCE));
+        assertEquals("Stopped by the test.", e.getMessage());
+        assertTrue(changes.isEmpty(), changes.toString());
     }
 }

@@ -3,7 +3,7 @@ package com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler;
 import com.astahpromcp.tool.astah.pro.common.outputdto.PointDoubleDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.LabelIdTypeDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.LabelIdTypeDTOAssembler;
-import com.astahpromcp.tool.astah.pro.presentation.LineStyleKind;
+import com.astahpromcp.tool.astah.pro.common.LineStyleKind;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.change_vision.jude.api.inf.model.IDependency;
 import com.change_vision.jude.api.inf.model.IElement;

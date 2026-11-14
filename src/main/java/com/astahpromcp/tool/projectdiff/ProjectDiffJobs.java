@@ -12,6 +12,7 @@ import com.astahpromcp.tool.projectdiff.outputdto.ProjectSideDTO;
 import com.astahpromcp.tool.projectdiff.outputdto.SummaryDTO;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -115,12 +117,18 @@ public final class ProjectDiffJobs implements ProcessLauncher {
     
     // Prepares a new comparison on the caller's thread, and returns the work to run in the background
     @FunctionalInterface
-    public interface Preparation {
+    interface Preparation {
         Runnable prepare(ProjectDiffJob job) throws Exception;
     }
-    
+
+    // Start comparing the project file basePath with the project file targetPath, or with the project open in Astah when targetPath is null,
+    // or return the comparison an earlier request with the same requestId started. The comparison is prepared on the caller's thread, which holds the Astah API lock while the host is used (ProjectDiffHost).
+    public Admission startComparison(String requestId, Path basePath, Path targetPath, ProjectDiffHost host) throws Exception {
+        return startComparison(requestId, inputKeyOf(basePath, targetPath), new ProjectDiffPreparation(this, host, basePath, targetPath));
+    }
+
     // Start a comparison, or return the one an earlier request with the same requestId started.
-    public Admission startComparison(String requestId, String inputKey, Preparation preparation) throws Exception {
+    Admission startComparison(String requestId, String inputKey, Preparation preparation) throws Exception {
         Admission admission = admit(requestId, inputKey);
         if (!admission.created()) {
             return admission;
@@ -181,12 +189,31 @@ public final class ProjectDiffJobs implements ProcessLauncher {
         return admission;
     }
     
+    // The comparison that an earlier request with the same requestId started for the same projects, or null when there is none. targetPath is null for the project open in Astah.
+    public ProjectDiffJob earlier(String requestId, Path basePath, Path targetPath) {
+        return earlier(requestId, inputKeyOf(basePath, targetPath));
+    }
+
     // The comparison that an earlier request with the same requestId started, or null when there is none.
-    public ProjectDiffJob earlier(String requestId, String inputKey) {
+    ProjectDiffJob earlier(String requestId, String inputKey) {
         sweep();
         synchronized (lock) {
             return findEarlier(requestId, inputKey);
         }
+    }
+
+    // What tells the projects of one request from those of another. targetPath is null for the project open in Astah.
+    static String inputKeyOf(Path basePath, Path targetPath) {
+        return keyOf(basePath) + "\n" + (targetPath == null ? "(the open project)" : keyOf(targetPath));
+    }
+
+    // A path as the requests are told apart by
+    static String keyOf(Path path) {
+        return keyOf(path, File.separatorChar == '\\');
+    }
+
+    static String keyOf(Path path, boolean caseInsensitive) {
+        return caseInsensitive ? path.toString().toLowerCase(Locale.ROOT) : path.toString();
     }
     
     // The comparison of an earlier request with the same requestId, or null; an empty requestId has none. Called with the lock held.
@@ -284,7 +311,7 @@ public final class ProjectDiffJobs implements ProcessLauncher {
     }
     
     // Try again to delete the folders that could not be deleted
-    public void retryPendingDeletions() {
+    void retryPendingDeletions() {
         List<PendingDeletion> pending;
         synchronized (lock) {
             pending = new ArrayList<>(pendingDeletions.values());
@@ -377,7 +404,6 @@ public final class ProjectDiffJobs implements ProcessLauncher {
         }
         
         job.awaitEnd(resultWaitMillis);
-        NormalizationDTO noNormalization = new NormalizationDTO(NormalizationRule.VERSION, false, List.of());
         int maxBytes = McpServerConfig.PROJECT_DIFF_MAX_RESPONSE_BYTES;
         
         return switch (job.state()) {
@@ -399,15 +425,20 @@ public final class ProjectDiffJobs implements ProcessLauncher {
                 Instant now = Instant.now();
                 job.keepUntil(now.plus(McpServerConfig.PROJECT_DIFF_READ_GRACE_MINUTES, ChronoUnit.MINUTES));
                 job.delivered(now);
-                yield ResponseLimiter.fitHeader(new DiffResultDTO(job.diffId(), DiffStatus.FAILED, format(job.expiresAt()), job.failure(), orEmpty(job.base()), orEmpty(job.target()),
-                        noNormalization, List.of(), ProjectDiffRunner.NOT_COMPARED, SummaryDTO.empty(), 0, 0, -1, 0, List.of(), false, false, ""), maxBytes);
+                yield ResponseLimiter.fitHeader(withoutResult(job, DiffStatus.FAILED, format(job.expiresAt()), job.failure()), maxBytes);
             }
             case PREPARING, RUNNING -> {
                 requireFirstPage(startIndex, startPropertyIndex, "the comparison is still running");
-                yield ResponseLimiter.fitHeader(new DiffResultDTO(job.diffId(), DiffStatus.RUNNING, "", DiffFailureDTO.empty(), orEmpty(job.base()), orEmpty(job.target()),
-                        noNormalization, List.of(), ProjectDiffRunner.NOT_COMPARED, SummaryDTO.empty(), 0, 0, -1, 0, List.of(), false, false, ""), maxBytes);
+                yield ResponseLimiter.fitHeader(withoutResult(job, DiffStatus.RUNNING, "", DiffFailureDTO.empty()), maxBytes);
             }
         };
+    }
+    
+    // The answer about a comparison that has no result to read pages of, because it is still running or has failed
+    private static DiffResultDTO withoutResult(ProjectDiffJob job, DiffStatus status, String expiresAt, DiffFailureDTO failure) {
+        NormalizationDTO noNormalization = new NormalizationDTO(NormalizationRule.VERSION, false, List.of());
+        return DiffResultDTO.withoutPage(job.diffId(), status, expiresAt, failure, orEmpty(job.base()), orEmpty(job.target()),
+                noNormalization, List.of(), ProjectDiffRunner.NOT_COMPARED, SummaryDTO.empty(), "");
     }
     
     private static void requireFirstPage(int startIndex, int startPropertyIndex, String why) {

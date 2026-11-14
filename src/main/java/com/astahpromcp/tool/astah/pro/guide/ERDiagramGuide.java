@@ -8,7 +8,7 @@ final class ERDiagramGuide {
     static String contents() {
         String contents = """
 IMPORTANT POINTS to Keep in Mind:
-* Before you refer to or edit an ER diagram, use the available tools to develop a thorough understanding of Object-Relational Impedance Mismatch.
+* Before you refer to or edit an ER diagram, read the Object-Relational Impedance Mismatch knowledge to develop a thorough understanding of Object-Relational Impedance Mismatch.
 
 
 Terminology Definitions (quoted from FIPS PUB 184, Integration Definition for Information Modeling (IDEF1X)):
@@ -97,7 +97,7 @@ ERSubtypeRelationship ---> "foreign keys" ERAttribute
 @enduml
 ```
         """;
-        
+
         return contents;
     }
 }

@@ -18,7 +18,7 @@ import java.util.Set;
 // The definitions held here have NOT been through ExclusiveToolProvider. That is deliberate and load-bearing:
 // an mcp tool script runs on its own thread while the request thread holds the Astah API lock for the whole run, and a
 // ReentrantLock is only reentrant for the thread that owns it, so taking the lock again from the script thread
-// would block forever. See McpToolScriptDispatcher for the drain that the unwrapped handlers still need.
+// would block forever. What the unwrapped handlers still need after each call is done by McpToolScriptHost.afterToolCall.
 @Slf4j
 public final class AstahToolRegistry {
     

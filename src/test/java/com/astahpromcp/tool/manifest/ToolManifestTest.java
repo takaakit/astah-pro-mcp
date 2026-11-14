@@ -32,13 +32,13 @@ public class ToolManifestTest {
     void load_ok_readsTheShippedManifest() {
         ToolManifest manifest = ToolManifest.load();
         
-        assertEquals(454, manifest.size(), "every tool definition the seven factories produce needs a row");
-        assertEquals(391, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
-        assertEquals(391, manifest.namesReachedOn(ToolManifest.Profile.DIRECT).size());
-        assertEquals(84, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
+        assertEquals(440, manifest.size(), "every tool definition the seven factories produce needs a row");
+        assertEquals(377, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
+        assertEquals(377, manifest.namesReachedOn(ToolManifest.Profile.DIRECT).size());
+        assertEquals(70, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
         assertEquals(312, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC, ToolManifest.Reach.MCP_TOOL_SCRIPT).size());
-        // 396 = 84 published directly + 312 called from an mcp tool script
-        assertEquals(396, manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC).size());
+        // 382 = 70 published directly + 312 called from an mcp tool script
+        assertEquals(382, manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC).size());
     }
     
     @Test
@@ -58,8 +58,8 @@ public class ToolManifestTest {
             ToolManifest.Entry entry = manifest.find(name);
             assertEquals(entry.publishesTo(ToolManifest.Profile.PROGRAMMATIC), entry.reason() != null, name);
         }
-        // 84 = rows with programmatic = x
-        assertEquals(84, manifest.notMcpToolScriptCallableReasons().size());
+        // 70 = rows with programmatic = x
+        assertEquals(70, manifest.notMcpToolScriptCallableReasons().size());
     }
     
     @Test

@@ -102,14 +102,7 @@ Common                       	get_astah_pro_mcp_version                         
 Common                       	get_chunk_of_all_definitions                       	x	s
 Common                       	get_chunk_of_all_named_elements                    	x	s
 Common                       	get_chunk_of_all_prsts                             	x	s
-Common                       	get_chunk_of_astah_pro_user_guide                  	x	x	direct
-Common                       	get_chunk_of_color_palette_guide                   	x	x	direct
-Common                       	get_chunk_of_conceptual_model_conventions          	x	x	direct
-Common                       	get_chunk_of_ddd_reference                         	x	x	direct
-Common                       	get_chunk_of_object_relational_impedance_mismatch  	x	x	direct
-Common                       	get_chunk_of_ocl_spec                              	x	x	direct
-Common                       	get_chunk_of_puml_guide                            	x	x	direct
-Common                       	get_chunk_of_systems_engineering                   	x	x	direct
+Common                       	get_chunk_of_document                              	x	x	direct
 Common                       	get_chunk_of_tools_callable_from_mcp_tool_script   	-	x	direct
 Common                       	get_comment_info                                   	x	s
 Common                       	get_constraint_info                                	x	s
@@ -122,16 +115,9 @@ Common                       	get_highlighted_prsts_within_dgm                  
 Common                       	get_info_of_all_definitions                        	x	s
 Common                       	get_info_of_all_named_elements                     	x	s
 Common                       	get_info_of_all_prsts                              	x	s
-Common                       	get_info_of_astah_pro_user_guide                   	x	x	network
-Common                       	get_info_of_color_palette_guide                    	x	x	network
-Common                       	get_info_of_conceptual_model_conventions           	x	x	network
-Common                       	get_info_of_ddd_reference                          	x	x	network
 Common                       	get_info_of_dgm_prsts                              	x	s
+Common                       	get_info_of_document                               	x	x	network
 Common                       	get_info_of_logs                                   	x	x	standalone
-Common                       	get_info_of_object_relational_impedance_mismatch   	x	x	network
-Common                       	get_info_of_ocl_spec                               	x	x	network
-Common                       	get_info_of_puml_guide                             	x	x	network
-Common                       	get_info_of_systems_engineering                    	x	x	network
 Common                       	get_info_of_tools_callable_from_mcp_tool_script    	-	x	direct
 Common                       	get_link_prst_info                                 	x	s
 Common                       	get_mcp_tool_script_example                        	-	x	no_structured_content

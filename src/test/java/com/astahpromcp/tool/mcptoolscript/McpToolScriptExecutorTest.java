@@ -10,6 +10,7 @@ import com.astahpromcp.tool.ResponseSupport;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.astah.pro.AstahApiLock;
+import com.astahpromcp.tool.astah.pro.mcptoolscript.AstahMcpToolScriptHost;
 import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.FakeTransactionBoundary;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
@@ -26,9 +27,12 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,36 +73,40 @@ public class McpToolScriptExecutorTest {
         }
     }
     
+    // Stands in for a real editing *Tool class: it funnels through TransactionSupport exactly as one would.
+    private static ToolDefinition editClassInfoTool() {
+        return new ToolDefinition(schema("edit_class_info"), ToolDefinition.ResultKind.DTO,
+                (exchange, request) -> {
+                    try {
+                        new TransactionSupport(new NoopTransactionManager()).run(() -> { });
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    return ResponseSupport.success(Map.of("edited", true));
+                });
+    }
+    
     private static AstahToolRegistry registry() {
         ToolProvider provider = () -> List.of(
                 new ToolDefinition(schema("get_class_info"), ToolDefinition.ResultKind.DTO,
                         (exchange, request) -> ResponseSupport.success(Map.of("name", "Sample", "args", request.arguments()))),
-                // Stands in for a real editing *Tool class: it funnels through TransactionSupport exactly as one would.
-                new ToolDefinition(schema("edit_class_info"), ToolDefinition.ResultKind.DTO,
-                        (exchange, request) -> {
-                            try {
-                                new TransactionSupport(new NoopTransactionManager()).run(() -> { });
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                            return ResponseSupport.success(Map.of("edited", true));
-                        }),
+                editClassInfoTool(),
                 new ToolDefinition(schema("capture_dgm_img"), ToolDefinition.ResultKind.CONTENTS,
                         (exchange, request) -> ResponseSupport.success(List.of(McpSchema.TextContent.builder("image").build()))),
                 new ToolDefinition(schema("run_astah_api_script"), ToolDefinition.ResultKind.DTO,
                         (exchange, request) -> ResponseSupport.success(Map.of("ok", true))),
-                new ToolDefinition(schema("get_info_of_ocl_spec"), ToolDefinition.ResultKind.DTO,
+                new ToolDefinition(schema("get_info_of_document"), ToolDefinition.ResultKind.DTO,
                         (exchange, request) -> ResponseSupport.success(Map.of("ok", true))));
         
         // The reasons the manifest gives these three, stated here because this registry has no manifest behind it
         return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of(
                 "capture_dgm_img", NotMcpToolScriptCallableReason.RETURNS_NO_STRUCTURED_CONTENT,
                 "run_astah_api_script", NotMcpToolScriptCallableReason.RUNS_AN_ASTAH_API_SCRIPT,
-                "get_info_of_ocl_spec", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
+                "get_info_of_document", NotMcpToolScriptCallableReason.PERFORMS_BLOCKING_IO));
     }
     
     private static McpToolScriptExecutor executor() {
-        return new McpToolScriptExecutor(registry(), 30, new FakeTransactionBoundary());
+        return new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
     }
     
     private static String evaluate(String expression) {
@@ -160,7 +168,7 @@ public class McpToolScriptExecutorTest {
         }
         
         assertTrue(captured.list.stream().anyMatch(event -> event.getLevel() == Level.INFO
-                        && event.getFormattedMessage().equals("MCP tool script made 3 tool function call(s)")),
+                        && event.getFormattedMessage().equals("MCP tool script made 3 tool function call(s); model changes: none")),
                 "Expected the call count at INFO, but the log was: " + captured.list);
     }
     
@@ -209,7 +217,7 @@ public class McpToolScriptExecutorTest {
     // agent looking for a different name instead of calling this one directly.
     @Test
     void execute_ng_refusesAnExcludedToolWithAMessageThatSaysHowToReachIt() {
-        for (String name : List.of("capture_dgm_img", "get_info_of_ocl_spec", "run_astah_api_script")) {
+        for (String name : List.of("capture_dgm_img", "get_info_of_document", "run_astah_api_script")) {
             McpToolScriptExecutor.Result result = executor().execute("tools." + name + "({});");
             
             assertFalse(result.ok(), name);
@@ -618,7 +626,7 @@ public class McpToolScriptExecutorTest {
     void execute_ng_timesOutAndDoesNotLeaveAccessSuspendedWhenTheScriptStops() throws Exception {
         // A script that waits in an interruptible call, against a one second budget
         McpToolScriptExecutor timeoutExecutor =
-                new McpToolScriptExecutor(interruptibleRegistry(), 1, new FakeTransactionBoundary());
+                new McpToolScriptExecutor(interruptibleRegistry(), 1, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         McpToolScriptExecutor.Result result = timeoutExecutor.execute("tools.wait_forever({});");
         
@@ -637,7 +645,7 @@ public class McpToolScriptExecutorTest {
     void execute_ng_startsNoFurtherToolCallsAfterATimeout() throws Exception {
         AtomicInteger callsAfterTimeout = new AtomicInteger();
         McpToolScriptExecutor timeoutExecutor =
-                new McpToolScriptExecutor(countingAfterWaitRegistry(callsAfterTimeout), 1, new FakeTransactionBoundary());
+                new McpToolScriptExecutor(countingAfterWaitRegistry(callsAfterTimeout), 1, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         McpToolScriptExecutor.Result result = timeoutExecutor.execute(
                 "tools.wait_forever({}); for (var i = 0; i < 50; i++) { try { tools.count_me({}); } catch (e) {} }");
@@ -655,7 +663,7 @@ public class McpToolScriptExecutorTest {
     void execute_ng_suspendsAccessWithTheTimeoutAsTheReason() throws Exception {
         CountDownLatch releaseTool = new CountDownLatch(1);
         McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(
-                uninterruptibleRegistry(new CountDownLatch(1), releaseTool), 1, new FakeTransactionBoundary());
+                uninterruptibleRegistry(new CountDownLatch(1), releaseTool), 1, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         try {
             McpToolScriptExecutor.Result result = timeoutExecutor.execute("tools.hold_on({});");
@@ -682,7 +690,7 @@ public class McpToolScriptExecutorTest {
         CountDownLatch toolRunning = new CountDownLatch(1);
         CountDownLatch releaseTool = new CountDownLatch(1);
         McpToolScriptExecutor executor =
-                new McpToolScriptExecutor(uninterruptibleRegistry(toolRunning, releaseTool), 30, new FakeTransactionBoundary());
+                new McpToolScriptExecutor(uninterruptibleRegistry(toolRunning, releaseTool), 30, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         AtomicReference<McpToolScriptExecutor.Result> result = new AtomicReference<>();
         AtomicBoolean interruptFlagKept = new AtomicBoolean();
@@ -719,7 +727,7 @@ public class McpToolScriptExecutorTest {
         CountDownLatch releaseTool = new CountDownLatch(1);
         AtomicInteger callsAfterInterrupt = new AtomicInteger();
         McpToolScriptExecutor executor = new McpToolScriptExecutor(
-                uninterruptibleRegistry(toolRunning, releaseTool, callsAfterInterrupt), 30, new FakeTransactionBoundary());
+                uninterruptibleRegistry(toolRunning, releaseTool, callsAfterInterrupt), 30, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         Thread caller = new Thread(
                 () -> executor.execute("tools.hold_on({}); for (var i = 0; i < 50; i++) { try { tools.count_me({}); } catch (e) {} }"),
@@ -746,7 +754,7 @@ public class McpToolScriptExecutorTest {
         CountDownLatch toolRunning = new CountDownLatch(1);
         CountDownLatch releaseTool = new CountDownLatch(1);
         McpToolScriptExecutor executor =
-                new McpToolScriptExecutor(uninterruptibleRegistry(toolRunning, releaseTool), 30, new FakeTransactionBoundary());
+                new McpToolScriptExecutor(uninterruptibleRegistry(toolRunning, releaseTool), 30, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         // The script tool and a following editing tool, each holding the Astah API lock exactly as a profile registers them.
         ToolDefinition scriptTool = lockedTool("run_script",
@@ -804,7 +812,7 @@ public class McpToolScriptExecutorTest {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
         
         McpToolScriptExecutor.Result result =
-                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.get_class_info({ id: '1' }).name;");
+                new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction)).execute("tools.get_class_info({ id: '1' }).name;");
         
         assertTrue(result.ok(), result.errorMessage());
         assertEquals(ModelChangesKind.NONE, result.modelChanges());
@@ -820,7 +828,7 @@ public class McpToolScriptExecutorTest {
         transaction.failOnBegin();
         
         McpToolScriptExecutor.Result result =
-                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.get_class_info({ id: '1' }).name;");
+                new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction)).execute("tools.get_class_info({ id: '1' }).name;");
         
         assertTrue(result.ok(), result.errorMessage());
         assertEquals(0, transaction.beginCount(), "A script that only reads must never even try to open a transaction");
@@ -831,7 +839,7 @@ public class McpToolScriptExecutorTest {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
         
         McpToolScriptExecutor.Result result =
-                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
+                new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction)).execute("tools.edit_class_info({ id: '1' });");
         
         assertTrue(result.ok(), result.errorMessage());
         assertEquals(ModelChangesKind.COMMITTED, result.modelChanges());
@@ -845,7 +853,7 @@ public class McpToolScriptExecutorTest {
     void execute_ng_rollsTheRunBackWhenTheScriptItselfFails() {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
         
-        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry(), 30, transaction)
+        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction))
                 .execute("tools.edit_class_info({ id: '1' }); throw new Error('boom');");
         
         assertFalse(result.ok());
@@ -865,7 +873,7 @@ public class McpToolScriptExecutorTest {
     void execute_ng_rollsTheRunBackWhenTheScriptCaughtTheToolFailure() {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
         
-        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry(), 30, transaction)
+        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction))
                 .execute("tools.edit_class_info({ id: '1' }); try { tools.capture_dgm_img({}); } catch (e) {} 'finished';");
         
         assertFalse(result.ok(), "The script finished, but the run did not");
@@ -880,7 +888,7 @@ public class McpToolScriptExecutorTest {
     @Test
     void execute_ng_rollsBackARunThatOutlivedItsTimeout() throws Exception {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
-        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, transaction);
+        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, new AstahMcpToolScriptHost(transaction));
         
         McpToolScriptExecutor.Result result = timeoutExecutor.execute(
                 "tools.edit_class_info({ id: '1' });"
@@ -899,9 +907,100 @@ public class McpToolScriptExecutorTest {
         assertFalse(transaction.isInTransaction());
     }
     
+    // The commit began before the wait ended, so the answer must not promise a rollback: rerunning would apply the changes twice.
+    @Test
+    void execute_ng_doesNotPromiseARollbackWhenTheWaitEndsDuringTheCommit() throws Exception {
+        GivenUpRun run = giveUpDuringTheCommit(McpToolScriptHost.RunKind.TIMED_OUT);
+        String message = run.result().errorMessage();
+        
+        assertFalse(run.result().ok());
+        assertEquals(ModelChangesKind.UNKNOWN, run.result().modelChanges());
+        assertFalse(message.contains("rolled back"), "The run was already committing, so no rollback may be promised: " + message);
+        assertTrue(message.startsWith("MCP tool script execution timed out after 1 seconds. "), message);
+        assertTrue(message.contains("may have been kept"), message);
+        assertTrue(message.contains("check the model before running the script again"), message);
+        
+        assertEquals(1, run.transaction().commitCount(), "Giving up on the wait does not call off a commit that has begun");
+        assertEquals(0, run.transaction().abortCount());
+        assertFalse(run.transaction().isInTransaction());
+    }
+    
+    @Test
+    void execute_ng_doesNotPromiseARollbackWhenTheWaitIsInterruptedDuringTheCommit() throws Exception {
+        GivenUpRun run = giveUpDuringTheCommit(McpToolScriptHost.RunKind.INTERRUPTED);
+        String message = run.result().errorMessage();
+        
+        assertFalse(run.result().ok());
+        assertEquals(ModelChangesKind.UNKNOWN, run.result().modelChanges());
+        assertFalse(message.contains("rolled back"), "The run was already committing, so no rollback may be promised: " + message);
+        assertTrue(message.startsWith("Interrupted while waiting for mcp tool script execution. "), message);
+        assertTrue(message.contains("check the model before running the script again"), message);
+        
+        assertEquals(1, run.transaction().commitCount());
+        assertEquals(0, run.transaction().abortCount());
+    }
+    
+    // The wait ended before the run asked to commit, so the run must keep nothing, and the answer can say so.
+    @Test
+    void execute_ng_keepsNothingWhenTheWaitEndsBeforeTheCommit() throws Exception {
+        GivenUpRun run = giveUpBeforeTheCommit(McpToolScriptHost.RunKind.TIMED_OUT);
+        String message = run.result().errorMessage();
+        
+        assertFalse(run.result().ok());
+        assertEquals(ModelChangesKind.UNKNOWN, run.result().modelChanges(),
+                "The run is still going when the caller is answered, so its rollback has not happened yet");
+        assertTrue(message.startsWith("MCP tool script execution timed out after 1 seconds. The run was stopped before it could commit, so it will keep none of its changes"),
+                message);
+        
+        assertEquals(0, run.transaction().commitCount(), "The caller was told the run keeps nothing");
+        assertEquals(1, run.transaction().abortCount());
+        assertFalse(run.transaction().isInTransaction());
+    }
+    
+    @Test
+    void execute_ng_keepsNothingWhenTheWaitIsInterruptedBeforeTheCommit() throws Exception {
+        GivenUpRun run = giveUpBeforeTheCommit(McpToolScriptHost.RunKind.INTERRUPTED);
+        String message = run.result().errorMessage();
+        
+        assertFalse(run.result().ok());
+        assertEquals(ModelChangesKind.UNKNOWN, run.result().modelChanges());
+        assertTrue(message.startsWith("Interrupted while waiting for mcp tool script execution. The run was stopped before it could commit"),
+                message);
+        
+        assertEquals(0, run.transaction().commitCount());
+        assertEquals(1, run.transaction().abortCount());
+    }
+    
+    // The run ends after its caller was answered, so the log is the only place left that says how it ended.
+    @Test
+    void execute_ng_logsTheOutcomeOfARunWhoseCallerStoppedWaiting() throws Exception {
+        Logger logger = (Logger) LoggerFactory.getLogger(McpToolScriptExecutor.class);
+        ListAppender<ILoggingEvent> captured = new ListAppender<>();
+        captured.start();
+        logger.addAppender(captured);
+        try {
+            giveUpDuringTheCommit(McpToolScriptHost.RunKind.TIMED_OUT);
+        } finally {
+            logger.detachAppender(captured);
+            captured.stop();
+        }
+        
+        assertTrue(captured.list.stream().anyMatch(event -> event.getLevel() == Level.WARN
+                        && event.getFormattedMessage().equals("An mcp tool script whose caller had stopped waiting has ended after 1 tool function call(s); model changes: committed")),
+                "Expected how the run ended at WARN, but the log was: " + captured.list);
+    }
+    
+    // The dispatcher is a script global, so nothing public on it may let the script abandon its own run.
+    @Test
+    void execute_ok_givesTheScriptNoWayToAbandonTheRun() {
+        assertEquals("function", evaluate("typeof __astahToolDispatcher.invoke"),
+                "The premise of this test: a script reaches the public methods of the dispatcher");
+        assertEquals("undefined", evaluate("typeof __astahToolDispatcher.abandon"));
+    }
+    
     @Test
     void execute_ng_stopsAPrintLoopOnceItTimesOut() throws Exception {
-        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, new FakeTransactionBoundary());
+        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, new AstahMcpToolScriptHost(new FakeTransactionBoundary()));
         
         McpToolScriptExecutor.Result result = timeoutExecutor.execute("while (true) { print('x'); }");
         
@@ -916,7 +1015,7 @@ public class McpToolScriptExecutorTest {
     void execute_ng_rollsBackAStoppedPrintLoopEvenWhenTheFirstAbortIsRefused() throws Exception {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
         transaction.failOnFirstAbort();
-        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, transaction);
+        McpToolScriptExecutor timeoutExecutor = new McpToolScriptExecutor(registry(), 1, new AstahMcpToolScriptHost(transaction));
         
         McpToolScriptExecutor.Result result = timeoutExecutor.execute(
                 "tools.edit_class_info({ id: '1' }); while (true) { print('x'); }");
@@ -936,7 +1035,7 @@ public class McpToolScriptExecutorTest {
         transaction.failOnCommit();
         
         McpToolScriptExecutor.Result result =
-                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
+                new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction)).execute("tools.edit_class_info({ id: '1' });");
         
         assertFalse(result.ok(), "A run whose commit was refused did not succeed");
         assertEquals(1, transaction.abortCount(), "The refused commit has to be rolled back");
@@ -954,7 +1053,7 @@ public class McpToolScriptExecutorTest {
         transaction.failOnAbort();
         
         McpToolScriptExecutor.Result result =
-                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
+                new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction)).execute("tools.edit_class_info({ id: '1' });");
         
         assertFalse(result.ok());
         assertEquals(ModelChangesKind.UNKNOWN, result.modelChanges());
@@ -971,7 +1070,7 @@ public class McpToolScriptExecutorTest {
         transaction.failOnFirstAbort();
         
         McpToolScriptExecutor.Result result =
-                new McpToolScriptExecutor(registry(), 30, transaction).execute("tools.edit_class_info({ id: '1' });");
+                new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction)).execute("tools.edit_class_info({ id: '1' });");
         
         assertFalse(result.ok());
         assertFalse(transaction.isInTransaction());
@@ -986,7 +1085,7 @@ public class McpToolScriptExecutorTest {
         FakeTransactionBoundary transaction = new FakeTransactionBoundary();
         transaction.failOnBegin();
         
-        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry(), 30, transaction)
+        McpToolScriptExecutor.Result result = new McpToolScriptExecutor(registry(), 30, new AstahMcpToolScriptHost(transaction))
                 .execute("tools.edit_class_info({ id: '1' }); print('ran anyway');");
         
         assertFalse(result.ok());
@@ -1068,6 +1167,104 @@ public class McpToolScriptExecutorTest {
                 }));
         
         return AstahToolRegistry.of(provider.createToolDefinitions(), Map.of());
+    }
+    
+    // An edit, then a tool that keeps running through its interrupt until the test releases it.
+    private static AstahToolRegistry editThenHoldRegistry(CountDownLatch running, CountDownLatch release) {
+        List<ToolDefinition> definitions = new ArrayList<>(uninterruptibleRegistry(running, release).all());
+        definitions.add(editClassInfoTool());
+        return AstahToolRegistry.of(definitions, Map.of());
+    }
+    
+    // The answer the caller got, and the transaction the run went on to close.
+    private record GivenUpRun(McpToolScriptExecutor.Result result, FakeTransactionBoundary transaction) {
+    }
+    
+    // A run whose script has finished and whose commit is under way when the wait for it ends.
+    private static GivenUpRun giveUpDuringTheCommit(McpToolScriptHost.RunKind kind) throws InterruptedException {
+        FakeTransactionBoundary transaction = new FakeTransactionBoundary();
+        CountDownLatch commitEntered = new CountDownLatch(1);
+        CountDownLatch releaseCommit = new CountDownLatch(1);
+        transaction.holdCommit(commitEntered, releaseCommit);
+        GiveUpOnCueHost host = new GiveUpOnCueHost(transaction, commitEntered, kind);
+        
+        McpToolScriptExecutor.Result result;
+        try {
+            result = new McpToolScriptExecutor(registry(), 1, host).execute("tools.edit_class_info({ id: '1' });");
+        } finally {
+            // Only after the answer, so that the answer is given while the commit is still going
+            releaseCommit.countDown();
+        }
+        host.awaitRunEnd();
+        return new GivenUpRun(result, transaction);
+    }
+    
+    // A run whose wait ends during a tool call, and which then finishes its script on its own.
+    private static GivenUpRun giveUpBeforeTheCommit(McpToolScriptHost.RunKind kind) throws InterruptedException {
+        FakeTransactionBoundary transaction = new FakeTransactionBoundary();
+        CountDownLatch toolRunning = new CountDownLatch(1);
+        CountDownLatch releaseTool = new CountDownLatch(1);
+        GiveUpOnCueHost host = new GiveUpOnCueHost(transaction, toolRunning, kind);
+        
+        McpToolScriptExecutor.Result result;
+        try {
+            result = new McpToolScriptExecutor(editThenHoldRegistry(toolRunning, releaseTool), 1, host)
+                    .execute("tools.edit_class_info({ id: '1' }); tools.hold_on({}); 'finished';");
+        } finally {
+            releaseTool.countDown();
+        }
+        host.awaitRunEnd();
+        return new GivenUpRun(result, transaction);
+    }
+    
+    // Gives up on the run when the test's cue fires rather than at a real deadline, which cannot be aimed inside a commit.
+    // It gives up in the order WatchedRunner does, but suspends no Astah API access, so nothing outlives the test.
+    private static final class GiveUpOnCueHost implements McpToolScriptHost {
+        
+        private final McpToolScriptHost scopes;
+        private final CountDownLatch cue;
+        private final RunKind kind;
+        private volatile Thread runner;
+        
+        GiveUpOnCueHost(FakeTransactionBoundary transaction, CountDownLatch cue, RunKind kind) {
+            this.scopes = new AstahMcpToolScriptHost(transaction);
+            this.cue = cue;
+            this.kind = kind;
+        }
+        
+        @Override
+        public <T> RunOutcome<T> runWatched(long timeoutSeconds, Callable<T> work, Runnable onAbandon) {
+            FutureTask<T> task = new FutureTask<>(work);
+            Thread thread = new Thread(task, "cued-mcp-tool-script-runner");
+            thread.setDaemon(true);
+            runner = thread;
+            thread.start();
+            
+            try {
+                assertTrue(cue.await(10, TimeUnit.SECONDS), "The run never reached the point the test gives up at");
+            } catch (InterruptedException e) {
+                throw new AssertionError(e);
+            }
+            
+            onAbandon.run();
+            thread.interrupt();
+            return new RunOutcome<>(kind, null, null);
+        }
+        
+        @Override
+        public RunScope openRunScope() {
+            return scopes.openRunScope();
+        }
+        
+        @Override
+        public void afterToolCall(String toolName) {
+            scopes.afterToolCall(toolName);
+        }
+        
+        void awaitRunEnd() throws InterruptedException {
+            runner.join(10_000);
+            assertFalse(runner.isAlive(), "The run should have ended once the test released it");
+        }
     }
     
     private static AstahToolRegistry countingAfterWaitRegistry(AtomicInteger callsAfterTimeout) {

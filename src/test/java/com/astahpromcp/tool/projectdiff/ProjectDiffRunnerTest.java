@@ -75,4 +75,69 @@ public class ProjectDiffRunnerTest {
         assertEquals(List.of("Both the base, 'A', and the target, 'B', reference other projects (see their 'referenceProjects')."
                 + " The elements they take from them are part of their XMIs, so they appear in the result too, including changes that come only from updating the references."), warnings);
     }
+    
+    @Test
+    void stopCheck_ok_looksOnceEveryInterval() {
+        int[] looks = {0};
+        ProjectDiffRunner.StopCheck check = new ProjectDiffRunner.StopCheck(() -> {
+            looks[0]++;
+            return false;
+        }, 60, 3);
+        
+        for (int i = 0; i < 9; i++) {
+            check.run();
+        }
+        
+        assertEquals(3, looks[0]);
+    }
+    
+    @Test
+    void stopCheck_ok_letsAComparisonWithinItsTimeGoOn() {
+        ProjectDiffRunner.StopCheck check = new ProjectDiffRunner.StopCheck(() -> false, 60, 1);
+        
+        assertDoesNotThrow(() -> {
+            for (int i = 0; i < 1_000; i++) {
+                check.run();
+            }
+        });
+    }
+    
+    @Test
+    void stopCheck_ng_stopsWhenStopIsRequested() {
+        ProjectDiffRunner.StopCheck check = new ProjectDiffRunner.StopCheck(() -> true, 60, 2);
+        
+        // The first run is not yet the one that looks
+        check.run();
+        IllegalStateException e = assertThrows(IllegalStateException.class, check::run);
+        assertEquals("The comparison was stopped.", e.getMessage());
+    }
+    
+    @Test
+    void stopCheck_ng_stopsWhenTheThreadIsInterrupted() {
+        ProjectDiffRunner.StopCheck check = new ProjectDiffRunner.StopCheck(() -> false, 60, 1);
+        Thread.currentThread().interrupt();
+        try {
+            IllegalStateException e = assertThrows(IllegalStateException.class, check::run);
+            assertEquals("The comparison was stopped.", e.getMessage());
+            assertTrue(Thread.currentThread().isInterrupted(), "The interrupt is kept for whatever waits next");
+        } finally {
+            Thread.interrupted();
+        }
+    }
+    
+    @Test
+    void stopCheck_ng_failsWhenTheTimeRunsOut() {
+        ProjectDiffRunner.StopCheck check = new ProjectDiffRunner.StopCheck(() -> false, 0, 1);
+        
+        IllegalStateException e = assertThrows(IllegalStateException.class, check::run);
+        assertEquals("Reading and comparing the XMIs took longer than 0 seconds.", e.getMessage());
+    }
+    
+    @Test
+    void stopCheck_ng_reportsAStopRatherThanTheTimeRunningOut() {
+        ProjectDiffRunner.StopCheck check = new ProjectDiffRunner.StopCheck(() -> true, 0, 1);
+        
+        IllegalStateException e = assertThrows(IllegalStateException.class, check::run);
+        assertEquals("The comparison was stopped.", e.getMessage());
+    }
 }

@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.model;
 
+import com.astahpromcp.tool.astah.pro.AstahElementType;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
@@ -321,7 +322,7 @@ public class NamedElementToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(NamedElementDTO.Type.values().length - 1, outputDTO.value().size());
+        assertEquals(AstahElementType.values().length - 1, outputDTO.value().size());
         assertFalse(outputDTO.value().contains("Unknown"));
     }
     

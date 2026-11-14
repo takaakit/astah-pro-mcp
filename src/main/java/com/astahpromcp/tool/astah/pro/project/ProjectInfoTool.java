@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.project;
 
+import com.astahpromcp.tool.astah.pro.AstahElementType;
 import com.astahpromcp.tool.astah.pro.AstahToolProvider;
 import com.astahpromcp.tool.ToolDefinition;
 import com.astahpromcp.tool.ToolSupport;
@@ -7,7 +8,6 @@ import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.outputdto.*;
 import com.astahpromcp.tool.astah.pro.common.outputdto.assembler.*;
-import com.astahpromcp.tool.astah.pro.model.outputdto.NamedElementDTO;
 import com.astahpromcp.tool.astah.pro.project.inputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.*;
 import com.astahpromcp.tool.astah.pro.project.outputdto.assembler.*;
@@ -93,7 +93,7 @@ public class ProjectInfoTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDto(
                 "get_all_constraints_and_conditions",
-                "Return all constraints and conditions (preconditions, postconditions, and body conditions) in the project. For example, use this tool to obtain the constraints when you want to verify whether constraints written in OCL are satisfied.",
+                "Return all constraints and conditions (preconditions, postconditions, and body conditions) in the project. For example, use this tool to obtain the constraints when you want to verify whether constraints written in OCL are satisfied. For the meaning of OCL expressions, consult the OCL (Object Constraint Language) Specification.",
                 this::getAllConstraintsAndConditions,
                 NoInputDTO.class,
                 ReportDTO.class),
@@ -235,7 +235,7 @@ public class ProjectInfoTool extends AstahToolProvider {
             for (IElement astahConstrainedElement : astahConstraint.getConstrainedElement()) {
                 if (astahConstrainedElement instanceof INamedElement astahConstrainedNamedElement) {
                     contents.append("# ").append(astahConstrainedNamedElement.getFullName(".")).append("\n");
-                    contents.append("Type: ").append(NamedElementDTO.Type.getCorrespondingType(astahConstrainedNamedElement).typeName).append("\n");
+                    contents.append("Type: ").append(AstahElementType.getCorrespondingType(astahConstrainedNamedElement).typeName).append("\n");
                     contents.append("ID: ").append(astahConstrainedNamedElement.getId()).append("\n");
                     
                     if (specification.startsWith("PRECONDITION:")) {

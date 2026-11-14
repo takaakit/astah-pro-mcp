@@ -34,7 +34,7 @@ public class ToolCatalogDerivationTest {
     }
     
     private ToolCatalog catalog() {
-        return ToolCatalogAssembler.build(DiagramThumbnails.INCLUDE, workspaceDir.resolve("images"), workspaceDir, projectDiffJobs);
+        return ToolCatalogAssembler.build(DiagramThumbnails.INCLUDE, workspaceDir.resolve("images"), workspaceDir, workspaceDir.resolve("document-cache"), projectDiffJobs);
     }
     
     @Test
@@ -42,7 +42,8 @@ public class ToolCatalogDerivationTest {
         ToolCatalog catalog = catalog();
         
         // Tools of the six factories that never touch Astah must not be in it
-        assertFalse(catalog.astahLockedNames().contains("get_info_of_ocl_spec"));
+        assertTrue(catalog.contains("get_info_of_document"), "the assertion below would check nothing if the tool were gone");
+        assertFalse(catalog.astahLockedNames().contains("get_info_of_document"));
         assertFalse(catalog.astahLockedNames().contains("generate_dgm_img_from_puml"));
         assertFalse(catalog.astahLockedNames().contains("get_proj_diff_result"));
         assertFalse(catalog.astahLockedNames().contains("proj_diff_guide"));

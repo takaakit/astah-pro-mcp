@@ -32,7 +32,7 @@ public final class AstahApiLock {
     }
     
     // The reason Astah API access is currently unusable, or null when it is usable.
-    // Derived from the abandoned thread's liveness, so the suspension lifts by itself as soon as that thread terminates; there is no state to reset and no window where the reason and the thread disagree.
+    // Derived from the abandoned thread's liveness, so the suspension lifts by itself as soon as that thread terminates, whether or not clearLiftedSuspension has run yet, and there is no window where the reason and the thread disagree.
     public static String suspensionReason() {
         Suspension suspension = SUSPENSION.get();
         if (suspension == null || !suspension.cause().isAlive()) {
@@ -40,6 +40,14 @@ public final class AstahApiLock {
         }
         
         return suspension.reason() + ". " + recoveryAdvice(suspension);
+    }
+    
+    // Forget a suspension whose abandoned thread has terminated, and return whether there was one, so that the caller settles once what that thread left behind.
+    // That thread closes its run (a rollback, or a commit it had begun) after the call that gave up released the lock, so nobody else drains what that queued on the EDT.
+    // Called while holding the lock, which is also held whenever a suspension is declared, so the compare-and-set only guards against a caller that breaks that rule.
+    static boolean clearLiftedSuspension() {
+        Suspension suspension = SUSPENSION.get();
+        return suspension != null && !suspension.cause().isAlive() && SUSPENSION.compareAndSet(suspension, null);
     }
     
     // Whether the abandoned thread has ignored its interrupt decides which recovery the client should expect: waiting only helps a thread that can still reach an interruptible point.

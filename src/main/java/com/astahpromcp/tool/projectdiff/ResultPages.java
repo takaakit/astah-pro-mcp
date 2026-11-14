@@ -46,9 +46,7 @@ final class ResultPages {
         checkStart(header, startIndex, startPropertyIndex);
         int total = header.summary().total();
         
-        DiffResultDTO skeleton = new DiffResultDTO(header.diffId(), header.status(), expiresAt, header.failure(), header.base(), header.target(),
-                header.normalization(), header.warnings(), header.notCompared(), header.summary(), startIndex, startPropertyIndex, -1, 0, List.of(),
-                false, false, header.fullDiffPath());
+        DiffResultDTO skeleton = header.startingAt(expiresAt, startIndex, startPropertyIndex);
         // The fields other than the changes keep at least half of the page for the changes
         skeleton = ResponseLimiter.fitHeader(skeleton, maxBytes / 2);
         long budget = maxBytes - ResponseLimiter.sizeOf(skeleton) - RESERVE_BYTES;
@@ -149,11 +147,8 @@ final class ResultPages {
         SummaryDTO summary = skeleton.summary();
         int valuesCut = parts.stream().mapToInt(Part::valuesCut).sum();
         List<ChangeDTO> changes = parts.stream().map(Part::change).toList();
-        return new DiffResultDTO(skeleton.diffId(), skeleton.status(), skeleton.expiresAt(), skeleton.failure(), skeleton.base(), skeleton.target(),
-                skeleton.normalization(), skeleton.warnings(), skeleton.notCompared(),
-                new SummaryDTO(summary.total(), summary.added(), summary.removed(), summary.modified(), changes.size(), valuesCut),
-                skeleton.startIndex(), skeleton.startPropertyIndex(), nextIndex, nextPropertyIndex, changes, nextIndex != -1, skeleton.shortened(),
-                skeleton.fullDiffPath());
+        return skeleton.withPage(new SummaryDTO(summary.total(), summary.added(), summary.removed(), summary.modified(), changes.size(), valuesCut),
+                nextIndex, nextPropertyIndex, changes);
     }
     
     // The part of the change at the given index of the result that a page holds: its properties from 'from' up to 'to', as shown

@@ -42,7 +42,7 @@ public class ConstraintTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDto(
                 "set_specification_of_constraint",
-                "Set the specification (specified by string) of the specified constraint (specified by ID), and return the model element of the constraint after it is set.",
+                "Set the specification (specified by string) of the specified constraint (specified by ID), and return the model element of the constraint after it is set. To write the specification in OCL, consult the OCL (Object Constraint Language) Specification.",
                 this::setSpecification,
                 ConstraintWithSpecificationDTO.class,
                 ConstraintDTO.class)

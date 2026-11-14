@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.presentation;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.astahpromcp.tool.astah.pro.common.LineStyleKind;
 import com.astahpromcp.tool.astah.pro.common.inputdto.IdDTO;
 import com.astahpromcp.tool.astah.pro.common.inputdto.PointIntDTO;
 import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;

@@ -71,7 +71,7 @@ public class McpStreamableHttpCompatibilityTest {
     @BeforeEach
     void setUp() throws Exception {
         // The production settings, so that what these tests see is what a client sees. Replaced are only the keep-alive and the size limit.
-        transport = McpServerApp.transportBuilder()
+        transport = ProfileServer.transportBuilder()
                 .keepAliveInterval(null)
                 .maxRequestSize(TEST_MAX_REQUEST_SIZE_BYTES)
                 .build();

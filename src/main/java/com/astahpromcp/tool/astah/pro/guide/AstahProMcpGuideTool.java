@@ -5,6 +5,7 @@ import com.astahpromcp.tool.ToolProvider;
 import com.astahpromcp.tool.ToolSupport;
 import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.astahpromcp.tool.common.outputdto.GuideDTO;
+import com.astahpromcp.tool.knowledge.document.ReferenceDocuments;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,7 @@ IMPORTANT POINTS to Keep in Mind:
 * Astah has only one project open at a time, and that project is shared by all agents and subagents. You may create new Astah projects freely, but even when work is split across multiple working directories (for example, git worktrees), NEVER duplicate an existing Astah project file into any of them.
 * When you create a new diagram, you MUST create and refine a preliminary layout of that diagram first, by calling the preliminary layout steps tool and performing the work in strict accordance with the steps it returns. Do this after you have decided what the diagram is to show - the elements to appear on it and the relationships between them - and immediately before you begin working out where on the diagram its presentations are to be placed. Do not do it while what the diagram is to show is still undecided, and do not do it once you have begun deciding where a presentation goes. Whether the diagram itself has been created by then makes no difference to this timing. Lay the diagram out in accordance with the preliminary layout once that layout has been finalized.
 * As part of drawing a new diagram, create a note in the upper-left corner of the diagram that describes what the diagram is meant to illustrate. This note describes the diagram as a whole rather than any particular element, so NEVER connect it to an element with a note anchor.
-* As part of drawing a new diagram, insert an SVG illustrative graphic in the upper-right corner of the diagram that represents the content of the diagram. Draw it as a sophisticated, text-free illustration of the subject, never as a cheap-looking one. Write colors as #RRGGBB, because rgba(), hsl() and var() are rendered black. If your edits make an existing illustrative graphic no longer represent the content of the diagram, replace it with one inserted in the same way.
+* As part of drawing a new diagram, insert an SVG illustrative graphic in the upper-right corner of the diagram that represents the content of the diagram, NOT its diagram type (such as class diagram or sequence diagram). Draw it as a sophisticated, text-free illustration of the subject, never as a cheap-looking one. Write colors as #RRGGBB, because rgba(), hsl() and var() are rendered black. If your edits make an existing illustrative graphic no longer represent the content of the diagram, replace it with one inserted in the same way.
 * Immediately after creating a new class, interface, or enumeration element, describe the responsibility of that element in the element's definition field.
 * When you place new elements on the diagram or your edits resize existing ones, as a final check, be sure to re-verify that the placement coordinates of those elements are appropriate and properly aligned (e.g., centered alignment, top-edge alignment, etc.), and always make any necessary fine adjustments to their coordinates.
 * When creating a presentation on a diagram that corresponds to a model, you must provide not only the diagram information but also the information of the corresponding model. In contrast, some presentations, such as notes, need no corresponding model information when they are created.  
@@ -273,8 +274,13 @@ LinkPresentation ---> "target end" Presentation
 Primitive Types:
 The following types are defined by default in the Astah project, so you can use them without adding model elements for those types. Note that names are case-sensitive when using them.
 %s
-""".formatted(primitiveTypes);
 
+
+Reference Documents:
+Read a reference document with the 'get_info_of_document' tool function, naming it in 'documentType', and read the rest of it with 'get_chunk_of_document'. Consult each one in the situation stated for it.
+%s
+""".formatted(primitiveTypes, ReferenceDocuments.bulletListOfAll());
+        
         return new GuideDTO(contents);
     }
 }

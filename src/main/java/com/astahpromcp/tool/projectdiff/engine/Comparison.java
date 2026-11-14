@@ -36,7 +36,8 @@ public final class Comparison {
         this.counts = counts;
     }
     
-    public static Comparison compare(XmiIndex base, XmiIndex target, boolean normalize) {
+    // checkStop is run at every element, and stops the comparison by throwing when it is to stop
+    public static Comparison compare(XmiIndex base, XmiIndex target, boolean normalize, Runnable checkStop) {
         int[] baseOf = new int[target.elements().size()];
         int[] targetOf = new int[base.elements().size()];
         Arrays.fill(baseOf, -1);
@@ -44,6 +45,7 @@ public final class Comparison {
         
         // The same xmi.id on both sides is the same element
         for (XmiIndex.Element element : target.elements()) {
+            checkStop.run();
             int baseIndex = base.indexOf(element.id());
             if (baseIndex >= 0) {
                 baseOf[element.index()] = baseIndex;
@@ -54,12 +56,13 @@ public final class Comparison {
         Map<NormalizationRule, Integer> counts = new EnumMap<>(NormalizationRule.class);
         if (normalize) {
             for (NormalizationRule rule : NormalizationRule.values()) {
-                counts.put(rule, matchByRule(rule, base, target, baseOf, targetOf));
+                counts.put(rule, matchByRule(rule, base, target, baseOf, targetOf, checkStop));
             }
         }
         
         List<Item> items = new ArrayList<>();
         for (XmiIndex.Element element : target.elements()) {
+            checkStop.run();
             int baseIndex = baseOf[element.index()];
             if (baseIndex < 0) {
                 items.add(new Item(ChangeKind.ADDED, -1, element.index(), false));
@@ -72,6 +75,7 @@ public final class Comparison {
             }
         }
         for (XmiIndex.Element element : base.elements()) {
+            checkStop.run();
             if (targetOf[element.index()] < 0) {
                 items.add(new Item(ChangeKind.REMOVED, element.index(), -1, false));
             }
@@ -82,9 +86,10 @@ public final class Comparison {
     
     // Pair the parts a rule covers that are left over on both sides, by their owner (already paired), their path from it
     // and their key, and only when exactly one candidate on each side remains
-    private static int matchByRule(NormalizationRule rule, XmiIndex base, XmiIndex target, int[] baseOf, int[] targetOf) {
+    private static int matchByRule(NormalizationRule rule, XmiIndex base, XmiIndex target, int[] baseOf, int[] targetOf, Runnable checkStop) {
         Map<List<Object>, List<Integer>> baseCandidates = new HashMap<>();
         for (XmiIndex.Element element : base.elements()) {
+            checkStop.run();
             if (targetOf[element.index()] >= 0 || element.parent() < 0 || targetOf[element.parent()] < 0 || !rule.covers(base, element)) {
                 continue;
             }
@@ -93,6 +98,7 @@ public final class Comparison {
         
         Map<List<Object>, List<Integer>> targetCandidates = new HashMap<>();
         for (XmiIndex.Element element : target.elements()) {
+            checkStop.run();
             if (baseOf[element.index()] >= 0 || element.parent() < 0 || baseOf[element.parent()] < 0 || !rule.covers(target, element)) {
                 continue;
             }

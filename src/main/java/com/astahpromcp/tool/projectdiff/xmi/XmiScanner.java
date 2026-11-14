@@ -78,12 +78,13 @@ final class XmiScanner {
         }
     }
     
-    // Hand each element with an xmi.id to the consumer once it ends, children before parents
-    static Header scan(Path xmi, Consumer<ScannedElement> consumer) throws IOException {
+    // Hand each element with an xmi.id to the consumer once it ends, children before parents.
+    // checkStop is run at the start of every element, and stops the scan by throwing when the comparison is to stop.
+    static Header scan(Path xmi, Consumer<ScannedElement> consumer, Runnable checkStop) throws IOException {
         try (InputStream in = Files.newInputStream(xmi)) {
             XMLStreamReader reader = newFactory().createXMLStreamReader(in);
             try {
-                return scan(reader, consumer);
+                return scan(reader, consumer, checkStop);
             } finally {
                 reader.close();
             }
@@ -104,7 +105,7 @@ final class XmiScanner {
         return factory;
     }
     
-    private static Header scan(XMLStreamReader reader, Consumer<ScannedElement> consumer) throws XMLStreamException {
+    private static Header scan(XMLStreamReader reader, Consumer<ScannedElement> consumer, Runnable checkStop) throws XMLStreamException {
         Deque<Frame> stack = new ArrayDeque<>();
         int order = 0;
         boolean rootSeen = false;
@@ -115,6 +116,7 @@ final class XmiScanner {
             int event = reader.next();
             
             if (event == XMLStreamConstants.START_ELEMENT) {
+                checkStop.run();
                 String tag = qualifiedName(reader.getPrefix(), reader.getLocalName());
                 Frame parent = stack.peek();
                 if (parent != null) {

@@ -62,7 +62,7 @@ public class NodePresentationTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "set_node_prst_location",
-                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image in low resolution.",
+                "Set the location (specified by x and y coordinates) of the specified node presentation (specified by ID), and return its rectangle after setting along with the updated diagram image in low resolution. For a lifeline, the specified Y coordinate is ignored.",
                 this::setNodePresentationLocation,
                 NodePresentationWithLocationDTO.class,
                 RectangleDTO.class),

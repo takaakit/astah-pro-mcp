@@ -2,9 +2,13 @@ package com.astahpromcp.tool.astah.pro.project;
 
 import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.ToolDefinition;
+import com.astahpromcp.tool.astah.pro.AstahApiLock;
+import com.astahpromcp.tool.astah.pro.ExclusiveToolProvider;
 import com.astahpromcp.tool.astah.pro.project.outputdto.DiffStartDTO;
+import com.astahpromcp.tool.projectdiff.ProjectDiffHost;
 import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import com.astahpromcp.tool.projectdiff.ProjectDiffResultTool;
+import com.astahpromcp.tool.projectdiff.export.OpenProjectSnapshot;
 import com.astahpromcp.tool.projectdiff.outputdto.ChangeDTO;
 import com.astahpromcp.tool.projectdiff.outputdto.ChangeKind;
 import com.astahpromcp.tool.projectdiff.outputdto.DiffResultDTO;
@@ -65,7 +69,7 @@ public class ProjectDiffToolsTest {
         projectAccessor.open(project.toString(), false, false, true);
         
         projectDiffJobs = new ProjectDiffJobs(folder.resolve("project-diff"));
-        diffProject = new ProjectDiffStartTool(projectAccessor, projectDiffJobs).createToolDefinitions().get(0);
+        diffProject = new ProjectDiffStartTool(projectAccessor, projectDiffJobs, new AstahProjectDiffHost(projectAccessor)).createToolDefinitions().get(0);
         getProjectDiffResult = new ProjectDiffResultTool(projectDiffJobs).createToolDefinitions().get(0);
     }
     
@@ -256,6 +260,45 @@ public class ProjectDiffToolsTest {
                 .anyMatch(property -> property.change() == PropertyChangeKind.REMOVED && !property.path().contains("[")), () -> changes.toString());
     }
     
+    // The host reaches the Astah API, so a call through the lock wrapper, as the server makes it, uses the host only on the thread that holds the Astah API lock
+    @Test
+    void diffProject_ok_usesTheHostOnlyUnderTheAstahApiLock() {
+        ProjectDiffHost astah = new AstahProjectDiffHost(projectAccessor);
+        List<String> calls = new ArrayList<>();
+        ProjectDiffHost watched = new ProjectDiffHost() {
+
+            private void record(String operation) {
+                calls.add(operation + (AstahApiLock.LOCK.isHeldByCurrentThread() ? " under the lock" : " WITHOUT the lock"));
+            }
+
+            @Override
+            public String astahInstallPath() {
+                record("astahInstallPath");
+                return astah.astahInstallPath();
+            }
+
+            @Override
+            public Class<?> xmiExportMainClass() {
+                record("xmiExportMainClass");
+                return astah.xmiExportMainClass();
+            }
+
+            @Override
+            public OpenProjectSnapshot captureOpenProject(Path xmiFile) throws Exception {
+                record("captureOpenProject");
+                return astah.captureOpenProject(xmiFile);
+            }
+        };
+        ToolDefinition locked = new ExclusiveToolProvider(new ProjectDiffStartTool(projectAccessor, projectDiffJobs, watched)).createToolDefinitions().get(0);
+
+        McpSchema.CallToolResult answer = call(locked, Map.of("baseProjectPath", project.toString(), "targetProjectPath", "", "requestId", "req-lock", "isProjectDiffGuideCalled", true));
+
+        assertNotEquals(Boolean.TRUE, answer.isError(), () -> answer.content().toString());
+        assertEquals(List.of("astahInstallPath under the lock", "xmiExportMainClass under the lock", "captureOpenProject under the lock"), calls);
+        DiffStartDTO started = JsonSupport.OBJ_MAPPER.convertValue(answer.structuredContent(), DiffStartDTO.class);
+        assertEquals(DiffStatus.DONE, await(started.diffId()).status());
+    }
+
     @Test
     void diffProject_ok_returnsTheSameComparisonForTheSameRequestId() {
         DiffStartDTO first = diff(project.toString(), "", "req-again");
