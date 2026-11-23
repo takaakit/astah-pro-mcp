@@ -41,17 +41,19 @@ public class ToolCatalogDerivationTest {
     void astahLockedNames_ok_coversEveryToolThatReachesTheAstahApi() {
         ToolCatalog catalog = catalog();
         
-        // Tools of the six factories that never touch Astah must not be in it
+        // Tools of the seven factories that never touch Astah must not be in it
         assertTrue(catalog.contains("get_info_of_document"), "the assertion below would check nothing if the tool were gone");
         assertFalse(catalog.astahLockedNames().contains("get_info_of_document"));
         assertFalse(catalog.astahLockedNames().contains("generate_dgm_img_from_puml"));
         assertFalse(catalog.astahLockedNames().contains("get_proj_diff_result"));
         assertFalse(catalog.astahLockedNames().contains("proj_diff_guide"));
+        assertFalse(catalog.astahLockedNames().contains("architecture_scenario_development_steps"));
         
         // Tools that do reach the API must be
         assertTrue(catalog.astahLockedNames().contains("get_class_info"));
         assertTrue(catalog.astahLockedNames().contains("create_class_in_parent_pkg"));
         assertTrue(catalog.astahLockedNames().contains("diff_proj"));
+        assertTrue(catalog.astahLockedNames().contains("retrieve_relationship_matrix"));
         
         assertTrue(catalog.names().containsAll(catalog.astahLockedNames()));
     }

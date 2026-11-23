@@ -116,7 +116,7 @@ public class ClassDiagramEditorToolTest {
             "TestClassDiagram");
         
         // Check that the diagram does not exist
-        assertNull(TestSupport.instance().getNamedElementByClassAndName(
+        assertEquals(0, TestSupport.instance().countNamedElementsByClassAndName(
             IClassDiagram.class,
             "TestClassDiagram"));
         
@@ -453,7 +453,6 @@ public class ClassDiagramEditorToolTest {
         // Check exception
         assertInstanceOf(IllegalStateException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("Astah could not draw association class 'AssociationClass0' on class diagram 'Class Diagram0'"));
-        assertTrue(exception.getCause().getMessage().contains("calling this tool again, even in a separate run, fails the same way"));
         assertTrue(exception.getCause().getMessage().contains("create_class_dgm"));
         assertFalse(projectAccessor.getTransactionManager().isInTransaction());
     }

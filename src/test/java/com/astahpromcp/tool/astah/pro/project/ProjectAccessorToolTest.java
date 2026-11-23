@@ -13,6 +13,7 @@ import com.astahpromcp.tool.common.inputdto.NoInputDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
 import com.change_vision.jude.api.inf.exception.ProjectLockedException;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,6 +137,10 @@ public class ProjectAccessorToolTest {
     
     @Test
     void createProject_ok() throws Exception {
+        // Check that the project opened in setUp holds Foo
+        String previousRootId = projectAccessor.getProject().getId();
+        assertNotEquals(0, TestSupport.instance().countNamedElementsByClassAndName(INamedElement.class, "Foo"));
+        
         // Create input DTO
         NoInputDTO inputDTO = new NoInputDTO();
         
@@ -150,9 +155,14 @@ public class ProjectAccessorToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+        String rootId = projectAccessor.getProject().getId();
+        assertEquals(rootId, outputDTO.element().id());
         
         // Check that a new project was created
-        assertNotNull(projectAccessor.getProject());
+        assertNotEquals(previousRootId, rootId);
+        assertEquals("no_title", projectAccessor.getProjectPath());
+        assertFalse(projectAccessor.isProjectModified());
+        assertEquals(0, TestSupport.instance().countNamedElementsByClassAndName(INamedElement.class, "Foo"));
     }
     
     @Test
@@ -487,7 +497,13 @@ public class ProjectAccessorToolTest {
     }
     
     @Test
-    void saveProject_ok() throws Exception {
+    void saveProject_ng_unmodifiedProject() throws Exception {
+        // Check that the project opened in setUp has a file and is not modified
+        File projectFile = new File(projectAccessor.getProjectPath());
+        assertTrue(projectFile.isFile(), projectFile.toString());
+        assertFalse(projectAccessor.isProjectModified());
+        long lastModifiedBefore = projectFile.lastModified();
+        
         // Create input DTO
         NoInputDTO inputDTO = new NoInputDTO();
         
@@ -499,12 +515,15 @@ public class ProjectAccessorToolTest {
             tool,
             inputDTO,
             ProjectPathDTO.class));
+        
+        // Check that the project file was not written
+        assertEquals(lastModifiedBefore, projectFile.lastModified());
     }
     
     @Test
     void saveProject_ng_1() throws Exception {
-        // Create a new project
-        projectAccessor.create();
+        // Make an untitled project with unsaved changes
+        makeModifiedUntitledProject();
         
         // Create input DTO
         NoInputDTO inputDTO = new NoInputDTO();
@@ -517,6 +536,10 @@ public class ProjectAccessorToolTest {
             tool,
             inputDTO,
             ProjectPathDTO.class));
+        
+        // Check that the unsaved changes were kept
+        assertUnsavedChangesKept("no_title");
+        assertFalse(new File("no_title").exists());
     }
     
     @Test
@@ -612,19 +635,27 @@ public class ProjectAccessorToolTest {
     }
     
     @Test
-    void saveProjectAs_ng_1() throws Exception {
+    void saveProjectAs_ng_1(@TempDir Path workspace) throws Exception {
+        String projectPath = projectAccessor.getProjectPath();
+        
         // Create input DTO
-        // Dummy file path
-        FilePathDTO inputDTO = new FilePathDTO("C:/dummy/ProjectAccessorToolTest_2.asta");
+        // A file path in a folder that does not exist
+        Path target = workspace.resolve("missing").resolve("ProjectAccessorToolTest_2.asta");
+        FilePathDTO inputDTO = new FilePathDTO(target.toString());
         
         // ----------------------------------------
         // Call saveProjectAs()
         // ----------------------------------------
-        assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
+        Exception exception = assertThrows(Exception.class, () -> TestSupport.instance().invokeToolMethodReturningDto(
             saveProjectAs,
             tool,
             inputDTO,
             ProjectPathDTO.class));
+        
+        // Check that nothing was written
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertFalse(Files.exists(target.getParent()));
+        assertEquals(projectPath, projectAccessor.getProjectPath());
     }
     
     @Test

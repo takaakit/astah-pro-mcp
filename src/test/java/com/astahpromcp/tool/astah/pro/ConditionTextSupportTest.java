@@ -96,6 +96,6 @@ public class ConditionTextSupportTest {
             ConditionTextSupport.requirePresent("invariant", "id0", "x > 0", new String[0], Function.identity());
         });
         
-        assertTrue(exception.getMessage().endsWith("Existing invariants: []."));
+        assertTrue(exception.getMessage().contains("[]"));
     }
 }

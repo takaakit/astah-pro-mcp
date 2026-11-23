@@ -485,10 +485,11 @@ public class MessageToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         String errorMessage = exception.getCause().getMessage();
-        assertTrue(errorMessage.contains("Message 'Test Return Message' "));
+        assertTrue(errorMessage.contains("'Test Return Message'"));
         assertTrue(errorMessage.contains("is a return message, and Astah does not allow the " + property + " of a return message to be set."));
-        assertTrue(errorMessage.contains("specify the message it returns from instead: '" + callMessage.getName() + "' (ID: " + callMessage.getId() + ")."));
-        assertTrue(errorMessage.contains("set its name with set_name."));
+        assertTrue(errorMessage.contains("'" + callMessage.getName() + "'"));
+        assertTrue(errorMessage.contains(callMessage.getId()));
+        assertTrue(errorMessage.contains("set_name"));
         
         // Check that the return message was left as it was
         assertEquals(valueBefore, currentValue.get());

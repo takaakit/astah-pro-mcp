@@ -3,6 +3,7 @@ package com.astahpromcp.tool.astah.pro.astahapiscript;
 import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.astah.pro.WatchedRunner;
 import com.astahpromcp.tool.common.BoundedWriter;
+import com.astahpromcp.tool.common.ScriptErrorOutput;
 import com.astahpromcp.tool.common.StopWhenInterruptedWriter;
 import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -12,6 +13,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 // Runs an astah api script -- JavaScript (the bundled Nashorn engine, via JSR-223) evaluated inside Astah's JVM with the Astah API bound as global variables.
 @Slf4j
@@ -143,16 +146,18 @@ public class AstahApiScriptExecutor {
             error = throwable;
         }
         
-        // Abort a dangling transaction before building the result, so that the note it appends to the error output is included in the result.
-        abortDanglingTransaction(errorOutput);
+        // Abort a dangling transaction before building the result, so that the note it leaves is included in the result.
+        List<String> notes = new ArrayList<>();
+        abortDanglingTransaction(notes);
         
-        appendTruncationNotes(output, errorOutput);
+        String errorText = ScriptErrorOutput.of(
+            output, errorOutput, McpServerConfig.ASTAH_API_SCRIPT_MAX_STDOUT_BYTES, "astah api script", notes);
         
         if (error == null) {
             return Result.success(
                 value == null ? "" : String.valueOf(value),
                 output.toString(),
-                errorOutput.toString());
+                errorText);
             
         } else if (error instanceof ScriptException exception) {
             return Result.failure(
@@ -160,7 +165,7 @@ public class AstahApiScriptExecutor {
                 exception.getLineNumber(),
                 exception.getColumnNumber(),
                 output.toString(),
-                errorOutput.toString());
+                errorText);
             
         } else {
             return Result.failure(
@@ -168,30 +173,22 @@ public class AstahApiScriptExecutor {
                 -1,
                 -1,
                 output.toString(),
-                errorOutput.toString());
+                errorText);
         }
     }
     
     // Safety net for editing astah api scripts that fail between beginTransaction and endTransaction
-    private static void abortDanglingTransaction(BoundedWriter errorOutput) {
+    private static void abortDanglingTransaction(List<String> notes) {
         try {
             if (TransactionManager.isInTransaction()) {
                 TransactionManager.abortTransaction();
-                errorOutput.write("A transaction left open by the astah api script was aborted.\n");
+                notes.add("A transaction left open by the astah api script was aborted.");
             }
             
         } catch (Throwable t) {
             // If the abort itself fails, every later edit would be blocked; make it visible.
             log.warn("Failed to abort a transaction left open by the astah api script", t);
-            errorOutput.write("Failed to abort a transaction left open by the astah api script: " + t + "\n");
-        }
-    }
-    
-    private static void appendTruncationNotes(BoundedWriter output, BoundedWriter errorOutput) {
-        if (output.truncated()) {
-            errorOutput.write(String.format(
-                "Output was truncated at %d bytes; print less from the astah api script.%n",
-                McpServerConfig.ASTAH_API_SCRIPT_MAX_STDOUT_BYTES));
+            notes.add("Failed to abort a transaction left open by the astah api script: " + t);
         }
     }
     

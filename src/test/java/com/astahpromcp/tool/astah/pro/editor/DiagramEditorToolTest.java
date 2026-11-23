@@ -277,10 +277,14 @@ public class DiagramEditorToolTest {
         IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IClassDiagram.class,
             "Class Diagram0");
+        String diagramId = classDiagram.getId();
+        
+        // Check that the diagram exists
+        assertEquals(1, TestSupport.instance().countNamedElementsById(diagramId));
         
         // Create input DTO
         DeleteDiagramDTO inputDTO = new DeleteDiagramDTO(
-            classDiagram.getId());
+            diagramId);
         
         // ----------------------------------------
         // Call deleteDiagram()
@@ -293,11 +297,10 @@ public class DiagramEditorToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(diagramId, outputDTO.namedElement().element().id());
         
         // Check that the diagram does not exist
-        assertNull(TestSupport.instance().getNamedElementByClassAndName(
-            IClassDiagram.class,
-            "Class Diagram0"));
+        assertEquals(0, TestSupport.instance().countNamedElementsById(diagramId));
     }
     
     @Test
@@ -311,11 +314,15 @@ public class DiagramEditorToolTest {
         IPresentation classFoo = TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
+        String presentationId = classFoo.getID();
+        
+        // Check that the presentation exists
+        assertEquals(1, TestSupport.countPresentationsById(classDiagram, presentationId));
         
         // Create input DTO
         DeletePresentationDTO inputDTO = new DeletePresentationDTO(
             classDiagram.getId(),
-            classFoo.getID());
+            presentationId);
         
         // ----------------------------------------
         // Call deletePresentation()
@@ -328,10 +335,9 @@ public class DiagramEditorToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(presentationId, outputDTO.id());
         
         // Check that the presentation does not exist
-        assertNull(TestSupport.instance().getPresentationByTypeAndLabel(
-            "Class",
-            "Foo"));
+        assertEquals(0, TestSupport.countPresentationsById(classDiagram, presentationId));
     }
 }

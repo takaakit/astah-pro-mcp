@@ -247,6 +247,19 @@ public final class McpServerConfig {
     public static final Set<String> PROJECT_DIFF_VERIFIED_XMI_VERSIONS = Set.of("1.2.0.44/44");
     
     // ----------
+    // Relationship matrix
+    
+    // Maximum number of rows a relationship matrix is drawn as a grid with. Beyond it the grid is left out, and the lists of the rows and the columns still show every relationship.
+    public static final int RELATIONSHIP_MATRIX_MAX_GRID_ROWS = 50;
+    
+    // Maximum number of columns a relationship matrix is drawn as a grid with.
+    // Kept low because an AI agent finds the column of a cell by counting vertical bars, which it gets wrong in a wide table, and a wide table does not fit a chat window either.
+    public static final int RELATIONSHIP_MATRIX_MAX_GRID_COLUMNS = 20;
+    
+    // Maximum size of a relationship matrix response, in UTF-8 bytes like the other limits on output.
+    public static final int RELATIONSHIP_MATRIX_MAX_RESPONSE_BYTES = 40_960;
+    
+    // ----------
     // Output directories
     
     // Root directory where generated output is stored.

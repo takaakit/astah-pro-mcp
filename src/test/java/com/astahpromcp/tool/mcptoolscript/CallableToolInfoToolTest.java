@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -407,8 +408,15 @@ public class CallableToolInfoToolTest {
         String negative = errorOf(chunkResult(tool, -1));
         String pastTheEnd = errorOf(chunkResult(tool, 4));
         
-        assertTrue(negative.contains("from 0 to 3"), negative);
-        assertTrue(pastTheEnd.contains("from 0 to 3"), pastTheEnd);
+        // The range of the chunk indexes, 0 to 3
+        assertTrue(numbersIn(negative).containsAll(List.of(0, 3)), negative);
+        assertTrue(numbersIn(pastTheEnd).containsAll(List.of(0, 3)), pastTheEnd);
+    }
+    
+    private static List<Integer> numbersIn(String text) {
+        return Pattern.compile("\\d+").matcher(text).results()
+                .map(match -> Integer.parseInt(match.group()))
+                .toList();
     }
     
     @Test

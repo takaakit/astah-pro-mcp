@@ -49,15 +49,15 @@ public class PreliminaryLayoutTool extends AstahToolProvider {
     
     private List<McpSchema.Content> getSteps(NoInputDTO param) throws Exception {
         String contents = """
-# Introspection Loop for Creating a Preliminary Layout Before Laying Out a New Diagram
-Follow these steps to create and refine a preliminary layout of a diagram before you work out where on that diagram its presentations are to be placed, so that the initial layout of the diagram is of good quality. Run this introspective loop once per diagram to be created. Do not skip, reorder, or merge steps.
+# Introspection Loop for Creating a Preliminary Layout Before Laying Out a Diagram
+Follow these steps to create and refine a preliminary layout of a diagram before you work out where on that diagram its presentations are to be placed, so that the initial layout of the diagram is of good quality. Run this introspective loop once per diagram to be created, or once per region of an existing diagram to be rearranged as described below. Do not skip, reorder, or merge steps.
 
 Run this loop at one point only in the course of creating a new diagram: after what that diagram is to show has been decided, and immediately before you begin working out where on the diagram its presentations are to be placed. Its two boundaries are these.
 - After what the diagram is to show has been decided. That means the elements to appear on the diagram and the relationships between them are settled, so that step 1 can enumerate them without deciding anything further. While any of that is still open, settle it first and do not start this loop: a layout refined against a set of elements that then changes has been refined against the wrong requirement, and the rounds spent on it are wasted.
 - Immediately before the placement is worked out. That means no decision has yet been made about where any presentation goes. This loop is how that placement is worked out: let nothing about it be settled beforehand, and let nothing decided outside this loop displace what it produces.
-Both boundaries are about what has been decided, not about what has been edited in the Astah project. Whether the diagram itself has been created when this loop runs makes no difference, and neither does when the presentations are actually placed on it. This loop is therefore neither a planning exercise to be run ahead of time, nor a means of reworking a placement already decided - once that placement has been decided, adjust it directly instead of running this loop. As an exception, when adding and deleting presentations on an existing diagram requires rearranging most of a region of it, you may run this loop for that region, treating the presentations outside it as fixed; list in step 1 those of them connected to the region, and draw them at their current positions.
+Both boundaries are about what has been decided, not about what has been edited in the Astah project. Whether the diagram itself has been created when this loop runs makes no difference, and neither does when the presentations are actually placed on it. This loop is therefore neither a planning exercise to be run ahead of time, nor a means of reworking a placement already decided - once that placement has been decided, adjust it directly instead of running this loop. As an exception, when adding and deleting presentations on an existing diagram requires rearranging most of a region of it, you may run this loop for that region. The presentations outside the region stay where they are; they are called fixed below, and the steps say what changes for a region.
 
-This procedure keeps its working artefacts - the element list, the SVG code and the evaluation result - in this conversation rather than in files, and every step refers back to what you yourself produced in an earlier step. Label each of those outputs with the name of the diagram being laid out, so that loops run for different diagrams do not get mixed up, and label the SVG code and the evaluation result with the round number as well, so that the rounds run for one diagram do not get mixed up either. Only the finished layout is written to a file, in step 6.
+This procedure keeps its working artefacts - the element list, the SVG code and the evaluation result - in this conversation rather than in files, and every step refers back to what you yourself produced in an earlier step. Label each of those outputs with the name of the diagram being laid out, and for a region with a short name you give the region, so that loops run for different diagrams or regions do not get mixed up, and label the SVG code and the evaluation result with the round number as well, so that the rounds run for one diagram do not get mixed up either. Only the finished layout is written to a file, in step 6.
 
 1. Enumerate the rectangles and lines to be placed on the diagram to be laid out.
    Referring to the "Rectangles and Lines to Draw in a Preliminary Layout" section below, output the enumerated result in the format shown below.
@@ -73,6 +73,8 @@ This procedure keeps its working artefacts - the element list, the SVG code and 
    > ## Lines
    > - holds (association): Class3 -> Class4
    > - (generalization): Class1 -> Class0
+
+   For a region, the "Requirement" describes what the region is to express. Besides the region's own presentations, list the fixed presentations connected to them or likely to get in their way, each marked "(fixed)", for example "- CashBox (class) (fixed)". Mark a line between two fixed presentations "(fixed)" as well.
 
 2. Understand the coding rules for the preliminary layout SVG code, and obtain the criteria this loop is judged against.
    - Read the "SVG Coding Rules" section below to understand how to write the SVG code.
@@ -91,6 +93,7 @@ This procedure keeps its working artefacts - the element list, the SVG code and 
    If the step 1 output is no longer visible to you, redo step 1 before continuing.
 
    Write the layout so that it follows the diagram layout guide and avoids the layout anti-patterns you obtained in step 2. Those are the criteria step 5 will judge it by, so write against them from round 0 rather than waiting to be told in a critique.
+   For a region, draw every fixed rectangle and line as it is on the diagram, and keep it there in every round.
 
    From round 1 on, revise the places pointed out in the revision suggestions and leave the rest of the previous SVG code as it is. You may nevertheless rewrite the whole of it when you judge that the layout has to be restructured as a whole.
    After writing it, use the data-name and data-type attributes to confirm that every rectangle and line listed in step 1 is drawn, and that nothing absent from that list is drawn. Fix any excess or omission.
@@ -114,12 +117,13 @@ This procedure keeps its working artefacts - the element list, the SVG code and 
      - Critique: point out what is wrong with the layout, naming the elements concerned. Where the guide or the anti-patterns you obtained in step 2 have an item for it, cite that item; where they have none, say so and raise the point anyway. They are the floor this layout has to clear, not the definition of a finished one.
      - Revision suggestions: for each point raised in the critique, describe concretely which element is to be moved, in which direction, and how, giving coordinates.
    - When a point should not be acted on, record it as set aside with the reason instead of a revision suggestion, and do not raise it again in a later round.
+   - For a region, never suggest moving or resizing a fixed rectangle or line; resolve a problem that involves one by moving the region's presentations.
    - Go on to step 6 when this round's evaluation produced no revision suggestion at all, or when the round you have just evaluated is round 3. This loop therefore writes at most four SVG codes: round 0 and rounds 1 to 3.
    - Otherwise, carry the critique and the revision suggestions into the next round, and go back to step 3 as the next round.
 
 6. Save the finished preliminary layout.
-   Write the SVG code of the last round you wrote - the round step 5 sent you here from - to the file {diagram-name}.svg in the directory below, creating the directory if it does not exist. Overwrite the file if one already exists.
-   This is the only file this procedure produces. It is the record of the preliminary layout, and the reference for placing the presentations of the diagram it was made for.
+   Write the SVG code of the last round you wrote - the round step 5 sent you here from - to the file {diagram-name}.svg, or {diagram-name}-{region-name}.svg for a region, in the directory below, creating the directory if it does not exist. Overwrite the file if one already exists.
+   This is the only file this procedure produces. It is the record of the preliminary layout, and the reference for placing the presentations of the diagram or region it was made for.
    %1$s
 
 

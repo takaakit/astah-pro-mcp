@@ -254,7 +254,7 @@ public class DiagramViewManagerToolTest {
             "Class Diagram0");
         
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(diagram.getId());
+        NoInputDTO inputDTO = new NoInputDTO();
         
         // Open diagram
         diagramViewManager.open(diagram);
@@ -281,7 +281,7 @@ public class DiagramViewManagerToolTest {
             "Class Diagram0");
         
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(diagram.getId());
+        NoInputDTO inputDTO = new NoInputDTO();
         
         // Open diagram
         diagramViewManager.open(diagram);
@@ -290,7 +290,9 @@ public class DiagramViewManagerToolTest {
         IPresentation presentation = TestSupport.instance().getPresentationByTypeAndLabel(
             "Class",
             "Foo");
+        diagramViewManager.unselectAll();
         diagramViewManager.select(presentation);
+        assertEquals(List.of(presentation), Arrays.asList(diagramViewManager.getSelectedPresentations()));
         
         // ----------------------------------------
         // Call getSelectedPresentations()
@@ -490,19 +492,28 @@ public class DiagramViewManagerToolTest {
     
     @Test
     void selectAllPresentations_ok() throws Exception {
-        // Get diagram
-        IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
-            IDiagram.class,
-            "Class Diagram0");
+        // Draw two classes on a diagram of their own
+        INodePresentation[] drawn = transactionSupport.call(() -> {
+            ClassDiagramEditor classDiagramEditor = projectAccessor.getDiagramEditorFactory().getClassDiagramEditor();
+            classDiagramEditor.setDiagram(classDiagramEditor.createClassDiagram(projectAccessor.getProject(), "Select All Target"));
+            IClass first = projectAccessor.getModelEditorFactory().getBasicModelEditor().createClass(projectAccessor.getProject(), "SelectAllFirst");
+            IClass second = projectAccessor.getModelEditorFactory().getBasicModelEditor().createClass(projectAccessor.getProject(), "SelectAllSecond");
+            return new INodePresentation[] {
+                classDiagramEditor.createNodePresentation(first, new Point2D.Double(0, 0)),
+                classDiagramEditor.createNodePresentation(second, new Point2D.Double(200, 0))
+            };
+        });
+        IDiagram diagram = drawn[0].getDiagram();
         
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(diagram.getId());
+        NoInputDTO inputDTO = new NoInputDTO();
         
         // Open diagram
         diagramViewManager.open(diagram);
         
         // Unselect all presentations
         diagramViewManager.unselectAll();
+        assertEquals(0, diagramViewManager.getSelectedPresentations().length);
         
         // ----------------------------------------
         // Call selectAllPresentations()
@@ -515,7 +526,17 @@ public class DiagramViewManagerToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
-        assertEquals(diagram.getPresentations().length, outputDTO.value().size());
+        List<String> returnedIds = outputDTO.value().stream().map(PresentationDTO::id).toList();
+        assertEquals(returnedIds.size(), Set.copyOf(returnedIds).size(), "A presentation is returned more than once: " + returnedIds);
+        assertTrue(returnedIds.containsAll(List.of(drawn[0].getID(), drawn[1].getID())), returnedIds.toString());
+        for (PresentationDTO presentation : outputDTO.value()) {
+            assertEquals(diagram.getId(), presentation.renderedInDiagram().id(), presentation.toString());
+        }
+        
+        // Check that the view has selected exactly what was returned
+        assertEquals(
+            Set.copyOf(returnedIds),
+            Arrays.stream(diagramViewManager.getSelectedPresentations()).map(IPresentation::getID).collect(Collectors.toSet()));
     }
     
     @Test
@@ -526,7 +547,7 @@ public class DiagramViewManagerToolTest {
             "Class Diagram0");
         
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(diagram.getId());
+        NoInputDTO inputDTO = new NoInputDTO();
         
         // Open diagram
         diagramViewManager.open(diagram);
@@ -535,7 +556,8 @@ public class DiagramViewManagerToolTest {
         diagramViewManager.selectAll();
         
         // Check presentations are selected before unselect all
-        assertNotEquals(0, diagram.getPresentations().length);
+        assertNotEquals(0, diagramViewManager.getSelectedPresentations().length);
+        Set<String> presentationIdsBefore = Arrays.stream(diagram.getPresentations()).map(IPresentation::getID).collect(Collectors.toSet());
         
         // ----------------------------------------
         // Call unselectAllPresentations()
@@ -548,11 +570,14 @@ public class DiagramViewManagerToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(diagram.getId(), outputDTO.namedElement().element().id());
         
-        // Check presentations are unselected after unselect all
-        assertEquals(0, diagram.getPresentations().length);
+        // Check that the selection is cleared and that the presentations on the diagram are left as they were
+        assertEquals(0, diagramViewManager.getSelectedPresentations().length);
+        assertEquals(presentationIdsBefore, Arrays.stream(diagram.getPresentations()).map(IPresentation::getID).collect(Collectors.toSet()));
     }
     
+    // auto_layout is not registered as a tool, so this only checks that the method can be called on the diagram open
     @Test
     void autoLayout_ok() throws Exception {
         // Get diagram
@@ -561,7 +586,7 @@ public class DiagramViewManagerToolTest {
             "Class Diagram0");
         
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(diagram.getId());
+        NoInputDTO inputDTO = new NoInputDTO();
         
         // Open diagram
         diagramViewManager.open(diagram);
@@ -577,6 +602,7 @@ public class DiagramViewManagerToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+        assertEquals(diagram.getId(), outputDTO.namedElement().element().id());
     }
     
     @Test
@@ -686,7 +712,8 @@ public class DiagramViewManagerToolTest {
             
             // Check exception
             IllegalArgumentException cause = assertInstanceOf(IllegalArgumentException.class, thrown.getCause());
-            assertTrue(cause.getMessage().contains("between 0.05 and 4.0"), cause.getMessage());
+            assertTrue(cause.getMessage().contains("0.05"), cause.getMessage());
+            assertTrue(cause.getMessage().contains("4.0"), cause.getMessage());
         }
         
         // Check that the zoom factor is left as it was

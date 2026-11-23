@@ -12,6 +12,7 @@ import com.astahpromcp.tool.astah.pro.model.outputdto.DiagramDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ImageFileDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationGeometryDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationGeometryDTO;
+import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationGeometriesDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationListDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
@@ -37,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -158,6 +161,7 @@ public class DiagramToolTest {
     @Test
     void getPresentationsOnDiagram_ok() throws Exception {
         // Get diagram
+        //   Class Diagram0 holds a frame, the classes Foo and Bar, the package subPackage, and a containment line from subPackage to a class.
         IDiagram diagram = (IDiagram) TestSupport.instance().getNamedElementByClassAndName(
             IDiagram.class,
             "Class Diagram0");
@@ -176,7 +180,21 @@ public class DiagramToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
-        assertTrue(outputDTO.value().size() >= 0);
+        List<PresentationDTO> presentations = outputDTO.value();
+        assertEquals(5, presentations.size(), presentations.toString());
+        assertEquals(5, presentations.stream().map(PresentationDTO::id).distinct().count(),
+            "A presentation is listed more than once: " + presentations);
+        assertEquals(
+            Map.of("Frame", 1L, "Class", 2L, "Package", 1L, "Containment", 1L),
+            presentations.stream().collect(Collectors.groupingBy(PresentationDTO::type, Collectors.counting())));
+        assertEquals(
+            Set.of("Foo", "Bar"),
+            presentations.stream().filter(presentation -> "Class".equals(presentation.type())).map(PresentationDTO::label).collect(Collectors.toSet()));
+        
+        // Check that every presentation listed is drawn on this diagram
+        for (PresentationDTO presentation : presentations) {
+            assertEquals(diagram.getId(), presentation.renderedInDiagram().id(), presentation.toString());
+        }
     }
     
     @Test

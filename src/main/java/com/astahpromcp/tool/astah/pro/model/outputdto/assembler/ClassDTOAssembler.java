@@ -12,16 +12,23 @@ import com.change_vision.jude.api.inf.model.*;
 import lombok.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ClassDTOAssembler {
     public static ClassDTO toDTO(@NonNull IClass astahClass) throws Exception {
         
         List<AttributeDTO> attributeDTOs = new ArrayList<>();
         List<AssociationDTO> associationDTOs = new ArrayList<>();
+        // Both ends of a self-association are attributes of this class, so the association is reached twice; the second time adds nothing.
+        Set<String> addedAssociationIds = new HashSet<>();
         for (IAttribute astahAttribute : astahClass.getAttributes()) {
-            if (astahAttribute.getAssociation() != null) {
-                associationDTOs.add(AssociationDTOAssembler.toDTO(astahAttribute.getAssociation()));
+            IAssociation astahAssociation = astahAttribute.getAssociation();
+            if (astahAssociation != null) {
+                if (addedAssociationIds.add(astahAssociation.getId())) {
+                    associationDTOs.add(AssociationDTOAssembler.toDTO(astahAssociation));
+                }
             } else {
                 attributeDTOs.add(AttributeDTOAssembler.toDTO(astahAttribute));
             }

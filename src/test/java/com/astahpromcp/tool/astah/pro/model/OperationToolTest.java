@@ -589,7 +589,7 @@ public class OperationToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("already has the precondition 'x > 0'"));
-        assertTrue(exception.getCause().getMessage().contains("Existing preconditions: " + Arrays.asList(preconditionsBefore)));
+        assertTrue(exception.getCause().getMessage().contains(Arrays.asList(preconditionsBefore).toString()));
         
         // Check that the precondition is not duplicated
         assertArrayEquals(preconditionsBefore, operation.getPreConditions());
@@ -717,7 +717,7 @@ public class OperationToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("has no precondition 'x > 0'"));
-        assertTrue(exception.getCause().getMessage().contains("Existing preconditions: " + Arrays.asList(preconditionsBefore)));
+        assertTrue(exception.getCause().getMessage().contains(Arrays.asList(preconditionsBefore).toString()));
         
         // Check that nothing was removed
         assertArrayEquals(preconditionsBefore, operation.getPreConditions());

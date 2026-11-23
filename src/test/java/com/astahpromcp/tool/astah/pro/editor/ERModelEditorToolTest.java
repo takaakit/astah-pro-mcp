@@ -572,9 +572,13 @@ public class ERModelEditorToolTest {
         IERPackage targetERPackage = (IERPackage) TestSupport.instance().getNamedElementByClassAndName(
             IERPackage.class,
             "package1");
+        String targetId = targetERPackage.getId();
+        
+        // Check that the ER package exists
+        assertEquals(1, TestSupport.instance().countNamedElementsById(targetId));
         
         // Create input DTO
-        IdDTO inputDTO = new IdDTO(targetERPackage.getId());
+        IdDTO inputDTO = new IdDTO(targetId);
         
         // ----------------------------------------
         // Call delete()
@@ -587,9 +591,10 @@ public class ERModelEditorToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
-        assertNull(TestSupport.instance().getNamedElementByClassAndName(
-            IERPackage.class,
-            "package1"));
+        assertEquals(targetId, outputDTO.id());
+        
+        // Check that the ER package does not exist
+        assertEquals(0, TestSupport.instance().countNamedElementsById(targetId));
     }
     
     @Test

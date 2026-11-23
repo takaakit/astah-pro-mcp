@@ -12,11 +12,19 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 // How long values are cut short for an answer
 public class ResponseLimiterTest {
+    
+    // The numbers a shown value holds, in order: the counts its notes give. The values the tests cut hold no digit of their own.
+    private static List<Integer> numbersIn(String text) {
+        return Pattern.compile("\\d+").matcher(text).results()
+                .map(match -> Integer.parseInt(match.group()))
+                .toList();
+    }
     
     private static ChangeDTO withProperty(PropertyChangeKind kind, String before, String after) {
         return new ChangeDTO(ChangeKind.MODIFIED, "c1", "", "UML:Class", List.of(), "C",
@@ -34,11 +42,12 @@ public class ResponseLimiterTest {
         
         assertNotEquals(shown[0], shown[1], "the two values look different");
         assertTrue(shown[1].contains("B"), shown[1]);
-        assertTrue(shown[0].startsWith("(2400 characters left out, the same in 'before' and 'after') ..."), shown[0]);
-        assertTrue(shown[1].startsWith("(2400 characters left out, the same in 'before' and 'after') ..."), shown[1]);
-        assertTrue(shown[1].endsWith("(cut short; 3000 characters in all)"), shown[1]);
-        // 100 characters of what leads up to the change, then the change
-        assertEquals('B', shown[1].charAt("(2400 characters left out, the same in 'before' and 'after') ...".length() + 100));
+        // The note in front counts what was left out, and the note behind counts the whole value
+        assertEquals(2400, numbersIn(shown[0]).getFirst(), shown[0]);
+        assertEquals(2400, numbersIn(shown[1]).getFirst(), shown[1]);
+        assertEquals(3000, numbersIn(shown[1]).getLast(), shown[1]);
+        // 100 characters of what leads up to the change, then the change; the notes hold no capital A
+        assertEquals('B', shown[1].charAt(shown[1].indexOf('A') + 100));
     }
     
     @Test
@@ -51,7 +60,7 @@ public class ResponseLimiterTest {
         assertTrue(shown[0].startsWith("xAAA"), shown[0]);
         assertTrue(shown[1].startsWith("yAAA"), shown[1]);
         // What is left out at the end is the same in both
-        assertTrue(shown[0].endsWith("... (the last 1000 characters, the same in 'before' and 'after', left out; 3000 characters in all)"), shown[0]);
+        assertEquals(List.of(1000, 3000), numbersIn(shown[0]));
     }
     
     @Test
@@ -63,7 +72,7 @@ public class ResponseLimiterTest {
         
         assertEquals(before, shown[0], "exactly at the limit, a value is kept whole");
         assertNotEquals(after, shown[1], "one character over the limit, it is cut");
-        assertTrue(shown[1].contains("2001 characters in all"), shown[1]);
+        assertEquals(2001, numbersIn(shown[1]).getLast(), shown[1]);
     }
     
     @Test
@@ -94,7 +103,8 @@ public class ResponseLimiterTest {
         
         String shown = ResponseLimiter.shorten(value, 11);
         
-        assertTrue(shown.startsWith("あ".repeat(10) + "... (cut short;"), shown);
+        assertTrue(shown.startsWith("あ".repeat(10)), shown);
+        assertFalse(Character.isSurrogate(shown.charAt(10)), shown);
         assertEquals(value, ResponseLimiter.shorten(value, value.length()));
     }
     
@@ -191,7 +201,7 @@ public class ResponseLimiterTest {
         
         assertEquals(1, shown.valuesCut());
         assertTrue(shown.change().properties().get(0).after().startsWith("BAAA"));
-        assertTrue(shown.change().properties().get(0).after().endsWith("(cut short; 3000 characters in all)"));
+        assertEquals(3000, numbersIn(shown.change().properties().get(0).after()).getLast());
     }
     
     @Test

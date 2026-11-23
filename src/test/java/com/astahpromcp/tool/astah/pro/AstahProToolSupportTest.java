@@ -54,6 +54,10 @@ public class AstahProToolSupportTest {
         INamedElement namedElement = TestSupport.instance().getNamedElementByClassAndName(
             INamedElement.class,
             "Foo");
+        String id = namedElement.getId();
+        
+        // Check that the element exists
+        assertEquals(1, TestSupport.instance().countNamedElementsById(id));
         
         // Delete element
         transactionSupport.run(() -> {
@@ -63,12 +67,10 @@ public class AstahProToolSupportTest {
         // ----------------------------------------
         // Call verifyDeleted()
         // ----------------------------------------
-        astahProToolSupport.verifyDeleted(namedElement.getId());
+        astahProToolSupport.verifyDeleted(id);
         
         // Check element
-        assertNull(TestSupport.instance().getNamedElementByClassAndName(
-            INamedElement.class,
-            "Foo"));
+        assertEquals(0, TestSupport.instance().countNamedElementsById(id));
     }
     
     @Test

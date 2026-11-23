@@ -20,14 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 // Which tools each profile publishes, which catalog they come from, and the instructions the profile hands its clients.
 public class ProfileCatalogWiringTest {
-    
-    // The sentence the programmatic profile's instructions held as written text before it was made from the manifest
-    private static final String NOT_MCP_TOOL_SCRIPT_CALLABLE_SENTENCE = "Tool functions that return an image or other content instead of structured content, that fetch over the network or convert a PDF, that create, open or save a project, that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order), that answer a standalone question about the project, the Astah view, the MCP server or the logs, that start a background job or wait for its result, and 'run_astah_api_script' itself cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ";
     
     @TempDir
     Path workspaceDir;
@@ -68,6 +66,15 @@ public class ProfileCatalogWiringTest {
             }
         }
         return names;
+    }
+    
+    // The phrase that names the kind of tool function a reason keeps from mcp tool scripts, as the production code makes it from the tool functions given that reason
+    private static String phraseOf(NotMcpToolScriptCallableReason reason, ToolManifest manifest) {
+        List<String> names = manifest.notMcpToolScriptCallableReasons().entrySet().stream()
+                .filter(entry -> entry.getValue() == reason)
+                .map(Map.Entry::getKey)
+                .toList();
+        return reason.instructionPhrase(names);
     }
     
     @Test
@@ -171,10 +178,18 @@ public class ProfileCatalogWiringTest {
     void instructionsOf_ok_listsTheKindsOfToolAScriptCannotCallAsTheyReadBefore() {
         ToolManifest manifest = ToolManifest.load();
         
-        assertEquals(NOT_MCP_TOOL_SCRIPT_CALLABLE_SENTENCE, McpServerApp.notMcpToolScriptCallableSentence(manifest));
+        // Every kind of tool function the shipped manifest keeps from mcp tool scripts is named, except the tool functions published directly, which need no saying
+        String sentence = McpServerApp.notMcpToolScriptCallableSentence(manifest);
+        Set<NotMcpToolScriptCallableReason> reasons = Set.copyOf(manifest.notMcpToolScriptCallableReasons().values());
+        assertTrue(reasons.size() > 1, "the shipped manifest gives too few reasons to check: " + reasons);
+        for (NotMcpToolScriptCallableReason reason : reasons) {
+            String phrase = phraseOf(reason, manifest);
+            if (phrase != null) {
+                assertTrue(sentence.contains(phrase), reason + ": " + sentence);
+            }
+        }
         
         String programmatic = McpServerApp.instructionsOf(profile("programmatic"), manifest);
-        assertTrue(programmatic.contains("rolled back. " + NOT_MCP_TOOL_SCRIPT_CALLABLE_SENTENCE + "The MCP client (you) MUST call"), programmatic);
         assertFalse(programmatic.contains(McpServerApp.NOT_MCP_TOOL_SCRIPT_CALLABLE_PLACEHOLDER), programmatic);
         
         String direct = McpServerApp.instructionsOf(profile("direct"), manifest);
@@ -182,18 +197,36 @@ public class ProfileCatalogWiringTest {
     }
     
     @Test
+    void instructionsOf_ok_tellWhenToReadTheScenariosAgain() {
+        ToolManifest manifest = ToolManifest.load();
+
+        for (String name : List.of("direct", "programmatic")) {
+            String instructions = McpServerApp.instructionsOf(profile(name), manifest);
+
+            assertTrue(instructions.contains("'read_architecture_scenarios'"), instructions);
+        }
+    }
+
+    @Test
     void notMcpToolScriptCallableSentence_ok_followsTheManifest() {
         ToolManifest oneKind = ToolManifest.parse(List.of(
                 "Common\topen_dgm\tx\tx\tview",
                 "Common\tdgm_guide\tx\tx\tdirect"), "test");
-        assertEquals("Tool functions that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order) cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ",
-                McpServerApp.notMcpToolScriptCallableSentence(oneKind));
+        String oneKindSentence = McpServerApp.notMcpToolScriptCallableSentence(oneKind);
+        String view = phraseOf(NotMcpToolScriptCallableReason.DRIVES_THE_VIEW, oneKind);
+        assertEquals(1, oneKindSentence.split(Pattern.quote(view), -1).length - 1, "the kind is named once: " + oneKindSentence);
+        assertFalse(oneKindSentence.contains(phraseOf(NotMcpToolScriptCallableReason.MANAGES_A_PROJECT_FILE, oneKind)), oneKindSentence);
+        // A tool function published directly is no kind to name
+        assertFalse(oneKindSentence.contains("dgm_guide"), oneKindSentence);
         
         ToolManifest twoKinds = ToolManifest.parse(List.of(
                 "Common\topen_dgm\tx\tx\tview",
                 "Common\tsave_proj\tx\tx\tproject_file"), "test");
-        assertEquals("Tool functions that create, open or save a project and that drive the diagram view (opening and closing a diagram, selection, highlighting, z-order) cannot be called from an mcp tool script; every one of them is already in your tool list, so call it directly as an MCP tool. ",
-                McpServerApp.notMcpToolScriptCallableSentence(twoKinds));
+        String twoKindsSentence = McpServerApp.notMcpToolScriptCallableSentence(twoKinds);
+        String projectFile = phraseOf(NotMcpToolScriptCallableReason.MANAGES_A_PROJECT_FILE, twoKinds);
+        // The kinds are named in the order of the reasons, whatever the order of the rows
+        assertTrue(twoKindsSentence.contains(projectFile), twoKindsSentence);
+        assertTrue(twoKindsSentence.indexOf(projectFile) < twoKindsSentence.indexOf(phraseOf(NotMcpToolScriptCallableReason.DRIVES_THE_VIEW, twoKinds)), twoKindsSentence);
         
         ToolManifest onlyTheGenericReason = ToolManifest.parse(List.of(
                 "Common\tdgm_guide\tx\tx\tdirect"), "test");

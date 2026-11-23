@@ -56,7 +56,11 @@ public class DocumentToolTest {
         String description = definition(tool(), "get_info_of_document").toolSchema().description();
         
         for (DocumentType type : DocumentType.values()) {
-            assertTrue(description.contains("* '" + type.value() + "': " + type.title() + ". " + type.usage()),
+            assertTrue(description.contains("'" + type.value() + "'"),
+                    "the description does not tell when to read " + type.value() + ": " + description);
+            assertTrue(description.contains(type.title()),
+                    "the description does not tell when to read " + type.value() + ": " + description);
+            assertTrue(description.contains(type.usage()),
                     "the description does not tell when to read " + type.value() + ": " + description);
         }
     }
@@ -79,7 +83,8 @@ public class DocumentToolTest {
         
         assertTrue(Boolean.TRUE.equals(result.isError()));
         String message = String.valueOf(result.content());
-        assertTrue(message.contains("'get_info_of_document' with documentType 'ocl_spec' first"), message);
+        assertTrue(message.contains("'get_info_of_document'"), message);
+        assertTrue(message.contains("'ocl_spec'"), message);
     }
     
     @Test

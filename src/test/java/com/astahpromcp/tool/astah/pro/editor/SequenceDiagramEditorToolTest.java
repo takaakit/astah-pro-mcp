@@ -13,6 +13,8 @@ import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.IClassDiagram;
+import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
@@ -65,6 +67,7 @@ public class SequenceDiagramEditorToolTest {
             projectAccessor,
             transactionSupport,
             sequenceDiagramEditor,
+            projectAccessor.getModelEditorFactory().getBasicModelEditor(),
             astahProToolSupport,
             imageCaptureSupport);
         
@@ -197,6 +200,44 @@ public class SequenceDiagramEditorToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+    
+    @Test
+    void createCombinedFragment_ok_leavesItsOperandWithoutAGuard() throws Exception {
+        // Get sequence diagram
+        ISequenceDiagram sequenceDiagram = (ISequenceDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            ISequenceDiagram.class,
+            "Sequence Diagram0");
+        
+        for (CombinedFragmentKind kind : CombinedFragmentKind.values()) {
+            // ----------------------------------------
+            // Call createCombinedFragment()
+            // ----------------------------------------
+            NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                createCombinedFragment,
+                tool,
+                new NewCombinedFragmentDTO(sequenceDiagram.getId(), "", kind, 100, 200, 150, 60),
+                NodePresentationDTO.class);
+            
+            // Check output DTO
+            assertNotNull(outputDTO);
+            
+            // Get combined fragment
+            INodePresentation combinedFragmentPresentation = (INodePresentation) TestSupport.instance().getPresentationById(outputDTO.presentation().id());
+            IInteractionOperand[] operands = ((ICombinedFragment) combinedFragmentPresentation.getModel()).getInteractionOperands();
+            
+            // Check that its one operand has no guard, not even the default guard Astah gives it
+            assertEquals(1, operands.length);
+            assertEquals(0, operands[0].getConstraints().length);
+            assertEquals("", operands[0].getGuard());
+            
+            // Delete it, so that the next one is created on the same lifelines
+            transactionSupport.run(() -> {
+                SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+                sequenceDiagramEditor.setDiagram(sequenceDiagram);
+                sequenceDiagramEditor.deletePresentation(combinedFragmentPresentation);
+            });
+        }
     }
     
     @Test

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,7 +76,7 @@ public class ListSnapshotTest {
         
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> changed.chunk(snapshotId, 1, "get_info_of_all_named_elements"));
         assertTrue(e.getMessage().contains(snapshotId), e.getMessage());
-        assertTrue(e.getMessage().contains("call 'get_info_of_all_named_elements' again"), e.getMessage());
+        assertTrue(e.getMessage().contains("'get_info_of_all_named_elements'"), e.getMessage());
     }
     
     @Test
@@ -85,7 +86,14 @@ public class ListSnapshotTest {
         IllegalArgumentException below = assertThrows(IllegalArgumentException.class, () -> snapshot.chunk(snapshot.id(), -1, "get_info_of_all_named_elements"));
         IllegalArgumentException above = assertThrows(IllegalArgumentException.class, () -> snapshot.chunk(snapshot.id(), 3, "get_info_of_all_named_elements"));
         
-        assertTrue(below.getMessage().contains("from 0 to 2"), below.getMessage());
-        assertTrue(above.getMessage().contains("from 0 to 2"), above.getMessage());
+        // The range of the indexes the list takes, 0 to 2
+        assertTrue(numbersIn(below.getMessage()).containsAll(List.of(0, 2)), below.getMessage());
+        assertTrue(numbersIn(above.getMessage()).containsAll(List.of(0, 2)), above.getMessage());
+    }
+    
+    private static List<Integer> numbersIn(String text) {
+        return Pattern.compile("\\d+").matcher(text).results()
+                .map(match -> Integer.parseInt(match.group()))
+                .toList();
     }
 }

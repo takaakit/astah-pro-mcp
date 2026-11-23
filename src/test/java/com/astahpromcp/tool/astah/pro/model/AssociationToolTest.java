@@ -242,7 +242,7 @@ public class AssociationToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("because it is association end B"));
-        assertTrue(exception.getCause().getMessage().contains("pass association end A (ID: " + associationEndAId + ")"));
+        assertTrue(exception.getCause().getMessage().contains(associationEndAId));
     }
     
     @Test
@@ -270,7 +270,7 @@ public class AssociationToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("because it is association end A"));
-        assertTrue(exception.getCause().getMessage().contains("pass association end B (ID: " + associationEndBId + ")"));
+        assertTrue(exception.getCause().getMessage().contains(associationEndBId));
     }
     
     @Test

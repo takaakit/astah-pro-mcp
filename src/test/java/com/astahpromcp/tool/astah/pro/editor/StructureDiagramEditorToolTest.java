@@ -9,6 +9,8 @@ import com.astahpromcp.tool.astah.pro.image.ImageCaptureSupport;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.LinkPresentationDTO;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
+import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.model.*;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
@@ -101,6 +103,78 @@ public class StructureDiagramEditorToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+    
+    @Test
+    void createNodePresentation_ok_interfaceKeepsTheGivenLocation() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+        
+        // Create interface
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
+        IClass paymentPort = new TransactionSupport(projectAccessor.getTransactionManager()).call(() -> basicModelEditor.createInterface(projectAccessor.getProject(), "PaymentPort"));
+        
+        // Create input DTO
+        NewNodePresentationDTO inputDTO = new NewNodePresentationDTO(
+            classDiagram.getId(),
+            paymentPort.getId(),
+            200,
+            300);
+        
+        // ----------------------------------------
+        // Call createNodePresentation()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createNodePresentation,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        
+        // Check that the interface is drawn as a rectangle, not as an icon, with its top-left corner at the given point
+        assertEquals(200, outputDTO.drawnRectangle().x());
+        assertEquals(300, outputDTO.drawnRectangle().y());
+        assertTrue(outputDTO.drawnRectangle().width() > 40);
+    }
+    
+    @Test
+    void createNodePresentation_ok_actorKeepsTheGivenLocation() throws Exception {
+        // Get class diagram
+        IClassDiagram classDiagram = (IClassDiagram) TestSupport.instance().getNamedElementByClassAndName(
+            IClassDiagram.class,
+            "Class Diagram0");
+        
+        // Create actor
+        UseCaseModelEditor useCaseModelEditor = projectAccessor.getModelEditorFactory().getUseCaseModelEditor();
+        IClass operator = new TransactionSupport(projectAccessor.getTransactionManager()).call(() -> useCaseModelEditor.createActor(projectAccessor.getProject(), "Operator"));
+        
+        // Create input DTO
+        NewNodePresentationDTO inputDTO = new NewNodePresentationDTO(
+            classDiagram.getId(),
+            operator.getId(),
+            200,
+            300);
+        
+        // ----------------------------------------
+        // Call createNodePresentation()
+        // ----------------------------------------
+        NodePresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            createNodePresentation,
+            tool,
+            inputDTO,
+            NodePresentationDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        
+        // Check that the actor is drawn as a rectangle, not as an icon, with its top-left corner at the given point
+        assertEquals(200, outputDTO.drawnRectangle().x());
+        assertEquals(300, outputDTO.drawnRectangle().y());
+        assertTrue(outputDTO.drawnRectangle().width() > 40);
     }
     
     @Test

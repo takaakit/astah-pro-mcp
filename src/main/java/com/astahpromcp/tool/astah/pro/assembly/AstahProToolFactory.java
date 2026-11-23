@@ -12,6 +12,7 @@ import com.astahpromcp.tool.astah.pro.image.*;
 import com.astahpromcp.tool.astah.pro.preliminary.*;
 import com.astahpromcp.tool.astah.pro.review.*;
 import com.astahpromcp.tool.astah.pro.astahapiscript.*;
+import com.astahpromcp.tool.astah.pro.matrix.RelationshipMatrixTool;
 import com.astahpromcp.tool.astah.pro.model.*;
 import com.astahpromcp.tool.astah.pro.presentation.*;
 import com.astahpromcp.tool.astah.pro.project.*;
@@ -103,6 +104,7 @@ public class AstahProToolFactory {
             providers.add(new PresentationTool(projectAccessor, transactionSupport, astahProToolSupport, imageCaptureSupport));
             providers.add(new ProjectAccessorTool(projectAccessor, astahProToolSupport));
             providers.add(new ProjectInfoTool(projectAccessor, astahProToolSupport));
+            providers.add(new RelationshipMatrixTool(projectAccessor, astahProToolSupport));
             providers.add(new ProjectDiffStartTool(projectAccessor, projectDiffJobs, new AstahProjectDiffHost(projectAccessor)));
             providers.add(new ImageCaptureTool(projectAccessor, imageCaptureSupport));
             providers.add(new HyperlinkOwnerTool(projectAccessor, transactionSupport, astahProToolSupport));
@@ -154,7 +156,7 @@ public class AstahProToolFactory {
             providers.add(new UsageTool(projectAccessor, transactionSupport, astahProToolSupport));
             
             // Sequence diagram tools
-            providers.add(new SequenceDiagramEditorTool(projectAccessor, transactionSupport, sequenceDiagramEditor, astahProToolSupport, imageCaptureSupport));
+            providers.add(new SequenceDiagramEditorTool(projectAccessor, transactionSupport, sequenceDiagramEditor, basicModelEditor, astahProToolSupport, imageCaptureSupport));
             providers.add(new SequenceDiagramTool(projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new CombinedFragmentTool(basicModelEditor, projectAccessor, transactionSupport, astahProToolSupport));
             providers.add(new GateTool(projectAccessor, transactionSupport, astahProToolSupport));

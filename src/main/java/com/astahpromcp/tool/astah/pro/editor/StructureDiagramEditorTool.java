@@ -94,6 +94,7 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
                 new Point2D.Double(
                         param.locationX(),
                         param.locationY()));
+            Point2D createdAt = nodePresentation.getLocation();
             
             // Use normal notation (e.g., interfaces as rectangles), except for actors on Use Case or Sequence diagrams.
             if (astahElement.hasStereotype("actor")
@@ -105,6 +106,11 @@ public class StructureDiagramEditorTool extends AstahToolProvider {
                 nodePresentation.setProperty(
                     Key.NOTATION_TYPE,
                     Value.NOTATION_TYPE_NORMAL);
+            }
+            
+            // Workaround: switching an icon (such as the lollipop of an interface, or an actor on a class diagram) to normal notation resizes the presentation around the centre of the icon, which moves its top-left corner away from the given point. So put it back where it was created. A presentation whose notation did not change has not moved, and is left alone.
+            if (!nodePresentation.getLocation().equals(createdAt)) {
+                nodePresentation.setLocation(createdAt);
             }
             return nodePresentation;
         });

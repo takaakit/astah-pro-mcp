@@ -40,7 +40,7 @@ public class UMLModelingArchitectureInsightsTool implements ToolProvider {
                 
                 ToolSupport.toolDefinitionReturningDto(
                     "store_uml_modeling_architecture_insights",
-                    "Store insights on UML, modeling, and architecture in a file, and return the absolute path of the stored file.",
+                    "Store insights on UML, modeling, and architecture in a file, and return the absolute path of the stored file. Fails if the file already exists.",
                     this::storeInsights,
                     TextContentsDTO.class,
                     AbsoluteFilePathDTO.class),

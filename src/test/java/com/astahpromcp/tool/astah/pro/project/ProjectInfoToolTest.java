@@ -277,7 +277,8 @@ public class ProjectInfoToolTest {
         
         // Check the error
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("'chunkIndex' is " + info.totalChunks()), exception.getCause().getMessage());
+        assertTrue(exception.getCause().getMessage().contains("'chunkIndex'"), exception.getCause().getMessage());
+        assertTrue(exception.getCause().getMessage().contains(String.valueOf(info.totalChunks())), exception.getCause().getMessage());
     }
     
     @Test
@@ -1039,7 +1040,7 @@ public class ProjectInfoToolTest {
     
     private static void assertListChangedError(Exception exception, String infoToolName) {
         assertInstanceOf(IllegalStateException.class, exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("call '" + infoToolName + "' again"), exception.getCause().getMessage());
+        assertTrue(exception.getCause().getMessage().contains("'" + infoToolName + "'"), exception.getCause().getMessage());
     }
     
     private static void assertUndirectedAssociation(String plantumlCode, String fqn1, String fqn2) {

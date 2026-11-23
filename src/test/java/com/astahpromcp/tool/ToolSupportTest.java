@@ -56,9 +56,12 @@ public class ToolSupportTest {
         
         assertEquals(1, inputEvents.size(), "One call must log its input exactly once");
         assertEquals(Level.DEBUG, inputEvents.get(0).getLevel());
-        // ReflectionToStringBuilder lists the fields by name
-        assertEquals("Tool input of " + toolName + ": ToolSupportTest.TestInputDTO[count=3,id=class-1]",
-                inputEvents.get(0).getFormattedMessage());
+        // The values the line is made of: the tool name, and the input with every field by name
+        Object[] arguments = inputEvents.get(0).getArgumentArray();
+        assertEquals(toolName, arguments[0]);
+        String input = String.valueOf(arguments[1]);
+        assertTrue(input.contains("count=3"), input);
+        assertTrue(input.contains("id=class-1"), input);
     }
     
     private List<ILoggingEvent> eventsAt(Level level) {
@@ -225,7 +228,8 @@ public class ToolSupportTest {
                 new McpSchema.CallToolRequest("test_dto", Map.of(), null));
         
         assertTrue(result.isError());
-        assertEquals("Exception @tool=test_dto: Failed to get class (ID: x) due to an incorrect ID.", errorText(result));
+        assertTrue(errorText(result).contains("test_dto"), errorText(result));
+        assertTrue(errorText(result).contains("Failed to get class (ID: x) due to an incorrect ID."), errorText(result));
         assertRejectedInputLogged(errorText(result));
     }
     
@@ -242,7 +246,8 @@ public class ToolSupportTest {
                 new McpSchema.CallToolRequest("test_contents", Map.of(), null));
         
         assertTrue(result.isError());
-        assertEquals("Exception @tool=test_contents: bad input", errorText(result));
+        assertTrue(errorText(result).contains("test_contents"), errorText(result));
+        assertTrue(errorText(result).contains("bad input"), errorText(result));
         assertRejectedInputLogged(errorText(result));
     }
     
@@ -260,7 +265,8 @@ public class ToolSupportTest {
                 new McpSchema.CallToolRequest("test_dto_and_contents", Map.of(), null));
         
         assertTrue(result.isError());
-        assertEquals("Exception @tool=test_dto_and_contents: broken", errorText(result));
+        assertTrue(errorText(result).contains("test_dto_and_contents"), errorText(result));
+        assertTrue(errorText(result).contains("broken"), errorText(result));
         
         // Anything but an invalid input may be a fault of the server, so it stays ERROR with its stack trace
         assertTrue(eventsAt(Level.WARN).isEmpty());

@@ -15,6 +15,7 @@ import com.change_vision.jude.api.inf.model.IFinalState;
 import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.model.ITransition;
+import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -399,5 +400,107 @@ public class StateToolTest {
         
         // Check output DTO
         assertNotNull(outputDTO);
+    }
+    
+    @Test
+    void setEntry_ok_emptyStringRemovesTheEntry() throws Exception {
+        // Create state
+        StateMachineDiagramEditor stateMachineDiagramEditor = projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor();
+        INodePresentation statePresentation = transactionSupport.call(() -> {
+            IStateMachineDiagram diagram = stateMachineDiagramEditor.createStatemachineDiagram(projectAccessor.getProject(), "Entry Fixture");
+            stateMachineDiagramEditor.setDiagram(diagram);
+            return stateMachineDiagramEditor.createState("EntryFixture", null, new Point2D.Double(100, 100));
+        });
+        IState state = (IState) statePresentation.getModel();
+        double heightBefore = statePresentation.getHeight();
+        
+        TestSupport.instance().invokeToolMethodReturningDto(
+            setEntry,
+            tool,
+            new StateWithEntryDTO(state.getId(), "testEntry"),
+            StateDTO.class);
+        
+        // ----------------------------------------
+        // Call setEntry() with an empty string
+        // ----------------------------------------
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setEntry,
+            tool,
+            new StateWithEntryDTO(state.getId(), ""),
+            StateDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        
+        // Check that the state is as tall as before, without the bare "entry" line Astah draws for an empty entry
+        assertEquals(heightBefore, statePresentation.getHeight());
+    }
+    
+    @Test
+    void setDoActivity_ok_emptyStringRemovesTheDoActivity() throws Exception {
+        // Create state
+        StateMachineDiagramEditor stateMachineDiagramEditor = projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor();
+        INodePresentation statePresentation = transactionSupport.call(() -> {
+            IStateMachineDiagram diagram = stateMachineDiagramEditor.createStatemachineDiagram(projectAccessor.getProject(), "DoActivity Fixture");
+            stateMachineDiagramEditor.setDiagram(diagram);
+            return stateMachineDiagramEditor.createState("DoActivityFixture", null, new Point2D.Double(100, 100));
+        });
+        IState state = (IState) statePresentation.getModel();
+        double heightBefore = statePresentation.getHeight();
+        
+        TestSupport.instance().invokeToolMethodReturningDto(
+            setDoActivity,
+            tool,
+            new StateWithDoActivityDTO(state.getId(), "testDoActivity"),
+            StateDTO.class);
+        
+        // ----------------------------------------
+        // Call setDoActivity() with an empty string
+        // ----------------------------------------
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setDoActivity,
+            tool,
+            new StateWithDoActivityDTO(state.getId(), ""),
+            StateDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        
+        // Check that the state is as tall as before, without the bare "do" line Astah draws for an empty doActivity
+        assertEquals(heightBefore, statePresentation.getHeight());
+    }
+    
+    @Test
+    void setExit_ok_emptyStringRemovesTheExit() throws Exception {
+        // Create state
+        StateMachineDiagramEditor stateMachineDiagramEditor = projectAccessor.getDiagramEditorFactory().getStateMachineDiagramEditor();
+        INodePresentation statePresentation = transactionSupport.call(() -> {
+            IStateMachineDiagram diagram = stateMachineDiagramEditor.createStatemachineDiagram(projectAccessor.getProject(), "Exit Fixture");
+            stateMachineDiagramEditor.setDiagram(diagram);
+            return stateMachineDiagramEditor.createState("ExitFixture", null, new Point2D.Double(100, 100));
+        });
+        IState state = (IState) statePresentation.getModel();
+        double heightBefore = statePresentation.getHeight();
+        
+        TestSupport.instance().invokeToolMethodReturningDto(
+            setExit,
+            tool,
+            new StateWithExitDTO(state.getId(), "testExit"),
+            StateDTO.class);
+        
+        // ----------------------------------------
+        // Call setExit() with an empty string
+        // ----------------------------------------
+        StateDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            setExit,
+            tool,
+            new StateWithExitDTO(state.getId(), ""),
+            StateDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        
+        // Check that the state is as tall as before, without the bare "exit" line Astah draws for an empty exit
+        assertEquals(heightBefore, statePresentation.getHeight());
     }
 }

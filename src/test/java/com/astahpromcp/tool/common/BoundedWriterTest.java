@@ -114,6 +114,29 @@ public class BoundedWriterTest {
         assertTrue(writer.truncated());
     }
     
+    // A character that does not fit can leave room for a shorter one, which must not slip in after the gap
+    @Test
+    void write_ok_dropsALaterWriteThatWouldFitTheRoomLeftBehind() {
+        BoundedWriter writer = new BoundedWriter(4);
+        
+        writer.write("ab");
+        writer.write("界");
+        writer.write("c");
+        
+        assertEquals("ab", writer.toString());
+        assertTrue(writer.truncated());
+        
+        // Taking back half of a pair frees a byte, which leaves room for three
+        BoundedWriter pairWriter = new BoundedWriter(4);
+        
+        pairWriter.write("a" + EMOJI.substring(0, 1));
+        pairWriter.write(EMOJI.substring(1));
+        pairWriter.write("xyz");
+        
+        assertEquals("a", pairWriter.toString());
+        assertTrue(pairWriter.truncated());
+    }
+    
     @Test
     void write_ok_writingNothingIsNotATruncation() {
         BoundedWriter writer = new BoundedWriter(0);

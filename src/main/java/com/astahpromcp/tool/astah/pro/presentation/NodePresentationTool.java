@@ -16,7 +16,10 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Typ
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
+import com.change_vision.jude.api.inf.model.ISequenceDiagram;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Value;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Locale;
 
 // Tools definition for the following Astah API.
 //   https://members.change-vision.com/javadoc/astah-api/latest/api/en/doc/javadoc/com/change_vision/jude/api/inf/presentation/INodePresentation.html
@@ -129,12 +133,22 @@ public class NodePresentationTool extends AstahToolProvider {
             throw new IllegalArgumentException("The width of a node presentation must be greater than 0: " + param.width());
         }
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
-        
+        rejectResizingIconLifeline(astahNodePresentation);
+
+        boolean icon = isDrawnAsIcon(astahNodePresentation);
+        double newWidth = param.width();
+        double newHeight = icon
+            ? astahNodePresentation.getHeight() * newWidth / astahNodePresentation.getWidth()
+            : astahNodePresentation.getHeight();
+
         try {
             txnAstah.run(() -> {
-                astahNodePresentation.setWidth(param.width());
+                astahNodePresentation.setWidth(newWidth);
+                if (icon) {
+                    astahNodePresentation.setHeight(newHeight);
+                }
             });
-            
+
         } catch (InvalidEditingException e) {
             if (Type.COMBINED_FRAGMENT.matches(astahNodePresentation.getType())) {
                 throw new InvalidEditingException(
@@ -144,6 +158,10 @@ public class NodePresentationTool extends AstahToolProvider {
                 throw new InvalidEditingException(
                     e.getKey(),
                     e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            } else if (icon) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + iconSizeRejectedHint(newWidth, newHeight));
             } else {
                 throw new InvalidEditingException(
                     e.getKey(),
@@ -164,12 +182,22 @@ public class NodePresentationTool extends AstahToolProvider {
             throw new IllegalArgumentException("The height of a node presentation must be greater than 0: " + param.height());
         }
         INodePresentation astahNodePresentation = astahProToolSupport.getNodePresentation(param.nodePresentationId());
-        
+        rejectResizingIconLifeline(astahNodePresentation);
+
+        boolean icon = isDrawnAsIcon(astahNodePresentation);
+        double newHeight = param.height();
+        double newWidth = icon
+            ? astahNodePresentation.getWidth() * newHeight / astahNodePresentation.getHeight()
+            : astahNodePresentation.getWidth();
+
         try {
             txnAstah.run(() -> {
-                astahNodePresentation.setHeight(param.height());
+                if (icon) {
+                    astahNodePresentation.setWidth(newWidth);
+                }
+                astahNodePresentation.setHeight(newHeight);
             });
-            
+
         } catch (InvalidEditingException e) {
             if (Type.COMBINED_FRAGMENT.matches(astahNodePresentation.getType())) {
                 throw new InvalidEditingException(
@@ -179,6 +207,10 @@ public class NodePresentationTool extends AstahToolProvider {
                 throw new InvalidEditingException(
                     e.getKey(),
                     e.getMessage() + " If this presentation cannot be moved or resized on this diagram, delete it and create it again at the location and size you want.");
+            } else if (icon) {
+                throw new InvalidEditingException(
+                    e.getKey(),
+                    e.getMessage() + iconSizeRejectedHint(newWidth, newHeight));
             } else {
                 throw new InvalidEditingException(
                     e.getKey(),
@@ -190,7 +222,34 @@ public class NodePresentationTool extends AstahToolProvider {
         RectangleDTO dto = RectangleDTOAssembler.toDTO(rectangle2D);
         
         McpSchema.Content thumbnailContent = imageCaptureSupport.createThumbnailContent(astahNodePresentation.getDiagram().getId());
-        
+
         return Pair.of(dto, List.of(thumbnailContent));
+    }
+
+    // Astah stretches an icon (an actor, the circle of an interface, a robustness icon) to fill whatever rectangle it is given, so an icon is resized by one ratio in both directions to keep its proportions.
+    private static boolean isDrawnAsIcon(INodePresentation nodePresentation) {
+        return Value.NOTATION_TYPE_ICON.equals(nodePresentation.getProperty(Key.NOTATION_TYPE))
+            && nodePresentation.getWidth() > 0
+            && nodePresentation.getHeight() > 0;
+    }
+
+    // Astah fixes the height of a lifeline on a sequence diagram, so an icon lifeline there cannot keep its proportions: a new width would only stretch the icon sideways, and an agent widens it to make room for its name, which is drawn outside the icon anyway.
+    private static void rejectResizingIconLifeline(INodePresentation nodePresentation) {
+        if (Type.LIFELINE.matches(nodePresentation.getType())
+            && nodePresentation.getDiagram() instanceof ISequenceDiagram
+            && isDrawnAsIcon(nodePresentation)) {
+            throw new IllegalArgumentException(String.format(
+                Locale.ROOT,
+                "The lifeline '%s' is drawn as an icon and cannot be resized: Astah fixes the height of a lifeline on a sequence diagram, so a new width would only stretch the icon sideways. Its name is drawn below the icon, outside its rectangle, so the icon does not need to be wider to fit it. Leave its size as it is, and keep the neighboring lifelines far enough apart for the name.",
+                nodePresentation.getLabel()));
+        }
+    }
+
+    private static String iconSizeRejectedHint(double width, double height) {
+        return String.format(
+            Locale.ROOT,
+            " This presentation is drawn as an icon, so its width and height are changed by the same ratio, to %.1f x %.1f, to keep the icon from being distorted. That size may be below the minimum this icon allows. Try a larger size; deleting the presentation does not get around this.",
+            width,
+            height);
     }
 }

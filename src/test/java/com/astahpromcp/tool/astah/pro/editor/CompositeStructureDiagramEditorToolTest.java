@@ -115,7 +115,7 @@ public class CompositeStructureDiagramEditorToolTest {
         IPackage rootPackage = projectAccessor.getProject();
         
         // Check that the diagram does not exist
-        assertNull(TestSupport.instance().getNamedElementByClassAndName(
+        assertEquals(0, TestSupport.instance().countNamedElementsByClassAndName(
             ICompositeStructureDiagram.class,
             "TestCompositeStructureDiagram"));
         

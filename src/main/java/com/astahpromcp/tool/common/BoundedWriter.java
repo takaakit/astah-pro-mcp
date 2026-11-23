@@ -33,8 +33,9 @@ public final class BoundedWriter extends Writer {
     }
     
     // Appends the text up to the first character that does not fit, which is dropped with the rest of the text.
+    // Everything written after that is dropped as well: the room the character left behind could still take a shorter one from a later write, which would then read as if it had come right after the text in front of the gap.
     private synchronized void append(String text) {
-        if (text == null) {
+        if (text == null || truncated) {
             return;
         }
         for (int i = 0; i < text.length(); i++) {

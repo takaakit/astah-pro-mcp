@@ -131,14 +131,25 @@ public class KnowledgeToolSupport {
         }
     }
     
+    // Splits the text into chunks of at most chunkSize UTF-16 chars, never between the two chars of a surrogate pair.
     public static List<String> splitText(String text, int chunkSize) {
+        // A chunk of one char could not hold a pair, and a chunk of none would never get past the start of the text
+        if (chunkSize < 2) {
+            throw new IllegalArgumentException("The chunk size must be at least 2, but was " + chunkSize + ".");
+        }
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
         
         List<String> chunks = new ArrayList<>();
-        for (int i = 0; i < text.length(); i += chunkSize) {
-            chunks.add(text.substring(i, Math.min(text.length(), i + chunkSize)));
+        int start = 0;
+        while (start < text.length()) {
+            int end = Math.min(text.length(), start + chunkSize);
+            if (splitsSurrogatePair(text, end)) {
+                end--;
+            }
+            chunks.add(text.substring(start, end));
+            start = end;
         }
         
         return chunks;
@@ -167,7 +178,17 @@ public class KnowledgeToolSupport {
             return overlap;
         }
         
-        return overlap.substring(overlap.length() - CHUNK_OVERLAP_MAX_CHARS);
+        // A cap that falls inside a surrogate pair starts the prefix after the pair rather than before it, so the prefix stays within the cap
+        int start = overlap.length() - CHUNK_OVERLAP_MAX_CHARS;
+        if (splitsSurrogatePair(overlap, start)) {
+            start++;
+        }
+        return overlap.substring(start);
+    }
+    
+    // Whether cutting the text in front of the char at index would separate the two chars of a surrogate pair
+    private static boolean splitsSurrogatePair(String text, int index) {
+        return index > 0 && index < text.length() && Character.isSurrogatePair(text.charAt(index - 1), text.charAt(index));
     }
     
     // Returns the last `lineCount` lines of the text

@@ -7,22 +7,20 @@ A local MCP server plugin for Astah Professional, a UML modeling tool, that enab
 - Generate source code from UML models, and vice versa.
 - Create UML diagrams from hand-drawn sketches.
 
-This plugin experimentally implements a programmatic tool calling mode, inspired by the **"Programmatic Tool Calling"** idea described in [this Anthropic article](https://www.anthropic.com/engineering/advanced-tool-use).
-
 ## Demo
 
-Topic: **ATM system**  
-Setup: Astah Pro **v12.0** / Astah Pro MCP **v0.3.3**
+Topic: **Vending machine**  
+Setup: Astah Pro **v12.0** / Astah Pro MCP **v0.3.7**
 
 Prompts:
-- **I.** *Design a simple ATM system and draw a class diagram in Astah to illustrate its structure. The system should support customer authentication, balance inquiry, cash withdrawal, and funds transfer.*
-- **II.** *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of withdrawing cash.*
-- **III.** *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of transferring funds between accounts.*
-- **IV.** *Based on the contents of the Astah model, draw a state machine diagram to illustrate the state transitions of an ATM session.*
+- **I.** *Design a simple beverage vending machine system and draw a class diagram in Astah to illustrate its structure. The system should support cash purchases by customers, product restocking by operators, and inventory management.*
+- **II.** *Based on the contents of the Astah model, draw a sequence diagram to illustrate the behavior of purchasing a beverage with cash.*
+- **III.** *Based on the contents of the Astah model, draw an activity diagram to illustrate the behavior of restocking beverages in the vending machine.*
+- **IV.** *Based on the contents of the Astah model, draw a state machine diagram to illustrate the state transitions of the vending machine during operation.*
 
 ### Claude Code
 
-**Opus 5.5 (medium)** / Total time: approx. **13 min**
+**Opus 5.5 (high effort)** / Total time: **17.6 min**
 
 <table width="100%">
   <tr>
@@ -32,16 +30,16 @@ Prompts:
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/claude-code/ATM%20System.png"><img src="demo/claude-code/ATM%20System.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/Withdraw%20Cash.png"><img src="demo/claude-code/Withdraw%20Cash.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/Transfer%20Funds.png"><img src="demo/claude-code/Transfer%20Funds.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/claude-code/Session%20States.png"><img src="demo/claude-code/Session%20States.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/VendingMachine%20Class%20Diagram.png"><img src="demo/claude-code/VendingMachine%20Class%20Diagram.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/Purchase%20Beverage%20With%20Cash.png"><img src="demo/claude-code/Purchase%20Beverage%20With%20Cash.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/Restock%20Beverages.png"><img src="demo/claude-code/Restock%20Beverages.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/claude-code/VendingMachine%20State%20Machine.png"><img src="demo/claude-code/VendingMachine%20State%20Machine.png" width="100%"></a></td>
   </tr>
 </table>
 
 ### Antigravity CLI
 
-**Gemini 4 Argon (medium)** / Total time: approx. **114 min**
+**Gemini 4 Neon (high effort)** / Total time: **31.2 min**
 
 <table width="100%">
   <tr>
@@ -51,16 +49,16 @@ Prompts:
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/antigravity-cli/ATM%20System%20Class%20Diagram.png"><img src="demo/antigravity-cli/ATM%20System%20Class%20Diagram.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/antigravity-cli/Cash%20Withdrawal%20Sequence%20Diagram.png"><img src="demo/antigravity-cli/Cash%20Withdrawal%20Sequence%20Diagram.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/antigravity-cli/Funds%20Transfer%20Activity%20Diagram.png"><img src="demo/antigravity-cli/Funds%20Transfer%20Activity%20Diagram.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/antigravity-cli/ATM%20Session%20State%20Machine%20Diagram.png"><img src="demo/antigravity-cli/ATM%20Session%20State%20Machine%20Diagram.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/VendingMachineStructure.png"><img src="demo/antigravity-cli/VendingMachineStructure.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/CashBeveragePurchase.png"><img src="demo/antigravity-cli/CashBeveragePurchase.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/RestockBeverages.png"><img src="demo/antigravity-cli/RestockBeverages.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/VendingMachineStateMachine.png"><img src="demo/antigravity-cli/VendingMachineStateMachine.png" width="100%"></a></td>
   </tr>
 </table>
 
 ### Codex CLI
 
-**GPT 6 Astra (medium)** / Total time: approx. **19 min**
+**GPT 6 Astra (high effort)** / Total time: **12.2 min**
 
 <table width="100%">
   <tr>
@@ -70,31 +68,16 @@ Prompts:
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/codex-cli/ATM%20System%20-%20Class%20Diagram.png"><img src="demo/codex-cli/ATM%20System%20-%20Class%20Diagram.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/codex-cli/Cash%20Withdrawal.png"><img src="demo/codex-cli/Cash%20Withdrawal.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/codex-cli/Funds%20Transfer.png"><img src="demo/codex-cli/Funds%20Transfer.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/codex-cli/ATM%20Session%20Lifecycle.png"><img src="demo/codex-cli/ATM%20Session%20Lifecycle.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/01%20-%20Vending%20Machine%20Structure.png"><img src="demo/codex-cli/01%20-%20Vending%20Machine%20Structure.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/02%20-%20Cash%20Purchase.png"><img src="demo/codex-cli/02%20-%20Cash%20Purchase.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/03%20-%20Beverage%20Restocking.png"><img src="demo/codex-cli/03%20-%20Beverage%20Restocking.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/codex-cli/04%20-%20Vending%20Machine%20Operation.png"><img src="demo/codex-cli/04%20-%20Vending%20Machine%20Operation.png" width="100%"></a></td>
   </tr>
 </table>
 
-### Grok Build
-
-**Grok 4.7 (medium)** / Total time: approx. **83 min**
-
-<table width="100%">
-  <tr>
-    <td width="25%" align="center"><b>I</b></td>
-    <td width="25%" align="center"><b>II</b></td>
-    <td width="25%" align="center"><b>III</b></td>
-    <td width="25%" align="center"><b>IV</b></td>
-  </tr>
-  <tr>
-    <td width="25%"><a href="demo/grok-build/ATM%20structure.png"><img src="demo/grok-build/ATM%20structure.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Cash%20withdrawal.png"><img src="demo/grok-build/Cash%20withdrawal.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/Transfer%20funds.png"><img src="demo/grok-build/Transfer%20funds.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/grok-build/ATM%20session.png"><img src="demo/grok-build/ATM%20session.png" width="100%"></a></td>
-  </tr>
-</table>
+> *Notes (from personal experience):*
+> - With Codex CLI, GPT 6 Astra > GPT 6.2 Astra for UML modeling.
+> - Across all AI agents, it is better to set Effort to High or above.
 
 ## Requirements
 
@@ -105,8 +88,6 @@ Prompts:
   - Claude Code
   - Antigravity CLI
   - Codex CLI
-  - Grok Build
-  - Cursor IDE
   - Antigravity IDE
   - Kiro IDE
 
@@ -147,8 +128,8 @@ This plugin experimentally implements a programmatic tool calling mode (port `88
 
 | Mode | Port | Exposed tools |
 | --- | --- | --- |
-| Programmatic tool calling | `8888` | 70 |
-| Direct tool calling | `18888` | 377 |
+| Programmatic tool calling | `8888` | 75 |
+| Direct tool calling | `18888` | 382 |
 
 <details>
 <summary><b>Claude Code</b></summary>
@@ -196,46 +177,6 @@ Create `.codex/config.toml` under your project directory or your user directory 
 transport = "http"
 url = "http://127.0.0.1:8888/mcp"
 ```
-
-</details>
-
-
-<details>
-<summary><b>Grok Build</b></summary>
-
-Run this command for project scope in your project directory:
-```bash
-grok mcp add --scope project --transport http astah-pro-mcp http://127.0.0.1:8888/mcp
-```
-
-Or run this command for user scope:
-```bash
-grok mcp add --scope user --transport http astah-pro-mcp http://127.0.0.1:8888/mcp
-```
-
-</details>
-
-
-<details>
-<summary><b>Cursor IDE</b></summary>
-
-```json
-{
-  "mcpServers": {
-    "astah-pro-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "http://127.0.0.1:8888/mcp",
-        "--allow-http"
-      ]
-    }
-  }
-}
-```
-
-> Use [mcp-remote](https://github.com/geelen/mcp-remote) to bridge the HTTP connection. [Node.js](https://nodejs.org/) must be installed.
 
 </details>
 

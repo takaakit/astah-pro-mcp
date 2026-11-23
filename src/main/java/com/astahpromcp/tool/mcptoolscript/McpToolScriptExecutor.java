@@ -2,6 +2,7 @@ package com.astahpromcp.tool.mcptoolscript;
 
 import com.astahpromcp.config.McpServerConfig;
 import com.astahpromcp.tool.common.BoundedWriter;
+import com.astahpromcp.tool.common.ScriptErrorOutput;
 import com.astahpromcp.tool.common.ScriptLine;
 import com.astahpromcp.tool.common.StopWhenInterruptedWriter;
 import com.astahpromcp.tool.mcptoolscript.outputdto.ModelChangesKind;
@@ -290,22 +291,20 @@ public class McpToolScriptExecutor {
         
         // Closed before the result is built, so that what closing it had to say is included.
         McpToolScriptHost.Closing closing = scope.close(error == null);
-        for (String note : closing.notes()) {
-            errorOutput.write(note + "\n");
-        }
         if (error == null) {
             error = closing.failure();
         }
         ModelChangesKind modelChanges = closing.modelChanges();
         logOutcome(dispatcher.callCount(), modelChanges, completion.abandonRequested());
         
-        appendTruncationNotes(output, errorOutput);
+        String errorText = ScriptErrorOutput.of(
+            output, errorOutput, McpServerConfig.MCP_TOOL_SCRIPT_MAX_STDOUT_BYTES, "mcp tool script", closing.notes());
         
         if (error == null) {
             return Result.success(
                 value == null ? "" : String.valueOf(value),
                 output.toString(),
-                errorOutput.toString(),
+                errorText,
                 modelChanges);
             
         } else if (error instanceof ScriptException exception) {
@@ -315,7 +314,7 @@ public class McpToolScriptExecutor {
                 exception.getColumnNumber(),
                 -1,
                 output.toString(),
-                errorOutput.toString(),
+                errorText,
                 modelChanges);
             
         } else {
@@ -328,7 +327,7 @@ public class McpToolScriptExecutor {
                 -1,
                 dispatcher.firstFailureCallIndex(),
                 output.toString(),
-                errorOutput.toString(),
+                errorText,
                 modelChanges);
         }
     }
@@ -379,14 +378,6 @@ public class McpToolScriptExecutor {
         }
         
         return message;
-    }
-    
-    private static void appendTruncationNotes(BoundedWriter output, BoundedWriter errorOutput) {
-        if (output.truncated()) {
-            errorOutput.write(String.format(
-                "Output was truncated at %d bytes; print less from the mcp tool script.%n",
-                McpServerConfig.MCP_TOOL_SCRIPT_MAX_STDOUT_BYTES));
-        }
     }
     
     private ScriptEngine createEngine() {

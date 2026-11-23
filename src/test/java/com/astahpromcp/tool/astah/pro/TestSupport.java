@@ -128,6 +128,29 @@ public class TestSupport {
         }
     }
     
+    public int countNamedElementsByClassAndName(Class<? extends INamedElement> clazz, String name) throws Exception {
+        return projectAccessor.findElements(clazz, name).length;
+    }
+    
+    public int countNamedElementsById(String id) throws Exception {
+        return projectAccessor.findElements(new ModelFinder() {
+            @Override
+            public boolean isTarget(INamedElement element) {
+                return element.getId().equals(id);
+            }
+        }).length;
+    }
+    
+    public static int countPresentationsById(IDiagram diagram, String id) throws Exception {
+        int count = 0;
+        for (IPresentation presentation : diagram.getPresentations()) {
+            if (presentation.getID().equals(id)) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
     @SuppressWarnings("unchecked")
     public <T> T invokeToolMethodReturningDto(Method method, Object tool, Object inputDTO, Class<T> resultType) throws Exception {
         return (T) method.invoke(

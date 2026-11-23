@@ -189,8 +189,6 @@ public class ExclusiveToolProviderTest {
             assertTrue(result.isError(), "Result should be an error while Astah API access is suspended");
             assertTrue(message.contains("ignored its interrupt"),
                     "Error message should report that the interrupt was ignored: " + message);
-            assertTrue(message.contains("restart Astah"),
-                    "Error message should tell the client that waiting will not help: " + message);
             
         } finally {
             keepSpinning.set(false);

@@ -40,7 +40,7 @@ public class ArchitecturalDesignSmellsTool implements ToolProvider {
                 
                 ToolSupport.toolDefinitionReturningDto(
                     "store_architectural_design_smells",
-                    "Store architectural smells and design smells that should be avoided in a file, and return the absolute path of the stored file.",
+                    "Store architectural smells and design smells that should be avoided in a file, and return the absolute path of the stored file. Fails if the file already exists.",
                     this::storeSmells,
                     TextContentsDTO.class,
                     AbsoluteFilePathDTO.class),

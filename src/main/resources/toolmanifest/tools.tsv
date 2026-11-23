@@ -30,6 +30,8 @@ Common                       	add_stereotype                                    
 Common                       	add_url_hyperlink_to_named_elem                    	x	s
 Common                       	add_url_hyperlink_to_node_prst                     	x	s
 Common                       	architectural_design_smells                        	x	x	direct
+Common                       	architecture_scenario_development_steps            	x	x	direct
+Common                       	architecture_scenario_evaluation_steps             	x	x	direct
 Common                       	astah_api_script_guide                             	x	x	no_structured_content
 Common                       	astah_pro_mcp_guide                                	x	x	direct
 Common                       	bring_prsts_to_front                               	x	x	view
@@ -146,6 +148,7 @@ Common                       	overlay_svg_img_on_dgm_img                        
 Common                       	preliminary_layout_steps                           	x	x	no_structured_content
 Common                       	proj_diff_guide                                    	x	x	direct
 Common                       	read_architectural_design_smells                   	x	x	direct
+Common                       	read_architecture_scenarios                        	x	x	direct
 Common                       	read_uml_modeling_architecture_insights            	x	x	direct
 Common                       	remove_all_file_path_hyperlinks_from_named_elem    	x	s
 Common                       	remove_all_file_path_hyperlinks_from_node_prst     	x	s
@@ -157,6 +160,7 @@ Common                       	remove_stereotype                                 
 Common                       	retrieve_classifiers_that_ref_or_be_refed_by       	x	s
 Common                       	retrieve_classifiers_within_pkg                    	x	s
 Common                       	retrieve_pkg_structure_as_puml                     	x	x	direct
+Common                       	retrieve_relationship_matrix                       	x	x	no_structured_content
 Common                       	retrieve_relationships_as_puml                     	x	x	direct
 Common                       	run_astah_api_script                               	x	x	astah_api_script
 Common                       	run_mcp_tool_script                                	-	x	direct
@@ -167,6 +171,7 @@ Common                       	search_within_prsts                               
 Common                       	select_all_prsts                                   	x	x	view
 Common                       	select_prsts                                       	x	x	view
 Common                       	send_prsts_to_back                                 	x	x	view
+Common                       	set_aside_architecture_scenario_dir                	x	x	direct
 Common                       	set_label                                          	x	s
 Common                       	set_line_style_of_link_prst                        	x	s
 Common                       	set_node_prst_height                               	x	s

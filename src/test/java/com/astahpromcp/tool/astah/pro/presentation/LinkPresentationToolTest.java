@@ -1,5 +1,6 @@
 package com.astahpromcp.tool.astah.pro.presentation;
 
+import com.astahpromcp.tool.JsonSupport;
 import com.astahpromcp.tool.astah.pro.AstahProToolSupport;
 import com.astahpromcp.tool.astah.pro.TestSupport;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
@@ -244,34 +245,18 @@ public class LinkPresentationToolTest {
         PointIntDTO startPoint = new PointIntDTO((int)points[0].getX(), (int)points[0].getY());
         PointIntDTO endPoint = new PointIntDTO((int)points[points.length - 1].getX(), (int)points[points.length - 1].getY());
         
-        // Create input DTO
-        LinkPresentationWithPointsDTO inputDTO = new LinkPresentationWithPointsDTO(
-            linkPresentation.getID(),
-            List.of(
-                startPoint,
-                new PointIntDTO(10, 20),
-                new PointIntDTO(30, 40),
-                new PointIntDTO(50, 60),
-                endPoint
-            ));
-        
         // Check points before setting
         assertNotEquals(5, linkPresentation.getPoints().length);
         
-        // ----------------------------------------
-        // Call setAllPoints()
-        // ----------------------------------------
-        LinkPresentationDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
-            setAllPoints,
-            tool,
-            inputDTO,
-            LinkPresentationDTO.class);
+        // Under a right-angle line style Astah moves the points next to the ends into line with them, so the points are set on a straight line, where Astah keeps every point as given
+        transactionSupport.run(() -> linkPresentation.setProperty(Key.LINE_SHAPE, LineStyleKind.LINE.astahValue));
         
-        // Check output DTO
-        assertNotNull(outputDTO);
-        
-        // Check points after setting
-        assertEquals(5, linkPresentation.getPoints().length);
+        setPoints(linkPresentation,
+            startPoint,
+            new PointIntDTO(10, 20),
+            new PointIntDTO(30, 40),
+            new PointIntDTO(50, 60),
+            endPoint);
     }
     
     @Test
@@ -421,7 +406,12 @@ public class LinkPresentationToolTest {
         
         // Check it was rejected with the line styles that can be set
         String message = rootCauseMessageOf(thrown);
-        assertTrue(message.contains("Specify one of line, line_right_angle, curve or curve_right_angle."), message);
+        for (LineStyleKind kind : LineStyleKind.values()) {
+            if (kind == LineStyleKind.UNKNOWN) {
+                continue;
+            }
+            assertTrue(message.contains(JsonSupport.OBJ_MAPPER.convertValue(kind, String.class)), message);
+        }
         
         // Check link presentation was left as it was
         assertEquals(LineStyleKind.LINE.astahValue, linkPresentation.getProperty(Key.LINE_SHAPE));
@@ -594,6 +584,16 @@ public class LinkPresentationToolTest {
             matches(points, stored, false) || matches(points, stored, true),
             "The stored points follow neither the given order nor its reverse."
                 + " given=" + List.of(points) + " stored=" + Arrays.toString(stored));
+        assertDrawnPointsAre(stored, outputDTO);
+    }
+    
+    // The returned link presentation must show the points the link was left with, not the ones it had before the call
+    private static void assertDrawnPointsAre(Point2D[] stored, LinkPresentationDTO outputDTO) {
+        assertEquals(stored.length, outputDTO.drawnPoints().size(), "drawnPoints=" + outputDTO.drawnPoints());
+        for (int i = 0; i < stored.length; i++) {
+            assertEquals(stored[i].getX(), outputDTO.drawnPoints().get(i).x(), 0.0, "x of point " + i);
+            assertEquals(stored[i].getY(), outputDTO.drawnPoints().get(i).y(), 0.0, "y of point " + i);
+        }
     }
     
     private static boolean matches(PointIntDTO[] given, Point2D[] stored, boolean reversed) {
@@ -700,7 +700,7 @@ public class LinkPresentationToolTest {
         PointIntDTO right = new PointIntDTO((int) (rectangle.getX() + rectangle.getWidth() * 0.7), insideY);
         int aboveY = (int) rectangle.getY() - 30;
         
-        // Astah works the ends of a self loop out for itself and moves them along the rectangle, so what it stores is checked against the rectangle rather than against the exact points given.
+        // Astah works the ends of a self loop out for itself and moves them along the rectangle, so the stored ends are checked against the rectangle, and only the points between them against the exact points given.
         setSelfLoopPoints(selfLink, rectangle,
             left, new PointIntDTO(left.x(), aboveY), new PointIntDTO(right.x(), aboveY), right);
         setSelfLoopPoints(selfLink, rectangle,
@@ -720,6 +720,14 @@ public class LinkPresentationToolTest {
         assertEquals(points.length, stored.length);
         assertTrue(rectangle.contains(stored[0]), "The first point is outside the rectangle: " + stored[0]);
         assertTrue(rectangle.contains(stored[stored.length - 1]), "The last point is outside the rectangle: " + stored[stored.length - 1]);
+        
+        // When Astah slides an end along the rectangle, the point next to it slides with it, so only the height of the loop is kept as given.
+        // The calls give their loops different heights, so a point left from an earlier call is noticed here.
+        for (int i = 1; i < stored.length - 1; i++) {
+            assertEquals(points[i].y(), stored[i].getY(), 0.5,
+                "The loop is not at the height given. given=" + List.of(points) + " stored=" + Arrays.toString(stored));
+        }
+        assertDrawnPointsAre(stored, outputDTO);
     }
     
     @Test

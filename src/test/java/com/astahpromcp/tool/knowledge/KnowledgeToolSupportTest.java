@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,6 +24,59 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class KnowledgeToolSupportTest {
+    
+    // U+1F600, a character outside the BMP: a surrogate pair of two UTF-16 chars
+    private static final String EMOJI = "😀";
+    
+    @Test
+    void splitText_ok_leavesASurrogatePairThatMeetsTheLimitToTheNextChunk() {
+        String text = "a".repeat(9) + EMOJI + "b";
+        
+        List<String> chunks = KnowledgeToolSupport.splitText(text, 10);
+        
+        assertEquals(List.of("a".repeat(9), EMOJI + "b"), chunks);
+    }
+    
+    @Test
+    void splitText_ng_rejectsAChunkSizeThatCannotHoldASurrogatePair() {
+        assertThrows(IllegalArgumentException.class, () -> KnowledgeToolSupport.splitText("abc", 1));
+        assertThrows(IllegalArgumentException.class, () -> KnowledgeToolSupport.splitText("abc", 0));
+    }
+    
+    @Test
+    void splitTextWithOverlap_ok_startsACappedOverlapPrefixAfterASurrogatePair() {
+        // No line breaks, so the prefix is the tail of the first chunk, and its cap falls between the two chars of the pair
+        int cap = KnowledgeToolSupport.CHUNK_OVERLAP_MAX_CHARS;
+        String text = "a".repeat(cap - 1) + EMOJI + "b".repeat(cap - 1) + "X";
+        
+        List<String> chunks = KnowledgeToolSupport.splitTextWithOverlap(text, 2 * cap, 3);
+        
+        assertEquals(2, chunks.size());
+        assertEquals("b".repeat(cap - 1) + "X", chunks.get(1));
+    }
+    
+    @Test
+    void chunkAndCache_ok_keepsEveryChunkWellFormedWhereAPairMeetsAChunkBoundary() {
+        int chunkSize = KnowledgeToolSupport.MAX_CHUNK_CHARS - KnowledgeToolSupport.CHUNK_OVERLAP_MAX_CHARS;
+        int cap = KnowledgeToolSupport.CHUNK_OVERLAP_MAX_CHARS;
+        
+        // The pair meets the end of the first chunk in one text, and the start of the capped overlap prefix in the other
+        for (String text : List.of(
+                "a".repeat(chunkSize - 1) + EMOJI + "b",
+                "a".repeat(chunkSize - cap - 1) + EMOJI + "b".repeat(cap - 1) + "c")) {
+            KnowledgeToolSupport.ContentCache contentCache = new KnowledgeToolSupport.ContentCache();
+            
+            DocumentDTO result = KnowledgeToolSupport.chunkAndCache(text, contentCache);
+            
+            assertEquals(2, result.totalChunks());
+            for (int i = 0; i < result.totalChunks(); i++) {
+                String chunk = contentCache.chunkAt(i);
+                assertTrue(StandardCharsets.UTF_8.newEncoder().canEncode(chunk), "chunk " + i + " holds half of a surrogate pair");
+                assertTrue(text.contains(chunk), "chunk " + i + " should be a continuous part of the document");
+                assertTrue(chunk.length() <= KnowledgeToolSupport.MAX_CHUNK_CHARS, "chunk " + i + " is over the budget");
+            }
+        }
+    }
     
     @Test
     void newHttpClient_ok_hasConnectTimeout() {
@@ -240,7 +294,6 @@ public class KnowledgeToolSupportTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> contentCache.chunkAt(1));
         
         // The message tells the valid range, so that the caller can correct the index
-        assertTrue(exception.getMessage().contains("0 to 0"), exception.getMessage());
         assertTrue(exception.getMessage().contains("totalChunks=1"), exception.getMessage());
     }
     

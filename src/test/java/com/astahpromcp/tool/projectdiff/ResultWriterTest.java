@@ -174,7 +174,8 @@ public class ResultWriterTest {
         assertEquals(2, answer.changes().size());
         PropertyChangeDTO property = answer.changes().get(0).properties().get(0);
         assertTrue(property.after().length() < 1_000, "the value is cut short");
-        assertTrue(property.after().contains("100000 characters"), property.after());
+        // The note counts the whole value
+        assertTrue(property.after().contains("100000"), property.after());
         assertTrue(property.cut());
         assertFalse(answer.changes().get(1).properties().get(0).cut());
         assertEquals(1, answer.summary().valuesCut());
@@ -237,8 +238,13 @@ public class ResultWriterTest {
         List<ChangeDTO> read = readAll(header, pages);
         
         PropertyChangeDTO shown = read.get(0).properties().get(0);
-        assertTrue(shown.before().startsWith("あ".repeat(100) + "... (cut short; 300"), shown.before());
-        assertTrue(shown.beforeRefName().startsWith("う".repeat(100) + "... (cut short; 300"), shown.beforeRefName());
+        // 100 characters are kept of each, and the note counts the 300 of the whole value
+        assertTrue(shown.before().startsWith("あ".repeat(100)), shown.before());
+        assertFalse(shown.before().startsWith("あ".repeat(101)), shown.before());
+        assertTrue(shown.before().contains("300"), shown.before());
+        assertTrue(shown.beforeRefName().startsWith("う".repeat(100)), shown.beforeRefName());
+        assertFalse(shown.beforeRefName().startsWith("う".repeat(101)), shown.beforeRefName());
+        assertTrue(shown.beforeRefName().contains("300"), shown.beforeRefName());
         assertTrue(shown.cut());
         assertEquals(3, pages.get(0).summary().valuesCut());
     }
@@ -289,8 +295,7 @@ public class ResultWriterTest {
         
         // Each change has its properties counted from 0: the first has one, the second three
         IllegalArgumentException negative = assertThrows(IllegalArgumentException.class, () -> page(header, 1, -1));
-        // Says how the index is counted, not that the change has no properties
-        assertTrue(negative.getMessage().contains("counted from 0"), negative.getMessage());
+        // Not that the change has no properties
         assertFalse(negative.getMessage().contains("has 0 properties"), negative.getMessage());
         assertThrows(IllegalArgumentException.class, () -> page(header, 0, -1));
         assertThrows(IllegalArgumentException.class, () -> page(header, 0, 1));

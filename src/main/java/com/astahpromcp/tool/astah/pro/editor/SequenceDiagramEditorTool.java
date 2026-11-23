@@ -14,9 +14,12 @@ import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.PresentationDTO.Type;
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.assembler.NodePresentationDTOAssembler;
 import com.astahpromcp.tool.astah.pro.TransactionSupport;
+import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.model.ICombinedFragment;
+import com.change_vision.jude.api.inf.model.IConstraint;
+import com.change_vision.jude.api.inf.model.IInteractionOperand;
 import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.model.IMessage;
 import com.change_vision.jude.api.inf.model.INamedElement;
@@ -41,13 +44,15 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
     private final ProjectAccessor projectAccessor;
     private final TransactionSupport txnAstah;
     private final SequenceDiagramEditor sequenceDiagramEditor;
+    private final BasicModelEditor basicModelEditor;
     private final AstahProToolSupport astahProToolSupport;
     private final ImageCaptureSupport imageCaptureSupport;
     
-    public SequenceDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, SequenceDiagramEditor sequenceDiagramEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
+    public SequenceDiagramEditorTool(ProjectAccessor projectAccessor, TransactionSupport transactionSupport, SequenceDiagramEditor sequenceDiagramEditor, BasicModelEditor basicModelEditor, AstahProToolSupport astahProToolSupport, ImageCaptureSupport imageCaptureSupport) {
         this.projectAccessor = projectAccessor;
         this.txnAstah = transactionSupport;
         this.sequenceDiagramEditor = sequenceDiagramEditor;
+        this.basicModelEditor = basicModelEditor;
         this.astahProToolSupport = astahProToolSupport;
         this.imageCaptureSupport = imageCaptureSupport;
     }
@@ -64,7 +69,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDtoAndContents(
                 "create_combined_fragment",
-                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created node presentation of the combined fragment along with the updated diagram image in low resolution. Set the name to an empty string when the combined fragment has no name.",
+                "Create a new combined fragment on the specified sequence diagram (specified by ID), and return the newly created node presentation of the combined fragment along with the updated diagram image in low resolution. The combined fragment is created with one operand, which has no guard. Set the name to an empty string when the combined fragment has no name.",
                 this::createCombinedFragment,
                 NewCombinedFragmentDTO.class,
                 NodePresentationDTO.class),
@@ -152,7 +157,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
         sequenceDiagramEditor.setDiagram(astahSequenceDiagram);
         
         INodePresentation combinedFragment = txnAstah.call(() -> {
-            return sequenceDiagramEditor.createCombinedFragment(
+            INodePresentation created = sequenceDiagramEditor.createCombinedFragment(
                 param.newCombinedFragmentName(),
                 param.combinedFragmentKind().astahValue,
                 new Point2D.Double(
@@ -160,6 +165,14 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
                         param.locationY()),
                 param.width(),
                 param.height());
+            
+            // Workaround: Astah gives the operand of a new combined fragment a default guard constraint, drawn as "[Guard]".
+            for (IInteractionOperand operand : ((ICombinedFragment) created.getModel()).getInteractionOperands()) {
+                for (IConstraint constraint : operand.getConstraints()) {
+                    basicModelEditor.delete(constraint);
+                }
+            }
+            return created;
         });
         
         NodePresentationDTO dto = NodePresentationDTOAssembler.toDTO(combinedFragment);
@@ -350,7 +363,7 @@ public class SequenceDiagramEditorTool extends AstahToolProvider {
             }
             throw new InvalidEditingException(
                 e.getKey(),
-                String.format("Astah cannot create a return message to message '%s', because the combined fragment %s covers lifeline '%s', which the return message goes back to (%s). Create return messages before creating the combined fragments on their lifelines.",
+                String.format("Astah cannot create a return message to message '%s', because the combined fragment %s covers lifeline '%s', which the return message goes back to (%s). Show what the message returns as its return value instead, with set_return_val_of_msg.",
                     astahTargetMessage.getName(),
                     covering.getName().isEmpty() ? "(unnamed, ID: " + covering.getId() + ")" : "'" + covering.getName() + "'",
                     astahTargetMessage.getSource().getName(),

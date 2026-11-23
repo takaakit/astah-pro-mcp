@@ -183,7 +183,7 @@ public class ElementToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("already has the stereotype 'singleton'"));
-        assertTrue(exception.getCause().getMessage().contains("It matches 'Singleton'"));
+        assertTrue(exception.getCause().getMessage().contains("'Singleton'"));
         
         // Check that nothing is added
         assertArrayEquals(stereotypesBefore, clazz.getStereotypes());
@@ -340,7 +340,7 @@ public class ElementToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("has no stereotype 'nonexistent'"));
-        assertTrue(exception.getCause().getMessage().contains("Existing stereotypes: " + Arrays.asList(stereotypesBefore)));
+        assertTrue(exception.getCause().getMessage().contains(Arrays.asList(stereotypesBefore).toString()));
         assertFalse(exception.getCause().getMessage().contains("Did you mean"));
         
         // Check that nothing was removed

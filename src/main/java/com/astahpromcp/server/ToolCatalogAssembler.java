@@ -10,6 +10,7 @@ import com.astahpromcp.tool.log.LogToolFactory;
 import com.astahpromcp.tool.manifest.ToolCatalog;
 import com.astahpromcp.tool.projectdiff.ProjectDiffJobs;
 import com.astahpromcp.tool.projectdiff.ProjectDiffToolFactory;
+import com.astahpromcp.tool.scenario.ArchitectureScenarioToolFactory;
 import com.astahpromcp.tool.visualization.VisualizationToolFactory;
 
 import java.nio.file.Path;
@@ -55,6 +56,7 @@ public final class ToolCatalogAssembler {
         providers.addAll(new ConfigToolFactory().createToolProviders());
         providers.addAll(new InfoToolFactory().createToolProviders());
         providers.addAll(new ProjectDiffToolFactory(projectDiffJobs).createToolProviders());
+        providers.addAll(new ArchitectureScenarioToolFactory(workspaceDir).createToolProviders());
         return providers;
     }
 }

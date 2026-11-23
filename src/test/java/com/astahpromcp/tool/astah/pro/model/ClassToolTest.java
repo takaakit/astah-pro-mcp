@@ -9,9 +9,11 @@ import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithAbstractDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithActiveDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithInvariantDTO;
 import com.astahpromcp.tool.astah.pro.model.inputdto.ClassWithLeafDTO;
+import com.astahpromcp.tool.astah.pro.model.outputdto.AssociationDTO;
 import com.astahpromcp.tool.astah.pro.model.outputdto.ClassDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
+import com.change_vision.jude.api.inf.model.IAssociation;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
 import com.change_vision.jude.api.inf.model.IModel;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -150,7 +153,44 @@ public class ClassToolTest {
         assertEquals(List.of(subClass.getId()), superClassDTO.specializations().stream().map(generalization -> generalization.subType().id()).toList());
         assertTrue(superClassDTO.generalizations().isEmpty());
     }
-    
+
+    // Both ends of a self-association are attributes of the class, yet it is one association
+    @Test
+    void getInfo_ok_listsEachAssociationOnceEvenWhenTheClassIsAtBothEnds() throws Exception {
+        IModel project = projectAccessor.getProject();
+        BasicModelEditor basicModelEditor = projectAccessor.getModelEditorFactory().getBasicModelEditor();
+
+        IClass employee = transactionSupport.call(() -> basicModelEditor.createClass(project, "Employee"));
+        IClass department = transactionSupport.call(() -> basicModelEditor.createClass(project, "Department"));
+        IAssociation manages = transactionSupport.call(() -> basicModelEditor.createAssociation(employee, employee, "manages", "manager", "subordinate"));
+        IAssociation belongsTo = transactionSupport.call(() -> basicModelEditor.createAssociation(employee, department, "belongsTo", "", ""));
+        IAssociation heads = transactionSupport.call(() -> basicModelEditor.createAssociation(employee, department, "heads", "", ""));
+
+        // ----------------------------------------
+        // Call getInfo()
+        // ----------------------------------------
+        ClassDTO employeeDTO = TestSupport.instance().invokeToolMethodReturningDto(
+            getInfo,
+            tool,
+            new IdDTO(employee.getId()),
+            ClassDTO.class);
+
+        // Check output DTO
+        assertEquals(
+            List.of(manages.getId(), belongsTo.getId(), heads.getId()).stream().sorted().toList(),
+            employeeDTO.associations().stream().map(association -> association.namedElement().element().id()).sorted().toList(),
+            "Each association should be listed once, the self-association included");
+
+        // The one entry of the self-association still holds both of its ends
+        AssociationDTO managesDTO = employeeDTO.associations().stream()
+            .filter(association -> association.namedElement().element().id().equals(manages.getId()))
+            .findFirst()
+            .orElseThrow();
+        assertNotEquals(managesDTO.associationEndA().id(), managesDTO.associationEndB().id());
+        assertEquals(employee.getId(), managesDTO.associationEndAOwner().id());
+        assertEquals(employee.getId(), managesDTO.associationEndBOwner().id());
+    }
+
     @Test
     void setAbstract_ok() throws Exception {
         // Get class
@@ -373,7 +413,8 @@ public class ClassToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("already has the invariant 'x > 0'"));
-        assertTrue(exception.getCause().getMessage().contains("Existing invariants: ["));
+        List<String> existingInvariants = Arrays.stream(clazz.getConstraints()).map(IConstraint::getSpecification).toList();
+        assertTrue(exception.getCause().getMessage().contains(existingInvariants.toString()));
         
         // Check that the invariant is not duplicated
         assertEquals(beforeCount, clazz.getConstraints().length);

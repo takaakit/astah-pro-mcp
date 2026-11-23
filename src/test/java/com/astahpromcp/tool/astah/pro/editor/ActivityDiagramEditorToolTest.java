@@ -884,7 +884,7 @@ public class ActivityDiagramEditorToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("The super partition (ID: " + anotherFixture.p1().getID() + ") is not on the target activity diagram 'Partition Fixture'"));
-        assertTrue(exception.getCause().getMessage().contains("but on 'Another Partition Fixture'"));
+        assertTrue(exception.getCause().getMessage().contains("'Another Partition Fixture'"));
         
         // Check that nothing was drawn on either diagram
         assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);
@@ -915,7 +915,7 @@ public class ActivityDiagramEditorToolTest {
         // Check exception
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("The previous partition (ID: " + anotherFixture.p1().getID() + ") is not on the target activity diagram 'Partition Fixture'"));
-        assertTrue(exception.getCause().getMessage().contains("but on 'Another Partition Fixture'"));
+        assertTrue(exception.getCause().getMessage().contains("'Another Partition Fixture'"));
         
         // Check that nothing was drawn on either diagram
         assertEquals(presentationCountBefore, fixture.diagram().getPresentations().length);

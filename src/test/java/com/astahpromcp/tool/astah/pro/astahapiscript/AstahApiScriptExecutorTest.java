@@ -168,6 +168,28 @@ public class AstahApiScriptExecutorTest {
                 "A truncated output must say so: " + result.errorOutput());
     }
     
+    // The error writer of the script context takes the error output of an astah api script, under the same limit as print()
+    @Test
+    void execute_ok_saysWhatHappenedEvenWhenTheScriptFilledItsErrorOutput() {
+        AstahApiScriptExecutor executor = new AstahApiScriptExecutor(projectAccessor, 30);
+        
+        AstahApiScriptExecutor.Result result = executor.execute("""
+                var err = context.getErrorWriter();
+                for (var i = 0; i < 20000; i++) {
+                    err.write('0123456789012345678901234567890123456789\\n');
+                    print('0123456789012345678901234567890123456789');
+                }
+                Java.type('com.change_vision.jude.api.inf.editor.TransactionManager').beginTransaction();
+                'done';
+                """);
+        
+        assertTrue(result.ok(), result.errorMessage());
+        assertTrue(result.errorOutput().contains("A transaction left open by the astah api script was aborted."), result.errorOutput());
+        assertTrue(result.errorOutput().contains("Output was truncated"), result.errorOutput());
+        assertTrue(result.errorOutput().contains("Error output was truncated"), result.errorOutput());
+        assertFalse(TransactionManager.isInTransaction());
+    }
+    
     @Test
     void execute_ng_stopsAPrintLoopOnceItTimesOut() throws Exception {
         AstahApiScriptExecutor executor = new AstahApiScriptExecutor(projectAccessor, 1);

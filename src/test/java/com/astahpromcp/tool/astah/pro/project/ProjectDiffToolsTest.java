@@ -403,7 +403,7 @@ public class ProjectDiffToolsTest {
             assertEquals(Boolean.TRUE, answer.isError());
             String message = answer.content().toString();
             assertTrue(message.contains("Call the project diff guide tool first"), message);
-            assertTrue(message.contains("again with 'isProjectDiffGuideCalled' set to true"), message);
+            assertTrue(message.contains("'isProjectDiffGuideCalled'"), message);
         }
         
         // Nothing was taken in: diffIds are numbered as comparisons are taken in, and the one started next, with the same requestId, is the first

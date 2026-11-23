@@ -61,21 +61,21 @@ public class StateTool extends AstahToolProvider {
             
             ToolSupport.toolDefinitionReturningDto(
                 "set_entry_of_state",
-                "Set the entry of the specified state (specified by ID), and return the model element of the state after it is edited.",
+                "Set the entry of the specified state (specified by ID), and return the model element of the state after it is edited. Specify an empty string to remove the entry.",
                 this::setEntry,
                 StateWithEntryDTO.class,
                 StateDTO.class),
             
             ToolSupport.toolDefinitionReturningDto(
                 "set_do_act_of_state",
-                "Set the doActivity of the specified state (specified by ID), and return the model element of the state after it is edited.",
+                "Set the doActivity of the specified state (specified by ID), and return the model element of the state after it is edited. Specify an empty string to remove the doActivity.",
                 this::setDoActivity,
                 StateWithDoActivityDTO.class,
                 StateDTO.class),
             
             ToolSupport.toolDefinitionReturningDto(
                 "set_exit_of_state",
-                "Set the exit of the specified state (specified by ID), and return the model element of the state after it is edited.",
+                "Set the exit of the specified state (specified by ID), and return the model element of the state after it is edited. Specify an empty string to remove the exit.",
                 this::setExit,
                 StateWithExitDTO.class,
                 StateDTO.class)
@@ -142,7 +142,7 @@ public class StateTool extends AstahToolProvider {
         IState astahState = astahProToolSupport.getState(param.targetStateId());
         
         txnAstah.run(() -> {
-            astahState.setEntry(param.entry());
+            astahState.setEntry(behaviorOrNull(param.entry()));
         });
         
         return StateDTOAssembler.toDTO(astahState);
@@ -152,7 +152,7 @@ public class StateTool extends AstahToolProvider {
         IState astahState = astahProToolSupport.getState(param.targetStateId());
         
         txnAstah.run(() -> {
-            astahState.setDoActivity(param.doActivity());
+            astahState.setDoActivity(behaviorOrNull(param.doActivity()));
         });
         
         return StateDTOAssembler.toDTO(astahState);
@@ -162,9 +162,14 @@ public class StateTool extends AstahToolProvider {
         IState astahState = astahProToolSupport.getState(param.targetStateId());
         
         txnAstah.run(() -> {
-            astahState.setExit(param.exit());
+            astahState.setExit(behaviorOrNull(param.exit()));
         });
         
         return StateDTOAssembler.toDTO(astahState);
+    }
+    
+    // Workaround: Astah still draws an empty entry, do or exit behavior as a bare "entry", "do" or "exit" line in the state, whereas null removes the line. An empty one means removing it, so a blank one is passed on as null.
+    private static String behaviorOrNull(String behavior) {
+        return behavior == null || behavior.isBlank() ? null : behavior.strip();
     }
 }

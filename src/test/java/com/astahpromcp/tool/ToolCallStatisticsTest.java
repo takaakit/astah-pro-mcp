@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.astahpromcp.tool.ToolCallStatistics.Route.DIRECT;
 import static com.astahpromcp.tool.ToolCallStatistics.Route.MCP_TOOL_SCRIPT;
@@ -31,10 +32,21 @@ public class ToolCallStatisticsTest {
         ToolCallStatistics.record(DIRECT, "save_proj", null);
         ToolCallStatistics.record(MCP_TOOL_SCRIPT, "get_proj", OK);
         
-        assertEquals(List.of(
-                "Tool call statistics of direct calls: 5 calls, 1 succeeded, 4 failed, success rate 20.0%, failed tools (calls/failures): open_dgm 2/2, run_mcp_tool_script 2/1, save_proj 1/1",
-                "Tool call statistics of calls from mcp tool scripts: 1 calls, 1 succeeded, 0 failed, success rate 100.0%, failed tools (calls/failures): none"),
-                ToolCallStatistics.summaries());
+        List<String> summaries = ToolCallStatistics.summaries();
+        assertEquals(2, summaries.size(), summaries::toString);
+        
+        // Direct calls: 5 calls, 1 succeeded, 4 failed, 20.0%, then the calls and failures of each failed tool
+        String direct = summaries.get(0);
+        assertEquals(List.of(5, 1, 4, 20, 0, 2, 2, 2, 1, 1, 1), numbersIn(direct), direct);
+        // The failed tools, most failures first
+        assertTrue(direct.contains("open_dgm"), direct);
+        assertTrue(direct.indexOf("open_dgm") < direct.indexOf("run_mcp_tool_script"), direct);
+        assertTrue(direct.indexOf("run_mcp_tool_script") < direct.indexOf("save_proj"), direct);
+        
+        // Calls from mcp tool scripts: 1 call, 1 succeeded, 0 failed, 100.0%, and no failed tool
+        String fromScripts = summaries.get(1);
+        assertEquals(List.of(1, 1, 0, 100, 0), numbersIn(fromScripts), fromScripts);
+        assertFalse(fromScripts.contains("get_proj"), fromScripts);
     }
     
     @Test
@@ -43,9 +55,18 @@ public class ToolCallStatisticsTest {
         
         ToolCallStatistics.logAndReset();
         
-        assertEquals(List.of(
-                "Tool call statistics of direct calls: 0 calls, 0 succeeded, 0 failed, success rate n/a, failed tools (calls/failures): none",
-                "Tool call statistics of calls from mcp tool scripts: 0 calls, 0 succeeded, 0 failed, success rate n/a, failed tools (calls/failures): none"),
-                ToolCallStatistics.summaries());
+        // Every route has 0 calls, 0 succeeded and 0 failed, no success rate and no failed tool
+        List<String> summaries = ToolCallStatistics.summaries();
+        assertEquals(2, summaries.size(), summaries::toString);
+        for (String summary : summaries) {
+            assertEquals(List.of(0, 0, 0), numbersIn(summary), summary);
+            assertFalse(summary.contains("get_proj"), summary);
+        }
+    }
+    
+    private static List<Integer> numbersIn(String text) {
+        return Pattern.compile("\\d+").matcher(text).results()
+                .map(match -> Integer.parseInt(match.group()))
+                .toList();
     }
 }

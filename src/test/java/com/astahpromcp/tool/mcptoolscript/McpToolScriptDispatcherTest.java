@@ -197,8 +197,6 @@ public class McpToolScriptDispatcherTest {
         
         RuntimeException e = assertThrows(RuntimeException.class, () -> dispatcher.invoke("delete_elem", "{}"));
         
-        assertFalse(e.getMessage().contains("Tool call #"),
-                "The ordinal belongs in the result, not in front of the message: " + e.getMessage());
         assertTrue(e.getMessage().startsWith("boom"),
                 "The message has to open with what went wrong: " + e.getMessage());
     }

@@ -12,10 +12,17 @@ import com.astahpromcp.tool.astah.pro.presentation.inputdto.NodePresentationWith
 import com.astahpromcp.tool.astah.pro.presentation.outputdto.NodePresentationDTO;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.SequenceDiagramEditor;
+import com.change_vision.jude.api.inf.editor.UseCaseDiagramEditor;
+import com.change_vision.jude.api.inf.editor.UseCaseModelEditor;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
+import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.ILifeline;
 import com.change_vision.jude.api.inf.model.ISequenceDiagram;
+import com.change_vision.jude.api.inf.model.IUseCaseDiagram;
 import com.change_vision.jude.api.inf.presentation.INodePresentation;
 import com.change_vision.jude.api.inf.presentation.IPresentation;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Key;
+import com.change_vision.jude.api.inf.presentation.PresentationPropertyConstants.Value;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.AfterEach;
@@ -294,18 +301,9 @@ public class NodePresentationToolTest {
     }
     
     @Test
-    void setNodePresentationWidth_ng_otherPresentationKeepsGeneralHint() throws Exception {
-        // A frame cannot be resized through the Astah API either, but it is not a combined fragment
-        SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
-        ISequenceDiagram diagram = transactionSupport.call(() ->
-            sequenceDiagramEditor.createSequenceDiagram(projectAccessor.getProject(), "FrameTarget"));
-        INodePresentation frame = null;
-        for (IPresentation presentation : diagram.getPresentations()) {
-            if ("Frame".equals(presentation.getType())) {
-                frame = (INodePresentation) presentation;
-            }
-        }
-        assertNotNull(frame);
+    void setNodePresentationLocation_ng_otherPresentationKeepsGeneralHint() throws Exception {
+        // A frame cannot be moved through the Astah API either, but it is not a combined fragment
+        INodePresentation frame = createFrameOnSequenceDiagram();
         
         // ----------------------------------------
         // Call setNodePresentationLocation()
@@ -323,6 +321,241 @@ public class NodePresentationToolTest {
         assertInstanceOf(InvalidEditingException.class, exception.getCause());
         assertTrue(exception.getCause().getMessage().contains("delete it and create it again"));
         assertFalse(exception.getCause().getMessage().contains("set_height_of_interaction_operand"));
+    }
+    
+    @Test
+    void setNodePresentationWidthHeight_ng_unsupportedElement() throws Exception {
+        // A frame cannot be resized through the Astah API either, but it is not a combined fragment
+        INodePresentation frame = createFrameOnSequenceDiagram();
+        Rectangle2D rectangleBefore = frame.getRectangle();
+        
+        String id = frame.getID();
+        Object[][] calls = {
+            { setNodePresentationWidth, new NodePresentationWithWidthDTO(id, (int) rectangleBefore.getWidth() + 100) },
+            { setNodePresentationHeight, new NodePresentationWithHeightDTO(id, (int) rectangleBefore.getHeight() + 100) }
+        };
+        
+        for (Object[] call : calls) {
+            // ----------------------------------------
+            // Call the tool method
+            // ----------------------------------------
+            Exception exception = assertThrows(Exception.class, () -> {
+                TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                    (Method) call[0],
+                    tool,
+                    call[1],
+                    RectangleDTO.class);
+            });
+            
+            // Check that the exception keeps the key Astah gave
+            InvalidEditingException cause = assertInstanceOf(InvalidEditingException.class, exception.getCause());
+            assertEquals(InvalidEditingException.UNSUPPORTED_ELEMENT_ERROR_KEY, cause.getKey());
+            assertFalse(cause.getMessage().contains("set_height_of_interaction_operand"));
+        }
+        
+        // Check that the frame is left as it was
+        assertEquals(rectangleBefore, frame.getRectangle());
+    }
+    
+    @Test
+    void setNodePresentationWidth_ok_icon() throws Exception {
+        // Get node presentation drawn as an icon
+        INodePresentation nodePresentation = createActorOnUseCaseDiagram();
+        assertEquals(Value.NOTATION_TYPE_ICON, nodePresentation.getProperty(Key.NOTATION_TYPE));
+        double ratio = nodePresentation.getHeight() / nodePresentation.getWidth();
+        int newWidth = (int) Math.round(nodePresentation.getWidth() * 1.5);
+        
+        // Create input DTO
+        NodePresentationWithWidthDTO inputDTO = new NodePresentationWithWidthDTO(
+            nodePresentation.getID(),
+            newWidth);
+        
+        // Check height before setting
+        assertNotEquals(newWidth * ratio, nodePresentation.getHeight(), 0.1);
+        
+        // ----------------------------------------
+        // Call setNodePresentationWidth()
+        // ----------------------------------------
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            setNodePresentationWidth,
+            tool,
+            inputDTO,
+            RectangleDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(newWidth, outputDTO.width(), 0.1);
+        assertEquals(newWidth * ratio, outputDTO.height(), 0.1);
+        
+        // Check that the height follows the width by the same ratio
+        assertEquals(newWidth, nodePresentation.getWidth(), 0.1);
+        assertEquals(newWidth * ratio, nodePresentation.getHeight(), 0.1);
+    }
+    
+    @Test
+    void setNodePresentationHeight_ok_icon() throws Exception {
+        // Get node presentation drawn as an icon
+        INodePresentation nodePresentation = createActorOnUseCaseDiagram();
+        assertEquals(Value.NOTATION_TYPE_ICON, nodePresentation.getProperty(Key.NOTATION_TYPE));
+        double ratio = nodePresentation.getWidth() / nodePresentation.getHeight();
+        int newHeight = (int) Math.round(nodePresentation.getHeight() * 1.5);
+        
+        // Create input DTO
+        NodePresentationWithHeightDTO inputDTO = new NodePresentationWithHeightDTO(
+            nodePresentation.getID(),
+            newHeight);
+        
+        // Check width before setting
+        assertNotEquals(newHeight * ratio, nodePresentation.getWidth(), 0.1);
+        
+        // ----------------------------------------
+        // Call setNodePresentationHeight()
+        // ----------------------------------------
+        RectangleDTO outputDTO = TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+            setNodePresentationHeight,
+            tool,
+            inputDTO,
+            RectangleDTO.class);
+        
+        // Check output DTO
+        assertNotNull(outputDTO);
+        assertEquals(newHeight, outputDTO.height(), 0.1);
+        assertEquals(newHeight * ratio, outputDTO.width(), 0.1);
+        
+        // Check that the width follows the height by the same ratio
+        assertEquals(newHeight, nodePresentation.getHeight(), 0.1);
+        assertEquals(newHeight * ratio, nodePresentation.getWidth(), 0.1);
+    }
+    
+    @Test
+    void setNodePresentationWidth_ng_iconBelowMinimum() throws Exception {
+        // Get node presentation drawn as an icon
+        INodePresentation nodePresentation = createActorOnUseCaseDiagram();
+        Rectangle2D rectangleBefore = nodePresentation.getRectangle();
+        
+        // Create input DTO
+        NodePresentationWithWidthDTO inputDTO = new NodePresentationWithWidthDTO(
+            nodePresentation.getID(),
+            5);
+        
+        // ----------------------------------------
+        // Call setNodePresentationWidth()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setNodePresentationWidth,
+                tool,
+                inputDTO,
+                RectangleDTO.class);
+        });
+        
+        // Check that the exception says that the width and the height were to change together
+        assertInstanceOf(InvalidEditingException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("drawn as an icon"));
+        
+        // Check that the icon is left as it was
+        assertEquals(rectangleBefore, nodePresentation.getRectangle());
+    }
+    
+    @Test
+    void setNodePresentationWidth_ng_iconLifeline() throws Exception {
+        // Get lifeline drawn as an icon
+        INodePresentation lifeline = createActorLifelineOnSequenceDiagram();
+        assertEquals(Value.NOTATION_TYPE_ICON, lifeline.getProperty(Key.NOTATION_TYPE));
+        Rectangle2D rectangleBefore = lifeline.getRectangle();
+        
+        // Create input DTO
+        NodePresentationWithWidthDTO inputDTO = new NodePresentationWithWidthDTO(
+            lifeline.getID(),
+            200);
+        
+        // ----------------------------------------
+        // Call setNodePresentationWidth()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setNodePresentationWidth,
+                tool,
+                inputDTO,
+                RectangleDTO.class);
+        });
+        
+        // Check that the exception says why, and that the name does not need a wider icon
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("drawn as an icon"));
+        assertTrue(exception.getCause().getMessage().contains("outside its rectangle"));
+        
+        // Check that the icon is not stretched
+        assertEquals(rectangleBefore, lifeline.getRectangle());
+    }
+    
+    @Test
+    void setNodePresentationHeight_ng_iconLifeline() throws Exception {
+        // Get lifeline drawn as an icon
+        INodePresentation lifeline = createActorLifelineOnSequenceDiagram();
+        assertEquals(Value.NOTATION_TYPE_ICON, lifeline.getProperty(Key.NOTATION_TYPE));
+        Rectangle2D rectangleBefore = lifeline.getRectangle();
+        
+        // Create input DTO
+        NodePresentationWithHeightDTO inputDTO = new NodePresentationWithHeightDTO(
+            lifeline.getID(),
+            50);
+        
+        // ----------------------------------------
+        // Call setNodePresentationHeight()
+        // ----------------------------------------
+        Exception exception = assertThrows(Exception.class, () -> {
+            TestSupport.instance().invokeToolMethodReturningDtoAndContents(
+                setNodePresentationHeight,
+                tool,
+                inputDTO,
+                RectangleDTO.class);
+        });
+        
+        // Check that the exception says why
+        assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+        assertTrue(exception.getCause().getMessage().contains("drawn as an icon"));
+        
+        // Check that the icon is left as it was
+        assertEquals(rectangleBefore, lifeline.getRectangle());
+    }
+    
+    private INodePresentation createActorOnUseCaseDiagram() throws Exception {
+        UseCaseModelEditor useCaseModelEditor = projectAccessor.getModelEditorFactory().getUseCaseModelEditor();
+        UseCaseDiagramEditor useCaseDiagramEditor = projectAccessor.getDiagramEditorFactory().getUseCaseDiagramEditor();
+        return transactionSupport.call(() -> {
+            IClass actor = useCaseModelEditor.createActor(projectAccessor.getProject(), "Visitor");
+            IUseCaseDiagram diagram = useCaseDiagramEditor.createUseCaseDiagram(projectAccessor.getProject(), "IconTarget");
+            useCaseDiagramEditor.setDiagram(diagram);
+            return useCaseDiagramEditor.createNodePresentation(actor, new Point2D.Double(100, 100));
+        });
+    }
+    
+    private INodePresentation createActorLifelineOnSequenceDiagram() throws Exception {
+        UseCaseModelEditor useCaseModelEditor = projectAccessor.getModelEditorFactory().getUseCaseModelEditor();
+        SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+        return transactionSupport.call(() -> {
+            IClass actor = useCaseModelEditor.createActor(projectAccessor.getProject(), "Customer");
+            ISequenceDiagram diagram = sequenceDiagramEditor.createSequenceDiagram(projectAccessor.getProject(), "IconLifelineTarget");
+            sequenceDiagramEditor.setDiagram(diagram);
+            INodePresentation lifeline = sequenceDiagramEditor.createLifeline("customer", 50);
+            ((ILifeline) lifeline.getModel()).setBase(actor);
+            return lifeline;
+        });
+    }
+    
+    private INodePresentation createFrameOnSequenceDiagram() throws Exception {
+        SequenceDiagramEditor sequenceDiagramEditor = projectAccessor.getDiagramEditorFactory().getSequenceDiagramEditor();
+        ISequenceDiagram diagram = transactionSupport.call(() ->
+            sequenceDiagramEditor.createSequenceDiagram(projectAccessor.getProject(), "FrameTarget"));
+        INodePresentation frame = null;
+        for (IPresentation presentation : diagram.getPresentations()) {
+            if ("Frame".equals(presentation.getType())) {
+                frame = (INodePresentation) presentation;
+            }
+        }
+        assertNotNull(frame);
+        return frame;
     }
     
     @Test

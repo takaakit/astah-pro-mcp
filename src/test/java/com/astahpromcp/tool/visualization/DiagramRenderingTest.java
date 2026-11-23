@@ -13,6 +13,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Base64;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,13 +51,18 @@ public class DiagramRenderingTest {
         assertFalse(Boolean.TRUE.equals(result.isError()), () -> result.content().toString());
         assertEquals(2, result.content().size());
         McpSchema.TextContent note = assertInstanceOf(McpSchema.TextContent.class, result.content().get(0));
-        assertTrue(note.text().contains("% of its natural size"), note.text());
         
         McpSchema.ImageContent content = assertInstanceOf(McpSchema.ImageContent.class, result.content().get(1));
         try (ByteArrayInputStream input = new ByteArrayInputStream(Base64.getDecoder().decode(content.data()))) {
             BufferedImage image = ImageIO.read(input);
             assertTrue((long) image.getWidth() * image.getHeight() <= McpServerConfig.SVG_MAX_RASTER_PIXELS,
                     image.getWidth() + "x" + image.getHeight());
+            
+            // The note says by how much: the percentage of the natural size of about 9600 pixels the image came out at
+            Matcher percentage = Pattern.compile("(\\d+)%").matcher(note.text());
+            assertTrue(percentage.find(), note.text());
+            assertTrue(Math.abs(Integer.parseInt(percentage.group(1)) - 100.0 * image.getWidth() / 9600) <= 1,
+                    image.getWidth() + "x" + image.getHeight() + ": " + note.text());
         }
     }
     

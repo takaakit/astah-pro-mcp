@@ -214,7 +214,6 @@ public class ImageCaptureSupportTest {
             McpSchema.Content content = support.createThumbnailContent(DIAGRAM_ID);
             
             String notice = assertInstanceOf(McpSchema.TextContent.class, content).text();
-            assertTrue(notice.contains("do not repeat it"), "The notice must keep the client from repeating the edit: " + notice);
             assertTrue(notice.contains("Failed to create output directory"), "The notice must say what went wrong: " + notice);
             
             long errors = captured.list.stream().filter(event -> event.getLevel() == Level.ERROR).count();

@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -219,7 +220,8 @@ public class ProjectDiffJobsTest {
         
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> jobs.admit("", "c\nd"));
         
-        assertTrue(e.getMessage().contains("1 folders of earlier comparisons (40 bytes)"), e.getMessage());
+        // 1 folder waiting to be deleted, taking 40 bytes
+        assertTrue(numbersIn(e.getMessage()).containsAll(List.of(1, 40)), e.getMessage());
     }
     
     @Test
@@ -301,7 +303,7 @@ public class ProjectDiffJobsTest {
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> jobs.admit("", "c\nd"));
         
         assertSame(kept, jobs.find(kept.diffId()));
-        assertTrue(e.getMessage().contains("Try again at " + ProjectDiffJobs.format(expiresAt)), e.getMessage());
+        assertTrue(e.getMessage().contains(ProjectDiffJobs.format(expiresAt)), e.getMessage());
         assertTrue(jobs.shutdown());
     }
     
@@ -315,7 +317,7 @@ public class ProjectDiffJobsTest {
         
         assertSame(kept, jobs.find(kept.diffId()));
         Instant freedAt = kept.lastDeliveredAt().plus(McpServerConfig.PROJECT_DIFF_READ_GRACE_MINUTES, ChronoUnit.MINUTES);
-        assertTrue(e.getMessage().contains("Try again at " + ProjectDiffJobs.format(freedAt)), e.getMessage());
+        assertTrue(e.getMessage().contains(ProjectDiffJobs.format(freedAt)), e.getMessage());
         assertTrue(jobs.shutdown());
     }
     
@@ -556,5 +558,11 @@ public class ProjectDiffJobsTest {
 
         assertNotEquals(ProjectDiffJobs.inputKeyOf(base, null), ProjectDiffJobs.inputKeyOf(base, Path.of("/work/Target.asta")));
         assertEquals(ProjectDiffJobs.inputKeyOf(base, null), ProjectDiffJobs.inputKeyOf(base, null));
+    }
+    
+    private static List<Integer> numbersIn(String text) {
+        return Pattern.compile("\\d+").matcher(text).results()
+                .map(match -> Integer.parseInt(match.group()))
+                .toList();
     }
 }

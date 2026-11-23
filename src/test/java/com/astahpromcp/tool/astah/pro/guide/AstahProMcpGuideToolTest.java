@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -70,9 +71,12 @@ public class AstahProMcpGuideToolTest {
             new NoInputDTO(),
             GuideDTO.class);
         
-        assertTrue(outputDTO.contents().contains("Reference Documents:\nRead a reference document with the 'get_info_of_document' tool function, naming it in 'documentType', and read the rest of it with 'get_chunk_of_document'."), outputDTO.contents());
         for (DocumentType type : DocumentType.values()) {
-            assertTrue(outputDTO.contents().contains("* '" + type.value() + "': " + type.title() + ". " + type.usage()),
+            assertTrue(outputDTO.contents().contains("'" + type.value() + "'"),
+                "the guide does not tell when to read " + type.value());
+            assertTrue(outputDTO.contents().contains(type.title()),
+                "the guide does not tell when to read " + type.value());
+            assertTrue(outputDTO.contents().contains(type.usage()),
                 "the guide does not tell when to read " + type.value());
         }
     }

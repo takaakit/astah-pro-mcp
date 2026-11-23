@@ -32,13 +32,13 @@ public class ToolManifestTest {
     void load_ok_readsTheShippedManifest() {
         ToolManifest manifest = ToolManifest.load();
         
-        assertEquals(440, manifest.size(), "every tool definition the seven factories produce needs a row");
-        assertEquals(377, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
-        assertEquals(377, manifest.namesReachedOn(ToolManifest.Profile.DIRECT).size());
-        assertEquals(70, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
+        assertEquals(445, manifest.size(), "every tool definition the eight factories produce needs a row");
+        assertEquals(382, manifest.namesFor(ToolManifest.Profile.DIRECT).size());
+        assertEquals(382, manifest.namesReachedOn(ToolManifest.Profile.DIRECT).size());
+        assertEquals(75, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC).size());
         assertEquals(312, manifest.namesFor(ToolManifest.Profile.PROGRAMMATIC, ToolManifest.Reach.MCP_TOOL_SCRIPT).size());
-        // 382 = 70 published directly + 312 called from an mcp tool script
-        assertEquals(382, manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC).size());
+        // 387 = 75 published directly + 312 called from an mcp tool script
+        assertEquals(387, manifest.namesReachedOn(ToolManifest.Profile.PROGRAMMATIC).size());
     }
     
     @Test
@@ -58,8 +58,8 @@ public class ToolManifestTest {
             ToolManifest.Entry entry = manifest.find(name);
             assertEquals(entry.publishesTo(ToolManifest.Profile.PROGRAMMATIC), entry.reason() != null, name);
         }
-        // 70 = rows with programmatic = x
-        assertEquals(70, manifest.notMcpToolScriptCallableReasons().size());
+        // 75 = rows with programmatic = x
+        assertEquals(75, manifest.notMcpToolScriptCallableReasons().size());
     }
     
     @Test
@@ -114,15 +114,22 @@ public class ToolManifestTest {
     void parse_ng_rejectsAValueItsColumnDoesNotTake() {
         Exception sInDirect = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "s", "s")));
-        assertTrue(sInDirect.getMessage().contains("column 'direct' must be one of [x, -] but was 's'"), sInDirect.getMessage());
+        // The column, the values it takes and the value it was given
+        assertTrue(sInDirect.getMessage().contains("'direct'"), sInDirect.getMessage());
+        assertTrue(sInDirect.getMessage().contains("[x, -]"), sInDirect.getMessage());
+        assertTrue(sInDirect.getMessage().contains("'s'"), sInDirect.getMessage());
         
         Exception unknownInDirect = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "yes", "s")));
-        assertTrue(unknownInDirect.getMessage().contains("column 'direct' must be one of [x, -] but was 'yes'"), unknownInDirect.getMessage());
+        assertTrue(unknownInDirect.getMessage().contains("'direct'"), unknownInDirect.getMessage());
+        assertTrue(unknownInDirect.getMessage().contains("[x, -]"), unknownInDirect.getMessage());
+        assertTrue(unknownInDirect.getMessage().contains("'yes'"), unknownInDirect.getMessage());
         
         Exception unknownInProgrammatic = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "x", "y")));
-        assertTrue(unknownInProgrammatic.getMessage().contains("column 'programmatic' must be one of [x, s, -] but was 'y'"), unknownInProgrammatic.getMessage());
+        assertTrue(unknownInProgrammatic.getMessage().contains("'programmatic'"), unknownInProgrammatic.getMessage());
+        assertTrue(unknownInProgrammatic.getMessage().contains("[x, s, -]"), unknownInProgrammatic.getMessage());
+        assertTrue(unknownInProgrammatic.getMessage().contains("'y'"), unknownInProgrammatic.getMessage());
     }
     
     @Test
@@ -130,12 +137,12 @@ public class ToolManifestTest {
         Exception e = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "x", "-")));
         assertTrue(e.getMessage().contains("get_class_info"), e.getMessage());
-        assertTrue(e.getMessage().contains("column 'programmatic'"), e.getMessage());
+        assertTrue(e.getMessage().contains("'programmatic'"), e.getMessage());
         
         // The same row with a reason is told the same, because what it needs is a programmatic column that reaches it, whichever way
         Exception withAReason = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "x", "-", "direct")));
-        assertTrue(withAReason.getMessage().contains("column 'programmatic'"), withAReason.getMessage());
+        assertTrue(withAReason.getMessage().contains("'programmatic'"), withAReason.getMessage());
     }
     
     @Test
@@ -193,7 +200,7 @@ public class ToolManifestTest {
     void parse_ng_rejectsAnUnknownReason() {
         Exception e = assertThrows(IllegalStateException.class,
                 () -> parse(row("open_dgm", "x", "x", "drives_view")));
-        assertTrue(e.getMessage().contains("column 'reason'"), e.getMessage());
+        assertTrue(e.getMessage().contains("'reason'"), e.getMessage());
     }
     
     @Test
@@ -201,13 +208,13 @@ public class ToolManifestTest {
         Exception e = assertThrows(IllegalStateException.class,
                 () -> parse(row("open_dgm", "x", "x")));
         assertTrue(e.getMessage().contains("open_dgm"), e.getMessage());
-        assertTrue(e.getMessage().contains("column 'reason'"), e.getMessage());
+        assertTrue(e.getMessage().contains("'reason'"), e.getMessage());
         
         // Published on the programmatic profile only, as the tools that run mcp tool scripts are, it still needs one
         Exception onTheProgrammaticProfileOnly = assertThrows(IllegalStateException.class,
                 () -> parse(row("run_mcp_tool_script", "-", "x")));
         assertTrue(onTheProgrammaticProfileOnly.getMessage().contains("run_mcp_tool_script"), onTheProgrammaticProfileOnly.getMessage());
-        assertTrue(onTheProgrammaticProfileOnly.getMessage().contains("column 'reason'"), onTheProgrammaticProfileOnly.getMessage());
+        assertTrue(onTheProgrammaticProfileOnly.getMessage().contains("'reason'"), onTheProgrammaticProfileOnly.getMessage());
     }
     
     @Test
@@ -215,12 +222,12 @@ public class ToolManifestTest {
         Exception onTheDirectProfileAndFromAScript = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "x", "s", "direct")));
         assertTrue(onTheDirectProfileAndFromAScript.getMessage().contains("get_class_info"), onTheDirectProfileAndFromAScript.getMessage());
-        assertTrue(onTheDirectProfileAndFromAScript.getMessage().contains("column 'reason'"), onTheDirectProfileAndFromAScript.getMessage());
+        assertTrue(onTheDirectProfileAndFromAScript.getMessage().contains("'reason'"), onTheDirectProfileAndFromAScript.getMessage());
         
         Exception fromAScriptOnly = assertThrows(IllegalStateException.class,
                 () -> parse(row("get_class_info", "-", "s", "direct")));
         assertTrue(fromAScriptOnly.getMessage().contains("get_class_info"), fromAScriptOnly.getMessage());
-        assertTrue(fromAScriptOnly.getMessage().contains("column 'reason'"), fromAScriptOnly.getMessage());
+        assertTrue(fromAScriptOnly.getMessage().contains("'reason'"), fromAScriptOnly.getMessage());
         
         Exception reachedByNoProfile = assertThrows(IllegalStateException.class,
                 () -> parse(row("create_er_attr", "-", "-", "direct")));

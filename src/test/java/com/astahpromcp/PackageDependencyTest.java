@@ -61,6 +61,7 @@ public class PackageDependencyTest {
             new Module("tool/log", TOOL_MODULE_LAYER, true),
             new Module("tool/config", TOOL_MODULE_LAYER, true),
             new Module("tool/info", TOOL_MODULE_LAYER, true),
+            new Module("tool/scenario", TOOL_MODULE_LAYER, true),
             new Module("server", 3, true),
             new Module("ui", 3, true),
             // com.astahpromcp itself, which holds the entry points
