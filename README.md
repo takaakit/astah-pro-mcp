@@ -39,7 +39,7 @@ Prompts:
 
 ### Antigravity CLI
 
-**Gemini 4 Neon (high effort)** / Total time: **31.2 min**
+**Gemini 4 Carbon (high effort)** / Total time: **86.3 min**
 
 <table width="100%">
   <tr>
@@ -49,10 +49,10 @@ Prompts:
     <td width="25%" align="center"><b>IV</b></td>
   </tr>
   <tr>
-    <td width="25%"><a href="demo/antigravity-cli/VendingMachineStructure.png"><img src="demo/antigravity-cli/VendingMachineStructure.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/antigravity-cli/CashBeveragePurchase.png"><img src="demo/antigravity-cli/CashBeveragePurchase.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/antigravity-cli/RestockBeverages.png"><img src="demo/antigravity-cli/RestockBeverages.png" width="100%"></a></td>
-    <td width="25%"><a href="demo/antigravity-cli/VendingMachineStateMachine.png"><img src="demo/antigravity-cli/VendingMachineStateMachine.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/Beverage%20Vending%20Machine%20Structure.png"><img src="demo/antigravity-cli/Beverage%20Vending%20Machine%20Structure.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/Cash%20Beverage%20Purchase.png"><img src="demo/antigravity-cli/Cash%20Beverage%20Purchase.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/Beverage%20Restocking.png"><img src="demo/antigravity-cli/Beverage%20Restocking.png" width="100%"></a></td>
+    <td width="25%"><a href="demo/antigravity-cli/Vending%20Machine%20Operation.png"><img src="demo/antigravity-cli/Vending%20Machine%20Operation.png" width="100%"></a></td>
   </tr>
 </table>
 
